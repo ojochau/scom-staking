@@ -27054,7 +27054,6 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.stakingComponent = void 0;
-    const Theme = components_17.Styles.Theme.ThemeVars;
     const colorVar = {
         primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
         primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
@@ -27124,7 +27123,7 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
     exports.stakingComponent = components_17.Styles.style({
         $nest: {
             'i-label': {
-                fontFamily: 'Raleway Regular',
+                fontFamily: 'Montserrat Regular',
             },
             'span': {
                 letterSpacing: '0.15px',
@@ -27344,13 +27343,6 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
                     }
                 },
             },
-            'i-panel.container': {
-                width: Theme.layout.container.width,
-                maxWidth: Theme.layout.container.maxWidth,
-                overflow: Theme.layout.container.overflow,
-                textAlign: Theme.layout.container.textAlign,
-                margin: '0 auto'
-            },
             '.ml-auto': {
                 marginLeft: 'auto',
             },
@@ -27409,55 +27401,6 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
             },
         }
     });
-});
-define("@scom/scom-staking/scconfig.json.ts", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    ///<amd-module name='@scom/scom-staking/scconfig.json.ts'/> 
-    exports.default = {
-        "name": "@scom-staking/main",
-        "env": "mainnet",
-        "version": "0.1.0",
-        "moduleDir": "src",
-        "main": "@scom-staking/main",
-        "modules": {
-            "@scom-staking/main": {
-                "path": "main"
-            },
-            "@scom-staking/assets": {
-                "path": "assets"
-            },
-            "@scom-staking/global": {
-                "path": "global"
-            },
-            "@scom-staking/store": {
-                "path": "store"
-            },
-            "@scom-staking/common": {
-                "path": "common"
-            },
-            "@scom-staking/staking-utils": {
-                "path": "staking-utils"
-            },
-            "@scom-staking/manage-stake": {
-                "path": "manage-stake"
-            }
-        },
-        "dependencies": {
-            "@ijstech/eth-wallet-web3modal": "*",
-            "@ijstech/eth-contract": "*",
-            "@scom/oswap-openswap-contract": "*",
-            "@scom/oswap-chainlink-contract": "*",
-            "@scom/oswap-cross-chain-bridge-contract": "*",
-            "@scom/oswap-time-is-money-contract": "*",
-            "@scom/scom-binance-chain-wallet": "*",
-            "@scom/scom-bit-keep-wallet": "*",
-            "@scom/scom-coin98-wallet": "*",
-            "@scom/scom-frontier-wallet": "*",
-            "@scom/scom-onto-wallet": "*",
-            "@scom/scom-trust-wallet": "*"
-        }
-    };
 });
 define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/common/index.tsx", "@scom/scom-staking/manage-stake/index.tsx", "@scom/scom-staking/contracts/oswap-time-is-money-contract/index.ts", "@scom/scom-staking/index.css.ts"], function (require, exports, components_18, eth_wallet_17, assets_5, index_35, index_36, index_37, index_38, index_39, index_40, index_css_1) {
     "use strict";
@@ -28071,7 +28014,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         return stakingElms[optionIdx];
                     }));
                     nodeItems.push(containerSection);
-                    containerSection.appendChild(this.$render("i-hstack", { background: { color: colorCampaignBackground }, width: "100%", class: "container", height: index_36.maxHeight }, stakingsElm));
+                    containerSection.appendChild(this.$render("i-hstack", { background: { color: colorCampaignBackground }, width: "100%", height: index_36.maxHeight }, stakingsElm));
                 }
                 ;
                 this.stakingElm.clearInnerHTML();

@@ -915,7 +915,7 @@ export default class ScomStaking extends Module implements PageBlock {
 
 			nodeItems.push(containerSection);
 			containerSection.appendChild(
-				<i-hstack background={{ color: colorCampaignBackground }} width="100%" class="container" height={maxHeight}>
+				<i-hstack background={{ color: colorCampaignBackground }} width="100%" height={maxHeight}>
 					{stakingsElm}
 				</i-hstack>
 			)

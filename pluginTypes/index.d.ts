@@ -16529,54 +16529,6 @@ declare module "@scom/scom-staking/manage-stake/index.tsx" {
 declare module "@scom/scom-staking/index.css.ts" {
     export const stakingComponent: string;
 }
-/// <amd-module name="@scom/scom-staking/scconfig.json.ts" />
-declare module "@scom/scom-staking/scconfig.json.ts" {
-    const _default_78: {
-        name: string;
-        env: string;
-        version: string;
-        moduleDir: string;
-        main: string;
-        modules: {
-            "@scom-staking/main": {
-                path: string;
-            };
-            "@scom-staking/assets": {
-                path: string;
-            };
-            "@scom-staking/global": {
-                path: string;
-            };
-            "@scom-staking/store": {
-                path: string;
-            };
-            "@scom-staking/common": {
-                path: string;
-            };
-            "@scom-staking/staking-utils": {
-                path: string;
-            };
-            "@scom-staking/manage-stake": {
-                path: string;
-            };
-        };
-        dependencies: {
-            "@ijstech/eth-wallet-web3modal": string;
-            "@ijstech/eth-contract": string;
-            "@scom/oswap-openswap-contract": string;
-            "@scom/oswap-chainlink-contract": string;
-            "@scom/oswap-cross-chain-bridge-contract": string;
-            "@scom/oswap-time-is-money-contract": string;
-            "@scom/scom-binance-chain-wallet": string;
-            "@scom/scom-bit-keep-wallet": string;
-            "@scom/scom-coin98-wallet": string;
-            "@scom/scom-frontier-wallet": string;
-            "@scom/scom-onto-wallet": string;
-            "@scom/scom-trust-wallet": string;
-        };
-    };
-    export default _default_78;
-}
 /// <amd-module name="@scom/scom-staking" />
 declare module "@scom/scom-staking" {
     import { Module, Container, ControlElement, IDataSchema } from '@ijstech/components';
