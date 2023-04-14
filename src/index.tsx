@@ -29,7 +29,7 @@ import { Result } from './common/index';
 import { ManageStake } from './manage-stake/index';
 import { Contracts } from './contracts/oswap-time-is-money-contract/index';
 import { stakingComponent } from './index.css';
-import StakingConfig from './comissions/index';
+import StakingConfig from './commissions/index';
 
 interface ScomStakingElement extends ControlElement {
 	data?: ISingleStakingCampaign;
@@ -983,7 +983,7 @@ export default class ScomStaking extends Module implements PageBlock {
 	render() {
 		return (
 			<i-panel id="stakingComponent" class={stakingComponent} minHeight={200}>
-				<i-panel id="stakingLayout" class="staking-layout" width={maxWidth} height={maxHeight}>
+				<i-panel id="stakingLayout" class="staking-layout" width={maxWidth} height={maxHeight} margin={{ top: '1rem', bottom: '1rem', left: 'auto', right: 'auto' }}>
 					<i-vstack id="loadingElm" class="i-loading-overlay">
 						<i-vstack class="i-loading-spinner" horizontalAlignment="center" verticalAlignment="center">
 							<i-icon

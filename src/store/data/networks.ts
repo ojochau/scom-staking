@@ -31,7 +31,7 @@ const Networks: { [key: number]: INetwork } = {
   },
   25: {
     chainId: ChainNetwork.CronosMainnet,
-    name: "Cronos",
+    name: "Cronos Mainnet",
     value: "Cronos",
     label: "Cronos Mainnet",
     icon: "cronosMainnet.svg", //notadded,
@@ -39,7 +39,7 @@ const Networks: { [key: number]: INetwork } = {
   },
   56: {
     chainId: ChainNetwork.BSCMainnet,
-    name: "Binance",
+    name: "Binance Smart Chain",
     value: "Binance",
     label: "Binance Smart Chain",
     icon: "bscMainnet.svg",
@@ -53,11 +53,12 @@ const Networks: { [key: number]: INetwork } = {
     value: 'Polygon',
     chainId: ChainNetwork.Polygon,
     icon: 'polygon.svg',
-    explorerName: 'PolygonScan'
+    explorerName: 'PolygonScan',
+    isDisabled: true
   },
   250: {
     label: 'Fantom Opera',
-    name: 'Fantom',
+    name: 'Fantom Opera',
     value: 'Fantom',
     chainId: ChainNetwork.Fantom,
     icon: 'fantom-ftm-logo.svg',
@@ -84,7 +85,7 @@ const Networks: { [key: number]: INetwork } = {
   },
   31337: {
     chainId: ChainNetwork.AminoTestnet,
-    name: "Amino",
+    name: 'Amino',
     label: 'Amino Testnet',
     value: 'AminoTestnet',
     icon: 'animoTestnet.svg',
@@ -102,7 +103,7 @@ const Networks: { [key: number]: INetwork } = {
   },
   43113: {
     chainId: ChainNetwork.Fuji,
-    name: "Fuji",
+    name: "Avalanche FUJI C-Chain",
     label: 'Avalanche FUJI C-Chain',
     value: 'Fuji',
     icon: 'avax.svg',
@@ -111,7 +112,7 @@ const Networks: { [key: number]: INetwork } = {
   },
   43114: {
     chainId: ChainNetwork.Avalanche,
-    name: "Avalanche",
+    name: 'Avalanche Mainnet C-Chain',
     label: 'Avalanche Mainnet C-Chain',
     value: 'Avalanche',
     icon: 'avax.svg',
@@ -121,7 +122,7 @@ const Networks: { [key: number]: INetwork } = {
   },
   4002: {
     chainId: ChainNetwork.FantomTestnet,
-    name: "Fantom Testnet",
+    name: 'Fantom Testnet',
     label: 'Fantom Testnet',
     value: 'FantomTestnet',
     icon: 'fantom-ftm-logo.svg',

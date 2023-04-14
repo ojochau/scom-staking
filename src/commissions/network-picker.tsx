@@ -8,7 +8,6 @@ import {
   Modal,
   GridLayout,
   HStack,
-  application,
   Panel,
   Container,
   Control
@@ -83,9 +82,7 @@ export default class ScomNetworkPicker extends Module {
 
   private setNetwork(network: INetwork) {
     this._selectedNetwork = network;
-    const img = this._selectedNetwork?.icon
-      ? Assets.fullPath(`img/network/${this._selectedNetwork.icon}`)
-      : undefined
+    const img = this._selectedNetwork.icon ? Assets.fullPath(`img/network/${this._selectedNetwork.icon}`) : undefined
     if (this.btnNetwork) {
       this.btnNetwork.caption = `<i-hstack verticalAlignment="center" gap="1.125rem">
         <i-panel>

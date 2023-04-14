@@ -16254,7 +16254,7 @@ define("@scom/scom-staking/store/data/networks.ts", ["require", "exports"], func
         },
         25: {
             chainId: ChainNetwork.CronosMainnet,
-            name: "Cronos",
+            name: "Cronos Mainnet",
             value: "Cronos",
             label: "Cronos Mainnet",
             icon: "cronosMainnet.svg",
@@ -16262,7 +16262,7 @@ define("@scom/scom-staking/store/data/networks.ts", ["require", "exports"], func
         },
         56: {
             chainId: ChainNetwork.BSCMainnet,
-            name: "Binance",
+            name: "Binance Smart Chain",
             value: "Binance",
             label: "Binance Smart Chain",
             icon: "bscMainnet.svg",
@@ -16276,11 +16276,12 @@ define("@scom/scom-staking/store/data/networks.ts", ["require", "exports"], func
             value: 'Polygon',
             chainId: ChainNetwork.Polygon,
             icon: 'polygon.svg',
-            explorerName: 'PolygonScan'
+            explorerName: 'PolygonScan',
+            isDisabled: true
         },
         250: {
             label: 'Fantom Opera',
-            name: 'Fantom',
+            name: 'Fantom Opera',
             value: 'Fantom',
             chainId: ChainNetwork.Fantom,
             icon: 'fantom-ftm-logo.svg',
@@ -16307,7 +16308,7 @@ define("@scom/scom-staking/store/data/networks.ts", ["require", "exports"], func
         },
         31337: {
             chainId: ChainNetwork.AminoTestnet,
-            name: "Amino",
+            name: 'Amino',
             label: 'Amino Testnet',
             value: 'AminoTestnet',
             icon: 'animoTestnet.svg',
@@ -16325,7 +16326,7 @@ define("@scom/scom-staking/store/data/networks.ts", ["require", "exports"], func
         },
         43113: {
             chainId: ChainNetwork.Fuji,
-            name: "Fuji",
+            name: "Avalanche FUJI C-Chain",
             label: 'Avalanche FUJI C-Chain',
             value: 'Fuji',
             icon: 'avax.svg',
@@ -16334,7 +16335,7 @@ define("@scom/scom-staking/store/data/networks.ts", ["require", "exports"], func
         },
         43114: {
             chainId: ChainNetwork.Avalanche,
-            name: "Avalanche",
+            name: 'Avalanche Mainnet C-Chain',
             label: 'Avalanche Mainnet C-Chain',
             value: 'Avalanche',
             icon: 'avax.svg',
@@ -16344,7 +16345,7 @@ define("@scom/scom-staking/store/data/networks.ts", ["require", "exports"], func
         },
         4002: {
             chainId: ChainNetwork.FantomTestnet,
-            name: "Fantom Testnet",
+            name: 'Fantom Testnet',
             label: 'Fantom Testnet',
             value: 'FantomTestnet',
             icon: 'fantom-ftm-logo.svg',
@@ -27393,7 +27394,7 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
         }
     });
 });
-define("@scom/scom-staking/comissions/network-picker.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_18) {
+define("@scom/scom-staking/commissions/network-picker.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_18) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_18.Styles.Theme.ThemeVars;
@@ -27487,7 +27488,7 @@ define("@scom/scom-staking/comissions/network-picker.css.ts", ["require", "expor
         }
     });
 });
-define("@scom/scom-staking/comissions/network-picker.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-staking/store/index.ts", "@scom/scom-staking/assets.ts", "@scom/scom-staking/comissions/network-picker.css.ts"], function (require, exports, components_19, index_36, assets_5, network_picker_css_1) {
+define("@scom/scom-staking/commissions/network-picker.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-staking/store/index.ts", "@scom/scom-staking/assets.ts", "@scom/scom-staking/commissions/network-picker.css.ts"], function (require, exports, components_19, index_36, assets_5, network_picker_css_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_19.Styles.Theme.ThemeVars;
@@ -27522,20 +27523,18 @@ define("@scom/scom-staking/comissions/network-picker.tsx", ["require", "exports"
             this._onCustomNetworkSelected && this._onCustomNetworkSelected(network);
         }
         setNetwork(network) {
-            var _a, _b, _c, _d;
+            var _a, _b, _c;
             this._selectedNetwork = network;
-            const img = ((_a = this._selectedNetwork) === null || _a === void 0 ? void 0 : _a.icon)
-                ? assets_5.default.fullPath(`img/network/${this._selectedNetwork.icon}`)
-                : undefined;
+            const img = this._selectedNetwork.icon ? assets_5.default.fullPath(`img/network/${this._selectedNetwork.icon}`) : undefined;
             if (this.btnNetwork) {
                 this.btnNetwork.caption = `<i-hstack verticalAlignment="center" gap="1.125rem">
         <i-panel>
           <i-image width=${17} height=${17} url="${img}"></i-image>
         </i-panel>
-        <i-label caption="${(_c = (_b = this._selectedNetwork) === null || _b === void 0 ? void 0 : _b.name) !== null && _c !== void 0 ? _c : ''}"></i-label>
+        <i-label caption="${(_b = (_a = this._selectedNetwork) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : ''}"></i-label>
       </i-hstack>`;
             }
-            (_d = this.networkMapper) === null || _d === void 0 ? void 0 : _d.forEach((value, key) => {
+            (_c = this.networkMapper) === null || _c === void 0 ? void 0 : _c.forEach((value, key) => {
                 var _a;
                 const chainId = (_a = this._selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId;
                 if (key === chainId) {
@@ -27645,10 +27644,48 @@ define("@scom/scom-staking/comissions/network-picker.tsx", ["require", "exports"
     ], ScomNetworkPicker);
     exports.default = ScomNetworkPicker;
 });
-define("@scom/scom-staking/comissions/index.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@ijstech/eth-contract"], function (require, exports, components_20, index_37, index_38, eth_contract_78) {
+define("@scom/scom-staking/commissions/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_20) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    let StakingConfig = class StakingConfig extends components_20.Module {
+    exports.tableStyle = exports.customStyle = void 0;
+    const Theme = components_20.Styles.Theme.ThemeVars;
+    exports.customStyle = components_20.Styles.style({
+        $nest: {
+            'input': {
+                paddingLeft: '10px'
+            },
+            '.staking-network-select': {
+                $nest: {
+                    '.os-modal .modal': {
+                        background: Theme.combobox.background
+                    },
+                    '.modal > i-panel': {
+                        borderRadius: 8
+                    },
+                    'i-label': {
+                        fontSize: '1rem !important'
+                    },
+                    '.list-item': {
+                        padding: '0.5rem 1rem !important'
+                    }
+                }
+            }
+        }
+    });
+    exports.tableStyle = components_20.Styles.style({
+        $nest: {
+            '.i-table-header>tr>th': {
+                fontSize: '0.875rem !important',
+                opacity: 0.6
+            }
+        }
+    });
+});
+define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/store/index.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/commissions/index.css.ts", "@scom/scom-staking/assets.ts"], function (require, exports, components_21, eth_wallet_17, index_37, index_38, index_css_1, assets_6) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const Theme = components_21.Styles.Theme.ThemeVars;
+    let StakingConfig = class StakingConfig extends components_21.Module {
         constructor() {
             super(...arguments);
             this.commissionsTableColumns = [
@@ -27656,14 +27693,43 @@ define("@scom/scom-staking/comissions/index.tsx", ["require", "exports", "@ijste
                     title: 'Network',
                     fieldName: 'chainId',
                     key: 'chainId',
+                    textAlign: 'left',
                     onRenderCell: function (source, columnData, rowData) {
-                        return index_38.getNetworkName(columnData);
+                        const network = index_37.SupportedNetworks.find(net => net.chainId === columnData);
+                        if (!network)
+                            return this.$render("i-panel", null);
+                        const networkInfo = index_37.getNetworkInfo(network.chainId);
+                        const imgUrl = networkInfo.icon ? assets_6.default.fullPath(`img/network/${networkInfo.icon}`) : '';
+                        const hstack = new components_21.HStack(undefined, {
+                            verticalAlignment: 'center',
+                            gap: 5
+                        });
+                        const imgEl = new components_21.Icon(hstack, {
+                            image: { url: imgUrl, width: 16, height: 16 }
+                        });
+                        const lbName = new components_21.Label(hstack, {
+                            caption: networkInfo.name || '',
+                            font: { size: '0.875rem' }
+                        });
+                        hstack.append(imgEl, lbName);
+                        return hstack;
                     }
                 },
                 {
-                    title: 'Wallet Address',
+                    title: 'Wallet',
                     fieldName: 'walletAddress',
-                    key: 'walletAddress'
+                    key: 'walletAddress',
+                    onRenderCell: function (source, columnData, rowData) {
+                        const replaced = columnData.slice(6, columnData.length - 9);
+                        const caption = ((columnData === null || columnData === void 0 ? void 0 : columnData.length) < 15) ? columnData : columnData.replace(replaced, '...');
+                        return new components_21.Label(undefined, {
+                            caption: caption || '',
+                            font: { size: '0.875rem' },
+                            tooltip: {
+                                content: columnData
+                            }
+                        });
+                    }
                 },
                 {
                     title: '',
@@ -27671,18 +27737,18 @@ define("@scom/scom-staking/comissions/index.tsx", ["require", "exports", "@ijste
                     key: '',
                     textAlign: 'center',
                     onRenderCell: async (source, data, rowData) => {
-                        const icon = new components_20.Icon(undefined, {
+                        const icon = new components_21.Icon(undefined, {
                             name: "edit",
-                            fill: "#03a9f4",
-                            height: 18,
-                            width: 18
+                            fill: Theme.text.primary,
+                            height: 14,
+                            width: 14
                         });
-                        icon.classList.add('pointer');
                         icon.onClick = async (source) => {
                             this.networkPicker.setNetworkByChainId(rowData.chainId);
                             this.inputWalletAddress.value = rowData.walletAddress;
                             this.modalAddCommission.visible = true;
                         };
+                        icon.classList.add('pointer');
                         return icon;
                     }
                 },
@@ -27692,18 +27758,18 @@ define("@scom/scom-staking/comissions/index.tsx", ["require", "exports", "@ijste
                     key: '',
                     textAlign: 'center',
                     onRenderCell: async (source, data, rowData) => {
-                        const icon = new components_20.Icon(undefined, {
+                        const icon = new components_21.Icon(undefined, {
                             name: "times",
-                            fill: "#ed5748",
-                            height: 18,
-                            width: 18
+                            fill: Theme.colors.primary.main,
+                            height: 14,
+                            width: 14
                         });
-                        icon.classList.add('pointer');
                         icon.onClick = async (source) => {
                             const index = this.commissionInfoList.findIndex(v => v.walletAddress == rowData.walletAddress && v.chainId == rowData.chainId);
                             if (index >= 0) {
                                 this.commissionInfoList.splice(index, 1);
                                 this.tableCommissions.data = this.commissionInfoList;
+                                this.toggleVisible();
                                 if (this._onCustomCommissionsChanged) {
                                     await this._onCustomCommissionsChanged({
                                         commissions: this.commissionInfoList
@@ -27711,6 +27777,7 @@ define("@scom/scom-staking/comissions/index.tsx", ["require", "exports", "@ijste
                                 }
                             }
                         };
+                        icon.classList.add('pointer');
                         return icon;
                     }
                 }
@@ -27719,8 +27786,8 @@ define("@scom/scom-staking/comissions/index.tsx", ["require", "exports", "@ijste
         async init() {
             super.init();
             this.commissionInfoList = [];
-            const embedderFee = index_38.getEmbedderCommissionFee();
-            this.lbCommissionShare.caption = `${index_37.formatNumber(new eth_contract_78.BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
+            const embedderFee = index_37.getEmbedderCommissionFee();
+            this.lbCommissionShare.caption = `${index_38.formatNumber(new eth_wallet_17.BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
         }
         get data() {
             const config = {};
@@ -27729,6 +27796,7 @@ define("@scom/scom-staking/comissions/index.tsx", ["require", "exports", "@ijste
         }
         set data(config) {
             this.tableCommissions.data = config.commissions || [];
+            this.toggleVisible();
         }
         get onCustomCommissionsChanged() {
             return this._onCustomCommissionsChanged;
@@ -27746,13 +27814,14 @@ define("@scom/scom-staking/comissions/index.tsx", ["require", "exports", "@ijste
         }
         async onConfirmCommissionClicked() {
             var _a;
-            const embedderFee = index_38.getEmbedderCommissionFee();
+            const embedderFee = index_37.getEmbedderCommissionFee();
             this.commissionInfoList.push({
                 chainId: (_a = this.networkPicker.selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId,
                 walletAddress: this.inputWalletAddress.value,
                 share: embedderFee
             });
             this.tableCommissions.data = this.commissionInfoList;
+            this.toggleVisible();
             this.modalAddCommission.visible = false;
             if (this._onCustomCommissionsChanged) {
                 await this._onCustomCommissionsChanged({
@@ -27770,7 +27839,7 @@ define("@scom/scom-staking/comissions/index.tsx", ["require", "exports", "@ijste
             else if (!this.inputWalletAddress.value) {
                 this.lbErrMsg.caption = 'Please enter wallet address';
             }
-            else if (!index_37.isWalletAddress(this.inputWalletAddress.value)) {
+            else if (!index_38.isWalletAddress(this.inputWalletAddress.value)) {
                 this.lbErrMsg.caption = 'Please enter valid wallet address';
             }
             else {
@@ -27791,14 +27860,27 @@ define("@scom/scom-staking/comissions/index.tsx", ["require", "exports", "@ijste
         onInputWalletAddressChanged() {
             this.validateModalFields();
         }
+        toggleVisible() {
+            var _a, _b;
+            const hasData = !!((_b = (_a = this.tableCommissions) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.length);
+            this.tableCommissions.visible = hasData;
+            this.pnlEmptyWallet.visible = !hasData;
+            this.btnAddWallet.visible = hasData;
+        }
         render() {
-            return (this.$render("i-vstack", { gap: '0.5rem', padding: { top: '1rem', bottom: '1rem', left: '1rem', right: '1rem' } },
-                this.$render("i-hstack", { gap: 4, verticalAlignment: "center", horizontalAlignment: "space-between" },
-                    this.$render("i-hstack", { gap: "1rem" },
-                        this.$render("i-label", { caption: "Commission Fee:", font: { bold: true } }),
-                        this.$render("i-label", { id: "lbCommissionShare", font: { bold: true } })),
-                    this.$render("i-button", { caption: "Add", background: { color: '#03a9f4' }, font: { color: '#fff' }, padding: { top: '0.4rem', bottom: '0.4rem', left: '2rem', right: '2rem' }, onClick: this.onAddCommissionClicked.bind(this) })),
-                this.$render("i-table", { id: 'tableCommissions', data: this.commissionInfoList, columns: this.commissionsTableColumns }),
+            return (this.$render("i-vstack", { gap: '0.5rem', padding: { top: '1rem', bottom: '1rem' }, class: index_css_1.customStyle },
+                this.$render("i-vstack", { gap: "5px" },
+                    this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", gap: "4px" },
+                        this.$render("i-hstack", { gap: "4px" },
+                            this.$render("i-label", { caption: "Commission Fee: ", opacity: 0.6, font: { size: '1rem' } }),
+                            this.$render("i-label", { id: "lbCommissionShare", font: { size: '1rem' } }),
+                            this.$render("i-icon", { name: "question-circle", fill: Theme.background.modal, width: 20, height: 20 })),
+                        this.$render("i-button", { id: "btnAddWallet", caption: "Add Wallet", border: { radius: '58px' }, padding: { top: '0.3rem', bottom: '0.3rem', left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText, size: '0.75rem', weight: 400 }, visible: false, onClick: this.onAddCommissionClicked.bind(this) })),
+                    this.$render("i-vstack", { id: "pnlEmptyWallet", border: { radius: '8px' }, background: { color: Theme.background.modal }, padding: { top: '1.875rem', bottom: '1.875rem', left: '1.563rem', right: '1.563rem' }, gap: "1.25rem", width: "100%", class: "text-center" },
+                        this.$render("i-label", { caption: "To receive commission fee please add your wallet address", font: { size: '1rem' } }),
+                        this.$render("i-panel", null,
+                            this.$render("i-button", { caption: "Add Wallet", border: { radius: '58px' }, padding: { top: '0.75rem', bottom: '0.75rem', left: '2.5rem', right: '2.5rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText, size: '0.875rem', weight: 400 }, onClick: this.onAddCommissionClicked.bind(this) })))),
+                this.$render("i-table", { id: 'tableCommissions', visible: false, data: this.commissionInfoList, columns: this.commissionsTableColumns, class: index_css_1.tableStyle }),
                 this.$render("i-modal", { id: 'modalAddCommission', maxWidth: '600px', closeIcon: { name: 'times-circle' }, onClose: this.onModalAddCommissionClosed },
                     this.$render("i-grid-layout", { width: '100%', verticalAlignment: 'center', gap: { row: '1rem' }, padding: { top: '1rem', bottom: '1rem', left: '2rem', right: '2rem' }, templateColumns: ['1fr', '3fr'], templateRows: ['auto', 'auto', 'auto', 'auto'], templateAreas: [
                             ['title', 'title'],
@@ -27807,27 +27889,27 @@ define("@scom/scom-staking/comissions/index.tsx", ["require", "exports", "@ijste
                             ["lbErrMsg", "errMsg"],
                             ['btnConfirm', 'btnConfirm']
                         ] },
-                        this.$render("i-hstack", { width: '100%', horizontalAlignment: 'center', grid: { area: 'title' } },
-                            this.$render("i-label", { caption: "Add Commission" })),
-                        this.$render("i-label", { caption: "Network", grid: { area: 'lbNetwork' } }),
-                        this.$render("i-scom-staking-network-picker", { id: 'networkPicker', grid: { area: 'network' }, networks: index_38.SupportedNetworks, onCustomNetworkSelected: this.onNetworkSelected }),
-                        this.$render("i-label", { caption: "Wallet Address", grid: { area: 'lbWalletAddress' } }),
-                        this.$render("i-input", { id: 'inputWalletAddress', grid: { area: 'walletAddress' }, width: '100%', onChanged: this.onInputWalletAddressChanged }),
+                        this.$render("i-hstack", { width: '100%', horizontalAlignment: 'center', grid: { area: 'title' }, margin: { bottom: '1.5rem' } },
+                            this.$render("i-label", { caption: "Add Wallet", font: { size: '1.5rem' } })),
+                        this.$render("i-label", { caption: "Network", grid: { area: 'lbNetwork' }, font: { size: '1rem' } }),
+                        this.$render("i-scom-staking-network-picker", { id: 'networkPicker', grid: { area: 'network' }, display: "block", networks: index_37.SupportedNetworks, background: { color: Theme.combobox.background }, border: { radius: 8, width: '1px', style: 'solid', color: Theme.input.background }, onCustomNetworkSelected: this.onNetworkSelected, class: "staking-network-select" }),
+                        this.$render("i-label", { caption: "Wallet Address", grid: { area: 'lbWalletAddress' }, font: { size: '1rem' } }),
+                        this.$render("i-input", { id: 'inputWalletAddress', grid: { area: 'walletAddress' }, width: '100%', height: 45, border: { radius: 8, width: '1px', style: 'solid', color: Theme.divider }, onChanged: this.onInputWalletAddressChanged }),
                         this.$render("i-label", { id: 'lbErrMsg', font: { color: '#ed5748' }, grid: { area: 'errMsg' } }),
-                        this.$render("i-hstack", { width: '100%', horizontalAlignment: 'center', grid: { area: 'btnConfirm' } },
-                            this.$render("i-button", { id: "btnConfirm", enabled: false, caption: "Confirm", background: { color: '#03a9f4' }, font: { color: '#fff' }, padding: { top: '0.4rem', bottom: '0.4rem', left: '2rem', right: '2rem' }, onClick: this.onConfirmCommissionClicked.bind(this) }))))));
+                        this.$render("i-hstack", { width: '100%', horizontalAlignment: 'center', grid: { area: 'btnConfirm' }, margin: { top: '1.25rem' } },
+                            this.$render("i-button", { id: "btnConfirm", enabled: false, caption: "Add Wallet", border: { radius: '58px' }, padding: { top: '0.75rem', bottom: '0.75rem', left: '2.5rem', right: '2.5rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText, size: '0.875rem', weight: 400 }, onClick: this.onConfirmCommissionClicked.bind(this) }))))));
         }
     };
     StakingConfig = __decorate([
-        components_20.customModule,
-        components_20.customElements("i-scom-staking-config")
+        components_21.customModule,
+        components_21.customElements("i-scom-staking-config")
     ], StakingConfig);
     exports.default = StakingConfig;
 });
-define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/common/index.tsx", "@scom/scom-staking/manage-stake/index.tsx", "@scom/scom-staking/contracts/oswap-time-is-money-contract/index.ts", "@scom/scom-staking/index.css.ts"], function (require, exports, components_21, eth_wallet_17, assets_6, index_39, index_40, index_41, index_42, index_43, index_44, index_css_1) {
+define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/common/index.tsx", "@scom/scom-staking/manage-stake/index.tsx", "@scom/scom-staking/contracts/oswap-time-is-money-contract/index.ts", "@scom/scom-staking/index.css.ts"], function (require, exports, components_22, eth_wallet_18, assets_7, index_39, index_40, index_41, index_42, index_43, index_44, index_css_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    let ScomStaking = class ScomStaking extends components_21.Module {
+    let ScomStaking = class ScomStaking extends components_22.Module {
         // private convertCampaignData(data: ISingleStakingCampaign) {
         // 	if (data) {
         // 		const hourVal = 60 * 60;
@@ -27890,7 +27972,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 var _a;
                 if (this._data && isConnected) {
                     try {
-                        const wallet = eth_wallet_17.Wallet.getClientInstance();
+                        const wallet = eth_wallet_18.Wallet.getClientInstance();
                         const infoList = this._data[wallet.chainId];
                         const stakingAddress = infoList && ((_a = infoList[0].stakings[0]) === null || _a === void 0 ? void 0 : _a.address);
                         if (stakingAddress) {
@@ -28049,13 +28131,13 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             };
             this.initEmptyUI = async () => {
                 if (!this.noCampaignSection) {
-                    this.noCampaignSection = await components_21.Panel.create({ height: '100%' });
+                    this.noCampaignSection = await components_22.Panel.create({ height: '100%' });
                 }
                 const isConnected = index_40.isWalletConnected();
                 this.noCampaignSection.clearInnerHTML();
                 this.noCampaignSection.appendChild(this.$render("i-panel", { class: "no-campaign", height: "100%", background: { color: '#192046' } },
                     this.$render("i-vstack", { gap: 10, verticalAlignment: "center" },
-                        this.$render("i-image", { url: assets_6.default.fullPath('img/staking/TrollTrooper.svg') }),
+                        this.$render("i-image", { url: assets_7.default.fullPath('img/staking/TrollTrooper.svg') }),
                         this.$render("i-label", { font: { color: '#FFFFFF' }, caption: isConnected ? 'No Campaigns' : 'Please connect with your wallet!' }),
                         !isConnected ? this.$render("i-button", { maxWidth: 220, caption: "Connect Wallet", class: "btn-os btn-stake", margin: { left: 'auto', right: 'auto', bottom: 0 }, font: { size: '14px' }, onClick: this.connectWallet }) : [])));
                 this.noCampaignSection.visible = true;
@@ -28097,7 +28179,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     const colorButton = index_40.isThemeApplied ? _tag.customColorButton : undefined;
                     const colorText = index_40.isThemeApplied ? _tag.customColorText || '#fff' : '#fff';
                     const colorTimeBackground = index_40.isThemeApplied ? _tag.customColorTimeBackground || '#F15E61' : '#F15E61';
-                    const containerSection = await components_21.Panel.create();
+                    const containerSection = await components_22.Panel.create();
                     containerSection.id = `campaign-${idx}`;
                     containerSection.classList.add('container');
                     const options = campaign.options;
@@ -28132,8 +28214,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     const defaultDecimalsOffset = 18 - lockedTokenDecimals;
                     const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
                     const activeEndTime = stakingInfo ? stakingInfo.endOfEntryPeriod : 0;
-                    let isStarted = components_21.moment(activeStartTime).diff(components_21.moment()) <= 0;
-                    let isClosed = components_21.moment(activeEndTime).diff(components_21.moment()) <= 0;
+                    let isStarted = components_22.moment(activeStartTime).diff(components_22.moment()) <= 0;
+                    let isClosed = components_22.moment(activeEndTime).diff(components_22.moment()) <= 0;
                     let totalLocked = {};
                     const stakingElms = [];
                     const optionTimer = { background: { color: colorTimeBackground }, font: { color: colorText } };
@@ -28146,14 +28228,14 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     const stickerLabels = [];
                     const stickerIcons = [];
                     for (let i = 0; i < options.length; i++) {
-                        stakingElms[i] = await components_21.VStack.create({ visible: i === 0 });
-                        activeTimerRows[i] = await components_21.VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
-                        activeTimerElms[i] = await components_21.VStack.create();
+                        stakingElms[i] = await components_22.VStack.create({ visible: i === 0 });
+                        activeTimerRows[i] = await components_22.VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
+                        activeTimerElms[i] = await components_22.VStack.create();
                         activeTimerRows[i].appendChild(this.$render("i-label", { caption: "End Date", font: { size: '14px', color: colorText }, class: "opacity-50" }));
                         activeTimerRows[i].appendChild(activeTimerElms[i]);
-                        endHours[i] = await components_21.Label.create(optionTimer);
-                        endDays[i] = await components_21.Label.create(optionTimer);
-                        endMins[i] = await components_21.Label.create(optionTimer);
+                        endHours[i] = await components_22.Label.create(optionTimer);
+                        endDays[i] = await components_22.Label.create(optionTimer);
+                        endMins[i] = await components_22.Label.create(optionTimer);
                         endHours[i].classList.add('timer-value');
                         endDays[i].classList.add('timer-value');
                         endMins[i].classList.add('timer-value');
@@ -28165,9 +28247,9 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             endMins[i],
                             this.$render("i-label", { caption: "M", class: "timer-unit", font: { color: colorText } })));
                         // Sticker
-                        stickerSections[i] = await components_21.Panel.create({ visible: false });
-                        stickerLabels[i] = await components_21.Label.create();
-                        stickerIcons[i] = await components_21.Icon.create();
+                        stickerSections[i] = await components_22.Panel.create({ visible: false });
+                        stickerLabels[i] = await components_22.Label.create();
+                        stickerIcons[i] = await components_22.Icon.create();
                         stickerSections[i].classList.add('sticker');
                         stickerSections[i].appendChild(this.$render("i-vstack", { class: "sticker-text" },
                             stickerIcons[i],
@@ -28186,7 +28268,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         for (const o of options) {
                             const _totalLocked = await index_41.getStakingTotalLocked(o.address);
                             totalLocked[o.address] = _totalLocked;
-                            const optionQty = new eth_wallet_17.BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
+                            const optionQty = new eth_wallet_18.BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
                             if (o.mode === 'Stake') {
                                 const keyStake = `#btn-stake-${o.address}`;
                                 const btnStake = this.querySelector(keyStake);
@@ -28196,7 +28278,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                                     const inputElm = this.querySelector(`#input-${o.address}`);
                                     if (inputElm) {
                                         const manageStake = this.querySelector(`#manage-stake-${o.address}`);
-                                        const inputVal = new eth_wallet_17.BigNumber(inputElm.value || 0);
+                                        const inputVal = new eth_wallet_18.BigNumber(inputElm.value || 0);
                                         isValidInput = inputVal.gt(0) && inputVal.lte(manageStake.getBalance()) && !(manageStake === null || manageStake === void 0 ? void 0 : manageStake.needToBeApproval());
                                     }
                                     btnStake.enabled = !isStaking && isValidInput && (isStarted && !(optionQty.lte(0) || isClosed));
@@ -28240,8 +28322,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         ;
                     };
                     const setEndRemainingTime = () => {
-                        isStarted = components_21.moment(activeStartTime).diff(components_21.moment()) <= 0;
-                        isClosed = components_21.moment(activeEndTime).diff(components_21.moment()) <= 0;
+                        isStarted = components_22.moment(activeStartTime).diff(components_22.moment()) <= 0;
+                        isClosed = components_22.moment(activeEndTime).diff(components_22.moment()) <= 0;
                         for (let i = 0; i < options.length; i++) {
                             activeTimerRows[i].visible = isStarted && !isClosed;
                         }
@@ -28254,9 +28336,9 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             }
                         }
                         else {
-                            const days = components_21.moment(activeEndTime).diff(components_21.moment(), 'days');
-                            const hours = components_21.moment(activeEndTime).diff(components_21.moment(), 'hours') - days * 24;
-                            const mins = components_21.moment(activeEndTime).diff(components_21.moment(), 'minutes') - days * 24 * 60 - hours * 60;
+                            const days = components_22.moment(activeEndTime).diff(components_22.moment(), 'days');
+                            const hours = components_22.moment(activeEndTime).diff(components_22.moment(), 'hours') - days * 24;
+                            const mins = components_22.moment(activeEndTime).diff(components_22.moment(), 'minutes') - days * 24 * 60 - hours * 60;
                             for (let i = 0; i < options.length; i++) {
                                 endDays[i].caption = `${days}`;
                                 endHours[i].caption = `${hours}`;
@@ -28282,10 +28364,10 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         const rewardsData = [option.rewardsData[0]];
                         const rewardOptions = !isClaim ? rewardsData : [];
                         let aprInfo = {};
-                        const claimStakedRow = await components_21.HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
+                        const claimStakedRow = await components_22.HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
                         claimStakedRow.appendChild(this.$render("i-label", { caption: "You Staked", font: { size: '16px', color: colorText } }));
-                        claimStakedRow.appendChild(this.$render("i-label", { caption: `${index_39.formatNumber(new eth_wallet_17.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`, font: { size: '16px', name: 'Montserrat Regular', color: colorText } }));
-                        const rowRewards = await components_21.VStack.create({ gap: 8, verticalAlignment: 'center' });
+                        claimStakedRow.appendChild(this.$render("i-label", { caption: `${index_39.formatNumber(new eth_wallet_18.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`, font: { size: '16px', name: 'Montserrat Regular', color: colorText } }));
+                        const rowRewards = await components_22.VStack.create({ gap: 8, verticalAlignment: 'center' });
                         for (let idx = 0; idx < rewardsData.length; idx++) {
                             const reward = rewardsData[idx];
                             const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
@@ -28302,7 +28384,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             const rewardSymbol = rewardToken.symbol || '';
                             rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
                                 this.$render("i-label", { caption: `${rewardSymbol} Locked`, font: { size: '16px', color: colorText } }),
-                                this.$render("i-label", { caption: `${index_39.formatNumber(new eth_wallet_17.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '16px', name: 'Montserrat Regular', color: colorText } })));
+                                this.$render("i-label", { caption: `${index_39.formatNumber(new eth_wallet_18.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '16px', name: 'Montserrat Regular', color: colorText } })));
                             // rowRewards.appendChild(
                             // 	<i-hstack horizontalAlignment="space-between">
                             // 		<i-label caption={`${rewardSymbol} Vesting Start`} font={{ size: '16px', color: colorText }} />
@@ -28315,26 +28397,26 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             // 		<i-label caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
                             // 	</i-hstack>
                             // );
-                            const passClaimStartTime = !(reward.claimStartTime && components_21.moment().diff(components_21.moment.unix(reward.claimStartTime)) < 0);
+                            const passClaimStartTime = !(reward.claimStartTime && components_22.moment().diff(components_22.moment.unix(reward.claimStartTime)) < 0);
                             let rewardClaimable = `0 ${rewardSymbol}`;
                             if (passClaimStartTime && isClaim) {
-                                rewardClaimable = `${index_39.formatNumber(new eth_wallet_17.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
+                                rewardClaimable = `${index_39.formatNumber(new eth_wallet_18.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
                             }
                             let startClaimingText = '';
                             if (!(!reward.claimStartTime || passClaimStartTime) && isClaim) {
-                                const claimStart = components_21.moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
+                                const claimStart = components_22.moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
                                 startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
                             }
                             rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
                                 this.$render("i-label", { caption: `${rewardSymbol} Claimable`, font: { size: '16px', color: colorText } }),
                                 this.$render("i-label", { caption: rewardClaimable, font: { size: '16px', name: 'Montserrat Regular', color: colorText } }),
                                 startClaimingText ? this.$render("i-label", { caption: startClaimingText, font: { size: '16px', color: colorText } }) : []));
-                            const btnClaim = await components_21.Button.create({
+                            const btnClaim = await components_22.Button.create({
                                 rightIcon: { spin: true, fill: colorText, visible: false },
                                 caption: `Claim ${rewardSymbol}`,
                                 background: { color: `${colorButton} !important` },
                                 font: { color: colorText },
-                                enabled: !(!passClaimStartTime || new eth_wallet_17.BigNumber(reward.claimable).isZero()) && isClaim,
+                                enabled: !(!passClaimStartTime || new eth_wallet_18.BigNumber(reward.claimable).isZero()) && isClaim,
                                 margin: { left: 'auto', right: 'auto' }
                             });
                             btnClaim.id = `btnClaim-${idx}-${option.address}`;
@@ -28345,7 +28427,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         ;
                         const getAprValue = (rewardOption) => {
                             if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
-                                const apr = new eth_wallet_17.BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, eth_wallet_17.BigNumber.ROUND_DOWN);
+                                const apr = new eth_wallet_18.BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, eth_wallet_18.BigNumber.ROUND_DOWN);
                                 return `${apr}%`;
                             }
                             return '';
@@ -28361,23 +28443,23 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             this.$render("i-hstack", { gap: 10, width: "100%", verticalAlignment: "center" },
                                 this.$render("i-hstack", { gap: 10, width: "50%" },
                                     this.$render("i-hstack", { width: pathsLength === 1 ? 63.5 : 80, position: "relative", verticalAlignment: "center" },
-                                        this.$render("i-image", { width: 60, height: 60, url: assets_6.default.fullPath(rewardIconPath), fallbackUrl: index_40.fallBackUrl }),
+                                        this.$render("i-image", { width: 60, height: 60, url: assets_7.default.fullPath(rewardIconPath), fallbackUrl: index_40.fallBackUrl }),
                                         _lockedTokenIconPaths.map((v, idxImg) => {
-                                            return this.$render("i-image", { position: "absolute", width: 28, height: 28, bottom: 0, left: (idxImg * 20) + 35, url: assets_6.default.fullPath(v), fallbackUrl: index_40.fallBackUrl });
+                                            return this.$render("i-image", { position: "absolute", width: 28, height: 28, bottom: 0, left: (idxImg * 20) + 35, url: assets_7.default.fullPath(v), fallbackUrl: index_40.fallBackUrl });
                                         })),
                                     this.$render("i-vstack", { gap: 2, overflow: { x: 'hidden' }, verticalAlignment: "center" },
                                         this.$render("i-label", { visible: !!campaign.customName, caption: campaign.customName, font: { size: '20px', name: 'Montserrat Bold', color: colorCampaignText, bold: true }, class: "text-overflow" }),
                                         this.$render("i-label", { visible: !!campaign.customDesc, caption: campaign.customDesc, font: { size: '16px', name: 'Montserrat Regular', color: colorText }, class: "opacity-50 text-overflow" }))),
                                 await Promise.all(rewardOptions.map(async (rewardOption, idx) => {
-                                    const lbApr = await components_21.Label.create({ font: { size: '40px', name: 'Montserrat Medium', color: '#72F35D' } });
-                                    const lbRate = await components_21.Label.create({ font: { size: '16px', name: 'Montserrat Regular', color: colorText } });
+                                    const lbApr = await components_22.Label.create({ font: { size: '40px', name: 'Montserrat Medium', color: '#72F35D' } });
+                                    const lbRate = await components_22.Label.create({ font: { size: '16px', name: 'Montserrat Regular', color: colorText } });
                                     lbApr.classList.add('text-overflow');
                                     lbRate.classList.add('opacity-50');
                                     const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
                                     const rewardTokenDecimals = rewardToken.decimals || 18;
                                     const decimalsOffset = 18 - rewardTokenDecimals;
                                     const lockTokenType = option.lockTokenType;
-                                    const rateDesc = `1 ${lockTokenType === index_39.LockTokenType.LP_Token ? 'LP' : index_40.tokenSymbol(option.lockTokenAddress)} : ${new eth_wallet_17.BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${index_40.tokenSymbol(rewardOption.rewardTokenAddress)}`;
+                                    const rateDesc = `1 ${lockTokenType === index_39.LockTokenType.LP_Token ? 'LP' : index_40.tokenSymbol(option.lockTokenAddress)} : ${new eth_wallet_18.BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${index_40.tokenSymbol(rewardOption.rewardTokenAddress)}`;
                                     const updateApr = async () => {
                                         var _a, _b, _c, _d;
                                         if (lockTokenType === index_39.LockTokenType.ERC20_Token) {
@@ -28423,7 +28505,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                                         this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: colorText }),
                                         this.$render("i-label", { caption: `Get ${lockedTokenSymbol}`, font: { size: '13.6px', color: colorText } }),
                                         lockedTokenIconPaths.map((v) => {
-                                            return this.$render("i-image", { display: "flex", width: 15, height: 15, url: assets_6.default.fullPath(v), fallbackUrl: index_40.fallBackUrl });
+                                            return this.$render("i-image", { display: "flex", width: 15, height: 15, url: assets_7.default.fullPath(v), fallbackUrl: index_40.fallBackUrl });
                                         })),
                                     campaign.showContractLink ?
                                         this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => index_39.viewOnExplorerByAddress(chainId, option.address) },
@@ -28444,7 +28526,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             };
             index_40.setDataFromSCConfig({ networks: Object.values(index_40.Networks), infuraId: index_40.InfuraId });
             index_40.setTokenStore();
-            this.$eventBus = components_21.application.EventBus;
+            this.$eventBus = components_22.application.EventBus;
             this.registerEvent();
         }
         getPropertiesSchema(readOnly) {
@@ -28617,11 +28699,11 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             this.executeReadyCallback();
         }
         render() {
-            return (this.$render("i-panel", { id: "stakingComponent", class: index_css_1.stakingComponent, minHeight: 200 },
-                this.$render("i-panel", { id: "stakingLayout", class: "staking-layout", width: index_40.maxWidth, height: index_40.maxHeight },
+            return (this.$render("i-panel", { id: "stakingComponent", class: index_css_2.stakingComponent, minHeight: 200 },
+                this.$render("i-panel", { id: "stakingLayout", class: "staking-layout", width: index_40.maxWidth, height: index_40.maxHeight, margin: { top: '1rem', bottom: '1rem', left: 'auto', right: 'auto' } },
                     this.$render("i-vstack", { id: "loadingElm", class: "i-loading-overlay" },
                         this.$render("i-vstack", { class: "i-loading-spinner", horizontalAlignment: "center", verticalAlignment: "center" },
-                            this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_6.default.fullPath('img/loading.svg'), width: 36, height: 36 } }),
+                            this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_7.default.fullPath('img/loading.svg'), width: 36, height: 36 } }),
                             this.$render("i-label", { caption: "Loading...", font: { color: '#FD4A4C', size: '1.5em' }, class: "i-loading-spinner_text" }))),
                     this.$render("i-panel", { id: "stakingElm", class: "wrapper" })),
                 this.$render("i-panel", { id: "manageStakeElm" }),
@@ -28630,8 +28712,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
         }
     };
     ScomStaking = __decorate([
-        components_21.customModule,
-        components_21.customElements('i-scom-staking')
+        components_22.customModule,
+        components_22.customElements('i-scom-staking')
     ], ScomStaking);
     exports.default = ScomStaking;
 });

@@ -16550,13 +16550,13 @@ declare module "@scom/scom-staking/manage-stake/index.tsx" {
 declare module "@scom/scom-staking/index.css.ts" {
     export const stakingComponent: string;
 }
-/// <amd-module name="@scom/scom-staking/comissions/network-picker.css.ts" />
-declare module "@scom/scom-staking/comissions/network-picker.css.ts" {
+/// <amd-module name="@scom/scom-staking/commissions/network-picker.css.ts" />
+declare module "@scom/scom-staking/commissions/network-picker.css.ts" {
     const _default_78: string;
     export default _default_78;
 }
-/// <amd-module name="@scom/scom-staking/comissions/network-picker.tsx" />
-declare module "@scom/scom-staking/comissions/network-picker.tsx" {
+/// <amd-module name="@scom/scom-staking/commissions/network-picker.tsx" />
+declare module "@scom/scom-staking/commissions/network-picker.tsx" {
     import { ControlElement, Module, Container } from '@ijstech/components';
     import { INetwork } from "@scom/scom-staking/global/index.ts";
     interface PickerElement extends ControlElement {
@@ -16597,8 +16597,13 @@ declare module "@scom/scom-staking/comissions/network-picker.tsx" {
         render(): any;
     }
 }
-/// <amd-module name="@scom/scom-staking/comissions/index.tsx" />
-declare module "@scom/scom-staking/comissions/index.tsx" {
+/// <amd-module name="@scom/scom-staking/commissions/index.css.ts" />
+declare module "@scom/scom-staking/commissions/index.css.ts" {
+    export const customStyle: string;
+    export const tableStyle: string;
+}
+/// <amd-module name="@scom/scom-staking/commissions/index.tsx" />
+declare module "@scom/scom-staking/commissions/index.tsx" {
     import { Module, ControlElement } from '@ijstech/components';
     import { IEmbedData, INetwork } from "@scom/scom-staking/global/index.ts";
     global {
@@ -16614,6 +16619,8 @@ declare module "@scom/scom-staking/comissions/index.tsx" {
         private networkPicker;
         private inputWalletAddress;
         private lbCommissionShare;
+        private btnAddWallet;
+        private pnlEmptyWallet;
         private commissionInfoList;
         private commissionsTableColumns;
         private btnConfirm;
@@ -16630,6 +16637,7 @@ declare module "@scom/scom-staking/comissions/index.tsx" {
         validateModalFields(): boolean;
         onNetworkSelected(network: INetwork): void;
         onInputWalletAddressChanged(): void;
+        private toggleVisible;
         render(): any;
     }
 }
@@ -16637,7 +16645,7 @@ declare module "@scom/scom-staking/comissions/index.tsx" {
 declare module "@scom/scom-staking" {
     import { Module, Container, ControlElement, IDataSchema } from '@ijstech/components';
     import { PageBlock, ISingleStakingCampaign } from "@scom/scom-staking/global/index.ts";
-    import StakingConfig from "@scom/scom-staking/comissions/index.tsx";
+    import StakingConfig from "@scom/scom-staking/commissions/index.tsx";
     interface ScomStakingElement extends ControlElement {
         data?: ISingleStakingCampaign;
     }
