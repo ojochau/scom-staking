@@ -12,11 +12,9 @@ import {
   CoreContractAddressesByChainId,
   ChainNativeTokenByChainId,
   WETHByChainId,
-  listNetworks,
   Networks,
-  ChainNetwork,
-  Testnets,
-  Mainnets
+  Mainnets,
+  SupportedNetworks
 } from './data/index';
 
 export * from './data/index';
@@ -183,7 +181,7 @@ export function canDisperse(chainId: number) {
 }
 
 export const listsNetworkShow = () => {
-  let list = listNetworks.filter(network => !Networks[network.chainId].isDisabled);
+  let list = [...SupportedNetworks];
   return list;
   // const siteEnv = getSiteEnv();
   // if (siteEnv === SITE_ENV.TESTNET) {
@@ -241,6 +239,18 @@ export const setDataFromSCConfig = (options: any) => {
   }
   if (options.networks) {
     setNetworkList(options.networks, options.infuraId)
+  }
+  if (options.proxyAddresses) {
+    setProxyAddresses(options.proxyAddresses)
+  }
+  if (options.ipfsGatewayUrl) {
+    setIPFSGatewayUrl(options.ipfsGatewayUrl);
+  }
+  if (options.apiGatewayUrls) {
+    setAPIGatewayUrls(options.apiGatewayUrls);
+  }
+  if (options.embedderCommissionFee) {
+    setEmbedderCommissionFee(options.embedderCommissionFee);
   }
 }
 
@@ -325,6 +335,8 @@ export const getTokenList = (chainId: number) => {
   return tokenList;
 }
 
+export type ProxyAddresses = { [key: number]: string };
+
 export const state = {
   siteEnv: SITE_ENV.TESTNET,
   networkMap: {} as { [key: number]: INetwork },
@@ -335,7 +347,11 @@ export const state = {
   infuraId: "",
   userTokens: {} as { [key: string]: ITokenObject[] },
   walletPluginMap: {} as Record<WalletPlugin, IClientSideProvider>,
-  stakingStatusMap: {} as {[key: string]: {value: boolean, text: string}}
+  stakingStatusMap: {} as {[key: string]: {value: boolean, text: string}},
+  proxyAddresses: {} as ProxyAddresses,
+  ipfsGatewayUrl: '',
+  apiGatewayUrls: {} as Record<string, string>,
+  embedderCommissionFee: '0'
 }
 
 export const setWalletPluginProvider = (walletPlugin: WalletPlugin, wallet: IClientSideProvider) => {
@@ -406,4 +422,41 @@ export const getNetworkExplorerName = (chainId: number) => {
     return getNetworkInfo(chainId).explorerName;
   }
   return 'Unknown';
+}
+
+export const getNetworkName = (chainId: number) => {
+  return getSiteSupportedNetworks().find(v => v.chainId === chainId)?.name || '';
+}
+
+export const setProxyAddresses = (data: ProxyAddresses) => {
+  state.proxyAddresses = data;
+}
+
+export const getProxyAddress = (chainId?: number) => {
+  const _chainId = chainId || Wallet.getInstance().chainId;
+  const proxyAddresses = state.proxyAddresses;
+  if (proxyAddresses) {
+    return proxyAddresses[_chainId];
+  }
+  return null;
+}
+
+export const setIPFSGatewayUrl = (url: string) => {
+  state.ipfsGatewayUrl = url;
+}
+
+export const getIPFSGatewayUrl = () => {
+  return state.ipfsGatewayUrl;
+}
+
+export const setAPIGatewayUrls = (urls: Record<string, string>) => {
+  state.apiGatewayUrls = urls;
+}
+
+const setEmbedderCommissionFee = (fee: string) => {
+  state.embedderCommissionFee = fee;
+}
+
+export const getEmbedderCommissionFee = () => {
+  return state.embedderCommissionFee;
 }

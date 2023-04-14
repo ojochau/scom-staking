@@ -15,14 +15,7 @@ export { CoreContractAddressesByChainId } from './core/index';
 
 export {
   getSingleStakingSchema,
-  ISingleStakingCampaign,
-  ISingleStaking,
-  IStakingCampaign,
-  Staking,
-  Reward,
-  RewardNeeded,
   LockTokenType,
-  LockTokenTypeList,
   USDPeggedTokenAddressMap,
 } from './staking/index';
 

@@ -22,3 +22,5 @@ export {
   IERC20ApprovalAction,
   ERC20ApprovalModel
 } from './approvalModel';
+
+export * from './interfaces';

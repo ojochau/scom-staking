@@ -1,7 +1,8 @@
 export interface INetwork {
     chainId: number;
     name: string;
-    label: string;
+    value?: string;
+    label?: string;
     icon: string;
     rpc?: string;
     isDisabled?: boolean;

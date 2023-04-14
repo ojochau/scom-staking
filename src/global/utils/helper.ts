@@ -380,3 +380,7 @@ export const viewOnExplorerByAddress = (chainId: number, address: string) => {
     window.open(url);
   }
 }
+
+export function isWalletAddress(address: string) {
+  return /^0x[a-fA-F0-9]{40}$/.test(address);
+}

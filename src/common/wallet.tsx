@@ -187,7 +187,7 @@ export class StakingWallet extends Module {
           verticalAlignment="center"
           gap={10}
         >
-          <i-image url={Assets.fullPath(`img/network/${network.img}`)} width={32} height={32} display="inline-block" margin={{ left: 12 }} />
+          <i-image url={Assets.fullPath(`img/network/${network.icon}`)} width={32} height={32} display="inline-block" margin={{ left: 12 }} />
           <i-label caption={network.label} />
         </i-hstack>
       )

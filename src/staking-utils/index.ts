@@ -7,6 +7,8 @@ import {
   ERC20ApprovalModel,
   IERC20ApprovalEventOptions,
   ITokenObject,
+  ISingleStakingCampaign,
+  ISingleStaking,
 } from "../global/index";
 import {
   USDPeggedTokenAddressMap,
@@ -14,9 +16,7 @@ import {
   WETHByChainId,
   tokenPriceAMMReference,
   getTokenDecimals,
-  tokenStore,
-  ISingleStakingCampaign,
-  ISingleStaking,
+  tokenStore
 } from "../store/index";
 
 export const getTokenPrice = async (token: string) => { // in USD value
