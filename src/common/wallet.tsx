@@ -19,7 +19,7 @@ import {
   switchNetwork,
   listsNetworkShow,
   getWalletProvider,
-  getSiteEnv,
+  // getSiteEnv,
   tokenStore,
   isWalletConnected,
   getWalletPluginProvider,
@@ -248,25 +248,25 @@ export class StakingWallet extends Module {
   }
 
   isWalletEnabled(walletName: WalletPlugin) {
-    switch (getSiteEnv()) {
-      case SITE_ENV.TESTNET: {
-        switch (walletName) {
-          case WalletPlugin.ONTOWallet:
-          case WalletPlugin.Coin98:
-          case WalletPlugin.TrustWallet:
-            return false;
-        }
-        break;
-      }
-      case SITE_ENV.MAINNET: {
+    // switch (getSiteEnv()) {
+    //   case SITE_ENV.TESTNET: {
+    //     switch (walletName) {
+    //       case WalletPlugin.ONTOWallet:
+    //       case WalletPlugin.Coin98:
+    //       case WalletPlugin.TrustWallet:
+    //         return false;
+    //     }
+    //     break;
+    //   }
+    //   case SITE_ENV.MAINNET: {
 
-        break;
-      }
-      case SITE_ENV.DEV: {
+    //     break;
+    //   }
+    //   case SITE_ENV.DEV: {
 
-        break;
-      }
-    }
+    //     break;
+    //   }
+    // }
     return true;
   }
 

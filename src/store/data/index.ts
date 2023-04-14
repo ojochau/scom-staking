@@ -14,9 +14,9 @@ export * from './networks';
 export { CoreContractAddressesByChainId } from './core/index';
 
 export {
-  getStakingUISchema,
-  getStakingSchema,
-  IStakingCampaignUI,
+  getSingleStakingSchema,
+  ISingleStakingCampaign,
+  ISingleStaking,
   IStakingCampaign,
   Staking,
   Reward,

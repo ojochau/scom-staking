@@ -117,7 +117,7 @@ export class Result extends Module {
       };
       mainSection.appendChild(section);
     } else if (this.message.status === 'success') {
-      const chainId: number = await Wallet.getInstance().getChainId();
+      const chainId: number = await Wallet.getClientInstance().getChainId();
       const explorerName = getNetworkExplorerName(chainId);
       
       const image = await Image.create({

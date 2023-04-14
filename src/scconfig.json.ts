@@ -40,6 +40,5 @@ export default {
     "@scom/scom-frontier-wallet": "*",
     "@scom/scom-onto-wallet": "*",
     "@scom/scom-trust-wallet": "*"
-  },
-  "InfuraId": "adc596bf88b648e2a8902bc9093930c5"
+  }
 }

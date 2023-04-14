@@ -10170,8 +10170,8 @@ declare module "@scom/scom-staking/store/data/networks.ts" {
         fantom: INetwork;
         polygon: INetwork;
         aminox: INetwork;
+        arbitrum: INetwork;
     };
-    const getNetworkType: (chainId: number) => "BSCScan" | "SnowTrace" | "PolygonScan" | "FTMScan" | "AminoX Explorer" | "Unknown";
     enum ChainNetwork {
         BSCMainnet = 56,
         BSCTestnet = 97,
@@ -10185,7 +10185,8 @@ declare module "@scom/scom-staking/store/data/networks.ts" {
         FantomTestnet = 4002,
         CronosMainnet = 25,
         CronosTestnet = 338,
-        AminoXTestnet = 13370
+        AminoXTestnet = 13370,
+        Arbitrum = 421613
     }
     const listNetworks: {
         label: string;
@@ -10193,7 +10194,7 @@ declare module "@scom/scom-staking/store/data/networks.ts" {
         chainId: ChainNetwork;
         img: string;
     }[];
-    export { InfuraId, Networks, Mainnets, Testnets, getNetworkType, ChainNetwork, listNetworks, };
+    export { InfuraId, Networks, Mainnets, Testnets, ChainNetwork, listNetworks, };
 }
 /// <amd-module name="@scom/scom-staking/store/data/core/index.ts" />
 declare module "@scom/scom-staking/store/data/core/index.ts" {
@@ -10215,40 +10216,24 @@ declare module "@scom/scom-staking/store/data/staking/index.ts" {
         name: string;
         value: LockTokenType;
     }[];
-    interface IStakingCampaignUI {
+    interface ISingleStakingCampaign {
         chainId: number;
         customName: string;
         customDesc?: string;
         customLogo?: string;
         getTokenURL?: string;
-        campaignStart: number;
-        campaignEnd: number;
         showContractLink?: boolean;
-        admin: string;
-        stakings: IStakingUI;
+        stakings: ISingleStaking;
     }
-    interface IStakingUI {
-        address?: string;
-        lockTokenAddress: string;
-        minLockTime: number;
-        minLockTimeUnit: number;
-        perAddressCap: number;
-        maxTotalLock: number;
+    interface ISingleStaking {
+        address: string;
         customDesc?: string;
         lockTokenType: LockTokenType;
-        rewards: IRewardUI;
+        rewards: ISingleReward;
     }
-    interface IRewardUI {
-        address?: string;
-        rewardTokenAddress: string;
-        multiplier: number;
-        initialReward: number;
-        vestingPeriod: number;
-        vestingPeriodUnit: number;
-        claimDeadline: number;
-        admin: string;
+    interface ISingleReward {
+        address: string;
         isCommonStartDate?: boolean;
-        vestingStartDate?: number;
     }
     interface IStakingCampaign {
         chainId: number;
@@ -10275,7 +10260,6 @@ declare module "@scom/scom-staking/store/data/staking/index.ts" {
         customDesc?: string;
         lockTokenType: LockTokenType;
         decimalsOffset?: number;
-        totalRewardAmount?: RewardNeeded[];
         rewards: Reward[];
     }
     interface Reward {
@@ -10293,7 +10277,7 @@ declare module "@scom/scom-staking/store/data/staking/index.ts" {
     const USDPeggedTokenAddressMap: {
         [key: number]: string;
     };
-    const getStakingSchema: (readOnly?: boolean) => {
+    const getSingleStakingSchema: (readOnly: boolean) => {
         type: string;
         properties: {
             chainId: {
@@ -10323,23 +10307,8 @@ declare module "@scom/scom-staking/store/data/staking/index.ts" {
                 title: string;
                 readOnly: boolean;
             };
-            campaignStart: {
-                type: string;
-                required: boolean;
-                readOnly: boolean;
-            };
-            campaignEnd: {
-                type: string;
-                required: boolean;
-                readOnly: boolean;
-            };
             showContractLink: {
                 type: string;
-                readOnly: boolean;
-            };
-            admin: {
-                type: string;
-                required: boolean;
                 readOnly: boolean;
             };
             stakings: {
@@ -10347,42 +10316,7 @@ declare module "@scom/scom-staking/store/data/staking/index.ts" {
                 properties: {
                     address: {
                         type: string;
-                        readOnly: boolean;
-                    };
-                    lockTokenAddress: {
-                        type: string;
                         required: boolean;
-                        readOnly: boolean;
-                    };
-                    minLockTime: {
-                        type: string;
-                        title: string;
-                        required: boolean;
-                        readOnly: boolean;
-                    };
-                    minLockTimeUnit: {
-                        type: string;
-                        title: string;
-                        oneOf: {
-                            title: string;
-                            const: number;
-                        }[];
-                        required: boolean;
-                        readOnly: boolean;
-                    };
-                    maxTotalLock: {
-                        type: string;
-                        required: boolean;
-                        readOnly: boolean;
-                    };
-                    perAddressCap: {
-                        type: string;
-                        required: boolean;
-                        readOnly: boolean;
-                    };
-                    customDesc: {
-                        type: string;
-                        title: string;
                         readOnly: boolean;
                     };
                     lockTokenType: {
@@ -10399,46 +10333,6 @@ declare module "@scom/scom-staking/store/data/staking/index.ts" {
                         properties: {
                             address: {
                                 type: string;
-                                readOnly: boolean;
-                            };
-                            rewardTokenAddress: {
-                                type: string;
-                                required: boolean;
-                                readOnly: boolean;
-                            };
-                            multiplier: {
-                                type: string;
-                                title: string;
-                                required: boolean;
-                                readOnly: boolean;
-                            };
-                            initialReward: {
-                                type: string;
-                                title: string;
-                                required: boolean;
-                                readOnly: boolean;
-                                minimum: number;
-                                maximum: number;
-                            };
-                            vestingPeriod: {
-                                type: string;
-                                title: string;
-                                required: boolean;
-                                readOnly: boolean;
-                            };
-                            vestingPeriodUnit: {
-                                type: string;
-                                title: string;
-                                oneOf: {
-                                    title: string;
-                                    const: number;
-                                }[];
-                                required: boolean;
-                                readOnly: boolean;
-                            };
-                            claimDeadline: {
-                                type: string;
-                                title: string;
                                 required: boolean;
                                 readOnly: boolean;
                             };
@@ -10447,90 +10341,20 @@ declare module "@scom/scom-staking/store/data/staking/index.ts" {
                                 title: string;
                                 readOnly: boolean;
                             };
-                            vestingStartDate: {
-                                type: string;
-                                readOnly: boolean;
-                            };
                         };
                     };
                 };
             };
         };
     };
-    const getStakingUISchema: () => {
-        type: string;
-        elements: {
-            type: string;
-            label: string;
-            elements: ({
-                type: string;
-                scope: string;
-                label?: undefined;
-                elements?: undefined;
-            } | {
-                type: string;
-                label: string;
-                scope: string;
-                elements?: undefined;
-            } | {
-                type: string;
-                label: string;
-                elements: ({
-                    type: string;
-                    scope: string;
-                    elements?: undefined;
-                    label?: undefined;
-                } | {
-                    type: string;
-                    elements: {
-                        type: string;
-                        label: string;
-                        scope: string;
-                    }[];
-                    scope?: undefined;
-                    label?: undefined;
-                } | {
-                    type: string;
-                    label: string;
-                    scope: string;
-                    elements?: undefined;
-                } | {
-                    type: string;
-                    label: string;
-                    elements: ({
-                        type: string;
-                        scope: string;
-                        label?: undefined;
-                        elements?: undefined;
-                    } | {
-                        type: string;
-                        label: string;
-                        scope: string;
-                        elements?: undefined;
-                    } | {
-                        type: string;
-                        elements: {
-                            type: string;
-                            label: string;
-                            scope: string;
-                        }[];
-                        scope?: undefined;
-                        label?: undefined;
-                    })[];
-                    scope?: undefined;
-                })[];
-                scope?: undefined;
-            })[];
-        }[];
-    };
-    export { getStakingUISchema, getStakingSchema, IStakingCampaignUI, IStakingCampaign, Staking, Reward, RewardNeeded, LockTokenType, LockTokenTypeList, USDPeggedTokenAddressMap };
+    export { getSingleStakingSchema, ISingleStakingCampaign, ISingleStaking, IStakingCampaign, Staking, Reward, RewardNeeded, LockTokenType, LockTokenTypeList, USDPeggedTokenAddressMap };
 }
 /// <amd-module name="@scom/scom-staking/store/data/index.ts" />
 declare module "@scom/scom-staking/store/data/index.ts" {
     export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath, getOpenSwapToken, } from "@scom/scom-staking/store/data/tokens/index.ts";
     export * from "@scom/scom-staking/store/data/networks.ts";
     export { CoreContractAddressesByChainId } from "@scom/scom-staking/store/data/core/index.ts";
-    export { getStakingUISchema, getStakingSchema, IStakingCampaignUI, IStakingCampaign, Staking, Reward, RewardNeeded, LockTokenType, LockTokenTypeList, USDPeggedTokenAddressMap, } from "@scom/scom-staking/store/data/staking/index.ts";
+    export { getSingleStakingSchema, ISingleStakingCampaign, ISingleStaking, IStakingCampaign, Staking, Reward, RewardNeeded, LockTokenType, LockTokenTypeList, USDPeggedTokenAddressMap, } from "@scom/scom-staking/store/data/staking/index.ts";
 }
 /// <amd-module name="@scom/scom-staking/store/utils.ts" />
 declare module "@scom/scom-staking/store/utils.ts" {
@@ -10552,8 +10376,6 @@ declare module "@scom/scom-staking/store/utils.ts" {
     export const INFINITE = "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
     export const getUserTokens: (chainId: number) => any;
     export const addUserTokens: (token: ITokenObject) => void;
-    export const setSiteEnv: (value: string) => void;
-    export const getSiteEnv: () => SITE_ENV;
     export const getInfuraId: () => string;
     interface NetworkConditions {
         isDisabled?: boolean;
@@ -16512,11 +16334,11 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/i
 declare module "@scom/scom-staking/staking-utils/index.ts" {
     import { BigNumber } from "@ijstech/eth-wallet";
     import { IERC20ApprovalEventOptions, ITokenObject } from "@scom/scom-staking/global/index.ts";
-    import { IStakingCampaign } from "@scom/scom-staking/store/index.ts";
+    import { ISingleStakingCampaign } from "@scom/scom-staking/store/index.ts";
     export const getTokenPrice: (token: string) => Promise<string>;
     const getAllCampaignsInfo: (stakingInfo: {
-        [key: number]: IStakingCampaign[];
-    }, imported?: boolean) => Promise<any[]>;
+        [key: number]: ISingleStakingCampaign;
+    }) => Promise<any[]>;
     const getStakingTotalLocked: (stakingAddress: string) => Promise<string>;
     const getLPObject: (pairAddress: string) => Promise<{
         address: string;
@@ -16548,8 +16370,7 @@ declare module "@scom/scom-staking/staking-utils/index.ts" {
     const claimToken: (contractAddress: string, callback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     const lockToken: (token: ITokenObject, amount: string, contractAddress: string) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     const getApprovalModelAction: (contractAddress: string, options: IERC20ApprovalEventOptions) => import("@scom/scom-staking/global/index.ts").IERC20ApprovalAction;
-    const deployCampaign: (campaign: IStakingCampaign, callback?: any) => Promise<IStakingCampaign>;
-    export { getAllCampaignsInfo, getStakingTotalLocked, getLPObject, getLPBalance, getVaultObject, getVaultBalance, getERC20RewardCurrentAPR, getLPRewardCurrentAPR, getVaultRewardCurrentAPR, withdrawToken, claimToken, lockToken, getApprovalModelAction, deployCampaign, };
+    export { getAllCampaignsInfo, getStakingTotalLocked, getLPObject, getLPBalance, getVaultObject, getVaultBalance, getERC20RewardCurrentAPR, getLPRewardCurrentAPR, getVaultRewardCurrentAPR, withdrawToken, claimToken, lockToken, getApprovalModelAction, };
 }
 /// <amd-module name="@scom/scom-staking/common/result.css.ts" />
 declare module "@scom/scom-staking/common/result.css.ts" {
@@ -16753,7 +16574,6 @@ declare module "@scom/scom-staking/scconfig.json.ts" {
             "@scom/scom-onto-wallet": string;
             "@scom/scom-trust-wallet": string;
         };
-        InfuraId: string;
     };
     export default _default_78;
 }
@@ -16761,9 +16581,9 @@ declare module "@scom/scom-staking/scconfig.json.ts" {
 declare module "@scom/scom-staking" {
     import { Module, Container, ControlElement, IDataSchema } from '@ijstech/components';
     import { PageBlock } from "@scom/scom-staking/global/index.ts";
-    import { IStakingCampaign, IStakingCampaignUI } from "@scom/scom-staking/store/index.ts";
+    import { ISingleStakingCampaign } from "@scom/scom-staking/store/index.ts";
     interface ScomStakingElement extends ControlElement {
-        data?: IStakingCampaignUI;
+        data?: ISingleStakingCampaign;
     }
     global {
         namespace JSX {
@@ -16795,7 +16615,7 @@ declare module "@scom/scom-staking" {
         private tokenMap;
         private getPropertiesSchema;
         private getThemeSchema;
-        getEmbedderActions(): ({
+        getEmbedderActions(): {
             name: string;
             icon: string;
             command: (builder: any, userInputData: any) => {
@@ -16804,73 +16624,8 @@ declare module "@scom/scom-staking" {
                 redo: () => void;
             };
             userInputDataSchema: IDataSchema;
-            userInputUISchema: {
-                type: string;
-                elements: {
-                    type: string;
-                    label: string;
-                    elements: ({
-                        type: string;
-                        scope: string;
-                        label?: undefined;
-                        elements?: undefined;
-                    } | {
-                        type: string;
-                        label: string;
-                        scope: string;
-                        elements?: undefined;
-                    } | {
-                        type: string;
-                        label: string;
-                        elements: ({
-                            type: string;
-                            scope: string;
-                            elements?: undefined;
-                            label?: undefined;
-                        } | {
-                            type: string;
-                            elements: {
-                                type: string;
-                                label: string;
-                                scope: string;
-                            }[];
-                            scope?: undefined;
-                            label?: undefined;
-                        } | {
-                            type: string;
-                            label: string;
-                            scope: string;
-                            elements?: undefined;
-                        } | {
-                            type: string;
-                            label: string;
-                            elements: ({
-                                type: string;
-                                scope: string;
-                                label?: undefined;
-                                elements?: undefined;
-                            } | {
-                                type: string;
-                                label: string;
-                                scope: string;
-                                elements?: undefined;
-                            } | {
-                                type: string;
-                                elements: {
-                                    type: string;
-                                    label: string;
-                                    scope: string;
-                                }[];
-                                scope?: undefined;
-                                label?: undefined;
-                            })[];
-                            scope?: undefined;
-                        })[];
-                        scope?: undefined;
-                    })[];
-                }[];
-            };
-        } | {
+        }[];
+        getActions(): {
             name: string;
             icon: string;
             command: (builder: any, userInputData: any) => {
@@ -16879,9 +16634,8 @@ declare module "@scom/scom-staking" {
                 redo: () => void;
             };
             userInputDataSchema: IDataSchema;
-            userInputUISchema?: undefined;
-        })[];
-        getActions(): ({
+        }[];
+        _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema): {
             name: string;
             icon: string;
             command: (builder: any, userInputData: any) => {
@@ -16890,170 +16644,8 @@ declare module "@scom/scom-staking" {
                 redo: () => void;
             };
             userInputDataSchema: IDataSchema;
-            userInputUISchema: {
-                type: string;
-                elements: {
-                    type: string;
-                    label: string;
-                    elements: ({
-                        type: string;
-                        scope: string;
-                        label?: undefined;
-                        elements?: undefined;
-                    } | {
-                        type: string;
-                        label: string;
-                        scope: string;
-                        elements?: undefined;
-                    } | {
-                        type: string;
-                        label: string;
-                        elements: ({
-                            type: string;
-                            scope: string;
-                            elements?: undefined;
-                            label?: undefined;
-                        } | {
-                            type: string;
-                            elements: {
-                                type: string;
-                                label: string;
-                                scope: string;
-                            }[];
-                            scope?: undefined;
-                            label?: undefined;
-                        } | {
-                            type: string;
-                            label: string;
-                            scope: string;
-                            elements?: undefined;
-                        } | {
-                            type: string;
-                            label: string;
-                            elements: ({
-                                type: string;
-                                scope: string;
-                                label?: undefined;
-                                elements?: undefined;
-                            } | {
-                                type: string;
-                                label: string;
-                                scope: string;
-                                elements?: undefined;
-                            } | {
-                                type: string;
-                                elements: {
-                                    type: string;
-                                    label: string;
-                                    scope: string;
-                                }[];
-                                scope?: undefined;
-                                label?: undefined;
-                            })[];
-                            scope?: undefined;
-                        })[];
-                        scope?: undefined;
-                    })[];
-                }[];
-            };
-        } | {
-            name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => Promise<void>;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
-            userInputUISchema?: undefined;
-        })[];
-        _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema): ({
-            name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => Promise<void>;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
-            userInputUISchema: {
-                type: string;
-                elements: {
-                    type: string;
-                    label: string;
-                    elements: ({
-                        type: string;
-                        scope: string;
-                        label?: undefined;
-                        elements?: undefined;
-                    } | {
-                        type: string;
-                        label: string;
-                        scope: string;
-                        elements?: undefined;
-                    } | {
-                        type: string;
-                        label: string;
-                        elements: ({
-                            type: string;
-                            scope: string;
-                            elements?: undefined;
-                            label?: undefined;
-                        } | {
-                            type: string;
-                            elements: {
-                                type: string;
-                                label: string;
-                                scope: string;
-                            }[];
-                            scope?: undefined;
-                            label?: undefined;
-                        } | {
-                            type: string;
-                            label: string;
-                            scope: string;
-                            elements?: undefined;
-                        } | {
-                            type: string;
-                            label: string;
-                            elements: ({
-                                type: string;
-                                scope: string;
-                                label?: undefined;
-                                elements?: undefined;
-                            } | {
-                                type: string;
-                                label: string;
-                                scope: string;
-                                elements?: undefined;
-                            } | {
-                                type: string;
-                                elements: {
-                                    type: string;
-                                    label: string;
-                                    scope: string;
-                                }[];
-                                scope?: undefined;
-                                label?: undefined;
-                            })[];
-                            scope?: undefined;
-                        })[];
-                        scope?: undefined;
-                    })[];
-                }[];
-            };
-        } | {
-            name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => Promise<void>;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
-            userInputUISchema?: undefined;
-        })[];
-        getData(): Promise<IStakingCampaign>;
+        }[];
+        getData(): Promise<ISingleStakingCampaign>;
         setData(value: any): Promise<void>;
         getTag(): Promise<any>;
         setTag(value: any): Promise<void>;
@@ -17061,7 +16653,6 @@ declare module "@scom/scom-staking" {
         confirm(): Promise<void>;
         discard(): Promise<void>;
         config(): Promise<void>;
-        private convertCampaignData;
         constructor(parent?: Container, options?: ControlElement);
         private registerEvent;
         private onWalletConnect;

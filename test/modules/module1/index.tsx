@@ -21,32 +21,15 @@ export default class Module1 extends Module {
                     "chainId": 43113,
                     "customName": "Scom-Staking",
                     "customDesc": "Earn OSWAP",
-                    "campaignStart": 1667290500,
-                    "campaignEnd": 1669883160,
                     "showContractLink": true,
-                    "admin": "0xA81961100920df22CF98703155029822f2F7f033",
                     "stakings":
                     {
-                        "address": "0x0A65a49932999bbCfaE21252a7cabEb3B264E03f",
-                        "lockTokenAddress": "0xb9C31Ea1D475c25E58a1bE1a46221db55E5A7C6e",
-                        "minLockTime": 1,
-                        "minLockTimeUnit": 1,
-                        "perAddressCap": 10,
-                        "maxTotalLock": 10,
-                        "customDesc": "",
+                        "address": "0x03C22D12eb6E5ea3a06F46Fc0e1857438BB7DCae",
                         "lockTokenType": 0,
                         "rewards":
                         {
-                            "address": "0x6378005EB043d60485Bd2E490386acAAC36Dd9Dd",
-                            "rewardTokenAddress": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-                            "multiplier": 0.2,
-                            "initialReward": 0.1,
-                            "vestingPeriod": 1,
-                            "vestingPeriodUnit": 30,
-                            "claimDeadline": 253402275599,
-                            "admin": "",
+                            "address": "0x10B846B7A1807B3610ee94c1b120D9c5E87C148d",
                             "isCommonStartDate": false,
-                            "vestingStartDate": 0
                         }
                     }
                 }} />

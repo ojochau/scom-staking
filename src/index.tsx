@@ -1,8 +1,8 @@
-import { moment, Module, Panel, Icon, Button, Label, VStack, HStack, Container, ControlElement, IEventBus, application, customModule, Input, customElements, IDataSchema, IUISchema } from '@ijstech/components';
+import { moment, Module, Panel, Icon, Button, Label, VStack, HStack, Container, ControlElement, IEventBus, application, customModule, Input, customElements, IDataSchema } from '@ijstech/components';
 import { BigNumber, Wallet } from '@ijstech/eth-wallet';
 import Assets from './assets';
 import { formatNumber, formatDate, registerSendTxEvents, TokenMapType, PageBlock, EventId, viewOnExplorerByAddress, downloadJsonFile } from './global/index';
-import { getChainId, getTokenIconPath, isWalletConnected, getNetworkInfo, getDefaultChainId, setDataFromSCConfig, setCurrentChainId, tokenSymbol, LockTokenType, getStakingStatus, IStakingCampaign, fallBackUrl, getLockedTokenObject, getLockedTokenSymbol, getLockedTokenIconPaths, getTokenUrl, isThemeApplied, maxHeight, maxWidth, tokenStore, setTokenStore, getStakingSchema, getStakingUISchema, IStakingCampaignUI, Staking, Reward } from './store/index';
+import { getChainId, getTokenIconPath, isWalletConnected, getNetworkInfo, getDefaultChainId, setDataFromSCConfig, setCurrentChainId, tokenSymbol, LockTokenType, getStakingStatus, fallBackUrl, getLockedTokenObject, getLockedTokenSymbol, getLockedTokenIconPaths, getTokenUrl, isThemeApplied, maxHeight, maxWidth, tokenStore, setTokenStore, getSingleStakingSchema, ISingleStakingCampaign, Networks, InfuraId } from './store/index';
 import {
 	getStakingTotalLocked,
 	getLPObject,
@@ -12,16 +12,15 @@ import {
 	getVaultRewardCurrentAPR,
 	claimToken,
 	getAllCampaignsInfo,
-	deployCampaign,
+	// deployCampaign,
 } from './staking-utils/index';
 import { Result } from './common/index';
 import { ManageStake } from './manage-stake/index';
 import { Contracts } from './contracts/oswap-time-is-money-contract/index';
 import { stakingComponent } from './index.css';
-import scconfig from './scconfig.json';
 
 interface ScomStakingElement extends ControlElement {
-	data?: IStakingCampaignUI;
+	data?: ISingleStakingCampaign;
 }
 
 declare global {
@@ -35,8 +34,8 @@ declare global {
 @customModule
 @customElements('i-scom-staking')
 export default class ScomStaking extends Module implements PageBlock {
-	private _oldData: IStakingCampaign;
-	private _data: IStakingCampaign;
+	private _oldData: ISingleStakingCampaign;
+	private _data: ISingleStakingCampaign;
 	private oldTag: any = {};
 	tag: any = {};
 	defaultEdit: boolean = true;
@@ -58,7 +57,7 @@ export default class ScomStaking extends Module implements PageBlock {
 	private tokenMap: TokenMapType = {};
 
 	private getPropertiesSchema(readOnly?: boolean) {
-		const propertiesSchema = getStakingSchema(readOnly);
+		const propertiesSchema = getSingleStakingSchema(readOnly);
 		return propertiesSchema as IDataSchema;
 	}
 
@@ -122,8 +121,7 @@ export default class ScomStaking extends Module implements PageBlock {
 						redo: () => { }
 					}
 				},
-				userInputDataSchema: propertiesSchema,
-				userInputUISchema: getStakingUISchema()
+				userInputDataSchema: propertiesSchema
 			},
 			{
 				name: 'Theme Settings',
@@ -155,7 +153,8 @@ export default class ScomStaking extends Module implements PageBlock {
 	}
 
 	async setData(value: any) {
-		this._data = this.convertCampaignData(value);
+		// this._data = this.convertCampaignData(value);
+		this._data = value;
 		this.onSetupPage(isWalletConnected());
 	}
 
@@ -178,49 +177,44 @@ export default class ScomStaking extends Module implements PageBlock {
 
 	async config() { }
 
-	private convertCampaignData(data: IStakingCampaignUI) {
-		if (data) {
-			const hourVal = 60 * 60;
-			const { stakings, campaignStart, campaignEnd } = data;
-			const { perAddressCap, minLockTime, maxTotalLock, rewards } = stakings;
-			const { multiplier, rewardTokenAddress } = rewards;
-			const _maxTotalLock = new BigNumber(maxTotalLock);
-			const _rewardAmount = new BigNumber(multiplier || 0).multipliedBy(_maxTotalLock);
-			const totalRewardAmount = {
-				value: _rewardAmount,
-				tokenAddress: rewardTokenAddress
-			};
-			const _rewards: Reward = {
-				...rewards,
-				multiplier: new BigNumber(rewards.multiplier),
-				initialReward: new BigNumber(rewards.initialReward),
-				vestingPeriod: new BigNumber(rewards.vestingPeriod).multipliedBy(rewards.vestingPeriodUnit).multipliedBy(hourVal),
-				claimDeadline: new BigNumber(rewards.claimDeadline),
-				vestingStartDate: new BigNumber(rewards.vestingStartDate || 0),
-				rewardAmount: _rewardAmount
-			}
-			const _stakings: Staking = {
-				...stakings,
-				minLockTime: new BigNumber(minLockTime),
-				perAddressCap: new BigNumber(perAddressCap),
-				maxTotalLock: _maxTotalLock,
-				totalRewardAmount: [totalRewardAmount],
-				rewards: [_rewards]
-			}
-			let _data: IStakingCampaign = {
-				...data,
-				campaignStart: new BigNumber(campaignStart),
-				campaignEnd: new BigNumber(campaignEnd),
-				stakings: [_stakings]
-			};
-			return _data;
-		}
-		return null;
-	}
+	// private convertCampaignData(data: ISingleStakingCampaign) {
+	// 	if (data) {
+	// 		const hourVal = 60 * 60;
+	// 		const { stakings, campaignStart, campaignEnd } = data;
+	// 		const { perAddressCap, minLockTime, maxTotalLock, rewards } = stakings;
+	// 		const { multiplier } = rewards;
+	// 		const _maxTotalLock = new BigNumber(maxTotalLock);
+	// 		const _rewardAmount = new BigNumber(multiplier || 0).multipliedBy(_maxTotalLock);
+	// 		const _rewards: Reward = {
+	// 			...rewards,
+	// 			multiplier: new BigNumber(rewards.multiplier),
+	// 			initialReward: new BigNumber(rewards.initialReward),
+	// 			vestingPeriod: new BigNumber(rewards.vestingPeriod).multipliedBy(rewards.vestingPeriodUnit).multipliedBy(hourVal),
+	// 			claimDeadline: new BigNumber(rewards.claimDeadline),
+	// 			vestingStartDate: new BigNumber(rewards.vestingStartDate || 0),
+	// 			rewardAmount: _rewardAmount
+	// 		}
+	// 		const _stakings: Staking = {
+	// 			...stakings,
+	// 			minLockTime: new BigNumber(minLockTime),
+	// 			perAddressCap: new BigNumber(perAddressCap),
+	// 			maxTotalLock: _maxTotalLock,
+	// 			rewards: [_rewards]
+	// 		}
+	// 		let _data: IStakingCampaign = {
+	// 			...data,
+	// 			campaignStart: new BigNumber(campaignStart),
+	// 			campaignEnd: new BigNumber(campaignEnd),
+	// 			stakings: [_stakings]
+	// 		};
+	// 		return _data;
+	// 	}
+	// 	return null;
+	// }
 
 	constructor(parent?: Container, options?: ControlElement) {
 		super(parent, options);
-		setDataFromSCConfig(scconfig);
+		setDataFromSCConfig({ networks: Object.values(Networks), infuraId: InfuraId });
 		setTokenStore();
 		this.$eventBus = application.EventBus;
 		this.registerEvent();
@@ -247,7 +241,7 @@ export default class ScomStaking extends Module implements PageBlock {
 	private isWalletValid = async (isConnected: boolean) => {
 		if (this._data && isConnected) {
 			try {
-				const wallet = Wallet.getInstance() as any;
+				const wallet = Wallet.getClientInstance();
 				const infoList = this._data[wallet.chainId];
 				const stakingAddress = infoList && infoList[0].stakings[0]?.address;
 				if (stakingAddress) {
@@ -274,7 +268,7 @@ export default class ScomStaking extends Module implements PageBlock {
 			await this.renderEmpty();
 			return;
 		}
-		this.campaigns = await getAllCampaignsInfo({ [this._data.chainId]: [this._data] });
+		this.campaigns = await getAllCampaignsInfo({ [this._data.chainId]: this._data });
 		await this.renderCampaigns(hideLoading);
 		if (!hideLoading && this.loadingElm) {
 			this.loadingElm.visible = false;
@@ -357,12 +351,16 @@ export default class ScomStaking extends Module implements PageBlock {
 
 	private checkValidation = () => {
 		if (!this._data) return false;
-		const { chainId, customName, campaignStart, campaignEnd, admin, stakings } = this._data;
-		if (!chainId || !customName || !campaignStart?.gt(0) || !campaignEnd?.gt(0) || !admin || !stakings) return false;
-		const { lockTokenAddress, minLockTime, perAddressCap, maxTotalLock, rewards } = stakings[0];
-		if (!lockTokenAddress || !minLockTime?.gt(0) || !perAddressCap?.gt(0) || !maxTotalLock?.gt(0) || !rewards) return false;
-		const { rewardTokenAddress, multiplier, initialReward, vestingPeriod, claimDeadline } = rewards[0];
-		if (!rewardTokenAddress || !multiplier?.gt(0) || initialReward?.isNaN() || !vestingPeriod?.gt(0) || !claimDeadline) return false;
+		const { chainId, customName, stakings } = this._data;
+		if (!chainId || !customName || !stakings) return false;
+		const { address, rewards, lockTokenType } = stakings;
+		if (!address || !rewards || !rewards.address || lockTokenType === undefined) return false;
+		// const { chainId, customName, campaignStart, campaignEnd, admin, stakings } = this._data;
+		// if (!chainId || !customName || !campaignStart?.gt(0) || !campaignEnd?.gt(0) || !admin || !stakings) return false;
+		// const { lockTokenAddress, minLockTime, perAddressCap, maxTotalLock, rewards } = stakings[0];
+		// if (!lockTokenAddress || !minLockTime?.gt(0) || !perAddressCap?.gt(0) || !maxTotalLock?.gt(0) || !rewards) return false;
+		// const { rewardTokenAddress, multiplier, initialReward, vestingPeriod, claimDeadline } = rewards[0];
+		// if (!rewardTokenAddress || !multiplier?.gt(0) || initialReward?.isNaN() || !vestingPeriod?.gt(0) || !claimDeadline) return false;
 		return true;
 	}
 
@@ -371,7 +369,6 @@ export default class ScomStaking extends Module implements PageBlock {
 			downloadJsonFile('campaign.json', { ...data });
 		}
 	}
-
 
 	private removeTimer = () => {
 		for (const timer of this.listAprTimer) {

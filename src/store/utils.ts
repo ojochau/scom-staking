@@ -71,18 +71,18 @@ export const addUserTokens = (token: ITokenObject) => {
   localStorage[TOKENS + chainId] = JSON.stringify(tokens);
 }
 
-export const setSiteEnv = (value: string) => {
-  if (Object.values(SITE_ENV).includes(value as SITE_ENV)) {
-    state.siteEnv = value as SITE_ENV;
-  } else {
-    state.siteEnv = SITE_ENV.TESTNET;
-  }
+// export const setSiteEnv = (value: string) => {
+//   if (Object.values(SITE_ENV).includes(value as SITE_ENV)) {
+//     state.siteEnv = value as SITE_ENV;
+//   } else {
+//     state.siteEnv = SITE_ENV.TESTNET;
+//   }
 
-}
+// }
 
-export const getSiteEnv = (): SITE_ENV => {
-  return state.siteEnv;
-}
+// export const getSiteEnv = (): SITE_ENV => {
+//   return state.siteEnv;
+// }
 
 const setInfuraId = (infuraId: string) => {
   state.infuraId = infuraId;
@@ -128,14 +128,15 @@ export const getMatchNetworks = (conditions: NetworkConditions): INetwork[] => {
 export const getSiteSupportedNetworks = () => {
   let networkFullList = Object.values(state.networkMap);
   let list = networkFullList.filter(network => !getNetworkInfo(network.chainId).isDisabled);
-  const siteEnv = getSiteEnv();
-  if (siteEnv === SITE_ENV.TESTNET) {
-    return list.filter((network) => network.isTestnet);
-  }
-  if (siteEnv === SITE_ENV.DEV) {
-    return list;
-  }
-  return list.filter((network) => !network.isTestnet);
+  return list;
+  // const siteEnv = getSiteEnv();
+  // if (siteEnv === SITE_ENV.TESTNET) {
+  //   return list.filter((network) => network.isTestnet);
+  // }
+  // if (siteEnv === SITE_ENV.DEV) {
+  //   return list;
+  // }
+  // return list.filter((network) => !network.isTestnet);
 }
 
 const setNetworkList = (networkList: INetwork[], infuraId?: string) => {
@@ -148,7 +149,7 @@ const setNetworkList = (networkList: INetwork[], infuraId?: string) => {
     state.networkMap[network.chainId] = network;
 
     if (network.rpc) {
-      const networkInfo = wallet.getNetworkInfo(network.chainId);
+      const networkInfo: any = Networks[network.chainId];
       wallet.setNetworkInfo({
         ...networkInfo,
         rpcUrls: [network.rpc]
@@ -183,34 +184,35 @@ export function canDisperse(chainId: number) {
 
 export const listsNetworkShow = () => {
   let list = listNetworks.filter(network => !Networks[network.chainId].isDisabled);
-  const siteEnv = getSiteEnv();
-  if (siteEnv === SITE_ENV.TESTNET) {
-    return list.filter((network) =>
-      [
-        ChainNetwork.AminoTestnet,
-        ChainNetwork.BSCTestnet,
-        ChainNetwork.Fuji,
-        ChainNetwork.FantomTestnet,
-        ChainNetwork.Mumbai,
-        ChainNetwork.AminoXTestnet,
-        ChainNetwork.CronosTestnet,
-      ].includes(network.chainId),
-    );
-  }
-  if (siteEnv === SITE_ENV.DEV) {
-    return list;
-  }
-  return list.filter((network) =>
-    [
-      //production
-      ChainNetwork.EthMainnet,
-      ChainNetwork.BSCMainnet,
-      ChainNetwork.Avalanche,
-      ChainNetwork.Polygon,
-      ChainNetwork.Fantom,
-      ChainNetwork.CronosMainnet,
-    ].includes(network.chainId) && canDisperse(network.chainId),
-  );
+  return list;
+  // const siteEnv = getSiteEnv();
+  // if (siteEnv === SITE_ENV.TESTNET) {
+  //   return list.filter((network) =>
+  //     [
+  //       ChainNetwork.AminoTestnet,
+  //       ChainNetwork.BSCTestnet,
+  //       ChainNetwork.Fuji,
+  //       ChainNetwork.FantomTestnet,
+  //       ChainNetwork.Mumbai,
+  //       ChainNetwork.AminoXTestnet,
+  //       ChainNetwork.CronosTestnet,
+  //     ].includes(network.chainId),
+  //   );
+  // }
+  // if (siteEnv === SITE_ENV.DEV) {
+  //   return list;
+  // }
+  // return list.filter((network) =>
+  //   [
+  //     //production
+  //     ChainNetwork.EthMainnet,
+  //     ChainNetwork.BSCMainnet,
+  //     ChainNetwork.Avalanche,
+  //     ChainNetwork.Polygon,
+  //     ChainNetwork.Fantom,
+  //     ChainNetwork.CronosMainnet,
+  //   ].includes(network.chainId) && canDisperse(network.chainId),
+  // );
 };
 
 export const getChainNativeToken = (chainId: number): ITokenObject => {
@@ -265,14 +267,15 @@ export function getChainId() {
 }
 
 export const getDefaultChainId = () => {
-  switch (getSiteEnv()) {
-    case SITE_ENV.TESTNET:
-      return Testnets.avalanche.chainId
-    case SITE_ENV.DEV:
-    case SITE_ENV.MAINNET:
-    default:
-      return Mainnets.avalanche.chainId
-  }
+  return Mainnets.avalanche.chainId;
+  // switch (getSiteEnv()) {
+  //   case SITE_ENV.TESTNET:
+  //     return Testnets.avalanche.chainId
+  //   case SITE_ENV.DEV:
+  //   case SITE_ENV.MAINNET:
+  //   default:
+  //     return Mainnets.avalanche.chainId
+  // }
 }
 
 export function getWalletProvider() {
@@ -360,7 +363,7 @@ export const projectNativeTokenSymbol = () => {
 };
 
 export const getTokenObject = async (address: string, showBalance?: boolean) => {
-  const ERC20Contract = new OpenSwapContracts.ERC20(Wallet.getInstance(), address);
+  const ERC20Contract = new OpenSwapContracts.ERC20(Wallet.getClientInstance(), address);
   const symbol = await ERC20Contract.symbol();
   const name = await ERC20Contract.name();
   const decimals = (await ERC20Contract.decimals()).toFixed();

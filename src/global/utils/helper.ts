@@ -21,6 +21,7 @@ export const explorerTxUrlsByChainId: { [key: number]: string } = {
   250: 'https://ftmscan.com/tx/',
   4002: 'https://testnet.ftmscan.com/tx/',
   13370: 'https://aminoxtestnet.blockscout.alphacarbon.network/tx/',
+  421613: 'https://goerli.arbiscan.io/tx/'
 }
 
 export const explorerAddressUrlsByChainId: {[key: number]: string} = {
@@ -36,6 +37,7 @@ export const explorerAddressUrlsByChainId: {[key: number]: string} = {
   250: 'https://ftmscan.com/address/',
   4002: 'https://testnet.ftmscan.com/address/',
   13370: 'https://aminoxtestnet.blockscout.alphacarbon.network/address/',
+  421613: 'https://goerli.arbiscan.io/address/'
 }
 
 export const DefaultDateTimeFormat = 'DD/MM/YYYY HH:mm:ss';

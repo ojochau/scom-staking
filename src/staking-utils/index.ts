@@ -1,4 +1,3 @@
-import { moment } from "@ijstech/components";
 import { Wallet, BigNumber, Utils, Erc20, IWallet } from "@ijstech/eth-wallet";
 import { Contracts as TimeIsMoneyContracts } from "../contracts/oswap-time-is-money-contract/index";
 import { Contracts } from "../contracts/oswap-openswap-contract/index";
@@ -14,11 +13,10 @@ import {
   ToUSDPriceFeedAddressesMap,
   WETHByChainId,
   tokenPriceAMMReference,
-  IStakingCampaign,
-  Staking,
-  Reward,
   getTokenDecimals,
   tokenStore,
+  ISingleStakingCampaign,
+  ISingleStaking,
 } from "../store/index";
 
 export const getTokenPrice = async (token: string) => { // in USD value
@@ -81,87 +79,36 @@ export const getTokenPrice = async (token: string) => { // in USD value
   return tokenPrice;
 }
 
-const getStakingRewardInfoByAddresses = async (option: Reward, providerAddress: string, releaseTime: number) => {
-  try {
-    let rewardAddress = option.address;
-    let isCommonStartDate = option.isCommonStartDate;
-    let reward = '0';
-    let claimSoFar = '0';
-    let claimable = '0';
-    let admin = '';
-    if (!rewardAddress) {
-      return {
-        reward,
-        claimSoFar,
-        claimable,
-        multiplier: option.multiplier
-      }
-    }
-
-    let wallet = Wallet.getClientInstance();
-    let rewardsContract;
-    if (isCommonStartDate) {
-      rewardsContract = new TimeIsMoneyContracts.RewardsCommonStartDate(wallet, rewardAddress);
-    }
-    else {
-      rewardsContract = new TimeIsMoneyContracts.Rewards(wallet, rewardAddress);
-    }
-
-    try {
-      admin = await rewardsContract.admin();
-      let rewardWei = await rewardsContract.reward();
-      let unclaimedWei = await rewardsContract.unclaimed();
-      let claimSoFarWei = await rewardsContract.claimSoFar(providerAddress);
-
-      reward = Utils.fromDecimals(rewardWei).toFixed();
-      claimSoFar = Utils.fromDecimals(claimSoFarWei).toFixed();
-      claimable = Utils.fromDecimals(unclaimedWei).toFixed();
-    } catch (err) {
-    }
-
-    let vestingPeriod = (await rewardsContract.vestingPeriod()).toNumber();
-    let vestingStart;
-
-    if (rewardsContract instanceof TimeIsMoneyContracts.RewardsCommonStartDate) {
-      let vestingStartDateRaw = (await rewardsContract.vestingStartDate()).toNumber();
-      vestingStart = moment.unix(vestingStartDateRaw);
-    }
-    else {
-      vestingStart = moment.unix(releaseTime);
-    }
-
-    let vestingEnd = moment(vestingStart).add(vestingPeriod, 'seconds');
-    let multiplierWei = await rewardsContract.multiplier();
-    let multiplier = Utils.fromDecimals(multiplierWei).toFixed();
-
-    return {
-      vestingPeriod,
-      vestingStart,
-      vestingEnd,
-      reward,
-      claimSoFar,
-      claimable,
-      multiplier,
-      admin
-    }
-  }
-  catch (err) {
-    console.log('err', err)
-    return null
-  }
-}
-
-const getDefaultStakingByAddress = async (option: Staking) => {
+const getDefaultStakingByAddress = async (option: ISingleStaking) => {
   try {
     let wallet = Wallet.getClientInstance();
+    let currentAddress = wallet.address;
     let stakingAddress = option.address;
-    let rewards = option.rewards;
+    let rewards = [option.rewards];
     let hasRewardAddress = rewards.length && rewards[0].address;
 
     let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet, stakingAddress);
-
+    let mode = '';
     let minimumLockTime = await timeIsMoney.minimumLockTime();
     let maximumTotalLock = await timeIsMoney.maximumTotalLock();
+    let totalLockedWei = await timeIsMoney.totalLocked();
+    let totalCreditWei = await timeIsMoney.getCredit(currentAddress);
+    let lockAmountWei = await timeIsMoney.lockAmount(currentAddress);
+    let withdrawn = await timeIsMoney.withdrawn(currentAddress);
+
+    let totalCredit = Utils.fromDecimals(totalCreditWei).toFixed();
+    let lockAmount = Utils.fromDecimals(lockAmountWei).toFixed();
+    let stakeQty = withdrawn ? '0' : lockAmount;
+
+    if (new BigNumber(totalCredit).gt(0) && hasRewardAddress) {
+      mode = 'Claim';
+    }
+    else if (new BigNumber(stakeQty).isZero()) {
+      mode = 'Stake';
+    }
+    else {
+      mode = 'Unlock';
+    }
 
     let startOfEntryPeriod = '0';
     try {
@@ -172,15 +119,20 @@ const getDefaultStakingByAddress = async (option: Staking) => {
     let endOfEntryPeriod = (await timeIsMoney.endOfEntryPeriod()).toFixed();
     let perAddressCapWei = await timeIsMoney.perAddressCap();
     let maxTotalLock = Utils.fromDecimals(maximumTotalLock).shiftedBy(stakingDecimals).toFixed();
+    let totalLocked = Utils.fromDecimals(totalLockedWei).toFixed();
     let perAddressCap = Utils.fromDecimals(perAddressCapWei).shiftedBy(stakingDecimals).toFixed();
 
     let obj = {
+      mode,
       minLockTime: minimumLockTime.toNumber(),
       maxTotalLock,
+      totalLocked,
+      stakeQty,
       startOfEntryPeriod: parseInt(startOfEntryPeriod) * 1000,
       endOfEntryPeriod: parseInt(endOfEntryPeriod) * 1000,
       perAddressCap,
       lockTokenAddress: tokenAddress,
+      tokenAddress: tokenAddress.toLowerCase(),
     };
 
     if (hasRewardAddress) {
@@ -189,10 +141,15 @@ const getDefaultStakingByAddress = async (option: Staking) => {
         return new Promise<void>(async (resolve, reject) => {
           let rewardsContract, admin, multiplier, initialReward, rewardTokenAddress, vestingPeriod, vestingStartDate, claimDeadline;
           try {
+            let claimable = '0';
             if (reward.isCommonStartDate) {
               rewardsContract = new TimeIsMoneyContracts.RewardsCommonStartDate(wallet, reward.address);
             } else {
               rewardsContract = new TimeIsMoneyContracts.Rewards(wallet, reward.address);
+            }
+            if (mode === 'Claim') {
+              let unclaimedWei = await rewardsContract.unclaimed();
+              claimable = Utils.fromDecimals(unclaimedWei).toFixed(); 
             }
             admin = await rewardsContract.admin();
             rewardTokenAddress = await rewardsContract.token();
@@ -204,11 +161,12 @@ const getDefaultStakingByAddress = async (option: Staking) => {
             vestingPeriod = (await rewardsContract.vestingPeriod()).toNumber();
             claimDeadline = (await rewardsContract.claimDeadline()).toNumber();
             if (reward.isCommonStartDate) {
-              vestingStartDate = (await (rewardsContract as any).vestingStartDate()).toNumber();
+              vestingStartDate = (await rewardsContract.vestingStartDate()).toNumber();
             }
             let rewardAmount = new BigNumber(multiplier).multipliedBy(maxTotalLock).toFixed();
             rewardsData.push({
               ...reward,
+              claimable,
               rewardTokenAddress,
               multiplier,
               initialReward,
@@ -226,6 +184,7 @@ const getDefaultStakingByAddress = async (option: Staking) => {
       return {
         ...option,
         ...obj,
+        rewardsData: rewardsData,
         rewards: rewardsData.sort((a, b) => a.index - b.index)
       }
     }
@@ -239,137 +198,13 @@ const getDefaultStakingByAddress = async (option: Staking) => {
   }
 }
 
-const getStakingOptionExtendedInfoByAddress = async (option: Staking) => {
-  try {
-    let wallet = Wallet.getClientInstance();
-    let chainId = wallet.chainId;
-    let stakingAddress = option.address;
-    let rewardOptions = option.rewards;
-    let currentAddress = wallet.address;
-    let hasRewardAddress = rewardOptions.length > 0 && rewardOptions[0].address;
-
-    let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet, stakingAddress);
-
-    let totalCreditWei = await timeIsMoney.getCredit(currentAddress);
-    let lockAmountWei = await timeIsMoney.lockAmount(currentAddress);
-    let withdrawn = await timeIsMoney.withdrawn(currentAddress);
-    let totalCredit = Utils.fromDecimals(totalCreditWei).toFixed();
-    let lockAmount = Utils.fromDecimals(lockAmountWei).toFixed();
-    let stakeQty = withdrawn ? '0' : lockAmount;
-    let mode = '';
-
-    if (new BigNumber(totalCredit).gt(0) && hasRewardAddress) {
-      mode = 'Claim';
-    }
-    else if (new BigNumber(stakeQty).isZero()) {
-      mode = 'Stake';
-    }
-    else {
-      mode = 'Unlock';
-    }
-
-    let minimumLockTime = await timeIsMoney.minimumLockTime();
-    let releaseTime = await timeIsMoney.releaseTime(currentAddress);
-    let maximumTotalLock = await timeIsMoney.maximumTotalLock();
-    let totalLockedWei = await timeIsMoney.totalLocked();
-
-    let startOfEntryPeriod = '0';
-    try {
-      startOfEntryPeriod = (await timeIsMoney.startOfEntryPeriod()).toFixed();
-    } catch (err) { }
-
-    let endOfEntryPeriod = (await timeIsMoney.endOfEntryPeriod()).toFixed();
-    let perAddressCapWei = await timeIsMoney.perAddressCap();
-    let lockedTime = releaseTime.minus(minimumLockTime);
-
-    let maxTotalLock = Utils.fromDecimals(maximumTotalLock).toFixed();
-    let totalLocked = Utils.fromDecimals(totalLockedWei).toFixed();
-    let perAddressCap = Utils.fromDecimals(perAddressCapWei).toFixed();
-    let tokenAddress = await timeIsMoney.token();
-
-    let obj = {
-      mode: mode,
-      minLockTime: minimumLockTime.toNumber(),
-      releaseTime: releaseTime.toNumber() * 1000,
-      lockedTime: lockedTime.toNumber() * 1000,
-      maxTotalLock: maxTotalLock,
-      totalLocked: totalLocked,
-      totalCredit: totalCredit,
-      stakeQty: stakeQty,
-      withdrawn: withdrawn,
-      lockAmount: lockAmount,
-      startOfEntryPeriod: parseInt(startOfEntryPeriod) * 1000,
-      endOfEntryPeriod: parseInt(endOfEntryPeriod) * 1000,
-      perAddressCap: perAddressCap,
-      tokenAddress: tokenAddress.toLowerCase(),
-    };
-
-    if (hasRewardAddress) {
-      let rewardsData: any[] = [];
-      let promises = rewardOptions.map(async (option, index) => {
-        return new Promise<void>(async (resolve, reject) => {
-          try {
-            let referencePair = '';
-            if (option.rewardTokenAddress && tokenPriceAMMReference[chainId]) {
-              referencePair = tokenPriceAMMReference[chainId][option.rewardTokenAddress.toLowerCase()];
-            }
-            if (mode === 'Claim') {
-              let stakingRewardInfo = await getStakingRewardInfoByAddresses(option, currentAddress, releaseTime.toNumber());
-              if (stakingRewardInfo) {
-                let vestedReward = new BigNumber(totalCredit).times(stakingRewardInfo.multiplier).minus(stakingRewardInfo.claimSoFar).toFixed();
-                rewardsData.push({
-                  ...option,
-                  ...stakingRewardInfo,
-                  referencePair,
-                  vestedReward,
-                  index
-                });
-              }
-            } else {
-              let rewardsContract;
-              if (option.isCommonStartDate) {
-                rewardsContract = new TimeIsMoneyContracts.RewardsCommonStartDate(wallet, option.address);
-              } else {
-                rewardsContract = new TimeIsMoneyContracts.Rewards(wallet, option.address);
-              }
-              let admin = await rewardsContract.admin();
-              let multiplierWei = await rewardsContract.multiplier();
-              let multiplier = Utils.fromDecimals(multiplierWei).toFixed();
-              rewardsData.push({
-                ...option,
-                referencePair,
-                multiplier,
-                admin,
-                index
-              });
-            }
-          }
-          catch (error) { }
-          resolve();
-        })
-      });
-      await Promise.all(promises);
-      return {
-        ...obj,
-        rewardsData: rewardsData.sort((a, b) => a.index - b.index)
-      }
-    }
-    else {
-      return obj;
-    }
-  }
-  catch (err) {
-    console.log('err', err);
-    return null;
-  }
-}
-
-const composeCampaignInfoList = async (stakingCampaignInfoList: IStakingCampaign[], addDurationOption: (options: any[], defaultOption: Staking) => void) => {
+const composeCampaignInfoList = async (stakingCampaignInfoList: ISingleStakingCampaign, addDurationOption: (options: any[], defaultOption: ISingleStaking) => void) => {
   let campaigns: any[] = [];
-  for (let i = 0; i < stakingCampaignInfoList.length; i++) {
-    let stakingCampaignInfo = stakingCampaignInfoList[i];
+  const _stakingCampaignInfoList = [stakingCampaignInfoList];
+  for (let i = 0; i < _stakingCampaignInfoList.length; i++) {
+    let stakingCampaignInfo = _stakingCampaignInfoList[i];
     let durationOptionsWithExtendedInfo: any[] = [];
-    let durationOptions = stakingCampaignInfo.stakings;
+    let durationOptions = [stakingCampaignInfo.stakings];
     for (let j = 0; j < durationOptions.length; j++) {
       let durationOption = durationOptions[j];
       addDurationOption(durationOptionsWithExtendedInfo, durationOption);
@@ -398,23 +233,18 @@ const composeCampaignInfoList = async (stakingCampaignInfoList: IStakingCampaign
   return campaigns;
 }
 
-const getAllCampaignsInfo = async (stakingInfo: { [key: number]: IStakingCampaign[] }, imported?: boolean) => {
+const getAllCampaignsInfo = async (stakingInfo: { [key: number]: ISingleStakingCampaign }) => {
   let wallet = Wallet.getClientInstance();
   let chainId = wallet.chainId;
   let stakingCampaignInfoList = stakingInfo[chainId];
   if (!stakingCampaignInfoList) return [];
 
   let optionExtendedInfoMap: any = {};
-  let allCampaignOptions = (stakingCampaignInfoList as any).flatMap((v: any) => v.stakings);
+  let allCampaignOptions = [stakingCampaignInfoList.stakings];
   let promises = allCampaignOptions.map(async (option: any, index: any) => {
     return new Promise<void>(async (resolve, reject) => {
       try {
-        let optionExtendedInfo;
-        if (imported) {
-          optionExtendedInfo = await getDefaultStakingByAddress(option);
-        } else {
-          optionExtendedInfo = await getStakingOptionExtendedInfoByAddress(option);
-        }
+        let optionExtendedInfo = await getDefaultStakingByAddress(option);
         if (optionExtendedInfo) optionExtendedInfoMap[option.address] = optionExtendedInfo;
       }
       catch (error) { }
@@ -423,7 +253,7 @@ const getAllCampaignsInfo = async (stakingInfo: { [key: number]: IStakingCampaig
   });
   await Promise.all(promises);
 
-  let campaigns: any[] = await composeCampaignInfoList(stakingCampaignInfoList, (options: any[], defaultOption: Staking) => {
+  let campaigns: any[] = await composeCampaignInfoList(stakingCampaignInfoList, (options: any[], defaultOption: ISingleStaking) => {
     if (defaultOption.address && optionExtendedInfoMap[defaultOption.address]) {
       options.push({
         ...defaultOption,
@@ -431,15 +261,12 @@ const getAllCampaignsInfo = async (stakingInfo: { [key: number]: IStakingCampaig
       })
     }
   })
-  if (imported) {
-    return campaigns.map(campaign => {
-      return {
-        ...campaign,
-        stakings: campaign.options,
-      }
-    })
-  }
-  return campaigns;
+  return campaigns.map(campaign => {
+    return {
+      ...campaign,
+      stakings: campaign.options,
+    }
+  });
 }
 
 const getStakingTotalLocked = async (stakingAddress: string) => {
@@ -684,81 +511,81 @@ const getApprovalModelAction = (contractAddress: string, options: IERC20Approval
   return approvalModelAction;
 }
 
-const deployCampaign = async (campaign: IStakingCampaign, callback?: any) => {
-  let listTransferReward: any[] = [];
-  let wallet = Wallet.getClientInstance();
-  let result: IStakingCampaign = { ...campaign, stakings: [] };
-  try {
-    for (const staking of campaign.stakings) {
-      let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet);
-      let stakingResult: Staking;
-      const { campaignStart, campaignEnd, admin } = campaign;
-      const { lockTokenAddress, maxTotalLock, minLockTime, perAddressCap } = staking;
-      let timeIsMoneyToken = new Erc20(wallet, lockTokenAddress);
-      let timeIsMoneyTokenDecimals = await timeIsMoneyToken.decimals;
-      const stakingAddress = await timeIsMoney.deploy({
-        token: lockTokenAddress,
-        maximumTotalLock: Utils.toDecimals(maxTotalLock, timeIsMoneyTokenDecimals),
-        minimumLockTime: minLockTime,
-        startOfEntryPeriod: campaignStart,
-        endOfEntryPeriod: campaignEnd,
-        perAddressCap: Utils.toDecimals(perAddressCap, timeIsMoneyTokenDecimals),
-      });
-      let rewardResult: Reward[] = [];
-      for (const reward of staking.rewards) {
-        const { multiplier, rewardTokenAddress, initialReward, vestingPeriod, isCommonStartDate, vestingStartDate, claimDeadline } = reward;
-        let rewardToken = new Erc20(wallet, rewardTokenAddress);
-        let rewardTokenDecimals = await rewardToken.decimals;
-        let params: any = {
-          timeIsMoney: timeIsMoney.address,
-          token: rewardTokenAddress,
-          multiplier: Utils.toDecimals(multiplier, rewardTokenDecimals),
-          initialReward: Utils.toDecimals(initialReward, rewardTokenDecimals),
-          vestingPeriod,
-          claimDeadline,
-          admin,
-        }
-        let rewardsContract;
-        if (isCommonStartDate) {
-          rewardsContract = new TimeIsMoneyContracts.RewardsCommonStartDate(wallet);
-          params = {
-            ...params,
-            vestingStartDate,
-          }
-        } else {
-          rewardsContract = new TimeIsMoneyContracts.Rewards(wallet);
-        }
-        const rewardAddress = await rewardsContract.deploy(params);
-        rewardResult.push({ ...reward, address: rewardAddress });
-        listTransferReward.push({
-          to: rewardAddress,
-          value: Utils.toDecimals(maxTotalLock.multipliedBy(multiplier), rewardTokenDecimals),
-          rewardTokenAddress,
-        });
-      };
-      stakingResult = { ...staking, address: stakingAddress, rewards: rewardResult };
-      result.stakings.push(stakingResult);
-    }
-  } catch (error) {
-    if (callback) {
-      callback(error, null);
-    }
-    return null;
-  }
-  try {
-    // Transfer max reward from the admin to the reward contract.
-    for (const transferReward of listTransferReward) {
-      const { to, value, rewardTokenAddress } = transferReward;
-      const contract = new Contracts.OSWAP_ERC20(wallet, rewardTokenAddress);
-      await contract.transfer({ to, value });
-    }
-  } catch (error) {
-    if (callback) {
-      callback(error, null);
-    }
-  }
-  return result;
-}
+// const deployCampaign = async (campaign: IStakingCampaign, callback?: any) => {
+//   let listTransferReward: any[] = [];
+//   let wallet = Wallet.getClientInstance();
+//   let result: IStakingCampaign = { ...campaign, stakings: [] };
+//   try {
+//     for (const staking of campaign.stakings) {
+//       let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet);
+//       let stakingResult: Staking;
+//       const { campaignStart, campaignEnd, admin } = campaign;
+//       const { lockTokenAddress, maxTotalLock, minLockTime, perAddressCap } = staking;
+//       let timeIsMoneyToken = new Erc20(wallet, lockTokenAddress);
+//       let timeIsMoneyTokenDecimals = await timeIsMoneyToken.decimals;
+//       const stakingAddress = await timeIsMoney.deploy({
+//         token: lockTokenAddress,
+//         maximumTotalLock: Utils.toDecimals(maxTotalLock, timeIsMoneyTokenDecimals),
+//         minimumLockTime: minLockTime,
+//         startOfEntryPeriod: campaignStart,
+//         endOfEntryPeriod: campaignEnd,
+//         perAddressCap: Utils.toDecimals(perAddressCap, timeIsMoneyTokenDecimals),
+//       });
+//       let rewardResult: Reward[] = [];
+//       for (const reward of staking.rewards) {
+//         const { multiplier, rewardTokenAddress, initialReward, vestingPeriod, isCommonStartDate, vestingStartDate, claimDeadline } = reward;
+//         let rewardToken = new Erc20(wallet, rewardTokenAddress);
+//         let rewardTokenDecimals = await rewardToken.decimals;
+//         let params: any = {
+//           timeIsMoney: timeIsMoney.address,
+//           token: rewardTokenAddress,
+//           multiplier: Utils.toDecimals(multiplier, rewardTokenDecimals),
+//           initialReward: Utils.toDecimals(initialReward, rewardTokenDecimals),
+//           vestingPeriod,
+//           claimDeadline,
+//           admin,
+//         }
+//         let rewardsContract;
+//         if (isCommonStartDate) {
+//           rewardsContract = new TimeIsMoneyContracts.RewardsCommonStartDate(wallet);
+//           params = {
+//             ...params,
+//             vestingStartDate,
+//           }
+//         } else {
+//           rewardsContract = new TimeIsMoneyContracts.Rewards(wallet);
+//         }
+//         const rewardAddress = await rewardsContract.deploy(params);
+//         rewardResult.push({ ...reward, address: rewardAddress });
+//         listTransferReward.push({
+//           to: rewardAddress,
+//           value: Utils.toDecimals(maxTotalLock.multipliedBy(multiplier), rewardTokenDecimals),
+//           rewardTokenAddress,
+//         });
+//       };
+//       stakingResult = { ...staking, address: stakingAddress, rewards: rewardResult };
+//       result.stakings.push(stakingResult);
+//     }
+//   } catch (error) {
+//     if (callback) {
+//       callback(error, null);
+//     }
+//     return null;
+//   }
+//   try {
+//     // Transfer max reward from the admin to the reward contract.
+//     for (const transferReward of listTransferReward) {
+//       const { to, value, rewardTokenAddress } = transferReward;
+//       const contract = new Contracts.OSWAP_ERC20(wallet, rewardTokenAddress);
+//       await contract.transfer({ to, value });
+//     }
+//   } catch (error) {
+//     if (callback) {
+//       callback(error, null);
+//     }
+//   }
+//   return result;
+// }
 
 export {
   getAllCampaignsInfo,
@@ -774,5 +601,5 @@ export {
   claimToken,
   lockToken,
   getApprovalModelAction,
-  deployCampaign,
+  // deployCampaign,
 }

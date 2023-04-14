@@ -7,6 +7,7 @@ const Networks: { [key: number]: INetwork } = {
     label: "Ethereum",
     icon: "ethereumNetwork.svg",
     rpc: `https://mainnet.infura.io/v3/${InfuraId}`,
+    explorerName: "Etherscan"
   },
   25: {
     chainId: 25,
@@ -21,12 +22,14 @@ const Networks: { [key: number]: INetwork } = {
     label: "Binance Smart Chain",
     icon: "bscMainnet.svg",
     rpc: 'https://bsc-dataseed.binance.org/',
+    explorerName: "BSCScan"
   },
   137: {
     label: 'Polygon',
     name: 'Polygon',
     chainId: 137,
     icon: 'polygon.svg',
+    explorerName: 'PolygonScan'
   },
   250: {
     label: 'Fantom Opera',
@@ -34,6 +37,7 @@ const Networks: { [key: number]: INetwork } = {
     chainId: 250,
     icon: 'fantom-ftm-logo.svg',
     rpc: 'https://rpc.ftm.tools/',
+    explorerName: 'FTMScan'
   },
   97: {
     label: 'BSC Testnet',
@@ -41,6 +45,7 @@ const Networks: { [key: number]: INetwork } = {
     chainId: 97,
     icon: 'bscMainnet.svg',
     rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
+    explorerName: 'BSCScan'
   },
   338: {
     label: 'Cronos Testnet',
@@ -62,6 +67,7 @@ const Networks: { [key: number]: INetwork } = {
     label: 'Mumbai',
     icon: 'polygon.svg',
     rpc: 'https://matic-mumbai.chainstacklabs.com',
+    explorerName: 'PolygonScan'
   },
   43113: {
     chainId: 43113,
@@ -69,6 +75,7 @@ const Networks: { [key: number]: INetwork } = {
     label: 'Avalanche FUJI C-Chain',
     icon: 'avax.svg',
     rpc: 'https://api.avax-test.network/ext/bc/C/rpc',
+    explorerName: 'SnowTrace'
   },
   43114: {
     chainId: 43114,
@@ -76,6 +83,7 @@ const Networks: { [key: number]: INetwork } = {
     label: 'Avalanche Mainnet C-Chain',
     icon: 'avax.svg',
     rpc: 'https://api.avax.network/ext/bc/C/rpc',
+    explorerName: 'SnowTrace'
   },
   4002: {
     chainId: 4002,
@@ -83,14 +91,23 @@ const Networks: { [key: number]: INetwork } = {
     label: 'Fantom Testnet',
     icon: 'fantom-ftm-logo.svg',
     rpc: 'https://rpc.testnet.fantom.network/',
-    isDisabled: true
+    isDisabled: true,
+    explorerName: 'FTMScan'
   },
   13370: {
     chainId: 13370,
     name: 'AminoX Testnet',
     label: 'AminoX Testnet',
     icon: 'aminoXTestnet.svg',
-    isDisabled: true
+    isDisabled: true,
+    explorerName: 'AminoX Explorer'
+  },
+  421613: {
+    chainId: 421613,
+    explorerName: 'ArbiScan',
+    name: 'Arbitrum Testnet',
+    label: 'Arbitrum Testnet',
+    icon: 'arbitrum.svg'
   }
 }
 const Mainnets = {
@@ -108,25 +125,8 @@ const Testnets = {
   fantom: Networks[4002],
   polygon: Networks[80001],
   aminox: Networks[13370],
+  arbitrum: Networks[421613]
 };
-const getNetworkType = (chainId: number) => {
-  if ([Mainnets.binance.chainId, Testnets.binance.chainId].includes(chainId)) {
-    return 'BSCScan';
-  }
-  if ([Mainnets.avalanche.chainId, Testnets.avalanche.chainId].includes(chainId)) {
-    return 'SnowTrace';
-  }
-  if ([Mainnets.polygon.chainId, Testnets.polygon.chainId].includes(chainId)) {
-    return 'PolygonScan';
-  }
-  if ([Mainnets.fantom.chainId, Testnets.fantom.chainId].includes(chainId)) {
-    return 'FTMScan';
-  }
-  if ([Testnets.aminox.chainId].includes(chainId)) {
-    return 'AminoX Explorer'
-  }
-  return 'Unknown';
-}
 
 enum ChainNetwork {
   BSCMainnet = 56,
@@ -141,7 +141,8 @@ enum ChainNetwork {
   FantomTestnet = 4002,
   CronosMainnet = 25,
   CronosTestnet = 338,
-  AminoXTestnet = 13370
+  AminoXTestnet = 13370,
+  Arbitrum = 421613
 }
 
 const listNetworks = [
@@ -223,6 +224,12 @@ const listNetworks = [
     chainId: ChainNetwork.AminoXTestnet,
     img: 'aminoXTestnet.svg'
   },
+  {
+    label: 'Arbitrum Testnet',
+    value: 'arbitrumTestnet',
+    chainId: ChainNetwork.Arbitrum,
+    img: 'arbitrum.svg'
+  },
 ];
 
 
@@ -231,7 +238,6 @@ export {
   Networks,
   Mainnets,
   Testnets,
-  getNetworkType,
   ChainNetwork,
   listNetworks,
 }
