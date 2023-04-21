@@ -15,7 +15,8 @@
     "@ijstech/eth-wallet-web3modal": "*",
     "@scom/scom-staking": "*",
     "@ijstech/eth-contract": "*",
-    "@ijstech/eth-wallet": "*"
+    "@ijstech/eth-wallet": "*",
+    "@scom/scom-dapp-container": "*"
   },
   "menus": [
     {

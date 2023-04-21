@@ -31,7 +31,20 @@ export default class Module1 extends Module {
                             "address": "0x10B846B7A1807B3610ee94c1b120D9c5E87C148d",
                             "isCommonStartDate": false,
                         }
-                    }
+                    },
+                    "networks": [
+                        {
+                          "chainId": 43113
+                        },
+                        {
+                          "chainId": 97
+                        }
+                    ],
+                    "wallets": [
+                        {
+                          "name": "metamask"
+                        }
+                    ]
                 }} />
             </i-hstack>
         </i-panel>

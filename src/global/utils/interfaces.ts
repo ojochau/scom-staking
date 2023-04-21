@@ -1,4 +1,4 @@
-import { BigNumber } from "@ijstech/eth-contract";
+import { BigNumber, IClientSideProvider } from "@ijstech/eth-wallet";
 
 export interface ICommissionInfo {
   chainId: number;
@@ -23,7 +23,10 @@ export interface ISingleStakingCampaign {
   showContractLink?: boolean,
   // admin: string, // new campaign
   stakings: ISingleStaking,
-  commissions?: ICommissionInfo[]
+  commissions?: ICommissionInfo[],
+  wallets: IWalletPlugin[],
+  networks: INetworkConfig[],
+  showHeader?: boolean
 }
 
 export interface ISingleStaking {
@@ -64,7 +67,18 @@ export interface IStakingCampaign {
   campaignEnd: BigNumber, //unix
   showContractLink?: boolean,
   admin: string, // can only withdraw remaining fund after claimDeadline.
-  stakings: Staking[],
+  stakings: Staking[]
+}
+
+export interface IWalletPlugin {
+  name: string;
+  packageName?: string;
+  provider?: IClientSideProvider;
+}
+
+export interface INetworkConfig {
+  chainId: number;
+  chainName?: string;
 }
 
 export interface RewardNeeded {
