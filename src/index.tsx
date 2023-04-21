@@ -30,6 +30,7 @@ import { ManageStake } from './manage-stake/index';
 import { Contracts } from './contracts/oswap-time-is-money-contract/index';
 import { stakingComponent } from './index.css';
 import StakingConfig from './commissions/index';
+import ScomDappContainer from '@scom/scom-dapp-container';
 
 interface ScomStakingElement extends ControlElement {
 	data?: ISingleStakingCampaign;
@@ -69,6 +70,7 @@ export default class ScomStaking extends Module implements PageBlock {
 	private tokenMap: TokenMapType = {};
 	private configDApp: StakingConfig;
 	private contractAddress: string;
+	private dappContainer: ScomDappContainer;
 
 	private getPropertiesSchema(readOnly?: boolean) {
 		const propertiesSchema = getSingleStakingSchema(readOnly);
@@ -324,6 +326,12 @@ export default class ScomStaking extends Module implements PageBlock {
 			await this.renderEmpty();
 			return;
 		}
+		const data: any = {
+			wallets: this._data.wallets ?? [],
+			networks: this._data.networks ?? [],
+			showHeader: this._data.showHeader ?? true
+		}
+    if (this.dappContainer?.setData) this.dappContainer.setData(data)
 		this.campaigns = await getAllCampaignsInfo({ [this._data.chainId]: this._data });
 		await this.renderCampaigns(hideLoading);
 		if (!hideLoading && this.loadingElm) {
@@ -982,26 +990,28 @@ export default class ScomStaking extends Module implements PageBlock {
 
 	render() {
 		return (
-			<i-panel id="stakingComponent" class={stakingComponent} minHeight={200}>
-				<i-panel id="stakingLayout" class="staking-layout" width={maxWidth} height={maxHeight} margin={{ top: '1rem', bottom: '1rem', left: 'auto', right: 'auto' }}>
-					<i-vstack id="loadingElm" class="i-loading-overlay">
-						<i-vstack class="i-loading-spinner" horizontalAlignment="center" verticalAlignment="center">
-							<i-icon
-								class="i-loading-spinner_icon"
-								image={{ url: Assets.fullPath('img/loading.svg'), width: 36, height: 36 }}
-							/>
-							<i-label
-								caption="Loading..." font={{ color: '#FD4A4C', size: '1.5em' }}
-								class="i-loading-spinner_text"
-							/>
+			<i-scom-dapp-container id="dappContainer">
+				<i-panel id="stakingComponent" class={stakingComponent} minHeight={200}>
+					<i-panel id="stakingLayout" class="staking-layout" width={maxWidth} height={maxHeight} margin={{ top: '1rem', bottom: '1rem', left: 'auto', right: 'auto' }}>
+						<i-vstack id="loadingElm" class="i-loading-overlay">
+							<i-vstack class="i-loading-spinner" horizontalAlignment="center" verticalAlignment="center">
+								<i-icon
+									class="i-loading-spinner_icon"
+									image={{ url: Assets.fullPath('img/loading.svg'), width: 36, height: 36 }}
+								/>
+								<i-label
+									caption="Loading..." font={{ color: '#FD4A4C', size: '1.5em' }}
+									class="i-loading-spinner_text"
+								/>
+							</i-vstack>
 						</i-vstack>
-					</i-vstack>
-					<i-panel id="stakingElm" class="wrapper" />
+						<i-panel id="stakingElm" class="wrapper" />
+					</i-panel>
+					<i-panel id="manageStakeElm" />
+					<staking-wallet />
+					<i-scom-staking-config id="configDApp" visible={false} />
 				</i-panel>
-				<i-panel id="manageStakeElm" />
-				<staking-wallet />
-				<i-scom-staking-config id="configDApp" visible={false} />
-			</i-panel>
+			</i-scom-dapp-container>
 		)
 	}
 }

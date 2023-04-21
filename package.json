@@ -32,6 +32,7 @@
         "@scom/scom-coin98-wallet": "^0.1.0",
         "@scom/scom-frontier-wallet": "^0.1.0",
         "@scom/scom-onto-wallet": "^0.1.0",
-        "@scom/scom-trust-wallet": "^0.1.0"
+        "@scom/scom-trust-wallet": "^0.1.0",
+        "@scom/scom-dapp-container": "^0.1.2"
     }
 }

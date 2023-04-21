@@ -9719,7 +9719,7 @@ declare module "@scom/scom-staking/global/utils/approvalModel.ts" {
 }
 /// <amd-module name="@scom/scom-staking/global/utils/interfaces.ts" />
 declare module "@scom/scom-staking/global/utils/interfaces.ts" {
-    import { BigNumber } from "@ijstech/eth-contract";
+    import { BigNumber, IClientSideProvider } from "@ijstech/eth-wallet";
     export interface ICommissionInfo {
         chainId: number;
         walletAddress: string;
@@ -9739,6 +9739,9 @@ declare module "@scom/scom-staking/global/utils/interfaces.ts" {
         showContractLink?: boolean;
         stakings: ISingleStaking;
         commissions?: ICommissionInfo[];
+        wallets: IWalletPlugin[];
+        networks: INetworkConfig[];
+        showHeader?: boolean;
     }
     export interface ISingleStaking {
         address: string;
@@ -9761,6 +9764,15 @@ declare module "@scom/scom-staking/global/utils/interfaces.ts" {
         showContractLink?: boolean;
         admin: string;
         stakings: Staking[];
+    }
+    export interface IWalletPlugin {
+        name: string;
+        packageName?: string;
+        provider?: IClientSideProvider;
+    }
+    export interface INetworkConfig {
+        chainId: number;
+        chainName?: string;
     }
     export interface RewardNeeded {
         value: BigNumber;
@@ -16679,6 +16691,7 @@ declare module "@scom/scom-staking" {
         private tokenMap;
         private configDApp;
         private contractAddress;
+        private dappContainer;
         private getPropertiesSchema;
         private getThemeSchema;
         getEmbedderActions(): {

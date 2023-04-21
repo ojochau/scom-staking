@@ -27991,6 +27991,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 this.onSetupPage(index_40.isWalletConnected());
             };
             this.onSetupPage = async (connected, hideLoading) => {
+                var _a, _b, _c, _d;
                 if (!hideLoading && this.loadingElm) {
                     this.loadingElm.visible = true;
                 }
@@ -27998,6 +27999,13 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     await this.renderEmpty();
                     return;
                 }
+                const data = {
+                    wallets: (_a = this._data.wallets) !== null && _a !== void 0 ? _a : [],
+                    networks: (_b = this._data.networks) !== null && _b !== void 0 ? _b : [],
+                    showHeader: (_c = this._data.showHeader) !== null && _c !== void 0 ? _c : true
+                };
+                if ((_d = this.dappContainer) === null || _d === void 0 ? void 0 : _d.setData)
+                    this.dappContainer.setData(data);
                 this.campaigns = await index_41.getAllCampaignsInfo({ [this._data.chainId]: this._data });
                 await this.renderCampaigns(hideLoading);
                 if (!hideLoading && this.loadingElm) {
@@ -28699,16 +28707,17 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             this.executeReadyCallback();
         }
         render() {
-            return (this.$render("i-panel", { id: "stakingComponent", class: index_css_2.stakingComponent, minHeight: 200 },
-                this.$render("i-panel", { id: "stakingLayout", class: "staking-layout", width: index_40.maxWidth, height: index_40.maxHeight, margin: { top: '1rem', bottom: '1rem', left: 'auto', right: 'auto' } },
-                    this.$render("i-vstack", { id: "loadingElm", class: "i-loading-overlay" },
-                        this.$render("i-vstack", { class: "i-loading-spinner", horizontalAlignment: "center", verticalAlignment: "center" },
-                            this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_7.default.fullPath('img/loading.svg'), width: 36, height: 36 } }),
-                            this.$render("i-label", { caption: "Loading...", font: { color: '#FD4A4C', size: '1.5em' }, class: "i-loading-spinner_text" }))),
-                    this.$render("i-panel", { id: "stakingElm", class: "wrapper" })),
-                this.$render("i-panel", { id: "manageStakeElm" }),
-                this.$render("staking-wallet", null),
-                this.$render("i-scom-staking-config", { id: "configDApp", visible: false })));
+            return (this.$render("i-scom-dapp-container", { id: "dappContainer" },
+                this.$render("i-panel", { id: "stakingComponent", class: index_css_2.stakingComponent, minHeight: 200 },
+                    this.$render("i-panel", { id: "stakingLayout", class: "staking-layout", width: index_40.maxWidth, height: index_40.maxHeight, margin: { top: '1rem', bottom: '1rem', left: 'auto', right: 'auto' } },
+                        this.$render("i-vstack", { id: "loadingElm", class: "i-loading-overlay" },
+                            this.$render("i-vstack", { class: "i-loading-spinner", horizontalAlignment: "center", verticalAlignment: "center" },
+                                this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_7.default.fullPath('img/loading.svg'), width: 36, height: 36 } }),
+                                this.$render("i-label", { caption: "Loading...", font: { color: '#FD4A4C', size: '1.5em' }, class: "i-loading-spinner_text" }))),
+                        this.$render("i-panel", { id: "stakingElm", class: "wrapper" })),
+                    this.$render("i-panel", { id: "manageStakeElm" }),
+                    this.$render("staking-wallet", null),
+                    this.$render("i-scom-staking-config", { id: "configDApp", visible: false }))));
         }
     };
     ScomStaking = __decorate([
