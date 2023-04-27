@@ -15,9 +15,10 @@ import {
   HStack
 } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
-import ScomNetworkPicker from './network-picker';
-import { getEmbedderCommissionFee, getNetworkInfo, SupportedNetworks } from '../store/index';
-import { formatNumber, isWalletAddress, ICommissionInfo, IEmbedData, INetwork } from '../global/index';
+// import ScomNetworkPicker from './network-picker';
+import ScomNetworkPicker from '@scom/scom-network-picker';
+import { getEmbedderCommissionFee, getNetworkInfo, getSupportedNetworks } from '../store/index';
+import { IExtendedNetwork, formatNumber, isWalletAddress, ICommissionInfo, IEmbedData } from '../global/index';
 import { customStyle, tableStyle } from './index.css'
 import assets from '../assets';
 const Theme = Styles.Theme.ThemeVars;
@@ -48,10 +49,11 @@ export default class StakingConfig extends Module {
       key: 'chainId',
       textAlign: 'left' as any,
       onRenderCell: function (source: Control, columnData: number, rowData: any) {
-        const network = SupportedNetworks.find(net => net.chainId === columnData)
+        const supportedNetworks = getSupportedNetworks();
+        const network = supportedNetworks.find(net => net.chainId === columnData)
         if (!network) return <i-panel></i-panel>
         const networkInfo = getNetworkInfo(network.chainId)
-        const imgUrl = networkInfo.icon ? assets.fullPath(`img/network/${networkInfo.icon}`) : ''
+        const imgUrl = networkInfo.image || ''
         const hstack = new HStack(undefined, {
           verticalAlignment: 'center',
           gap: 5
@@ -60,7 +62,7 @@ export default class StakingConfig extends Module {
           image: {url: imgUrl, width: 16, height: 16}
         })
         const lbName = new Label(hstack, {
-          caption: networkInfo.name || '',
+          caption: networkInfo.chainName || '',
           font: {size: '0.875rem'}
         })
         hstack.append(imgEl, lbName);
@@ -220,7 +222,11 @@ export default class StakingConfig extends Module {
     }
   }
 
-  onNetworkSelected(network: INetwork) {
+  getSupportedChainIds() {
+    return getSupportedNetworks().map(v => ({chainId: v.chainId}))
+  }
+
+  onNetworkSelected(network: IExtendedNetwork) {
     this.validateModalFields();
   }
 
@@ -311,11 +317,12 @@ export default class StakingConfig extends Module {
             </i-hstack>
 
             <i-label caption="Network" grid={{ area: 'lbNetwork' }} font={{size: '1rem'}} />
-            <i-scom-staking-network-picker
+            <i-scom-network-picker
               id='networkPicker'
               grid={{ area: 'network' }}
               display="block"
-              networks={SupportedNetworks}
+              type='combobox'
+              networks={this.getSupportedChainIds()}
               background={{color: Theme.combobox.background}}
               border={{radius: 8, width: '1px', style: 'solid', color: Theme.input.background}}
               onCustomNetworkSelected={this.onNetworkSelected}

@@ -9824,13 +9824,9 @@ declare module "@scom/scom-staking/global/utils/index.ts" {
 }
 /// <amd-module name="@scom/scom-staking/global/index.ts" />
 declare module "@scom/scom-staking/global/index.ts" {
-    export interface INetwork {
-        chainId: number;
-        name: string;
-        value?: string;
-        label?: string;
-        icon: string;
-        rpc?: string;
+    import { INetwork } from '@ijstech/eth-wallet';
+    export interface IExtendedNetwork extends INetwork {
+        shortName?: string;
         isDisabled?: boolean;
         isMainChain?: boolean;
         isCrossChainSupported?: boolean;
@@ -9838,27 +9834,9 @@ declare module "@scom/scom-staking/global/index.ts" {
         explorerTxUrl?: string;
         explorerAddressUrl?: string;
         isTestnet?: boolean;
+        symbol?: string;
+        env?: string;
     }
-    export const ABIKeys: {
-        Factory: string;
-        Pair: string;
-        OracleFactory: string;
-        OraclePair: string;
-        OracleLiquidityProvider: string;
-        HybridRouterRegistry: string;
-        HybridRouter: string;
-        RangeFactory: string;
-        RangePair: string;
-        RangeLiquidityProvider: string;
-        OracleAdaptor: string;
-        RestrictedFactory: string;
-        RestrictedPair: string;
-        RestrictedLiquidityProvider: string;
-        ConfigStore: string;
-        PeggedOracleFactory: string;
-        PeggedOraclePair: string;
-        PeggedOracleLiquidityProvider: string;
-    };
     export const enum EventId {
         ConnectWallet = "stakingConnectWallet",
         ChangeNetwork = "stakingChangeNetwork",
@@ -9871,432 +9849,6 @@ declare module "@scom/scom-staking/global/index.ts" {
         EmitNewToken = "emitNewToken"
     }
     export * from "@scom/scom-staking/global/utils/index.ts";
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/mainnet/avalanche.ts" />
-declare module "@scom/scom-staking/store/data/tokens/mainnet/avalanche.ts" {
-    export const Tokens_Avalanche: ({
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        name: string;
-        symbol: string;
-        address: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    } | {
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/mainnet/ethereum.ts" />
-declare module "@scom/scom-staking/store/data/tokens/mainnet/ethereum.ts" {
-    export const Tokens_Ethereuem: ({
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        symbol: string;
-        address: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    })[];
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/mainnet/polygon.ts" />
-declare module "@scom/scom-staking/store/data/tokens/mainnet/polygon.ts" {
-    export const Tokens_Polygon: ({
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    } | {
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/mainnet/bsc.ts" />
-declare module "@scom/scom-staking/store/data/tokens/mainnet/bsc.ts" {
-    export const Tokens_BSC: ({
-        name: string;
-        symbol: string;
-        address: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        symbol: string;
-        address: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        symbol: string;
-        address: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    })[];
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/mainnet/fantom.ts" />
-declare module "@scom/scom-staking/store/data/tokens/mainnet/fantom.ts" {
-    export const Tokens_Fantom: ({
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    } | {
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/mainnet/cronos.ts" />
-declare module "@scom/scom-staking/store/data/tokens/mainnet/cronos.ts" {
-    export const Tokens_Cronos: ({
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/mainnet/index.ts" />
-declare module "@scom/scom-staking/store/data/tokens/mainnet/index.ts" {
-    export { Tokens_Avalanche } from "@scom/scom-staking/store/data/tokens/mainnet/avalanche.ts";
-    export { Tokens_Ethereuem } from "@scom/scom-staking/store/data/tokens/mainnet/ethereum.ts";
-    export { Tokens_Polygon } from "@scom/scom-staking/store/data/tokens/mainnet/polygon.ts";
-    export { Tokens_BSC } from "@scom/scom-staking/store/data/tokens/mainnet/bsc.ts";
-    export { Tokens_Fantom } from "@scom/scom-staking/store/data/tokens/mainnet/fantom.ts";
-    export { Tokens_Cronos } from "@scom/scom-staking/store/data/tokens/mainnet/cronos.ts";
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/testnet/kovan.ts" />
-declare module "@scom/scom-staking/store/data/tokens/testnet/kovan.ts" {
-    export const Tokens_Kovan: ({
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-        isVaultToken?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-        isVaultToken?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isVaultToken: boolean;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-        isVaultToken?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/testnet/bsc-testnet.ts" />
-declare module "@scom/scom-staking/store/data/tokens/testnet/bsc-testnet.ts" {
-    export const Tokens_BSC_Testnet: ({
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/testnet/fuji.ts" />
-declare module "@scom/scom-staking/store/data/tokens/testnet/fuji.ts" {
-    export const Tokens_Fuji: ({
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/testnet/mumbai.ts" />
-declare module "@scom/scom-staking/store/data/tokens/testnet/mumbai.ts" {
-    export const Tokens_Mumbai: ({
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/testnet/fantom-testnet.ts" />
-declare module "@scom/scom-staking/store/data/tokens/testnet/fantom-testnet.ts" {
-    export const Tokens_Fantom_Testnet: ({
-        address: string;
-        decimals: number;
-        name: string;
-        symbol: string;
-        isWETH: boolean;
-        isCommon?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/testnet/amino.ts" />
-declare module "@scom/scom-staking/store/data/tokens/testnet/amino.ts" {
-    export const Tokens_Amino: ({
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    })[];
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/testnet/aminoX-testnet.ts" />
-declare module "@scom/scom-staking/store/data/tokens/testnet/aminoX-testnet.ts" {
-    export const Tokens_AminoXTestnet: ({
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    })[];
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/testnet/cronos-testnet.ts" />
-declare module "@scom/scom-staking/store/data/tokens/testnet/cronos-testnet.ts" {
-    export const Tokens_Cronos_Testnet: ({
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/testnet/index.ts" />
-declare module "@scom/scom-staking/store/data/tokens/testnet/index.ts" {
-    export { Tokens_Kovan } from "@scom/scom-staking/store/data/tokens/testnet/kovan.ts";
-    export { Tokens_BSC_Testnet } from "@scom/scom-staking/store/data/tokens/testnet/bsc-testnet.ts";
-    export { Tokens_Fuji } from "@scom/scom-staking/store/data/tokens/testnet/fuji.ts";
-    export { Tokens_Mumbai } from "@scom/scom-staking/store/data/tokens/testnet/mumbai.ts";
-    export { Tokens_Fantom_Testnet } from "@scom/scom-staking/store/data/tokens/testnet/fantom-testnet.ts";
-    export { Tokens_Amino } from "@scom/scom-staking/store/data/tokens/testnet/amino.ts";
-    export { Tokens_AminoXTestnet } from "@scom/scom-staking/store/data/tokens/testnet/aminoX-testnet.ts";
-    export { Tokens_Cronos_Testnet } from "@scom/scom-staking/store/data/tokens/testnet/cronos-testnet.ts";
-}
-/// <amd-module name="@scom/scom-staking/store/data/tokens/index.ts" />
-declare module "@scom/scom-staking/store/data/tokens/index.ts" {
-    import { ITokenObject } from "@scom/scom-staking/global/index.ts";
-    const DefaultERC20Tokens: {
-        [chainId: number]: ITokenObject[];
-    };
-    const ChainNativeTokenByChainId: {
-        [chainId: number]: ITokenObject;
-    };
-    const WETHByChainId: {
-        [chainId: number]: ITokenObject;
-    };
-    const getOpenSwapToken: (chainId: number) => ITokenObject;
-    const DefaultTokens: {
-        [chainId: number]: ITokenObject[];
-    };
-    const ToUSDPriceFeedAddressesMap: {
-        [chainId: number]: {
-            [token: string]: string;
-        };
-    };
-    const tokenPriceAMMReference: {
-        [chainId: number]: {
-            [token: string]: string;
-        };
-    };
-    const getTokenIconPath: (tokenObj: any, chainId?: number) => string;
-    export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath, getOpenSwapToken, };
-}
-/// <amd-module name="@scom/scom-staking/store/data/networks.ts" />
-declare module "@scom/scom-staking/store/data/networks.ts" {
-    import { INetwork } from "@scom/scom-staking/global/index.ts";
-    const InfuraId = "adc596bf88b648e2a8902bc9093930c5";
-    enum ChainNetwork {
-        BSCMainnet = 56,
-        BSCTestnet = 97,
-        EthMainnet = 1,
-        Polygon = 137,
-        AminoTestnet = 31337,
-        Mumbai = 80001,
-        Fuji = 43113,
-        Avalanche = 43114,
-        Fantom = 250,
-        FantomTestnet = 4002,
-        CronosMainnet = 25,
-        CronosTestnet = 338,
-        AminoXTestnet = 13370,
-        Arbitrum = 421613
-    }
-    const Networks: {
-        [key: number]: INetwork;
-    };
-    const Mainnets: {
-        binance: INetwork;
-        ethereum: INetwork;
-        avalanche: INetwork;
-        cronos: INetwork;
-        fantom: INetwork;
-        polygon: INetwork;
-    };
-    const Testnets: {
-        binance: INetwork;
-        cronos: INetwork;
-        avalanche: INetwork;
-        fantom: INetwork;
-        polygon: INetwork;
-        aminox: INetwork;
-        arbitrum: INetwork;
-    };
-    const SupportedNetworks: INetwork[];
-    export { InfuraId, Networks, Mainnets, Testnets, ChainNetwork, SupportedNetworks };
-}
-/// <amd-module name="@scom/scom-staking/store/data/core/index.ts" />
-declare module "@scom/scom-staking/store/data/core/index.ts" {
-    export const CoreContractAddressesByChainId: {
-        [chainId: number]: {
-            [contract: string]: string;
-        };
-    };
 }
 /// <amd-module name="@scom/scom-staking/store/data/staking/index.ts" />
 declare module "@scom/scom-staking/store/data/staking/index.ts" {
@@ -10378,15 +9930,12 @@ declare module "@scom/scom-staking/store/data/staking/index.ts" {
 }
 /// <amd-module name="@scom/scom-staking/store/data/index.ts" />
 declare module "@scom/scom-staking/store/data/index.ts" {
-    export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath, getOpenSwapToken, } from "@scom/scom-staking/store/data/tokens/index.ts";
-    export * from "@scom/scom-staking/store/data/networks.ts";
-    export { CoreContractAddressesByChainId } from "@scom/scom-staking/store/data/core/index.ts";
     export { getSingleStakingSchema, LockTokenType, USDPeggedTokenAddressMap, } from "@scom/scom-staking/store/data/staking/index.ts";
 }
 /// <amd-module name="@scom/scom-staking/store/utils.ts" />
 declare module "@scom/scom-staking/store/utils.ts" {
-    import { Erc20, IClientSideProvider, Wallet } from '@ijstech/eth-wallet';
-    import { INetwork, ITokenObject, SITE_ENV } from "@scom/scom-staking/global/index.ts";
+    import { Erc20, IClientSideProvider } from '@ijstech/eth-wallet';
+    import { IExtendedNetwork, ITokenObject, SITE_ENV } from "@scom/scom-staking/global/index.ts";
     export * from "@scom/scom-staking/store/data/index.ts";
     export enum WalletPlugin {
         MetaMask = "metamask",
@@ -10402,27 +9951,14 @@ declare module "@scom/scom-staking/store/utils.ts" {
     export const INFINITE = "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
     export const getUserTokens: (chainId: number) => any;
     export const addUserTokens: (token: ITokenObject) => void;
+    export const getSupportedNetworks: () => IExtendedNetwork[];
     export const getInfuraId: () => string;
-    interface NetworkConditions {
-        isDisabled?: boolean;
-        isTestnet?: boolean;
-        isCrossChainSupported?: boolean;
-        isMainChain?: boolean;
-    }
-    export const getMatchNetworks: (conditions: NetworkConditions) => INetwork[];
-    export const getSiteSupportedNetworks: () => INetwork[];
-    export const getNetworkInfo: (chainId: number) => INetwork;
+    export const getSiteSupportedNetworks: () => IExtendedNetwork[];
+    export const getNetworkInfo: (chainId: number) => IExtendedNetwork;
     export const setCurrentChainId: (value: number) => void;
     export const getCurrentChainId: () => number;
-    export function getAddresses(chainId: number): {
-        [contract: string]: string;
-    };
-    export function getDisperseAddress(chainId: number): string;
-    export function canDisperse(chainId: number): boolean;
-    export const listsNetworkShow: () => INetwork[];
     export const getChainNativeToken: (chainId: number) => ITokenObject;
     export const getWETH: (chainId: number) => ITokenObject;
-    export function setGovToken(wallet: Wallet): ITokenObject;
     export const setDataFromSCConfig: (options: any) => void;
     export function isWalletConnected(): boolean;
     export function switchNetwork(chainId: number): Promise<void>;
@@ -10436,14 +9972,14 @@ declare module "@scom/scom-staking/store/utils.ts" {
     export const setSlippageTolerance: (value: any) => void;
     export const getTransactionDeadline: () => any;
     export const setTransactionDeadline: (value: any) => void;
-    export const getTokenList: (chainId: number) => ITokenObject[];
+    export const getTokenList: (chainId: number) => import("@scom/scom-token-list/interface.ts").ITokenObject[];
     export type ProxyAddresses = {
         [key: number]: string;
     };
     export const state: {
         siteEnv: SITE_ENV;
         networkMap: {
-            [key: number]: INetwork;
+            [key: number]: IExtendedNetwork;
         };
         currentChainId: number;
         isExpertMode: boolean;
@@ -10508,9 +10044,41 @@ declare module "@scom/scom-staking/store/index.ts" {
     export const maxHeight = "321px";
     export * from "@scom/scom-staking/store/utils.ts";
 }
+/// <amd-module name="@scom/scom-staking/scconfig.json.ts" />
+declare module "@scom/scom-staking/scconfig.json.ts" {
+    const _default_49: {
+        infuraId: string;
+        networks: ({
+            chainId: number;
+            isMainChain: boolean;
+            isCrossChainSupported: boolean;
+            explorerName: string;
+            explorerTxUrl: string;
+            explorerAddressUrl: string;
+            isTestnet: boolean;
+            shortName?: undefined;
+        } | {
+            chainId: number;
+            shortName: string;
+            isCrossChainSupported: boolean;
+            explorerName: string;
+            explorerTxUrl: string;
+            explorerAddressUrl: string;
+            isTestnet: boolean;
+            isMainChain?: undefined;
+        })[];
+        proxyAddresses: {
+            "97": string;
+            "43113": string;
+        };
+        ipfsGatewayUrl: string;
+        embedderCommissionFee: string;
+    };
+    export default _default_49;
+}
 /// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.json.ts" {
-    const _default_49: {
+    const _default_50: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -10552,7 +10120,7 @@ declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contra
         })[];
         bytecode: string;
     };
-    export default _default_49;
+    export default _default_50;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.ts" />
 declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.ts" {
@@ -10647,7 +10215,7 @@ declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contra
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.json.ts" {
-    const _default_50: {
+    const _default_51: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -10689,7 +10257,7 @@ declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contra
         })[];
         bytecode: string;
     };
-    export default _default_50;
+    export default _default_51;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.ts" />
 declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.ts" {
@@ -10788,7 +10356,7 @@ declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contra
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.json.ts" {
-    const _default_51: {
+    const _default_52: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -10830,7 +10398,7 @@ declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contra
         })[];
         bytecode: string;
     };
-    export default _default_51;
+    export default _default_52;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.ts" />
 declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.ts" {
@@ -10913,7 +10481,7 @@ declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contra
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.json.ts" {
-    const _default_52: {
+    const _default_53: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -10955,7 +10523,7 @@ declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contra
         })[];
         bytecode: string;
     };
-    export default _default_52;
+    export default _default_53;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.ts" />
 declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.ts" {
@@ -11045,7 +10613,7 @@ declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/index.
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/AggregatorProxy.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/AggregatorProxy.json.ts" {
-    const _default_53: {
+    const _default_54: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -11087,7 +10655,7 @@ declare module "@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/
         })[];
         bytecode: string;
     };
-    export default _default_53;
+    export default _default_54;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/AggregatorProxy.ts" />
 declare module "@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/AggregatorProxy.ts" {
@@ -11224,7 +10792,7 @@ declare module "@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/EACAggregatorProxy.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/EACAggregatorProxy.json.ts" {
-    const _default_54: {
+    const _default_55: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -11266,7 +10834,7 @@ declare module "@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/
         })[];
         bytecode: string;
     };
-    export default _default_54;
+    export default _default_55;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/EACAggregatorProxy.ts" />
 declare module "@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/EACAggregatorProxy.ts" {
@@ -11414,7 +10982,7 @@ declare module "@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/Owned.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/Owned.json.ts" {
-    const _default_55: {
+    const _default_56: {
         abi: ({
             inputs: any[];
             stateMutability: string;
@@ -11459,7 +11027,7 @@ declare module "@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/
         })[];
         bytecode: string;
     };
-    export default _default_55;
+    export default _default_56;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/Owned.ts" />
 declare module "@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/Owned.ts" {
@@ -11510,7 +11078,7 @@ declare module "@scom/scom-staking/contracts/oswap-chainlink-contract/index.ts" 
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.json.ts" {
-    const _default_56: {
+    const _default_57: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -11541,7 +11109,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_56;
+    export default _default_57;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.ts" {
@@ -11580,7 +11148,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/token/ERC20/ERC20.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/token/ERC20/ERC20.json.ts" {
-    const _default_57: {
+    const _default_58: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -11622,7 +11190,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_57;
+    export default _default_58;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/token/ERC20/ERC20.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/token/ERC20/ERC20.ts" {
@@ -11721,7 +11289,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.json.ts" {
-    const _default_58: {
+    const _default_59: {
         abi: {
             inputs: {
                 internalType: string;
@@ -11739,7 +11307,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         }[];
         bytecode: string;
     };
-    export default _default_58;
+    export default _default_59;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.ts" {
@@ -11763,7 +11331,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/Authorization.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/Authorization.json.ts" {
-    const _default_59: {
+    const _default_60: {
         abi: ({
             inputs: any[];
             stateMutability: string;
@@ -11801,7 +11369,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_59;
+    export default _default_60;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/Authorization.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/Authorization.ts" {
@@ -11866,7 +11434,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/MOCK_TrollRegistry.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/MOCK_TrollRegistry.json.ts" {
-    const _default_60: {
+    const _default_61: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -11908,7 +11476,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_60;
+    export default _default_61;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/MOCK_TrollRegistry.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/MOCK_TrollRegistry.ts" {
@@ -12260,7 +11828,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/MintableToken.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/MintableToken.json.ts" {
-    const _default_61: {
+    const _default_62: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -12302,7 +11870,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_61;
+    export default _default_62;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/MintableToken.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/MintableToken.ts" {
@@ -12470,7 +12038,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_BridgeVaultTrollRegistry.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_BridgeVaultTrollRegistry.json.ts" {
-    const _default_62: {
+    const _default_63: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -12512,7 +12080,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_62;
+    export default _default_63;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_BridgeVaultTrollRegistry.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_BridgeVaultTrollRegistry.ts" {
@@ -12720,7 +12288,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ChainRegistry.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ChainRegistry.json.ts" {
-    const _default_63: {
+    const _default_64: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -12808,7 +12376,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_63;
+    export default _default_64;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ChainRegistry.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ChainRegistry.ts" {
@@ -13041,7 +12609,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ChainRegistryExecutor.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ChainRegistryExecutor.json.ts" {
-    const _default_64: {
+    const _default_65: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -13090,7 +12658,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_64;
+    export default _default_65;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ChainRegistryExecutor.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ChainRegistryExecutor.ts" {
@@ -13126,7 +12694,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ConfigStore.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ConfigStore.json.ts" {
-    const _default_65: {
+    const _default_66: {
         abi: ({
             inputs: {
                 components: {
@@ -13173,7 +12741,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_65;
+    export default _default_66;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ConfigStore.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ConfigStore.ts" {
@@ -13397,7 +12965,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ConfigStoreTradeVault.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ConfigStoreTradeVault.json.ts" {
-    const _default_66: {
+    const _default_67: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -13446,7 +13014,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_66;
+    export default _default_67;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ConfigStoreTradeVault.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ConfigStoreTradeVault.ts" {
@@ -13507,7 +13075,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ContractProxy.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ContractProxy.json.ts" {
-    const _default_67: {
+    const _default_68: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -13556,7 +13124,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_67;
+    export default _default_68;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ContractProxy.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ContractProxy.ts" {
@@ -13667,7 +13235,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_MainChainTrollRegistry.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_MainChainTrollRegistry.json.ts" {
-    const _default_68: {
+    const _default_69: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -13719,7 +13287,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_68;
+    export default _default_69;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_MainChainTrollRegistry.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_MainChainTrollRegistry.ts" {
@@ -14188,7 +13756,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_MainChainVotingExecutor.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_MainChainVotingExecutor.json.ts" {
-    const _default_69: {
+    const _default_70: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -14237,7 +13805,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_69;
+    export default _default_70;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_MainChainVotingExecutor.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_MainChainVotingExecutor.ts" {
@@ -14276,7 +13844,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_RouterVaultWrapper.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_RouterVaultWrapper.json.ts" {
-    const _default_70: {
+    const _default_71: {
         abi: ({
             inputs: any[];
             stateMutability: string;
@@ -14331,7 +13899,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_70;
+    export default _default_71;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_RouterVaultWrapper.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_RouterVaultWrapper.ts" {
@@ -14447,7 +14015,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_SideChainTrollRegistry.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_SideChainTrollRegistry.json.ts" {
-    const _default_71: {
+    const _default_72: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -14489,7 +14057,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_71;
+    export default _default_72;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_SideChainTrollRegistry.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_SideChainTrollRegistry.ts" {
@@ -14903,7 +14471,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_SideChainVotingExecutor.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_SideChainVotingExecutor.json.ts" {
-    const _default_72: {
+    const _default_73: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -14945,7 +14513,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_72;
+    export default _default_73;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_SideChainVotingExecutor.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_SideChainVotingExecutor.ts" {
@@ -14992,7 +14560,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingContract.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingContract.json.ts" {
-    const _default_73: {
+    const _default_74: {
         abi: ({
             inputs: {
                 components: {
@@ -15025,7 +14593,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_73;
+    export default _default_74;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingContract.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingContract.ts" {
@@ -15152,7 +14720,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingManager.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingManager.json.ts" {
-    const _default_74: {
+    const _default_75: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -15194,7 +14762,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_74;
+    export default _default_75;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingManager.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingManager.ts" {
@@ -15524,7 +15092,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingRegistry.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingRegistry.json.ts" {
-    const _default_75: {
+    const _default_76: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -15558,7 +15126,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_75;
+    export default _default_76;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingRegistry.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingRegistry.ts" {
@@ -15592,7 +15160,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_BridgeVault.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_BridgeVault.json.ts" {
-    const _default_76: {
+    const _default_77: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -15675,7 +15243,7 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/c
         })[];
         bytecode: string;
     };
-    export default _default_76;
+    export default _default_77;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_BridgeVault.ts" />
 declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_BridgeVault.ts" {
@@ -16293,8 +15861,8 @@ declare module "@scom/scom-staking/staking-utils/index.ts" {
 }
 /// <amd-module name="@scom/scom-staking/common/result.css.ts" />
 declare module "@scom/scom-staking/common/result.css.ts" {
-    const _default_77: string;
-    export default _default_77;
+    const _default_78: string;
+    export default _default_78;
 }
 /// <amd-module name="@scom/scom-staking/common/result.tsx" />
 declare module "@scom/scom-staking/common/result.tsx" {
@@ -16399,53 +15967,6 @@ declare module "@scom/scom-staking/manage-stake/index.tsx" {
 declare module "@scom/scom-staking/index.css.ts" {
     export const stakingComponent: string;
 }
-/// <amd-module name="@scom/scom-staking/commissions/network-picker.css.ts" />
-declare module "@scom/scom-staking/commissions/network-picker.css.ts" {
-    const _default_78: string;
-    export default _default_78;
-}
-/// <amd-module name="@scom/scom-staking/commissions/network-picker.tsx" />
-declare module "@scom/scom-staking/commissions/network-picker.tsx" {
-    import { ControlElement, Module, Container } from '@ijstech/components';
-    import { INetwork } from "@scom/scom-staking/global/index.ts";
-    interface PickerElement extends ControlElement {
-        networks?: INetwork[] | '*';
-        selectedChainId?: number;
-        switchNetworkOnSelect?: boolean;
-        onCustomNetworkSelected?: (network: INetwork) => void;
-    }
-    global {
-        namespace JSX {
-            interface IntrinsicElements {
-                ['i-scom-staking-network-picker']: PickerElement;
-            }
-        }
-    }
-    export default class ScomNetworkPicker extends Module {
-        private mdNetwork;
-        private gridNetworkGroup;
-        private pnlNetwork;
-        private btnNetwork;
-        private networkMapper;
-        private _networkList;
-        private _selectedNetwork;
-        private _switchNetworkOnSelect;
-        private networkPlaceholder;
-        private _onCustomNetworkSelected;
-        constructor(parent?: Container, options?: any);
-        get selectedNetwork(): INetwork;
-        setNetworkByChainId(chainId: number): void;
-        clearNetwork(): void;
-        private onNetworkSelected;
-        private setNetwork;
-        private renderNetworks;
-        private renderModalItem;
-        private renderUI;
-        private renderCombobox;
-        init(): void;
-        render(): any;
-    }
-}
 /// <amd-module name="@scom/scom-staking/commissions/index.css.ts" />
 declare module "@scom/scom-staking/commissions/index.css.ts" {
     export const customStyle: string;
@@ -16454,7 +15975,7 @@ declare module "@scom/scom-staking/commissions/index.css.ts" {
 /// <amd-module name="@scom/scom-staking/commissions/index.tsx" />
 declare module "@scom/scom-staking/commissions/index.tsx" {
     import { Module, ControlElement } from '@ijstech/components';
-    import { IEmbedData, INetwork } from "@scom/scom-staking/global/index.ts";
+    import { IExtendedNetwork, IEmbedData } from "@scom/scom-staking/global/index.ts";
     global {
         namespace JSX {
             interface IntrinsicElements {
@@ -16484,7 +16005,10 @@ declare module "@scom/scom-staking/commissions/index.tsx" {
         onAddCommissionClicked(): void;
         onConfirmCommissionClicked(): Promise<void>;
         validateModalFields(): boolean;
-        onNetworkSelected(network: INetwork): void;
+        getSupportedChainIds(): {
+            chainId: number;
+        }[];
+        onNetworkSelected(network: IExtendedNetwork): void;
         onInputWalletAddressChanged(): void;
         private toggleVisible;
         render(): any;

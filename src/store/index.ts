@@ -1,7 +1,7 @@
 import Assets from '../assets';
-import { DefaultTokens, LockTokenType, getTokenIconPath } from './data/index';
-import { tokenStore } from '@scom/scom-token-list';
-import { getAddresses, getChainId, getChainNativeToken, isWalletConnected } from './utils';
+import { tokenStore, assets as tokenAssets, DefaultTokens, WETHByChainId } from '@scom/scom-token-list';
+import { getChainId, getChainNativeToken, isWalletConnected } from './utils';
+import {LockTokenType} from '../global/index';
 
 export const fallBackUrl = Assets.fullPath('img/tokens/token-placeholder.svg');
 
@@ -16,7 +16,7 @@ export const getTokenIcon = (address: string) => {
   } else {
     tokenObject = tokenMap[address.toLowerCase()];
   }
-  return Assets.fullPath(getTokenIconPath(tokenObject, getChainId()));
+  return Assets.fullPath(tokenAssets.getTokenIconPath(tokenObject, getChainId()));
 }
 
 export const tokenSymbol = (address: string) => {
@@ -69,16 +69,16 @@ export const getLockedTokenIconPaths = (info: any, tokenObject: any, chainId: nu
       tokenMap = tokenStore.tokenMap;
     }
     if (info.lockTokenType == LockTokenType.ERC20_Token) {
-      return [getTokenIconPath(tokenObject, chainId)];
+      return [tokenAssets.getTokenIconPath(tokenObject, chainId)];
     }
     if (info.lockTokenType == LockTokenType.LP_Token) {
       const nativeToken = DefaultTokens[chainId]?.find((token) => token.isNative);
       const token0 = tokenMap[tokenObject.token0] || nativeToken;
       const token1 = tokenMap[tokenObject.token1] || nativeToken;
-      return [getTokenIconPath(token0, chainId), getTokenIconPath(token1, chainId)];
+      return [tokenAssets.getTokenIconPath(token0, chainId), tokenAssets.getTokenIconPath(token1, chainId)];
     }
     if (info.lockTokenType == LockTokenType.VAULT_Token) {
-      return [getTokenIconPath(tokenObject.assetToken, chainId)];
+      return [tokenAssets.getTokenIconPath(tokenObject.assetToken, chainId)];
     }
   }
   return [];
@@ -86,9 +86,8 @@ export const getLockedTokenIconPaths = (info: any, tokenObject: any, chainId: nu
 
 export const getTokenDecimals = (address: string) => {
   let chainId = getChainId();
-  const Address = getAddresses(chainId);
   const ChainNativeToken = getChainNativeToken(chainId);
-  const tokenObject = (!address || address.toLowerCase() === Address['WETH9'].toLowerCase()) ? ChainNativeToken : tokenStore.tokenMap[address.toLowerCase()];
+  const tokenObject = (!address || address.toLowerCase() === WETHByChainId[chainId].address.toLowerCase()) ? ChainNativeToken : tokenStore.tokenMap[address.toLowerCase()];
   return tokenObject ? tokenObject.decimals : 18;
 }
 

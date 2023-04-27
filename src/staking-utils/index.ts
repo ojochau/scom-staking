@@ -12,12 +12,9 @@ import {
 } from "../global/index";
 import {
   USDPeggedTokenAddressMap,
-  ToUSDPriceFeedAddressesMap,
-  WETHByChainId,
-  tokenPriceAMMReference,
   getTokenDecimals
 } from "../store/index";
-import { tokenStore } from '@scom/scom-token-list';
+import { tokenStore, ToUSDPriceFeedAddressesMap, WETHByChainId, tokenPriceAMMReference } from '@scom/scom-token-list';
 
 export const getTokenPrice = async (token: string) => { // in USD value
   let wallet = Wallet.getClientInstance();

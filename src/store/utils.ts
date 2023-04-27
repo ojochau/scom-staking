@@ -1,21 +1,14 @@
 import { Erc20, IClientSideProvider, Wallet } from '@ijstech/eth-wallet';
 import {
   EventId,
-  INetwork,
+  IExtendedNetwork,
   ITokenObject,
   SITE_ENV
 } from '../global/index';
 
+import {DefaultTokens, ChainNativeTokenByChainId, WETHByChainId} from '@scom/scom-token-list';
 import { Contracts as OpenSwapContracts } from "../contracts/oswap-openswap-contract/index";
-import {
-  DefaultTokens,
-  CoreContractAddressesByChainId,
-  ChainNativeTokenByChainId,
-  WETHByChainId,
-  Networks,
-  Mainnets,
-  SupportedNetworks
-} from './data/index';
+import getNetworkList from '@scom/scom-network-list'
 
 export * from './data/index';
 
@@ -69,18 +62,9 @@ export const addUserTokens = (token: ITokenObject) => {
   localStorage[TOKENS + chainId] = JSON.stringify(tokens);
 }
 
-// export const setSiteEnv = (value: string) => {
-//   if (Object.values(SITE_ENV).includes(value as SITE_ENV)) {
-//     state.siteEnv = value as SITE_ENV;
-//   } else {
-//     state.siteEnv = SITE_ENV.TESTNET;
-//   }
-
-// }
-
-// export const getSiteEnv = (): SITE_ENV => {
-//   return state.siteEnv;
-// }
+export const getSupportedNetworks = () => {
+  return Object.values(state.networkMap);
+}
 
 const setInfuraId = (infuraId: string) => {
   state.infuraId = infuraId;
@@ -117,12 +101,6 @@ function matchFilter<O extends { [keys: string]: any }>(list: O[], filter: Parti
   }));
 }
 
-export const getMatchNetworks = (conditions: NetworkConditions): INetwork[] => {
-  let networkFullList = Object.values(state.networkMap);
-  let out = matchFilter(networkFullList, conditions);
-  return out;
-}
-
 export const getSiteSupportedNetworks = () => {
   let networkFullList = Object.values(state.networkMap);
   let list = networkFullList.filter(network => !getNetworkInfo(network.chainId).isDisabled);
@@ -137,22 +115,27 @@ export const getSiteSupportedNetworks = () => {
   // return list.filter((network) => !network.isTestnet);
 }
 
-const setNetworkList = (networkList: INetwork[], infuraId?: string) => {
+const setNetworkList = (networkList: IExtendedNetwork[], infuraId?: string) => {
   const wallet = Wallet.getClientInstance();
   state.networkMap = {};
+  const defaultNetworkList = getNetworkList();
+  const defaultNetworkMap = defaultNetworkList.reduce((acc, cur) => {
+    acc[cur.chainId] = cur;
+    return acc;
+  }, {});
   for (let network of networkList) {
-    if (infuraId && network.rpc) {
-      network.rpc = network.rpc.replace(/{InfuraId}/g, infuraId);
+    const networkInfo = defaultNetworkMap[network.chainId];
+    if (!networkInfo) continue;
+    if (infuraId && network.rpcUrls && network.rpcUrls.length > 0) {
+      for (let i = 0; i < network.rpcUrls.length; i++) {
+        network.rpcUrls[i] = network.rpcUrls[i].replace(/{InfuraId}/g, infuraId);
+      }
     }
-    state.networkMap[network.chainId] = network;
-
-    if (network.rpc) {
-      const networkInfo: any = Networks[network.chainId];
-      wallet.setNetworkInfo({
-        ...networkInfo,
-        rpcUrls: [network.rpc]
-      });
-    }
+    state.networkMap[network.chainId] = {
+      ...networkInfo,
+      ...network
+    };
+    wallet.setNetworkInfo(state.networkMap[network.chainId]);
   }
 }
 
@@ -168,51 +151,6 @@ export const getCurrentChainId = (): number => {
   return state.currentChainId;
 }
 
-export function getAddresses(chainId: number) {
-  return CoreContractAddressesByChainId[chainId];
-};
-
-export function getDisperseAddress(chainId: number) {
-  return CoreContractAddressesByChainId[chainId][Disperse] || null;
-}
-
-export function canDisperse(chainId: number) {
-  return !!getDisperseAddress(chainId);
-}
-
-export const listsNetworkShow = () => {
-  let list = [...SupportedNetworks];
-  return list;
-  // const siteEnv = getSiteEnv();
-  // if (siteEnv === SITE_ENV.TESTNET) {
-  //   return list.filter((network) =>
-  //     [
-  //       ChainNetwork.AminoTestnet,
-  //       ChainNetwork.BSCTestnet,
-  //       ChainNetwork.Fuji,
-  //       ChainNetwork.FantomTestnet,
-  //       ChainNetwork.Mumbai,
-  //       ChainNetwork.AminoXTestnet,
-  //       ChainNetwork.CronosTestnet,
-  //     ].includes(network.chainId),
-  //   );
-  // }
-  // if (siteEnv === SITE_ENV.DEV) {
-  //   return list;
-  // }
-  // return list.filter((network) =>
-  //   [
-  //     //production
-  //     ChainNetwork.EthMainnet,
-  //     ChainNetwork.BSCMainnet,
-  //     ChainNetwork.Avalanche,
-  //     ChainNetwork.Polygon,
-  //     ChainNetwork.Fantom,
-  //     ChainNetwork.CronosMainnet,
-  //   ].includes(network.chainId) && canDisperse(network.chainId),
-  // );
-};
-
 export const getChainNativeToken = (chainId: number): ITokenObject => {
   return ChainNativeTokenByChainId[chainId];
 };
@@ -221,17 +159,6 @@ export const getWETH = (chainId: number): ITokenObject => {
   let wrappedToken = WETHByChainId[chainId];
   return wrappedToken;
 };
-
-export function setGovToken(wallet: Wallet): ITokenObject {
-  let GOV_TOKEN: ITokenObject;
-  const Address = getAddresses(getChainId());
-  if (wallet.chainId === 43113 || wallet.chainId === 43114) {
-    GOV_TOKEN = { address: Address["GOV_TOKEN"], decimals: 18, symbol: "veOSWAP", name: 'Vote-escrowed OSWAP' };
-  } else {
-    GOV_TOKEN = { address: Address["GOV_TOKEN"], decimals: 18, symbol: "OSWAP", name: 'OpenSwap' };
-  }
-  return GOV_TOKEN;
-}
 
 export const setDataFromSCConfig = (options: any) => {
   if (options.infuraId) {
@@ -327,7 +254,7 @@ export type ProxyAddresses = { [key: number]: string };
 
 export const state = {
   siteEnv: SITE_ENV.TESTNET,
-  networkMap: {} as { [key: number]: INetwork },
+  networkMap: {} as { [key: number]: IExtendedNetwork },
   currentChainId: 0,
   isExpertMode: false,
   slippageTolerance: 0.5,
@@ -401,7 +328,7 @@ export const getNetworkExplorerName = (chainId: number) => {
 }
 
 export const getNetworkName = (chainId: number) => {
-  return getSiteSupportedNetworks().find(v => v.chainId === chainId)?.name || '';
+  return getSiteSupportedNetworks().find(v => v.chainId === chainId)?.chainName || '';
 }
 
 export const setProxyAddresses = (data: ProxyAddresses) => {

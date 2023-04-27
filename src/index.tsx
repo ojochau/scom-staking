@@ -13,8 +13,9 @@ import {
 	ISingleStakingCampaign,
 	LockTokenType
 } from './global/index';
-import { getChainId, getTokenIconPath, isWalletConnected, getNetworkInfo, setDataFromSCConfig, setCurrentChainId, tokenSymbol, getStakingStatus, fallBackUrl, getLockedTokenObject, getLockedTokenSymbol, getLockedTokenIconPaths, getTokenUrl, isThemeApplied, maxHeight, maxWidth, getSingleStakingSchema, Networks, InfuraId } from './store/index';
+import { getChainId, isWalletConnected, getNetworkInfo, setDataFromSCConfig, setCurrentChainId, tokenSymbol, getStakingStatus, fallBackUrl, getLockedTokenObject, getLockedTokenSymbol, getLockedTokenIconPaths, getTokenUrl, isThemeApplied, maxHeight, maxWidth, getSingleStakingSchema } from './store/index';
 import { tokenStore, assets as tokenAssets } from '@scom/scom-token-list';
+import scconfig from './scconfig.json';
 
 import {
 	getStakingTotalLocked,
@@ -274,7 +275,7 @@ export default class ScomStaking extends Module implements PageBlock {
 
 	constructor(parent?: Container, options?: ControlElement) {
 		super(parent, options);
-		setDataFromSCConfig({ networks: Object.values(Networks), infuraId: InfuraId });
+		setDataFromSCConfig(scconfig);
 		this.$eventBus = application.EventBus;
 		this.registerEvent();
 	}
@@ -838,7 +839,7 @@ export default class ScomStaking extends Module implements PageBlock {
 				const _lockedTokenIconPaths = getLockedTokenIconPaths(option, _lockedTokenObject, chainId, this.tokenMap);
 				const pathsLength = _lockedTokenIconPaths.length;
 				const rewardToken = this.getRewardToken(rewardsData[0].rewardTokenAddress);
-				const rewardIconPath = getTokenIconPath(rewardToken, chainId);
+				const rewardIconPath = tokenAssets.getTokenIconPath(rewardToken, chainId);
 				stakingElms[optionIdx].appendChild(
 					<i-vstack gap={15} width={maxWidth} height="100%" padding={{ top: 10, bottom: 10, left: 20, right: 20 }} position="relative">
 						{stickerSections[optionIdx]}
