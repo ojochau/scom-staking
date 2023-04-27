@@ -1,6 +1,6 @@
 import Assets from '../assets';
 import { DefaultTokens, LockTokenType, getTokenIconPath } from './data/index';
-import { tokenStore } from './token';
+import { tokenStore } from '@scom/scom-token-list';
 import { getAddresses, getChainId, getChainNativeToken, isWalletConnected } from './utils';
 
 export const fallBackUrl = Assets.fullPath('img/tokens/token-placeholder.svg');
@@ -100,6 +100,4 @@ export const isMultiple = false;
 export const maxWidth = '690px';
 export const maxHeight = '321px';
 
-export * from './token';
 export * from './utils';
-export * from './wallet';

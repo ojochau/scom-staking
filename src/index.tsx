@@ -13,7 +13,9 @@ import {
 	ISingleStakingCampaign,
 	LockTokenType
 } from './global/index';
-import { getChainId, getTokenIconPath, isWalletConnected, getNetworkInfo, getDefaultChainId, setDataFromSCConfig, setCurrentChainId, tokenSymbol, getStakingStatus, fallBackUrl, getLockedTokenObject, getLockedTokenSymbol, getLockedTokenIconPaths, getTokenUrl, isThemeApplied, maxHeight, maxWidth, tokenStore, setTokenStore, getSingleStakingSchema, Networks, InfuraId } from './store/index';
+import { getChainId, getTokenIconPath, isWalletConnected, getNetworkInfo, setDataFromSCConfig, setCurrentChainId, tokenSymbol, getStakingStatus, fallBackUrl, getLockedTokenObject, getLockedTokenSymbol, getLockedTokenIconPaths, getTokenUrl, isThemeApplied, maxHeight, maxWidth, getSingleStakingSchema, Networks, InfuraId } from './store/index';
+import { tokenStore, assets as tokenAssets } from '@scom/scom-token-list';
+
 import {
 	getStakingTotalLocked,
 	getLPObject,
@@ -167,42 +169,42 @@ export default class ScomStaking extends Module implements PageBlock {
 	}
 
 	getConfigurators() {
-    let self = this;
-    return [
-      {
-        name: 'Commissions',
-        target: 'Embedders',
-        elementName: 'i-scom-staking-config',
-        getLinkParams: () => {
-          const commissions = this._data.commissions || [];
-          return {
-            data: window.btoa(JSON.stringify(commissions))
-          }
-        },
-        setLinkParams: async (params: any) => {
-          if (params.data) {
-            const decodedString = window.atob(params.data);
-            const commissions = JSON.parse(decodedString);
-            let resultingData = {
-              ...self._data,
-              commissions
-            };
-            await this.setData(resultingData);
-          }
-        },
-        bindOnChanged: (element: StakingConfig, callback: (data: any) => Promise<void>) => {
-          element.onCustomCommissionsChanged = async (data: any) => {
-            let resultingData = {
-              ...self._data,
-              ...data
-            };
-            await this.setData(resultingData);
-            await callback(data);
-          }
-        }
-      }
-    ]
-  }
+		let self = this;
+		return [
+			{
+				name: 'Commissions',
+				target: 'Embedders',
+				elementName: 'i-scom-staking-config',
+				getLinkParams: () => {
+					const commissions = this._data.commissions || [];
+					return {
+						data: window.btoa(JSON.stringify(commissions))
+					}
+				},
+				setLinkParams: async (params: any) => {
+					if (params.data) {
+						const decodedString = window.atob(params.data);
+						const commissions = JSON.parse(decodedString);
+						let resultingData = {
+							...self._data,
+							commissions
+						};
+						await this.setData(resultingData);
+					}
+				},
+				bindOnChanged: (element: StakingConfig, callback: (data: any) => Promise<void>) => {
+					element.onCustomCommissionsChanged = async (data: any) => {
+						let resultingData = {
+							...self._data,
+							...data
+						};
+						await this.setData(resultingData);
+						await callback(data);
+					}
+				}
+			}
+		]
+	}
 
 	async getData() {
 		return this._data;
@@ -273,7 +275,6 @@ export default class ScomStaking extends Module implements PageBlock {
 	constructor(parent?: Container, options?: ControlElement) {
 		super(parent, options);
 		setDataFromSCConfig({ networks: Object.values(Networks), infuraId: InfuraId });
-		setTokenStore();
 		this.$eventBus = application.EventBus;
 		this.registerEvent();
 	}
@@ -331,7 +332,8 @@ export default class ScomStaking extends Module implements PageBlock {
 			networks: this._data.networks ?? [],
 			showHeader: this._data.showHeader ?? true
 		}
-    if (this.dappContainer?.setData) this.dappContainer.setData(data)
+		tokenStore.updateTokenMapData();
+		if (this.dappContainer?.setData) this.dappContainer.setData(data)
 		this.campaigns = await getAllCampaignsInfo({ [this._data.chainId]: this._data });
 		await this.renderCampaigns(hideLoading);
 		if (!hideLoading && this.loadingElm) {
@@ -468,13 +470,14 @@ export default class ScomStaking extends Module implements PageBlock {
 			this.stakingResult.closeModal();
 			this.stakingResult.visible = true;
 		}, 100);
-		setCurrentChainId(getDefaultChainId());
 		const data = this.getAttribute('data', true);
 		if (data) {
+			setCurrentChainId(data.chainId);
 			await this.setData(data);
 		} else {
 			this.renderEmpty();
 		}
+
 		this.isReadyCallbackQueued = false;
 		this.executeReadyCallback();
 	}
@@ -1008,7 +1011,6 @@ export default class ScomStaking extends Module implements PageBlock {
 						<i-panel id="stakingElm" class="wrapper" />
 					</i-panel>
 					<i-panel id="manageStakeElm" />
-					<staking-wallet />
 					<i-scom-staking-config id="configDApp" visible={false} />
 				</i-panel>
 			</i-scom-dapp-container>

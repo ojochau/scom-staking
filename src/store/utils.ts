@@ -273,19 +273,7 @@ export async function switchNetwork(chainId: number) {
 }
 
 export function getChainId() {
-  return isWalletConnected() ? Wallet.getClientInstance().chainId : state.currentChainId || getDefaultChainId();
-}
-
-export const getDefaultChainId = () => {
-  return Mainnets.avalanche.chainId;
-  // switch (getSiteEnv()) {
-  //   case SITE_ENV.TESTNET:
-  //     return Testnets.avalanche.chainId
-  //   case SITE_ENV.DEV:
-  //   case SITE_ENV.MAINNET:
-  //   default:
-  //     return Mainnets.avalanche.chainId
-  // }
+  return isWalletConnected() ? Wallet.getClientInstance().chainId : state.currentChainId;
 }
 
 export function getWalletProvider() {
@@ -365,18 +353,6 @@ export const getWalletPluginMap = () => {
 export const getWalletPluginProvider = (walletPlugin: WalletPlugin) => {
   return state.walletPluginMap[walletPlugin];
 }
-
-export const projectNativeToken = (): ITokenObject & { address: string } | null => {
-  let chainId = getChainId();
-  if (chainId == null || chainId == undefined) return null;
-  let stakeToken = DefaultTokens[chainId].find(v => v.symbol == 'OSWAP')
-  return stakeToken ? { ...stakeToken, address: stakeToken.address!.toLowerCase() } : null;
-}
-
-export const projectNativeTokenSymbol = () => {
-  const token = projectNativeToken();
-  return token ? token.symbol : ''
-};
 
 export const getTokenObject = async (address: string, showBalance?: boolean) => {
   const ERC20Contract = new OpenSwapContracts.ERC20(Wallet.getClientInstance(), address);

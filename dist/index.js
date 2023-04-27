@@ -16850,7 +16850,7 @@ define("@scom/scom-staking/store/data/index.ts", ["require", "exports", "@scom/s
 define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/index.ts", "@scom/scom-staking/store/data/index.ts", "@scom/scom-staking/store/data/index.ts", "@ijstech/components"], function (require, exports, eth_wallet_4, index_11, index_12, index_13, index_14, components_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.getNetworkName = exports.getNetworkExplorerName = exports.getStakingStatus = exports.setStakingStatus = exports.hasUserToken = exports.setUserTokens = exports.getTokenObject = exports.projectNativeTokenSymbol = exports.projectNativeToken = exports.getWalletPluginProvider = exports.getWalletPluginMap = exports.setWalletPluginProvider = exports.state = exports.getTokenList = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getErc20 = exports.hasMetaMask = exports.getWalletProvider = exports.getDefaultChainId = exports.getChainId = exports.switchNetwork = exports.isWalletConnected = exports.setDataFromSCConfig = exports.setGovToken = exports.getWETH = exports.getChainNativeToken = exports.listsNetworkShow = exports.canDisperse = exports.getDisperseAddress = exports.getAddresses = exports.getCurrentChainId = exports.setCurrentChainId = exports.getNetworkInfo = exports.getSiteSupportedNetworks = exports.getMatchNetworks = exports.getInfuraId = exports.addUserTokens = exports.getUserTokens = exports.INFINITE = exports.nullAddress = exports.WalletPlugin = void 0;
+    exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.getNetworkName = exports.getNetworkExplorerName = exports.getStakingStatus = exports.setStakingStatus = exports.hasUserToken = exports.setUserTokens = exports.getTokenObject = exports.getWalletPluginProvider = exports.getWalletPluginMap = exports.setWalletPluginProvider = exports.state = exports.getTokenList = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getErc20 = exports.hasMetaMask = exports.getWalletProvider = exports.getChainId = exports.switchNetwork = exports.isWalletConnected = exports.setDataFromSCConfig = exports.setGovToken = exports.getWETH = exports.getChainNativeToken = exports.listsNetworkShow = exports.canDisperse = exports.getDisperseAddress = exports.getAddresses = exports.getCurrentChainId = exports.setCurrentChainId = exports.getNetworkInfo = exports.getSiteSupportedNetworks = exports.getMatchNetworks = exports.getInfuraId = exports.addUserTokens = exports.getUserTokens = exports.INFINITE = exports.nullAddress = exports.WalletPlugin = void 0;
     __exportStar(index_14, exports);
     var WalletPlugin;
     (function (WalletPlugin) {
@@ -17089,21 +17089,9 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
     }
     exports.switchNetwork = switchNetwork;
     function getChainId() {
-        return isWalletConnected() ? eth_wallet_4.Wallet.getClientInstance().chainId : exports.state.currentChainId || exports.getDefaultChainId();
+        return isWalletConnected() ? eth_wallet_4.Wallet.getClientInstance().chainId : exports.state.currentChainId;
     }
     exports.getChainId = getChainId;
-    const getDefaultChainId = () => {
-        return index_13.Mainnets.avalanche.chainId;
-        // switch (getSiteEnv()) {
-        //   case SITE_ENV.TESTNET:
-        //     return Testnets.avalanche.chainId
-        //   case SITE_ENV.DEV:
-        //   case SITE_ENV.MAINNET:
-        //   default:
-        //     return Mainnets.avalanche.chainId
-        // }
-    };
-    exports.getDefaultChainId = getDefaultChainId;
     function getWalletProvider() {
         return localStorage.getItem('walletProvider') || '';
     }
@@ -17179,19 +17167,6 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
         return exports.state.walletPluginMap[walletPlugin];
     };
     exports.getWalletPluginProvider = getWalletPluginProvider;
-    const projectNativeToken = () => {
-        let chainId = getChainId();
-        if (chainId == null || chainId == undefined)
-            return null;
-        let stakeToken = index_13.DefaultTokens[chainId].find(v => v.symbol == 'OSWAP');
-        return stakeToken ? Object.assign(Object.assign({}, stakeToken), { address: stakeToken.address.toLowerCase() }) : null;
-    };
-    exports.projectNativeToken = projectNativeToken;
-    const projectNativeTokenSymbol = () => {
-        const token = exports.projectNativeToken();
-        return token ? token.symbol : '';
-    };
-    exports.projectNativeTokenSymbol = projectNativeTokenSymbol;
     const getTokenObject = async (address, showBalance) => {
         const ERC20Contract = new index_12.Contracts.ERC20(eth_wallet_4.Wallet.getClientInstance(), address);
         const symbol = await ERC20Contract.symbol();
@@ -17278,473 +17253,7 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
     };
     exports.getEmbedderCommissionFee = getEmbedderCommissionFee;
 });
-define("@scom/scom-staking/store/token.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/scom-staking/store/utils.ts"], function (require, exports, eth_wallet_5, utils_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.setTokenStore = exports.tokenStore = exports.TokenStore = void 0;
-    class TokenStore {
-        constructor(defaultTokensByChain) {
-            this._defaultTokensByChain = defaultTokensByChain;
-            const defaultChainId = utils_1.getDefaultChainId();
-            this._tokenMap = this._updateTokenMapData(defaultChainId);
-        }
-        get tokenBalances() {
-            return this._tokenBalances;
-        }
-        get tokenMap() {
-            return this._tokenMap;
-        }
-        get projectToken() {
-            return this._projectToken;
-        }
-        getTokenList(chainId) {
-            if (!chainId)
-                return [];
-            const tokenList = [...this._defaultTokensByChain[chainId]];
-            const userCustomTokens = utils_1.getUserTokens(chainId);
-            if (userCustomTokens) {
-                userCustomTokens.forEach(v => tokenList.push(Object.assign(Object.assign({}, v), { isNew: false, isCustom: true })));
-            }
-            return tokenList;
-        }
-        async getERC20Balance(wallet, token) {
-            const erc20 = new eth_wallet_5.Contracts.ERC20(wallet, token);
-            const balance = await erc20.balanceOf(wallet.address);
-            return balance;
-        }
-        getTokenBalance(token) {
-            let balance = '0';
-            if (!token || !this._tokenBalances)
-                return balance;
-            if (token.address) {
-                balance = this._tokenBalances[token.address.toLowerCase()];
-            }
-            else {
-                balance = this._tokenBalances[token.symbol];
-            }
-            return balance;
-        }
-        getProjectTokenBalance() {
-            let balance = '0';
-            if (this._projectToken && this._projectToken.address && this._tokenBalances) {
-                balance = this._tokenBalances[this._projectToken.address.toLowerCase()];
-            }
-            return balance;
-        }
-        async _updateAllTokenBalances(erc20TokenList, nativeToken) {
-            let allTokenBalancesMap = {};
-            try {
-                const wallet = eth_wallet_5.Wallet.getClientInstance();
-                const erc20 = new eth_wallet_5.Contracts.ERC20(wallet);
-                const data = wallet.encodeFunctionCall(erc20, 'balanceOf', [wallet.address]);
-                const result = await wallet.multiCall(erc20TokenList.map((v) => {
-                    return {
-                        to: v.address,
-                        data
-                    };
-                }));
-                if (result) {
-                    for (let i = 0; i < erc20TokenList.length; i++) {
-                        const token = erc20TokenList[i];
-                        if (token.address) {
-                            allTokenBalancesMap[token.address.toLowerCase()] = new eth_wallet_5.BigNumber(result.results[i]).shiftedBy(-token.decimals).toFixed();
-                        }
-                    }
-                    let balance = (await eth_wallet_5.Wallet.getClientInstance().balance).toFixed();
-                    allTokenBalancesMap[nativeToken.symbol] = balance;
-                }
-                else {
-                    let promises = [];
-                    const tokenList = [...erc20TokenList, nativeToken];
-                    promises.push(...tokenList.map(async (token, index) => {
-                        try {
-                            if (token.address) {
-                                let balance = await this.getERC20Balance(wallet, token.address);
-                                allTokenBalancesMap[token.address.toLowerCase()] = new eth_wallet_5.BigNumber(balance).shiftedBy(-token.decimals).toFixed();
-                            }
-                            else {
-                                let balance = await eth_wallet_5.Wallet.getClientInstance().balance;
-                                allTokenBalancesMap[token.symbol] = balance.toFixed();
-                            }
-                        }
-                        catch (error) { }
-                    }));
-                    await Promise.all(promises);
-                }
-            }
-            catch (error) { }
-            return allTokenBalancesMap;
-        }
-        async updateAllTokenBalances() {
-            const wallet = eth_wallet_5.Wallet.getClientInstance();
-            let allTokenBalancesMap = {};
-            const tokenList = this.getTokenList(wallet.chainId);
-            if (!wallet.chainId || !tokenList)
-                return allTokenBalancesMap;
-            const nativeToken = tokenList.find(v => !v.address);
-            const erc20TokenList = tokenList.filter(v => !!v.address);
-            allTokenBalancesMap = await this._updateAllTokenBalances(erc20TokenList, nativeToken);
-            this._tokenBalances = allTokenBalancesMap;
-            return this._tokenBalances;
-        }
-        async updateTokenBalances(erc20TokenList) {
-            const wallet = eth_wallet_5.Wallet.getClientInstance();
-            let tokenBalancesMap = {};
-            if (!wallet.chainId)
-                return tokenBalancesMap;
-            const nativeToken = utils_1.getChainNativeToken(wallet.chainId);
-            tokenBalancesMap = await this._updateAllTokenBalances(erc20TokenList, nativeToken);
-            for (let tokenAddress of Object.keys(tokenBalancesMap)) {
-                this._tokenBalances[tokenAddress] = tokenBalancesMap[tokenAddress];
-            }
-            return this._tokenBalances;
-        }
-        _updateTokenMapData(chainId) {
-            let allTokensMap = {};
-            if (this._defaultTokensByChain[chainId]) {
-                let defaultTokenList = this._defaultTokensByChain[chainId].sort((a, b) => {
-                    if (a.symbol.toLowerCase() < b.symbol.toLowerCase()) {
-                        return -1;
-                    }
-                    if (a.symbol.toLowerCase() > b.symbol.toLowerCase()) {
-                        return 1;
-                    }
-                    return 0;
-                });
-                for (let i = 0; i < defaultTokenList.length; i++) {
-                    let defaultTokenItem = defaultTokenList[i];
-                    if (defaultTokenItem.address)
-                        allTokensMap[defaultTokenItem.address.toLowerCase()] = defaultTokenItem;
-                    else
-                        allTokensMap[defaultTokenItem.symbol] = defaultTokenItem;
-                }
-                const userCustomTokens = utils_1.getUserTokens(chainId);
-                if (userCustomTokens) {
-                    userCustomTokens.forEach(v => allTokensMap[v.address] = Object.assign(Object.assign({}, v), { isCustom: true }));
-                }
-                let stakeToken = defaultTokenList.find(v => v.symbol == 'OSWAP');
-                this._projectToken = stakeToken ? Object.assign(Object.assign({}, stakeToken), { address: stakeToken.address.toLowerCase() }) : undefined;
-            }
-            return allTokensMap;
-        }
-        updateTokenMapData() {
-            let chainId = utils_1.getChainId();
-            let allTokensMap = this._updateTokenMapData(chainId);
-            this._tokenMap = allTokensMap;
-            return allTokensMap;
-        }
-    }
-    exports.TokenStore = TokenStore;
-    const setTokenStore = () => {
-        exports.tokenStore = new TokenStore(utils_1.DefaultTokens);
-    };
-    exports.setTokenStore = setTokenStore;
-});
-define("@scom/scom-staking/wallets/scom-coin98-wallet/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components"], function (require, exports, eth_wallet_6, components_4) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Coin98Provider = void 0;
-    let moduleDir = components_4.application.currentModuleDir;
-    function fullPath(path) {
-        if (path.indexOf('://') > 0)
-            return path;
-        return `${moduleDir}/${path}`;
-    }
-    class Coin98Provider extends eth_wallet_6.EthereumProvider {
-        get displayName() {
-            return 'Coin98 Wallet';
-        }
-        get image() {
-            return fullPath('img/Coin98.svg');
-        }
-        get provider() {
-            return window['ethereum'];
-        }
-        get homepage() {
-            return 'https://docs.coin98.com/products/coin98-wallet';
-        }
-        installed() {
-            let ethereum = window['ethereum'];
-            return !!ethereum && (!!ethereum.isCoin98 || !!window['isCoin98']);
-        }
-    }
-    exports.Coin98Provider = Coin98Provider;
-});
-define("@scom/scom-staking/wallets/scom-trust-wallet/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components"], function (require, exports, eth_wallet_7, components_5) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.TrustWalletProvider = void 0;
-    let moduleDir = components_5.application.currentModuleDir;
-    function fullPath(path) {
-        if (path.indexOf('://') > 0)
-            return path;
-        return `${moduleDir}/${path}`;
-    }
-    class TrustWalletProvider extends eth_wallet_7.EthereumProvider {
-        get displayName() {
-            return 'Trust Wallet';
-        }
-        get image() {
-            return fullPath('img/trustwallet.svg');
-        }
-        get provider() {
-            return window['ethereum'];
-        }
-        get homepage() {
-            return 'https://link.trustwallet.com/open_url?url=' + window.location.href;
-        }
-        installed() {
-            let ethereum = window['ethereum'];
-            return !!ethereum && !!ethereum.isTrust;
-        }
-    }
-    exports.TrustWalletProvider = TrustWalletProvider;
-});
-define("@scom/scom-staking/wallets/scom-binance-chain-wallet/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components"], function (require, exports, eth_wallet_8, components_6) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.BinanceChainWalletProvider = void 0;
-    let moduleDir = components_6.application.currentModuleDir;
-    function fullPath(path) {
-        if (path.indexOf('://') > 0)
-            return path;
-        return `${moduleDir}/${path}`;
-    }
-    class BinanceChainWalletProvider extends eth_wallet_8.EthereumProvider {
-        get displayName() {
-            return 'Binance Chain Wallet';
-        }
-        get image() {
-            return fullPath('img/binance-chain-wallet.svg');
-        }
-        get provider() {
-            return window['BinanceChain'];
-        }
-        get homepage() {
-            return 'https://www.binance.org/en';
-        }
-        installed() {
-            return !!window['BinanceChain'];
-        }
-    }
-    exports.BinanceChainWalletProvider = BinanceChainWalletProvider;
-});
-define("@scom/scom-staking/wallets/scom-onto-wallet/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components"], function (require, exports, eth_wallet_9, components_7) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.ONTOWalletProvider = void 0;
-    let moduleDir = components_7.application.currentModuleDir;
-    function fullPath(path) {
-        if (path.indexOf('://') > 0)
-            return path;
-        return `${moduleDir}/${path}`;
-    }
-    class ONTOWalletProvider extends eth_wallet_9.EthereumProvider {
-        get displayName() {
-            return 'ONTO Wallet';
-        }
-        get image() {
-            return fullPath('img/ONTOWallet.jpg');
-        }
-        get provider() {
-            return window['onto'];
-        }
-        get homepage() {
-            return 'https://onto.app/en/download/?mode=app';
-        }
-        installed() {
-            return !!window['onto'];
-        }
-    }
-    exports.ONTOWalletProvider = ONTOWalletProvider;
-});
-define("@scom/scom-staking/wallets/scom-bit-keep-wallet/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components"], function (require, exports, eth_wallet_10, components_8) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.BitKeepWalletProvider = void 0;
-    let moduleDir = components_8.application.currentModuleDir;
-    function fullPath(path) {
-        if (path.indexOf('://') > 0)
-            return path;
-        return `${moduleDir}/${path}`;
-    }
-    class BitKeepWalletProvider extends eth_wallet_10.EthereumProvider {
-        get displayName() {
-            return 'BitKeep Wallet';
-        }
-        get image() {
-            return fullPath('img/BitKeep.png');
-        }
-        get provider() {
-            return window['bitkeep']['ethereum'];
-        }
-        get homepage() {
-            return 'https://bitkeep.com/download?type=2';
-        }
-        installed() {
-            return !!window['isBitKeep'];
-        }
-    }
-    exports.BitKeepWalletProvider = BitKeepWalletProvider;
-});
-define("@scom/scom-staking/wallets/scom-frontier-wallet/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components"], function (require, exports, eth_wallet_11, components_9) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.FrontierWalletProvider = void 0;
-    let moduleDir = components_9.application.currentModuleDir;
-    function fullPath(path) {
-        if (path.indexOf('://') > 0)
-            return path;
-        return `${moduleDir}/${path}`;
-    }
-    class FrontierWalletProvider extends eth_wallet_11.EthereumProvider {
-        get displayName() {
-            return 'Frontier Wallet';
-        }
-        get image() {
-            return fullPath('img/frontier-wallet.svg');
-        }
-        get provider() {
-            return window['frontier']['ethereum'];
-        }
-        get homepage() {
-            return 'https://www.frontier.xyz/browser-extension';
-        }
-        installed() {
-            return !!window['frontier'];
-        }
-    }
-    exports.FrontierWalletProvider = FrontierWalletProvider;
-});
-define("@scom/scom-staking/store/wallet.ts", ["require", "exports", "@scom/scom-staking/store/utils.ts", "@scom/scom-staking/wallets/scom-coin98-wallet/index.ts", "@scom/scom-staking/wallets/scom-trust-wallet/index.ts", "@scom/scom-staking/wallets/scom-binance-chain-wallet/index.ts", "@scom/scom-staking/wallets/scom-onto-wallet/index.ts", "@scom/scom-staking/wallets/scom-bit-keep-wallet/index.ts", "@scom/scom-staking/wallets/scom-frontier-wallet/index.ts", "@ijstech/eth-wallet", "@ijstech/components", "@scom/scom-staking/store/token.ts"], function (require, exports, utils_2, index_15, index_16, index_17, index_18, index_19, index_20, eth_wallet_12, components_10, token_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.logoutWallet = exports.connectWallet = exports.initWalletPlugins = exports.WalletPluginConfig = void 0;
-    exports.WalletPluginConfig = {
-        [utils_2.WalletPlugin.MetaMask]: {
-            provider: (wallet, events, options) => {
-                return new eth_wallet_12.MetaMaskProvider(wallet, events, options);
-            }
-        },
-        [utils_2.WalletPlugin.Coin98]: {
-            provider: (wallet, events, options) => {
-                return new index_15.Coin98Provider(wallet, events, options);
-            }
-        },
-        [utils_2.WalletPlugin.TrustWallet]: {
-            provider: (wallet, events, options) => {
-                return new index_16.TrustWalletProvider(wallet, events, options);
-            }
-        },
-        [utils_2.WalletPlugin.BinanceChainWallet]: {
-            provider: (wallet, events, options) => {
-                return new index_17.BinanceChainWalletProvider(wallet, events, options);
-            }
-        },
-        [utils_2.WalletPlugin.ONTOWallet]: {
-            provider: (wallet, events, options) => {
-                return new index_18.ONTOWalletProvider(wallet, events, options);
-            }
-        },
-        [utils_2.WalletPlugin.BitKeepWallet]: {
-            provider: (wallet, events, options) => {
-                return new index_19.BitKeepWalletProvider(wallet, events, options);
-            }
-        },
-        [utils_2.WalletPlugin.FrontierWallet]: {
-            provider: (wallet, events, options) => {
-                return new index_20.FrontierWalletProvider(wallet, events, options);
-            },
-        },
-        [utils_2.WalletPlugin.WalletConnect]: {
-            provider: (wallet, events, options) => {
-                return new eth_wallet_12.Web3ModalProvider(wallet, events, options);
-            }
-        }
-    };
-    function initWalletPlugins(eventHandlers) {
-        let wallet = eth_wallet_12.Wallet.getClientInstance();
-        const events = {
-            onAccountChanged: async (account) => {
-                var _a;
-                if (eventHandlers && eventHandlers.accountsChanged) {
-                    eventHandlers.accountsChanged(account);
-                }
-                const connected = !!account;
-                if (connected) {
-                    localStorage.setItem('walletProvider', ((_a = eth_wallet_12.Wallet.getClientInstance().clientSideProvider) === null || _a === void 0 ? void 0 : _a.name) || '');
-                    if (wallet.chainId !== utils_2.getCurrentChainId()) {
-                        utils_2.setCurrentChainId(wallet.chainId);
-                        components_10.application.EventBus.dispatch("chainChanged" /* chainChanged */, wallet.chainId);
-                    }
-                    token_1.tokenStore.updateTokenMapData();
-                    await token_1.tokenStore.updateAllTokenBalances();
-                }
-                components_10.application.EventBus.dispatch("isWalletConnected" /* IsWalletConnected */, connected);
-            },
-            onChainChanged: async (chainIdHex) => {
-                const chainId = Number(chainIdHex);
-                if (eventHandlers && eventHandlers.chainChanged) {
-                    eventHandlers.chainChanged(chainId);
-                }
-                utils_2.setCurrentChainId(chainId);
-                token_1.tokenStore.updateTokenMapData();
-                await token_1.tokenStore.updateAllTokenBalances();
-                components_10.application.EventBus.dispatch("chainChanged" /* chainChanged */, chainId);
-            }
-        };
-        let networkList = utils_2.getSiteSupportedNetworks();
-        const rpcs = {};
-        for (const network of networkList) {
-            let rpc = network.rpc;
-            if (rpc)
-                rpcs[network.chainId] = rpc;
-        }
-        for (let pluginName in exports.WalletPluginConfig) {
-            let providerOptions;
-            if (pluginName == utils_2.WalletPlugin.WalletConnect) {
-                providerOptions = {
-                    name: pluginName,
-                    infuraId: utils_2.getInfuraId(),
-                    bridge: "https://bridge.walletconnect.org",
-                    rpc: rpcs,
-                    useDefaultProvider: true
-                };
-            }
-            else {
-                providerOptions = {
-                    name: pluginName,
-                    infuraId: utils_2.getInfuraId(),
-                    rpc: rpcs,
-                    useDefaultProvider: true
-                };
-            }
-            let provider = exports.WalletPluginConfig[pluginName].provider(wallet, events, providerOptions);
-            utils_2.setWalletPluginProvider(pluginName, provider);
-        }
-    }
-    exports.initWalletPlugins = initWalletPlugins;
-    async function connectWallet(walletPlugin) {
-        let wallet = eth_wallet_12.Wallet.getClientInstance();
-        if (!wallet.chainId) {
-            wallet.chainId = utils_2.getDefaultChainId();
-        }
-        let provider = utils_2.getWalletPluginProvider(walletPlugin);
-        if (provider === null || provider === void 0 ? void 0 : provider.installed()) {
-            await wallet.connect(provider);
-        }
-        return wallet;
-    }
-    exports.connectWallet = connectWallet;
-    async function logoutWallet() {
-        const wallet = eth_wallet_12.Wallet.getClientInstance();
-        await wallet.disconnect();
-        localStorage.setItem('walletProvider', '');
-        components_10.application.EventBus.dispatch("IsWalletDisconnected" /* IsWalletDisconnected */, false);
-    }
-    exports.logoutWallet = logoutWallet;
-});
-define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-staking/assets.ts", "@scom/scom-staking/store/data/index.ts", "@scom/scom-staking/store/token.ts", "@scom/scom-staking/store/utils.ts", "@scom/scom-staking/store/token.ts", "@scom/scom-staking/store/utils.ts", "@scom/scom-staking/store/wallet.ts"], function (require, exports, assets_1, index_21, token_2, utils_3, token_3, utils_4, wallet_1) {
+define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-staking/assets.ts", "@scom/scom-staking/store/data/index.ts", "@scom/scom-token-list", "@scom/scom-staking/store/utils.ts", "@scom/scom-staking/store/utils.ts"], function (require, exports, assets_1, index_15, scom_token_list_1, utils_1, utils_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.maxHeight = exports.maxWidth = exports.isMultiple = exports.isThemeApplied = exports.getTokenUrl = exports.baseUrl = exports.getTokenDecimals = exports.getLockedTokenIconPaths = exports.getLockedTokenSymbol = exports.getLockedTokenObject = exports.tokenSymbol = exports.getTokenIcon = exports.fallBackUrl = void 0;
@@ -17752,23 +17261,23 @@ define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-s
     const getTokenIcon = (address) => {
         if (!address)
             return '';
-        const tokenMap = token_2.tokenStore.tokenMap;
+        const tokenMap = scom_token_list_1.tokenStore.tokenMap;
         let ChainNativeToken;
         let tokenObject;
-        if (utils_3.isWalletConnected()) {
-            ChainNativeToken = utils_3.getChainNativeToken(utils_3.getChainId());
+        if (utils_1.isWalletConnected()) {
+            ChainNativeToken = utils_1.getChainNativeToken(utils_1.getChainId());
             tokenObject = address == ChainNativeToken.symbol ? ChainNativeToken : tokenMap[address.toLowerCase()];
         }
         else {
             tokenObject = tokenMap[address.toLowerCase()];
         }
-        return assets_1.default.fullPath(index_21.getTokenIconPath(tokenObject, utils_3.getChainId()));
+        return assets_1.default.fullPath(index_15.getTokenIconPath(tokenObject, utils_1.getChainId()));
     };
     exports.getTokenIcon = getTokenIcon;
     const tokenSymbol = (address) => {
         if (!address)
             return '';
-        const tokenMap = token_2.tokenStore.tokenMap;
+        const tokenMap = scom_token_list_1.tokenStore.tokenMap;
         let tokenObject = tokenMap[address.toLowerCase()];
         if (!tokenObject) {
             tokenObject = tokenMap[address];
@@ -17779,16 +17288,16 @@ define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-s
     // staking common
     const getLockedTokenObject = (info, tokenInfo, tokenMap) => {
         if (info) {
-            if (info.lockTokenType == index_21.LockTokenType.ERC20_Token) {
+            if (info.lockTokenType == index_15.LockTokenType.ERC20_Token) {
                 if (!tokenMap) {
-                    tokenMap = token_2.tokenStore.tokenMap;
+                    tokenMap = scom_token_list_1.tokenStore.tokenMap;
                 }
                 return tokenMap[tokenInfo.tokenAddress];
             }
-            if (info.lockTokenType == index_21.LockTokenType.LP_Token && tokenInfo.lpToken) {
+            if (info.lockTokenType == index_15.LockTokenType.LP_Token && tokenInfo.lpToken) {
                 return tokenInfo.lpToken.object;
             }
-            else if (info.lockTokenType == index_21.LockTokenType.VAULT_Token && tokenInfo.vaultToken) {
+            else if (info.lockTokenType == index_15.LockTokenType.VAULT_Token && tokenInfo.vaultToken) {
                 return tokenInfo.vaultToken.object;
             }
         }
@@ -17797,13 +17306,13 @@ define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-s
     exports.getLockedTokenObject = getLockedTokenObject;
     const getLockedTokenSymbol = (info, token) => {
         if (info) {
-            if (info.lockTokenType == index_21.LockTokenType.ERC20_Token) {
+            if (info.lockTokenType == index_15.LockTokenType.ERC20_Token) {
                 return token ? token.symbol : '';
             }
-            if (info.lockTokenType == index_21.LockTokenType.LP_Token) {
+            if (info.lockTokenType == index_15.LockTokenType.LP_Token) {
                 return 'LP';
             }
-            if (info.lockTokenType == index_21.LockTokenType.VAULT_Token) {
+            if (info.lockTokenType == index_15.LockTokenType.VAULT_Token) {
                 return token ? `vt${token.assetToken.symbol}` : '';
             }
         }
@@ -17814,29 +17323,29 @@ define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-s
         var _a;
         if (info && tokenObject) {
             if (!tokenMap) {
-                tokenMap = token_2.tokenStore.tokenMap;
+                tokenMap = scom_token_list_1.tokenStore.tokenMap;
             }
-            if (info.lockTokenType == index_21.LockTokenType.ERC20_Token) {
-                return [index_21.getTokenIconPath(tokenObject, chainId)];
+            if (info.lockTokenType == index_15.LockTokenType.ERC20_Token) {
+                return [index_15.getTokenIconPath(tokenObject, chainId)];
             }
-            if (info.lockTokenType == index_21.LockTokenType.LP_Token) {
-                const nativeToken = (_a = index_21.DefaultTokens[chainId]) === null || _a === void 0 ? void 0 : _a.find((token) => token.isNative);
+            if (info.lockTokenType == index_15.LockTokenType.LP_Token) {
+                const nativeToken = (_a = index_15.DefaultTokens[chainId]) === null || _a === void 0 ? void 0 : _a.find((token) => token.isNative);
                 const token0 = tokenMap[tokenObject.token0] || nativeToken;
                 const token1 = tokenMap[tokenObject.token1] || nativeToken;
-                return [index_21.getTokenIconPath(token0, chainId), index_21.getTokenIconPath(token1, chainId)];
+                return [index_15.getTokenIconPath(token0, chainId), index_15.getTokenIconPath(token1, chainId)];
             }
-            if (info.lockTokenType == index_21.LockTokenType.VAULT_Token) {
-                return [index_21.getTokenIconPath(tokenObject.assetToken, chainId)];
+            if (info.lockTokenType == index_15.LockTokenType.VAULT_Token) {
+                return [index_15.getTokenIconPath(tokenObject.assetToken, chainId)];
             }
         }
         return [];
     };
     exports.getLockedTokenIconPaths = getLockedTokenIconPaths;
     const getTokenDecimals = (address) => {
-        let chainId = utils_3.getChainId();
-        const Address = utils_3.getAddresses(chainId);
-        const ChainNativeToken = utils_3.getChainNativeToken(chainId);
-        const tokenObject = (!address || address.toLowerCase() === Address['WETH9'].toLowerCase()) ? ChainNativeToken : token_2.tokenStore.tokenMap[address.toLowerCase()];
+        let chainId = utils_1.getChainId();
+        const Address = utils_1.getAddresses(chainId);
+        const ChainNativeToken = utils_1.getChainNativeToken(chainId);
+        const tokenObject = (!address || address.toLowerCase() === Address['WETH9'].toLowerCase()) ? ChainNativeToken : scom_token_list_1.tokenStore.tokenMap[address.toLowerCase()];
         return tokenObject ? tokenObject.decimals : 18;
     };
     exports.getTokenDecimals = getTokenDecimals;
@@ -17846,9 +17355,7 @@ define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-s
     exports.isMultiple = false;
     exports.maxWidth = '690px';
     exports.maxHeight = '321px';
-    __exportStar(token_3, exports);
-    __exportStar(utils_4, exports);
-    __exportStar(wallet_1, exports);
+    __exportStar(utils_2, exports);
 });
 define("@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -25479,55 +24986,55 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/index.ts"
     ///<amd-module name='@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/index.ts'/> 
     exports.Contracts = Contracts;
 });
-define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/scom-staking/contracts/oswap-time-is-money-contract/index.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/index.ts", "@scom/scom-staking/contracts/oswap-chainlink-contract/index.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/index.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts"], function (require, exports, eth_wallet_13, index_22, index_23, index_24, index_25, index_26, index_27) {
+define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/scom-staking/contracts/oswap-time-is-money-contract/index.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/index.ts", "@scom/scom-staking/contracts/oswap-chainlink-contract/index.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/index.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list"], function (require, exports, eth_wallet_5, index_16, index_17, index_18, index_19, index_20, index_21, scom_token_list_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getApprovalModelAction = exports.lockToken = exports.claimToken = exports.withdrawToken = exports.getVaultRewardCurrentAPR = exports.getLPRewardCurrentAPR = exports.getERC20RewardCurrentAPR = exports.getVaultBalance = exports.getVaultObject = exports.getLPBalance = exports.getLPObject = exports.getStakingTotalLocked = exports.getAllCampaignsInfo = exports.getTokenPrice = void 0;
     const getTokenPrice = async (token) => {
-        let wallet = eth_wallet_13.Wallet.getClientInstance();
+        let wallet = eth_wallet_5.Wallet.getClientInstance();
         let chainId = wallet.chainId;
         let tokenPrice;
         // get price from price feed 
-        let tokenPriceFeedAddress = index_27.ToUSDPriceFeedAddressesMap[chainId][token.toLowerCase()];
+        let tokenPriceFeedAddress = index_21.ToUSDPriceFeedAddressesMap[chainId][token.toLowerCase()];
         if (tokenPriceFeedAddress) {
-            let aggregator = new index_24.Contracts.EACAggregatorProxy(wallet, tokenPriceFeedAddress);
+            let aggregator = new index_18.Contracts.EACAggregatorProxy(wallet, tokenPriceFeedAddress);
             let tokenLatestRoundData = await aggregator.latestRoundData();
             let tokenPriceFeedDecimals = await aggregator.decimals();
             return tokenLatestRoundData.answer.shiftedBy(-tokenPriceFeedDecimals).toFixed();
         }
         // get price from AMM
-        let referencePair = index_27.tokenPriceAMMReference[chainId][token.toLowerCase()];
+        let referencePair = index_21.tokenPriceAMMReference[chainId][token.toLowerCase()];
         if (!referencePair)
             return null;
-        let pair = new index_23.Contracts.OSWAP_Pair(wallet, referencePair);
+        let pair = new index_17.Contracts.OSWAP_Pair(wallet, referencePair);
         let token0 = await pair.token0();
         let token1 = await pair.token1();
         let reserves = await pair.getReserves();
-        let token0PriceFeedAddress = index_27.ToUSDPriceFeedAddressesMap[chainId][token0.toLowerCase()];
-        let token1PriceFeedAddress = index_27.ToUSDPriceFeedAddressesMap[chainId][token1.toLowerCase()];
+        let token0PriceFeedAddress = index_21.ToUSDPriceFeedAddressesMap[chainId][token0.toLowerCase()];
+        let token1PriceFeedAddress = index_21.ToUSDPriceFeedAddressesMap[chainId][token1.toLowerCase()];
         if (token0PriceFeedAddress || token1PriceFeedAddress) {
             if (token0PriceFeedAddress) {
-                let aggregator = new index_24.Contracts.EACAggregatorProxy(wallet, token0PriceFeedAddress);
+                let aggregator = new index_18.Contracts.EACAggregatorProxy(wallet, token0PriceFeedAddress);
                 let token0LatestRoundData = await aggregator.latestRoundData();
                 let token0PriceFeedDecimals = await aggregator.decimals();
-                let token0USDPrice = new eth_wallet_13.BigNumber(token0LatestRoundData.answer).shiftedBy(-token0PriceFeedDecimals).toFixed();
-                if (new eth_wallet_13.BigNumber(token.toLowerCase()).lt(token0.toLowerCase())) {
-                    tokenPrice = new eth_wallet_13.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token0USDPrice).toFixed();
+                let token0USDPrice = new eth_wallet_5.BigNumber(token0LatestRoundData.answer).shiftedBy(-token0PriceFeedDecimals).toFixed();
+                if (new eth_wallet_5.BigNumber(token.toLowerCase()).lt(token0.toLowerCase())) {
+                    tokenPrice = new eth_wallet_5.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token0USDPrice).toFixed();
                 }
                 else {
-                    tokenPrice = new eth_wallet_13.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token0USDPrice).toFixed();
+                    tokenPrice = new eth_wallet_5.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token0USDPrice).toFixed();
                 }
             }
             else {
-                let aggregator = new index_24.Contracts.EACAggregatorProxy(wallet, token1PriceFeedAddress);
+                let aggregator = new index_18.Contracts.EACAggregatorProxy(wallet, token1PriceFeedAddress);
                 let token1LatestRoundData = await aggregator.latestRoundData();
                 let token1PriceFeedDecimals = await aggregator.decimals();
-                let token1USDPrice = new eth_wallet_13.BigNumber(token1LatestRoundData.answer).shiftedBy(-token1PriceFeedDecimals).toFixed();
-                if (new eth_wallet_13.BigNumber(token.toLowerCase()).lt(token1.toLowerCase())) {
-                    tokenPrice = new eth_wallet_13.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token1USDPrice).toFixed();
+                let token1USDPrice = new eth_wallet_5.BigNumber(token1LatestRoundData.answer).shiftedBy(-token1PriceFeedDecimals).toFixed();
+                if (new eth_wallet_5.BigNumber(token.toLowerCase()).lt(token1.toLowerCase())) {
+                    tokenPrice = new eth_wallet_5.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token1USDPrice).toFixed();
                 }
                 else {
-                    tokenPrice = new eth_wallet_13.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token1USDPrice).toFixed();
+                    tokenPrice = new eth_wallet_5.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token1USDPrice).toFixed();
                 }
             }
         }
@@ -25536,13 +25043,13 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
                 let token1Price = await exports.getTokenPrice(token1);
                 if (!token1Price)
                     return null;
-                tokenPrice = new eth_wallet_13.BigNumber(token1Price).times(reserves._reserve1).div(reserves._reserve0).toFixed();
+                tokenPrice = new eth_wallet_5.BigNumber(token1Price).times(reserves._reserve1).div(reserves._reserve0).toFixed();
             }
             else {
                 let token0Price = await exports.getTokenPrice(token0);
                 if (!token0Price)
                     return null;
-                tokenPrice = new eth_wallet_13.BigNumber(token0Price).times(reserves._reserve0).div(reserves._reserve1).toFixed();
+                tokenPrice = new eth_wallet_5.BigNumber(token0Price).times(reserves._reserve0).div(reserves._reserve1).toFixed();
             }
         }
         return tokenPrice;
@@ -25550,12 +25057,12 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
     exports.getTokenPrice = getTokenPrice;
     const getDefaultStakingByAddress = async (option) => {
         try {
-            let wallet = eth_wallet_13.Wallet.getClientInstance();
+            let wallet = eth_wallet_5.Wallet.getClientInstance();
             let currentAddress = wallet.address;
             let stakingAddress = option.address;
             let rewards = [option.rewards];
             let hasRewardAddress = rewards.length && rewards[0].address;
-            let timeIsMoney = new index_22.Contracts.TimeIsMoney(wallet, stakingAddress);
+            let timeIsMoney = new index_16.Contracts.TimeIsMoney(wallet, stakingAddress);
             let mode = '';
             let minimumLockTime = await timeIsMoney.minimumLockTime();
             let maximumTotalLock = await timeIsMoney.maximumTotalLock();
@@ -25563,13 +25070,13 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
             let totalCreditWei = await timeIsMoney.getCredit(currentAddress);
             let lockAmountWei = await timeIsMoney.lockAmount(currentAddress);
             let withdrawn = await timeIsMoney.withdrawn(currentAddress);
-            let totalCredit = eth_wallet_13.Utils.fromDecimals(totalCreditWei).toFixed();
-            let lockAmount = eth_wallet_13.Utils.fromDecimals(lockAmountWei).toFixed();
+            let totalCredit = eth_wallet_5.Utils.fromDecimals(totalCreditWei).toFixed();
+            let lockAmount = eth_wallet_5.Utils.fromDecimals(lockAmountWei).toFixed();
             let stakeQty = withdrawn ? '0' : lockAmount;
-            if (new eth_wallet_13.BigNumber(totalCredit).gt(0) && hasRewardAddress) {
+            if (new eth_wallet_5.BigNumber(totalCredit).gt(0) && hasRewardAddress) {
                 mode = 'Claim';
             }
-            else if (new eth_wallet_13.BigNumber(stakeQty).isZero()) {
+            else if (new eth_wallet_5.BigNumber(stakeQty).isZero()) {
                 mode = 'Stake';
             }
             else {
@@ -25581,12 +25088,12 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
             }
             catch (err) { }
             let tokenAddress = await timeIsMoney.token();
-            let stakingDecimals = 18 - index_27.getTokenDecimals(tokenAddress.toLocaleLowerCase());
+            let stakingDecimals = 18 - index_21.getTokenDecimals(tokenAddress.toLocaleLowerCase());
             let endOfEntryPeriod = (await timeIsMoney.endOfEntryPeriod()).toFixed();
             let perAddressCapWei = await timeIsMoney.perAddressCap();
-            let maxTotalLock = eth_wallet_13.Utils.fromDecimals(maximumTotalLock).shiftedBy(stakingDecimals).toFixed();
-            let totalLocked = eth_wallet_13.Utils.fromDecimals(totalLockedWei).toFixed();
-            let perAddressCap = eth_wallet_13.Utils.fromDecimals(perAddressCapWei).shiftedBy(stakingDecimals).toFixed();
+            let maxTotalLock = eth_wallet_5.Utils.fromDecimals(maximumTotalLock).shiftedBy(stakingDecimals).toFixed();
+            let totalLocked = eth_wallet_5.Utils.fromDecimals(totalLockedWei).toFixed();
+            let perAddressCap = eth_wallet_5.Utils.fromDecimals(perAddressCapWei).shiftedBy(stakingDecimals).toFixed();
             let obj = {
                 mode,
                 minLockTime: minimumLockTime.toNumber(),
@@ -25607,28 +25114,28 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
                         try {
                             let claimable = '0';
                             if (reward.isCommonStartDate) {
-                                rewardsContract = new index_22.Contracts.RewardsCommonStartDate(wallet, reward.address);
+                                rewardsContract = new index_16.Contracts.RewardsCommonStartDate(wallet, reward.address);
                             }
                             else {
-                                rewardsContract = new index_22.Contracts.Rewards(wallet, reward.address);
+                                rewardsContract = new index_16.Contracts.Rewards(wallet, reward.address);
                             }
                             if (mode === 'Claim') {
                                 let unclaimedWei = await rewardsContract.unclaimed();
-                                claimable = eth_wallet_13.Utils.fromDecimals(unclaimedWei).toFixed();
+                                claimable = eth_wallet_5.Utils.fromDecimals(unclaimedWei).toFixed();
                             }
                             admin = await rewardsContract.admin();
                             rewardTokenAddress = await rewardsContract.token();
-                            let rewardToken = new eth_wallet_13.Erc20(wallet, rewardTokenAddress);
+                            let rewardToken = new eth_wallet_5.Erc20(wallet, rewardTokenAddress);
                             let rewardTokenDecimals = await rewardToken.decimals;
                             let multiplierWei = await rewardsContract.multiplier();
-                            multiplier = eth_wallet_13.Utils.fromDecimals(multiplierWei, rewardTokenDecimals).toFixed();
-                            initialReward = eth_wallet_13.Utils.fromDecimals(await rewardsContract.initialReward(), rewardTokenDecimals).toFixed();
+                            multiplier = eth_wallet_5.Utils.fromDecimals(multiplierWei, rewardTokenDecimals).toFixed();
+                            initialReward = eth_wallet_5.Utils.fromDecimals(await rewardsContract.initialReward(), rewardTokenDecimals).toFixed();
                             vestingPeriod = (await rewardsContract.vestingPeriod()).toNumber();
                             claimDeadline = (await rewardsContract.claimDeadline()).toNumber();
                             if (reward.isCommonStartDate) {
                                 vestingStartDate = (await rewardsContract.vestingStartDate()).toNumber();
                             }
-                            let rewardAmount = new eth_wallet_13.BigNumber(multiplier).multipliedBy(maxTotalLock).toFixed();
+                            let rewardAmount = new eth_wallet_5.BigNumber(multiplier).multipliedBy(maxTotalLock).toFixed();
                             rewardsData.push(Object.assign(Object.assign({}, reward), { claimable,
                                 rewardTokenAddress,
                                 multiplier,
@@ -25678,7 +25185,7 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
         return campaigns;
     };
     const getAllCampaignsInfo = async (stakingInfo) => {
-        let wallet = eth_wallet_13.Wallet.getClientInstance();
+        let wallet = eth_wallet_5.Wallet.getClientInstance();
         let chainId = wallet.chainId;
         let stakingCampaignInfoList = stakingInfo[chainId];
         if (!stakingCampaignInfoList)
@@ -25708,22 +25215,22 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
     };
     exports.getAllCampaignsInfo = getAllCampaignsInfo;
     const getStakingTotalLocked = async (stakingAddress) => {
-        let wallet = eth_wallet_13.Wallet.getClientInstance();
-        let timeIsMoney = new index_22.Contracts.TimeIsMoney(wallet, stakingAddress);
+        let wallet = eth_wallet_5.Wallet.getClientInstance();
+        let timeIsMoney = new index_16.Contracts.TimeIsMoney(wallet, stakingAddress);
         let totalLockedWei = await timeIsMoney.totalLocked();
-        let totalLocked = eth_wallet_13.Utils.fromDecimals(totalLockedWei).toFixed();
+        let totalLocked = eth_wallet_5.Utils.fromDecimals(totalLockedWei).toFixed();
         return totalLocked;
     };
     exports.getStakingTotalLocked = getStakingTotalLocked;
     const getWETH = (wallet) => {
-        let wrappedToken = index_27.WETHByChainId[wallet.chainId];
+        let wrappedToken = index_21.WETHByChainId[wallet.chainId];
         return wrappedToken;
     };
     const getLPObject = async (pairAddress) => {
         try {
-            let wallet = eth_wallet_13.Wallet.getClientInstance();
+            let wallet = eth_wallet_5.Wallet.getClientInstance();
             const WETH = getWETH(wallet);
-            let pair = new index_23.Contracts.OSWAP_Pair(wallet, pairAddress);
+            let pair = new index_17.Contracts.OSWAP_Pair(wallet, pairAddress);
             let getSymbol = await pair.symbol();
             let getName = await pair.name();
             let getDecimal = await pair.decimals();
@@ -25744,20 +25251,20 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
     };
     exports.getLPObject = getLPObject;
     const getLPBalance = async (pairAddress) => {
-        let wallet = eth_wallet_13.Wallet.getClientInstance();
-        let pair = new index_23.Contracts.OSWAP_Pair(wallet, pairAddress);
+        let wallet = eth_wallet_5.Wallet.getClientInstance();
+        let pair = new index_17.Contracts.OSWAP_Pair(wallet, pairAddress);
         let balance = await pair.balanceOf(wallet.address);
-        return eth_wallet_13.Utils.fromDecimals(balance).toFixed();
+        return eth_wallet_5.Utils.fromDecimals(balance).toFixed();
     };
     exports.getLPBalance = getLPBalance;
     const getVaultObject = async (vaultAddress) => {
         try {
-            let wallet = eth_wallet_13.Wallet.getClientInstance();
-            let vault = new index_25.Contracts.OSWAP_BridgeVault(wallet, vaultAddress);
+            let wallet = eth_wallet_5.Wallet.getClientInstance();
+            let vault = new index_19.Contracts.OSWAP_BridgeVault(wallet, vaultAddress);
             let symbol = await vault.symbol();
             let name = await vault.name();
             let decimals = await vault.decimals();
-            let tokenMap = index_27.tokenStore.tokenMap;
+            let tokenMap = scom_token_list_2.tokenStore.tokenMap;
             let assetToken = tokenMap[vaultAddress.toLowerCase()];
             return {
                 address: vaultAddress.toLowerCase(),
@@ -25773,16 +25280,16 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
     };
     exports.getVaultObject = getVaultObject;
     const getVaultBalance = async (vaultAddress) => {
-        let wallet = eth_wallet_13.Wallet.getClientInstance();
-        let vault = new index_25.Contracts.OSWAP_BridgeVault(wallet, vaultAddress);
+        let wallet = eth_wallet_5.Wallet.getClientInstance();
+        let vault = new index_19.Contracts.OSWAP_BridgeVault(wallet, vaultAddress);
         let balance = await vault.balanceOf(wallet.address);
-        return eth_wallet_13.Utils.fromDecimals(balance).toFixed();
+        return eth_wallet_5.Utils.fromDecimals(balance).toFixed();
     };
     exports.getVaultBalance = getVaultBalance;
     const getERC20RewardCurrentAPR = async (rewardOption, lockedToken, lockedDays) => {
-        let wallet = eth_wallet_13.Wallet.getClientInstance();
+        let wallet = eth_wallet_5.Wallet.getClientInstance();
         let chainId = wallet.chainId;
-        const usdPeggedTokenAddress = index_27.USDPeggedTokenAddressMap[chainId];
+        const usdPeggedTokenAddress = index_21.USDPeggedTokenAddressMap[chainId];
         if (!usdPeggedTokenAddress)
             return '';
         let APR = "";
@@ -25790,21 +25297,21 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
         let lockedTokenPrice = await exports.getTokenPrice(lockedToken.address);
         if (!rewardPrice || !lockedTokenPrice)
             return null;
-        APR = new eth_wallet_13.BigNumber(rewardOption.multiplier).times(new eth_wallet_13.BigNumber(rewardPrice).times(365)).div(new eth_wallet_13.BigNumber(lockedTokenPrice).times(lockedDays)).toFixed();
+        APR = new eth_wallet_5.BigNumber(rewardOption.multiplier).times(new eth_wallet_5.BigNumber(rewardPrice).times(365)).div(new eth_wallet_5.BigNumber(lockedTokenPrice).times(lockedDays)).toFixed();
         return APR;
     };
     exports.getERC20RewardCurrentAPR = getERC20RewardCurrentAPR;
     const getReservesByPair = async (pairAddress, tokenInAddress, tokenOutAddress) => {
-        let wallet = eth_wallet_13.Wallet.getClientInstance();
+        let wallet = eth_wallet_5.Wallet.getClientInstance();
         let reserveObj;
-        let pair = new index_23.Contracts.OSWAP_Pair(wallet, pairAddress);
+        let pair = new index_17.Contracts.OSWAP_Pair(wallet, pairAddress);
         let reserves = await pair.getReserves();
         if (!tokenInAddress || !tokenOutAddress) {
             tokenInAddress = await pair.token0();
             tokenOutAddress = await pair.token1();
         }
         if (tokenInAddress && tokenOutAddress) {
-            if (new eth_wallet_13.BigNumber(tokenInAddress.toLowerCase()).lt(tokenOutAddress.toLowerCase())) {
+            if (new eth_wallet_5.BigNumber(tokenInAddress.toLowerCase()).lt(tokenOutAddress.toLowerCase())) {
                 reserveObj = {
                     reserveA: reserves._reserve0,
                     reserveB: reserves._reserve1
@@ -25822,62 +25329,62 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
     const getLPRewardCurrentAPR = async (rewardOption, lpObject, lockedDays) => {
         if (!lpObject)
             return '';
-        let wallet = eth_wallet_13.Wallet.getClientInstance();
+        let wallet = eth_wallet_5.Wallet.getClientInstance();
         const WETH = getWETH(wallet);
         const WETHAddress = WETH.address;
         let chainId = wallet.chainId;
-        const usdPeggedTokenAddress = index_27.USDPeggedTokenAddressMap[chainId];
+        const usdPeggedTokenAddress = index_21.USDPeggedTokenAddressMap[chainId];
         if (!usdPeggedTokenAddress)
             return '';
         let APR = '';
         if (lpObject.token0.toLowerCase() == usdPeggedTokenAddress.toLowerCase() || lpObject.token1.toLowerCase() == usdPeggedTokenAddress.toLowerCase()) {
             let rewardPrice = '';
             if (rewardOption.APROption && rewardOption.APROption == 1) {
-                let WETH9PriceFeedAddress = index_27.ToUSDPriceFeedAddressesMap[chainId][WETHAddress.toLowerCase()];
+                let WETH9PriceFeedAddress = index_21.ToUSDPriceFeedAddressesMap[chainId][WETHAddress.toLowerCase()];
                 if (!WETH9PriceFeedAddress)
                     return '';
-                let aggregator = new index_24.Contracts.EACAggregatorProxy(wallet, WETH9PriceFeedAddress);
+                let aggregator = new index_18.Contracts.EACAggregatorProxy(wallet, WETH9PriceFeedAddress);
                 let WETH9LatestRoundData = await aggregator.latestRoundData();
                 let WETH9PriceFeedDecimals = await aggregator.decimals();
-                let WETH9USDPrice = new eth_wallet_13.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
+                let WETH9USDPrice = new eth_wallet_5.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
                 let rewardReserves = await getReservesByPair(rewardOption.referencePair, WETHAddress, rewardOption.rewardTokenAddress);
                 if (!rewardReserves)
                     return '';
-                rewardPrice = new eth_wallet_13.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
+                rewardPrice = new eth_wallet_5.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
             }
             else {
                 let rewardReserves = await getReservesByPair(rewardOption.referencePair, usdPeggedTokenAddress, rewardOption.rewardTokenAddress);
                 if (!rewardReserves)
                     return '';
-                rewardPrice = new eth_wallet_13.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).toFixed();
+                rewardPrice = new eth_wallet_5.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).toFixed();
             }
             let lpTokenOut = lpObject.token0.toLowerCase() == usdPeggedTokenAddress.toLowerCase() ? lpObject.token1 : lpObject.token0;
             let lockedLPReserves = await getReservesByPair(lpObject.address, usdPeggedTokenAddress, lpTokenOut);
             if (!lockedLPReserves)
                 return '';
-            let lockedLPPrice = new eth_wallet_13.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(2).toFixed();
-            APR = new eth_wallet_13.BigNumber(rewardOption.multiplier).times(new eth_wallet_13.BigNumber(rewardPrice).times(365)).div(new eth_wallet_13.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
+            let lockedLPPrice = new eth_wallet_5.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(2).toFixed();
+            APR = new eth_wallet_5.BigNumber(rewardOption.multiplier).times(new eth_wallet_5.BigNumber(rewardPrice).times(365)).div(new eth_wallet_5.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
         }
         else {
             if (!lpObject.token0 || !lpObject.token1 || lpObject.token0.toLowerCase() == WETHAddress.toLowerCase() || lpObject.token1.toLowerCase() == WETHAddress.toLowerCase()) {
-                let WETH9PriceFeedAddress = index_27.ToUSDPriceFeedAddressesMap[chainId][WETHAddress.toLowerCase()];
+                let WETH9PriceFeedAddress = index_21.ToUSDPriceFeedAddressesMap[chainId][WETHAddress.toLowerCase()];
                 if (!WETH9PriceFeedAddress)
                     return '';
-                let aggregator = new index_24.Contracts.EACAggregatorProxy(wallet, WETH9PriceFeedAddress);
+                let aggregator = new index_18.Contracts.EACAggregatorProxy(wallet, WETH9PriceFeedAddress);
                 let WETH9LatestRoundData = await aggregator.latestRoundData();
                 let WETH9PriceFeedDecimals = await aggregator.decimals();
-                let WETH9USDPrice = new eth_wallet_13.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
+                let WETH9USDPrice = new eth_wallet_5.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
                 let rewardReserves = await getReservesByPair(rewardOption.referencePair, WETHAddress, rewardOption.rewardTokenAddress);
                 if (!rewardReserves)
                     return '';
-                let rewardPrice = new eth_wallet_13.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
+                let rewardPrice = new eth_wallet_5.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
                 let otherTokenAddress = (!lpObject.token0 || lpObject.token0.toLowerCase() == WETHAddress.toLowerCase()) ? lpObject.token1 : lpObject.token0;
                 let lockedLPReserves = await getReservesByPair(lpObject.address, WETHAddress, otherTokenAddress);
                 if (!lockedLPReserves)
                     return '';
-                let otherTokenPrice = new eth_wallet_13.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(WETH9USDPrice).toFixed();
-                let lockedLPPrice = new eth_wallet_13.BigNumber(otherTokenPrice).times(2).div(new eth_wallet_13.BigNumber(otherTokenPrice).div(WETH9USDPrice).sqrt()).toFixed();
-                APR = new eth_wallet_13.BigNumber(rewardOption.multiplier).times(new eth_wallet_13.BigNumber(rewardPrice).times(365)).div(new eth_wallet_13.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
+                let otherTokenPrice = new eth_wallet_5.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(WETH9USDPrice).toFixed();
+                let lockedLPPrice = new eth_wallet_5.BigNumber(otherTokenPrice).times(2).div(new eth_wallet_5.BigNumber(otherTokenPrice).div(WETH9USDPrice).sqrt()).toFixed();
+                APR = new eth_wallet_5.BigNumber(rewardOption.multiplier).times(new eth_wallet_5.BigNumber(rewardPrice).times(365)).div(new eth_wallet_5.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
             }
         }
         return APR;
@@ -25890,13 +25397,13 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
             let assetTokenPrice = await exports.getTokenPrice(vaultObject.assetToken.address);
             if (!assetTokenPrice || !rewardPrice)
                 return '';
-            let wallet = eth_wallet_13.Wallet.getClientInstance();
-            let vault = new index_25.Contracts.OSWAP_BridgeVault(wallet, vaultObject.address);
+            let wallet = eth_wallet_5.Wallet.getClientInstance();
+            let vault = new index_19.Contracts.OSWAP_BridgeVault(wallet, vaultObject.address);
             let vaultTokenTotalSupply = await vault.totalSupply();
             let lpAssetBalance = await vault.lpAssetBalance();
-            let lpToAssetRatio = new eth_wallet_13.BigNumber(lpAssetBalance).div(vaultTokenTotalSupply).toFixed();
-            let VaultTokenPrice = new eth_wallet_13.BigNumber(assetTokenPrice).times(lpToAssetRatio).toFixed();
-            APR = new eth_wallet_13.BigNumber(rewardOption.multiplier).times(new eth_wallet_13.BigNumber(rewardPrice).times(365)).div(new eth_wallet_13.BigNumber(VaultTokenPrice).times(lockedDays)).toFixed();
+            let lpToAssetRatio = new eth_wallet_5.BigNumber(lpAssetBalance).div(vaultTokenTotalSupply).toFixed();
+            let VaultTokenPrice = new eth_wallet_5.BigNumber(assetTokenPrice).times(lpToAssetRatio).toFixed();
+            APR = new eth_wallet_5.BigNumber(rewardOption.multiplier).times(new eth_wallet_5.BigNumber(rewardPrice).times(365)).div(new eth_wallet_5.BigNumber(VaultTokenPrice).times(lockedDays)).toFixed();
         }
         catch (_a) { }
         return APR;
@@ -25906,8 +25413,8 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
         if (!contractAddress)
             return;
         try {
-            let wallet = eth_wallet_13.Wallet.getClientInstance();
-            let timeIsMoney = new index_22.Contracts.TimeIsMoney(wallet, contractAddress);
+            let wallet = eth_wallet_5.Wallet.getClientInstance();
+            let timeIsMoney = new index_16.Contracts.TimeIsMoney(wallet, contractAddress);
             let receipt = await timeIsMoney.withdraw(true);
             return receipt;
         }
@@ -25922,8 +25429,8 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
         if (!contractAddress)
             return;
         try {
-            let wallet = eth_wallet_13.Wallet.getClientInstance();
-            let rewards = new index_22.Contracts.Rewards(wallet, contractAddress);
+            let wallet = eth_wallet_5.Wallet.getClientInstance();
+            let rewards = new index_16.Contracts.Rewards(wallet, contractAddress);
             let receipt = await rewards.claim();
             return receipt;
         }
@@ -25939,26 +25446,26 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
             return;
         if (!contractAddress)
             return;
-        let wallet = eth_wallet_13.Wallet.getClientInstance();
+        let wallet = eth_wallet_5.Wallet.getClientInstance();
         let decimals = typeof token.decimals === 'object' ? token.decimals.toNumber() : token.decimals;
-        let tokenAmount = eth_wallet_13.Utils.toDecimals(amount, decimals);
-        let timeIsMoney = new index_22.Contracts.TimeIsMoney(wallet, contractAddress);
+        let tokenAmount = eth_wallet_5.Utils.toDecimals(amount, decimals);
+        let timeIsMoney = new index_16.Contracts.TimeIsMoney(wallet, contractAddress);
         let receipt = await timeIsMoney.lock(tokenAmount);
         return receipt;
     };
     exports.lockToken = lockToken;
     const getApprovalModelAction = (contractAddress, options) => {
         const approvalOptions = Object.assign(Object.assign({}, options), { spenderAddress: contractAddress });
-        const approvalModel = new index_26.ERC20ApprovalModel(approvalOptions);
+        const approvalModel = new index_20.ERC20ApprovalModel(approvalOptions);
         let approvalModelAction = approvalModel.getAction();
         return approvalModelAction;
     };
     exports.getApprovalModelAction = getApprovalModelAction;
 });
-define("@scom/scom-staking/common/result.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_11) {
+define("@scom/scom-staking/common/result.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = components_11.Styles.style({
+    exports.default = components_4.Styles.style({
         textAlign: 'center',
         $nest: {
             'i-label > *': {
@@ -26013,12 +25520,12 @@ define("@scom/scom-staking/common/result.css.ts", ["require", "exports", "@ijste
         }
     });
 });
-define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-staking/common/result.css.ts", "@scom/scom-staking/assets.ts"], function (require, exports, components_12, eth_wallet_14, index_28, index_29, result_css_1, assets_2) {
+define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-staking/common/result.css.ts", "@scom/scom-staking/assets.ts"], function (require, exports, components_5, eth_wallet_6, index_22, index_23, result_css_1, assets_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Result = void 0;
     ;
-    let Result = class Result extends components_12.Module {
+    let Result = class Result extends components_5.Module {
         constructor(parent, options) {
             super(parent, options);
         }
@@ -26062,13 +25569,13 @@ define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/
         }
         async buildLink() {
             if (this.message.txtHash) {
-                const chainId = await eth_wallet_14.Wallet.getClientInstance().getChainId();
-                index_28.viewOnExplorerByTxHash(chainId, this.message.txtHash);
+                const chainId = await eth_wallet_6.Wallet.getClientInstance().getChainId();
+                index_22.viewOnExplorerByTxHash(chainId, this.message.txtHash);
             }
         }
         async renderUI() {
             this.mainContent.innerHTML = '';
-            const mainSection = await components_12.VStack.create({
+            const mainSection = await components_5.VStack.create({
                 horizontalAlignment: 'center'
             });
             if (this.message.status === 'warning') {
@@ -26079,13 +25586,13 @@ define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/
                             this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_2.default.fullPath('img/loading.svg'), width: 24, height: 24 } }),
                             this.$render("i-label", { caption: "Loading...", font: { color: '#FD4A4C' }, class: "i-loading-spinner_text" })))));
                 mainSection.appendChild(loading);
-                const section = new components_12.VStack();
+                const section = new components_5.VStack();
                 section.margin = { bottom: 20 };
                 const captionList = ['Waiting For Confirmation', this.message.content || '', 'Confirm this transaction in your wallet'];
                 const classList = ['waiting-txt mb-1', 'mb-1', 'confirm-txt'];
                 for (let i = 0; i < captionList.length; i++) {
                     const caption = captionList[i];
-                    const label = await components_12.Label.create();
+                    const label = await components_5.Label.create();
                     label.caption = caption;
                     if (classList[i]) {
                         const classes = classList[i].split(' ');
@@ -26097,37 +25604,37 @@ define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/
                 mainSection.appendChild(section);
             }
             else if (this.message.status === 'success') {
-                const chainId = await eth_wallet_14.Wallet.getClientInstance().getChainId();
-                const explorerName = index_29.getNetworkExplorerName(chainId);
-                const image = await components_12.Image.create({
+                const chainId = await eth_wallet_6.Wallet.getClientInstance().getChainId();
+                const explorerName = index_23.getNetworkExplorerName(chainId);
+                const image = await components_5.Image.create({
                     width: '50px',
                     url: assets_2.default.fullPath('img/success-icon.svg')
                 });
                 image.classList.add("inline-block", "mb");
                 mainSection.appendChild(image);
-                const label = await components_12.Label.create();
+                const label = await components_5.Label.create();
                 label.caption = 'Transaction Submitted';
                 label.classList.add("waiting-txt");
                 mainSection.appendChild(label);
-                const contentSection = await components_12.Panel.create();
+                const contentSection = await components_5.Panel.create();
                 contentSection.id = "contentSection";
                 mainSection.appendChild(contentSection);
-                const contentLabel = await components_12.Label.create();
+                const contentLabel = await components_5.Label.create();
                 contentLabel.caption = this.message.content || '';
                 contentSection.appendChild(contentLabel);
                 if (this.message.txtHash) {
-                    const section = new components_12.VStack();
-                    const label1 = await components_12.Label.create({
+                    const section = new components_5.VStack();
+                    const label1 = await components_5.Label.create({
                         caption: this.message.txtHash.substr(0, 33),
                         margin: { bottom: 4 }
                     });
                     section.appendChild(label1);
-                    const label2 = await components_12.Label.create({
+                    const label2 = await components_5.Label.create({
                         caption: this.message.txtHash.substr(33, this.message.txtHash.length)
                     });
                     label2.classList.add("mb-1");
                     section.appendChild(label2);
-                    const link = await components_12.Label.create({
+                    const link = await components_5.Label.create({
                         caption: `View on ${explorerName}`,
                     });
                     link.onClick = this.buildLink.bind(this);
@@ -26135,7 +25642,7 @@ define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/
                     section.appendChild(link);
                     contentSection.appendChild(section);
                 }
-                const button = new components_12.Button(mainSection, {
+                const button = new components_5.Button(mainSection, {
                     width: '100%',
                     caption: 'Close'
                 });
@@ -26146,26 +25653,26 @@ define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/
                 mainSection.appendChild(button);
             }
             else {
-                const image = await components_12.Image.create({
+                const image = await components_5.Image.create({
                     width: '50px',
                     url: assets_2.default.fullPath('img/oswap_error.png')
                 });
                 image.classList.add("inline-block", "mb");
                 mainSection.appendChild(image);
-                const label = await components_12.Label.create({
+                const label = await components_5.Label.create({
                     caption: 'Transaction Rejected.'
                 });
                 label.classList.add("waiting-txt", "mb");
                 mainSection.appendChild(label);
-                const section = await components_12.VStack.create();
+                const section = await components_5.VStack.create();
                 section.id = "contentSection";
-                const contentLabel = await components_12.Label.create({
+                const contentLabel = await components_5.Label.create({
                     caption: await this.onErrMsgChanged()
                 });
                 contentLabel.classList.add("mb-1");
                 section.appendChild(contentLabel);
                 mainSection.appendChild(section);
-                const button = new components_12.Button(mainSection, {
+                const button = new components_5.Button(mainSection, {
                     width: '100%',
                     caption: 'Cancel'
                 });
@@ -26184,7 +25691,7 @@ define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/
             if (this.message.content.message && this.message.content.message.includes('Internal JSON-RPC error.')) {
                 this.message.content.message = JSON.parse(this.message.content.message.replace('Internal JSON-RPC error.\n', '')).message;
             }
-            return await index_28.parseContractError(this.message.content.message, this.message.obj);
+            return await index_22.parseContractError(this.message.content.message, this.message.obj);
         }
         render() {
             return (this.$render("i-modal", { id: "confirmModal", closeIcon: { name: 'times' }, class: "confirm-modal", minHeight: "280px" },
@@ -26192,479 +25699,22 @@ define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/
         }
     };
     Result = __decorate([
-        components_12.customElements('staking-result')
+        components_5.customElements('staking-result')
     ], Result);
     exports.Result = Result;
     ;
 });
-define("@scom/scom-staking/common/wallet.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_13) {
+define("@scom/scom-staking/common/index.tsx", ["require", "exports", "@scom/scom-staking/common/result.tsx"], function (require, exports, result_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.walletModalStyle = void 0;
-    exports.walletModalStyle = components_13.Styles.style({
-        backgroundColor: '#000',
-        $nest: {
-            '::-webkit-scrollbar-track': {
-                backgroundColor: 'unset'
-            },
-            '::-webkit-scrollbar': {
-                width: '5px',
-                backgroundColor: 'unset'
-            },
-            '::-webkit-scrollbar-thumb': {
-                background: 'rgba(255, 255, 255, 0.2) 0% 0% no-repeat padding-box',
-                borderRadius: '5px',
-            },
-            '.btn': {
-                height: 'auto !important',
-                cursor: 'pointer',
-                fontWeight: 600,
-                display: 'inline-flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: '5px',
-                backgroundColor: 'transparent',
-                $nest: {
-                    '&:hover': {
-                        transition: 'all .2s ease-out'
-                    }
-                }
-            },
-            '.btn-connect': {
-                padding: '.375rem .5rem',
-                border: 'none',
-                transition: 'all .2s ease-out',
-                $nest: {
-                    '&:hover': {
-                        opacity: '.9',
-                        transition: 'all .2s ease-out',
-                    }
-                }
-            },
-            '.os-modal': {
-                borderRadius: 20,
-                boxSizing: 'border-box',
-                fontSize: '.875rem',
-                fontWeight: 400,
-                $nest: {
-                    'i-label': {
-                        color: '#fff'
-                    },
-                    'i-icon': {
-                        display: 'inline-block'
-                    },
-                    '.mr-2-5': {
-                        marginRight: '2.5rem'
-                    },
-                    '&.connect-modal > div > div': {
-                        width: 440,
-                        maxWidth: '100%',
-                        height: 'auto'
-                    },
-                    '&.connect-modal .i-modal_content': {
-                        padding: '0 1.5rem'
-                    },
-                    '> div > div': {
-                        backgroundColor: '#252a48',
-                        height: 'calc(100% - 160px)',
-                        borderRadius: 15,
-                        lineHeight: 1.5,
-                        wordWrap: 'break-word',
-                        padding: 0,
-                        minHeight: 400,
-                        width: 360
-                    },
-                    '.i-modal_content': {
-                        padding: '0 1.25rem'
-                    },
-                    '.i-modal_header': {
-                        borderRadius: '20px 20px 0 0',
-                        background: 'unset',
-                        padding: '16px 24px 0',
-                        $nest: {
-                            'span': {
-                                color: '#f15e61'
-                            }
-                        }
-                    },
-                    '.networkSection': {
-                        marginLeft: '-1.25rem',
-                        marginRight: '-1.25rem',
-                    },
-                    '.list-view': {
-                        $nest: {
-                            '.list-item:hover': {
-                                $nest: {
-                                    '> *': {
-                                        opacity: 1
-                                    }
-                                }
-                            },
-                            '.list-item:not(:first-child)': {
-                                marginTop: '.5rem'
-                            },
-                            '.list-item': {
-                                backgroundColor: '#0c1234',
-                                minHeight: '50px',
-                                position: 'relative',
-                                borderRadius: 10,
-                                cursor: 'pointer',
-                                border: 'none',
-                                transition: 'all .3s ease-in',
-                                overflow: 'unset',
-                                $nest: {
-                                    '&.disabled-network-selection': {
-                                        cursor: 'default',
-                                        $nest: {
-                                            '&:hover > *': {
-                                                backgroundColor: '#0c1234',
-                                                opacity: '0.5 !important',
-                                            }
-                                        }
-                                    },
-                                    '> *': {
-                                        opacity: 0.8
-                                    }
-                                }
-                            },
-                            '.list-item.is-actived': {
-                                $nest: {
-                                    '> *': {
-                                        opacity: 1
-                                    },
-                                    '&:after': {
-                                        content: "''",
-                                        top: '50%',
-                                        left: 9,
-                                        position: 'absolute',
-                                        background: '#20bf55',
-                                        borderRadius: '50%',
-                                        width: 10,
-                                        height: 10,
-                                        transform: 'translate3d(-50%,-50%,0)'
-                                    },
-                                    '.custom-img': {
-                                        marginLeft: '.75rem'
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    '.networks': {
-                        display: 'flex',
-                        flexDirection: 'column',
-                        color: '#f05e61',
-                        marginTop: '1.5rem',
-                        height: 'calc(100% - 160px)',
-                        overflowY: 'auto',
-                        width: '100% !important',
-                        paddingLeft: '1.25rem',
-                        paddingRight: '1.25rem',
-                        $nest: {
-                            '.list-item': {
-                                padding: '.5rem'
-                            }
-                        }
-                    },
-                    '.wallets': {
-                        marginTop: '.5rem',
-                        $nest: {
-                            '.list-item': {
-                                padding: '.5rem',
-                                position: 'relative',
-                            },
-                            '.list-item .image-container': {
-                                order: 2
-                            }
-                        }
-                    },
-                    '.small-label > *': {
-                        fontSize: '.875rem'
-                    },
-                    '.large-label > *': {
-                        fontSize: '1.25rem',
-                        lineHeight: 1.5
-                    },
-                    '.custom-link *': {
-                        color: '#fff'
-                    },
-                    '.custom-link a': {
-                        display: 'inline-flex',
-                        alignItems: 'center'
-                    }
-                }
-            }
-        }
-    });
-});
-define("@scom/scom-staking/common/wallet.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/store/index.ts", "@scom/scom-staking/common/wallet.css.ts", "@scom/scom-staking/assets.ts"], function (require, exports, components_14, eth_wallet_15, index_30, wallet_css_1, assets_3) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.StakingWallet = void 0;
-    ;
-    let StakingWallet = class StakingWallet extends components_14.Module {
-        constructor(parent, options) {
-            super(parent, options);
-            this.onChainChanged = async (chainId) => {
-                let wallet = eth_wallet_15.Wallet.getClientInstance();
-                const isConnected = wallet.isConnected;
-                this.updateList(isConnected);
-                if (!isConnected) {
-                    const acivedElm = this.networkGroup.querySelector('.is-actived');
-                    acivedElm && acivedElm.classList.remove('is-actived');
-                    const connectingElm = this.networkGroup.querySelector(`[data-key="${chainId}"]`);
-                    connectingElm && connectingElm.classList.add('is-actived');
-                }
-            };
-            this.openConnectModal = () => {
-                this.showModal('connectModal', 'Connect Wallet');
-            };
-            this.$eventBus = components_14.application.EventBus;
-            this.registerEvent();
-        }
-        ;
-        registerEvent() {
-            this.$eventBus.register(this, "stakingConnectWallet" /* ConnectWallet */, this.openConnectModal);
-            this.$eventBus.register(this, "stakingChangeNetwork" /* ChangeNetwork */, () => this.showModal('switchModal'));
-            this.$eventBus.register(this, "isWalletConnected" /* IsWalletConnected */, async (connected) => {
-                this.updateList(connected);
-            });
-            this.$eventBus.register(this, "IsWalletDisconnected" /* IsWalletDisconnected */, async (connected) => {
-                this.updateList(connected);
-            });
-            this.$eventBus.register(this, "chainChanged" /* chainChanged */, async (chainId) => {
-                this.onChainChanged(chainId);
-            });
-        }
-        async requestAccounts() {
-            try {
-                await this.wallet.web3.eth.requestAccounts();
-            }
-            catch (error) {
-                console.error(error);
-            }
-        }
-        async initData() {
-            const selectedProvider = localStorage.getItem('walletProvider');
-            const isValidProvider = Object.values(index_30.WalletPlugin).includes(selectedProvider);
-            if (isValidProvider) {
-                this.wallet = await index_30.connectWallet(selectedProvider);
-            }
-        }
-        showModal(name, title = '') {
-            const modalELm = this[name];
-            title && (modalELm.title = title);
-            if (name === 'switchModal') {
-                this.updateListNetworkUI();
-            }
-            modalELm.visible = true;
-        }
-        isLive(walletPlugin) {
-            var _a;
-            const provider = index_30.getWalletPluginProvider(walletPlugin);
-            return provider ? provider.installed() && ((_a = eth_wallet_15.Wallet.getClientInstance().clientSideProvider) === null || _a === void 0 ? void 0 : _a.name) === walletPlugin : false;
-        }
-        isNetworkLive(chainId) {
-            return eth_wallet_15.Wallet.getClientInstance().chainId === chainId;
-        }
-        async switchNetwork(chainId) {
-            if (!chainId)
-                return;
-            await index_30.switchNetwork(chainId);
-            this.switchModal.visible = false;
-        }
-        async connectToProviderFunc(walletPlugin) {
-            const provider = index_30.getWalletPluginProvider(walletPlugin);
-            if (provider === null || provider === void 0 ? void 0 : provider.installed()) {
-                await index_30.connectWallet(walletPlugin);
-            }
-            else {
-                const homepage = provider.homepage;
-                window.open(homepage, '_blank');
-            }
-            this.connectModal.visible = false;
-        }
-        ;
-        async renderWalletButton() {
-            const modalElm = await components_14.Modal.create({
-                maxWidth: '200px',
-                showBackdrop: false,
-                height: 'auto',
-                popupPlacement: 'bottomRight'
-            });
-            modalElm.classList.add("account-dropdown");
-            const vstack = await components_14.VStack.create({
-                gap: '15px'
-            });
-            const itemCaptions = ["Switch wallet"];
-            const itemFunctions = [
-                () => this.showModal('connectModal', 'Switch wallet')
-            ];
-            itemCaptions.forEach(async (caption, i) => {
-                const buttonItem = await components_14.Button.create({
-                    caption,
-                    width: '100%',
-                    height: 'auto',
-                    padding: { top: '0.5rem', bottom: '0.5rem', left: '0.75rem', right: '0.75rem' }
-                });
-                buttonItem.onClick = (source, event) => {
-                    event.stopPropagation();
-                    modalElm.visible = false;
-                    itemFunctions[i]();
-                    return true;
-                };
-                vstack.appendChild(buttonItem);
-                modalElm.item = vstack;
-            });
-            this.walletConnectButton = await components_14.Button.create({
-                caption: 'Connect Wallet',
-                margin: { left: 8 }
-            });
-            this.walletConnectButton.classList.add('btn', 'btn-os', 'btn-connect');
-            this.walletConnectButton.onClick = this.openConnectModal;
-        }
-        renderNetworks() {
-            this.networkGroup.clearInnerHTML();
-            const networksList = index_30.listsNetworkShow();
-            this.networkGroup.append(...networksList.map((network) => {
-                return (this.$render("i-hstack", { onClick: () => this.switchNetwork(network.chainId), class: this.isNetworkLive(network.chainId) ? 'is-actived list-item' : 'list-item', "data-key": network.chainId, verticalAlignment: "center", gap: 10 },
-                    this.$render("i-image", { url: assets_3.default.fullPath(`img/network/${network.icon}`), width: 32, height: 32, display: "inline-block", margin: { left: 12 } }),
-                    this.$render("i-label", { caption: network.label })));
-            }));
-        }
-        renderWalletList() {
-            let accountsChangedEventHandler = async (account) => {
-                index_30.tokenStore.updateTokenMapData();
-            };
-            let chainChangedEventHandler = async (hexChainId) => {
-                index_30.tokenStore.updateTokenMapData();
-            };
-            index_30.initWalletPlugins({
-                'accountsChanged': accountsChangedEventHandler,
-                'chainChanged': chainChangedEventHandler
-            });
-            this.walletListElm.clearInnerHTML();
-            let wallets = [];
-            let walletsDisabled = [];
-            const walletPluginMap = index_30.getWalletPluginMap();
-            for (let pluginName in walletPluginMap) {
-                const walletPlugin = walletPluginMap[pluginName];
-                let walletEnabled = this.isWalletEnabled(walletPlugin.name);
-                let walletJSX = (this.$render("i-hstack", { onClick: () => this.connectToProviderFunc(walletPlugin.name), class: this.isLive(walletPlugin.name) ? 'is-actived list-item' : 'list-item', "data-key": walletPlugin.name, enabled: walletEnabled, verticalAlignment: "center", gap: 10 },
-                    this.$render("i-image", { url: walletPlugin.image, width: 32, height: 32, class: "inline-block custom-img" }),
-                    this.$render("i-label", { caption: walletPlugin.displayName })));
-                walletEnabled ? wallets.push(walletJSX) : walletsDisabled.push(walletJSX);
-            }
-            this.walletListElm.append(...wallets);
-            this.walletListElm.append(...walletsDisabled);
-        }
-        updateDot(parent, connected, type) {
-            var _a;
-            const acivedElm = parent.querySelector('.is-actived');
-            acivedElm && acivedElm.classList.remove('is-actived');
-            if (connected) {
-                const wallet = eth_wallet_15.Wallet.getClientInstance();
-                const connectingVal = type === 'network' ? wallet.chainId : (_a = wallet.clientSideProvider) === null || _a === void 0 ? void 0 : _a.name;
-                const connectingElm = parent.querySelector(`[data-key="${connectingVal}"]`);
-                connectingElm && connectingElm.classList.add('is-actived');
-            }
-        }
-        isWalletEnabled(walletName) {
-            // switch (getSiteEnv()) {
-            //   case SITE_ENV.TESTNET: {
-            //     switch (walletName) {
-            //       case WalletPlugin.ONTOWallet:
-            //       case WalletPlugin.Coin98:
-            //       case WalletPlugin.TrustWallet:
-            //         return false;
-            //     }
-            //     break;
-            //   }
-            //   case SITE_ENV.MAINNET: {
-            //     break;
-            //   }
-            //   case SITE_ENV.DEV: {
-            //     break;
-            //   }
-            // }
-            return true;
-        }
-        updateListNetworkUI() {
-            var _a;
-            const listElm = ((_a = this.networkGroup) === null || _a === void 0 ? void 0 : _a.querySelectorAll('.list-item')) || [];
-            const isConnected = index_30.isWalletConnected();
-            const isMetaMask = index_30.getWalletProvider() === index_30.WalletPlugin.MetaMask;
-            for (const elm of listElm) {
-                if (isMetaMask || !isConnected) {
-                    elm.classList.remove('disabled-network-selection');
-                }
-                else {
-                    elm.classList.add('disabled-network-selection');
-                }
-            }
-        }
-        updateList(connected) {
-            if (connected) {
-                this.noteNetworkLabel.caption = index_30.getWalletProvider() === index_30.WalletPlugin.MetaMask ?
-                    'OpenSwap supports the following networks, please click to connect.' :
-                    'OpenSwap supports the following networks, please switch network in the connected wallet.';
-            }
-            else {
-                this.noteNetworkLabel.caption = 'OpenSwap supports the following networks, please click to connect.';
-            }
-            this.updateDot(this.walletListElm, connected, 'wallet');
-            this.updateDot(this.networkGroup, connected, 'network');
-        }
-        connectedCallback() {
-            super.connectedCallback();
-        }
-        getElementProperty(name) {
-            let value;
-            if (this.attrs[name] && this.attrs[name].__target) {
-                value = this.getAttributeValue(this.attrs[name].__target, this.attrs[name].__path);
-            }
-            return value;
-        }
-        async init() {
-            this.classList.add(wallet_css_1.walletModalStyle);
-            super.init();
-            await this.renderWalletButton();
-            this.renderNetworks();
-            this.renderWalletList();
-            await this.initData();
-        }
-        async render() {
-            return (this.$render("i-panel", null,
-                this.$render("i-modal", { id: "switchModal", title: "Supported Network", closeIcon: { name: 'times' }, class: "os-modal" },
-                    this.$render("i-vstack", { height: "100%", class: "i-modal_content" },
-                        this.$render("i-label", { id: "noteNetworkLabel", class: "mt-1 small-label", caption: "OpenSwap supports the following networks, please click to connect." }),
-                        this.$render("i-panel", { class: "flex networkSection", height: "100%" },
-                            this.$render("i-grid-layout", { id: "networkGroup", class: "list-view networks", columnsPerRow: 1, templateRows: ['max-content'] })))),
-                this.$render("i-modal", { id: "connectModal", title: "Connect Wallet", class: "os-modal connect-modal", closeIcon: { name: 'times', fill: '#f7d063' } },
-                    this.$render("i-panel", { class: "i-modal_content" },
-                        this.$render("i-label", { class: "mt-1 small-label", caption: "Recommended wallet for Chrome" }),
-                        this.$render("i-panel", { padding: { bottom: 16 } },
-                            this.$render("i-grid-layout", { id: "walletListElm", class: "list-view wallets", columnsPerRow: 1, templateRows: ['max-content'] }))))));
-        }
-    };
-    StakingWallet = __decorate([
-        components_14.customElements('staking-wallet')
-    ], StakingWallet);
-    exports.StakingWallet = StakingWallet;
-    ;
-});
-define("@scom/scom-staking/common/index.tsx", ["require", "exports", "@scom/scom-staking/common/result.tsx", "@scom/scom-staking/common/wallet.tsx"], function (require, exports, result_1, wallet_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.StakingWallet = exports.Result = void 0;
+    exports.Result = void 0;
     Object.defineProperty(exports, "Result", { enumerable: true, get: function () { return result_1.Result; } });
-    Object.defineProperty(exports, "StakingWallet", { enumerable: true, get: function () { return wallet_2.StakingWallet; } });
 });
-define("@scom/scom-staking/manage-stake/manage-stake.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_15) {
+define("@scom/scom-staking/manage-stake/manage-stake.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.stakingManageStakeStyle = void 0;
-    exports.stakingManageStakeStyle = components_15.Styles.style({
+    exports.stakingManageStakeStyle = components_6.Styles.style({
         $nest: {
             'input': {
                 $nest: {
@@ -26691,7 +25741,7 @@ define("@scom/scom-staking/manage-stake/manage-stake.css.ts", ["require", "expor
         }
     });
 });
-define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-staking/common/index.tsx", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/manage-stake/manage-stake.css.ts"], function (require, exports, components_16, eth_wallet_16, index_31, index_32, index_33, index_34, manage_stake_css_1) {
+define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/common/index.tsx", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/manage-stake/manage-stake.css.ts"], function (require, exports, components_7, eth_wallet_7, index_24, index_25, scom_token_list_3, index_26, index_27, manage_stake_css_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ManageStake = void 0;
@@ -26702,7 +25752,7 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
         CurrentMode[CurrentMode["UNLOCK"] = 1] = "UNLOCK";
     })(CurrentMode || (CurrentMode = {}));
     ;
-    let ManageStake = class ManageStake extends components_16.Module {
+    let ManageStake = class ManageStake extends components_7.Module {
         constructor(parent, options) {
             super(parent, options);
             this.stakingInfo = {};
@@ -26719,7 +25769,7 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
             this.setData = (data) => {
                 this.address = data.address;
                 this.stakingInfo = data;
-                this.onSetupPage(index_32.isWalletConnected());
+                this.onSetupPage(index_25.isWalletConnected());
             };
             this.getBalance = () => {
                 return this.balance;
@@ -26757,21 +25807,21 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                 if (this.inputAmount.enabled === false)
                     return;
                 this.currentMode = CurrentMode.STAKE;
-                index_31.limitInputNumber(this.inputAmount, ((_a = this.lockedTokenObject) === null || _a === void 0 ? void 0 : _a.decimals) || 18);
+                index_24.limitInputNumber(this.inputAmount, ((_a = this.lockedTokenObject) === null || _a === void 0 ? void 0 : _a.decimals) || 18);
                 this.approvalModelAction.checkAllowance(this.lockedTokenObject, this.inputAmount.value);
             };
             this.setMaxBalance = () => {
                 var _a;
                 this.currentMode = CurrentMode.STAKE;
-                this.inputAmount.value = eth_wallet_16.BigNumber.min(this.availableQty, this.balance, this.perAddressCap).toFixed();
-                index_31.limitInputNumber(this.inputAmount, ((_a = this.lockedTokenObject) === null || _a === void 0 ? void 0 : _a.decimals) || 18);
+                this.inputAmount.value = eth_wallet_7.BigNumber.min(this.availableQty, this.balance, this.perAddressCap).toFixed();
+                index_24.limitInputNumber(this.inputAmount, ((_a = this.lockedTokenObject) === null || _a === void 0 ? void 0 : _a.decimals) || 18);
                 this.approvalModelAction.checkAllowance(this.lockedTokenObject, this.inputAmount.value);
             };
             this.renderStakingInfo = async (info) => {
                 var _a;
                 if (!info || !Object.keys(info).length) {
                     this.btnApprove.visible = false;
-                    if (!index_32.isWalletConnected()) {
+                    if (!index_25.isWalletConnected()) {
                         this.btnMax.visible = false;
                         this.inputAmount.enabled = false;
                     }
@@ -26792,16 +25842,16 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                 let vaultTokenData = {};
                 const { tokenAddress, lockTokenType, mode } = info;
                 if (tokenAddress && mode === 'Stake') {
-                    if (lockTokenType == index_32.LockTokenType.LP_Token) {
+                    if (lockTokenType == index_25.LockTokenType.LP_Token) {
                         lpTokenData = {
-                            'object': await index_34.getLPObject(tokenAddress),
-                            'balance': await index_34.getLPBalance(tokenAddress)
+                            'object': await index_27.getLPObject(tokenAddress),
+                            'balance': await index_27.getLPBalance(tokenAddress)
                         };
                     }
-                    else if (lockTokenType == index_32.LockTokenType.VAULT_Token) {
+                    else if (lockTokenType == index_25.LockTokenType.VAULT_Token) {
                         vaultTokenData = {
-                            'object': await index_34.getVaultObject(tokenAddress),
-                            'balance': await index_34.getVaultBalance(tokenAddress)
+                            'object': await index_27.getVaultObject(tokenAddress),
+                            'balance': await index_27.getVaultBalance(tokenAddress)
                         };
                     }
                 }
@@ -26810,15 +25860,15 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                     lpToken: lpTokenData,
                     vaultToken: vaultTokenData
                 };
-                this.lockedTokenObject = index_32.getLockedTokenObject(info, tokenInfo, this.tokenMap);
+                this.lockedTokenObject = index_25.getLockedTokenObject(info, tokenInfo, this.tokenMap);
                 const defaultDecimalsOffset = 18 - (((_a = this.lockedTokenObject) === null || _a === void 0 ? void 0 : _a.decimals) || 18);
-                const symbol = index_32.getLockedTokenSymbol(info, this.lockedTokenObject);
+                const symbol = index_25.getLockedTokenSymbol(info, this.lockedTokenObject);
                 this.tokenSymbol = symbol;
-                this.perAddressCap = new eth_wallet_16.BigNumber(info.perAddressCap).shiftedBy(defaultDecimalsOffset).toFixed();
-                this.maxQty = new eth_wallet_16.BigNumber(info.maxTotalLock).shiftedBy(defaultDecimalsOffset).toNumber();
-                this.stakeQty = new eth_wallet_16.BigNumber(info.stakeQty).shiftedBy(defaultDecimalsOffset).toFixed();
-                const totalLocked = new eth_wallet_16.BigNumber(info.totalLocked).shiftedBy(defaultDecimalsOffset);
-                this.availableQty = new eth_wallet_16.BigNumber(this.maxQty).minus(totalLocked).toFixed();
+                this.perAddressCap = new eth_wallet_7.BigNumber(info.perAddressCap).shiftedBy(defaultDecimalsOffset).toFixed();
+                this.maxQty = new eth_wallet_7.BigNumber(info.maxTotalLock).shiftedBy(defaultDecimalsOffset).toNumber();
+                this.stakeQty = new eth_wallet_7.BigNumber(info.stakeQty).shiftedBy(defaultDecimalsOffset).toFixed();
+                const totalLocked = new eth_wallet_7.BigNumber(info.totalLocked).shiftedBy(defaultDecimalsOffset);
+                this.availableQty = new eth_wallet_7.BigNumber(this.maxQty).minus(totalLocked).toFixed();
                 this.btnApprove.visible = false;
                 // Unstake
                 if (CurrentMode[mode.toUpperCase()] !== CurrentMode.STAKE) {
@@ -26834,20 +25884,20 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                 }
                 // Stake
                 if (tokenAddress && mode === 'Stake') {
-                    if (lockTokenType == index_32.LockTokenType.ERC20_Token) {
-                        await index_32.tokenStore.updateAllTokenBalances();
-                        let balances = index_32.tokenStore.tokenBalances;
+                    if (lockTokenType == index_25.LockTokenType.ERC20_Token) {
+                        await scom_token_list_3.tokenStore.updateAllTokenBalances();
+                        let balances = scom_token_list_3.tokenStore.tokenBalances;
                         this.tokenBalances = Object.keys(balances).reduce((accumulator, key) => {
                             accumulator[key.toLowerCase()] = balances[key];
                             return accumulator;
                         }, {});
                         this.balance = this.tokenBalances[tokenAddress] || '0';
                     }
-                    else if (lockTokenType == index_32.LockTokenType.LP_Token) {
-                        this.balance = new eth_wallet_16.BigNumber(lpTokenData.balance || 0).shiftedBy(defaultDecimalsOffset).toFixed();
+                    else if (lockTokenType == index_25.LockTokenType.LP_Token) {
+                        this.balance = new eth_wallet_7.BigNumber(lpTokenData.balance || 0).shiftedBy(defaultDecimalsOffset).toFixed();
                     }
-                    else if (lockTokenType == index_32.LockTokenType.VAULT_Token) {
-                        this.balance = new eth_wallet_16.BigNumber(vaultTokenData.balance || 0).shiftedBy(defaultDecimalsOffset).toFixed();
+                    else if (lockTokenType == index_25.LockTokenType.VAULT_Token) {
+                        this.balance = new eth_wallet_7.BigNumber(vaultTokenData.balance || 0).shiftedBy(defaultDecimalsOffset).toFixed();
                     }
                     this.btnMax.visible = true;
                     this.lbToken.caption = symbol;
@@ -26863,25 +25913,26 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                     this.renderStakingInfo(null);
                     return;
                 }
-                this.tokenMap = index_32.tokenStore.tokenMap;
+                this.tokenMap = scom_token_list_3.tokenStore.tokenMap;
                 await this.initApprovalModelAction();
+                await this.ready();
                 await this.renderStakingInfo(this.stakingInfo);
             };
             this.updateEnableInput = async () => {
                 var _a, _b;
                 if (((_a = this.stakingInfo) === null || _a === void 0 ? void 0 : _a.mode) !== 'Stake')
                     return;
-                const totalLocked = await index_34.getStakingTotalLocked(this.address);
+                const totalLocked = await index_27.getStakingTotalLocked(this.address);
                 const activeStartTime = this.stakingInfo ? this.stakingInfo.startOfEntryPeriod : 0;
                 const activeEndTime = this.stakingInfo ? this.stakingInfo.endOfEntryPeriod : 0;
                 const lockedTokenDecimals = ((_b = this.lockedTokenObject) === null || _b === void 0 ? void 0 : _b.decimals) || 18;
                 const defaultDecimalsOffset = 18 - lockedTokenDecimals;
-                const optionQty = new eth_wallet_16.BigNumber(this.stakingInfo.maxTotalLock).minus(totalLocked).shiftedBy(defaultDecimalsOffset);
-                const isStarted = components_16.moment(activeStartTime).diff(components_16.moment()) <= 0;
-                const isClosed = components_16.moment(activeEndTime).diff(components_16.moment()) <= 0;
+                const optionQty = new eth_wallet_7.BigNumber(this.stakingInfo.maxTotalLock).minus(totalLocked).shiftedBy(defaultDecimalsOffset);
+                const isStarted = components_7.moment(activeStartTime).diff(components_7.moment()) <= 0;
+                const isClosed = components_7.moment(activeEndTime).diff(components_7.moment()) <= 0;
                 const enabled = (isStarted && !(optionQty.lte(0) || isClosed));
                 this.inputAmount.enabled = enabled;
-                this.btnMax.enabled = enabled && new eth_wallet_16.BigNumber(this.balance).gt(0);
+                this.btnMax.enabled = enabled && new eth_wallet_7.BigNumber(this.balance).gt(0);
             };
         }
         get actionKey() {
@@ -26891,19 +25942,19 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
             return `#btn-unstake-${this.address}`;
         }
         async initApprovalModelAction() {
-            this.approvalModelAction = index_34.getApprovalModelAction(this.address, {
+            this.approvalModelAction = index_27.getApprovalModelAction(this.address, {
                 sender: this,
                 payAction: async () => {
                     this.showResultMessage(this.stakingResult, 'warning', `${this.currentMode === CurrentMode.STAKE ? 'Stake' : 'Unlock'} ${this.tokenSymbol}`);
                     if (this.currentMode === CurrentMode.STAKE) {
-                        index_34.lockToken(this.lockedTokenObject, this.inputAmount.value, this.address);
+                        index_27.lockToken(this.lockedTokenObject, this.inputAmount.value, this.address);
                     }
                     else {
-                        index_34.withdrawToken(this.address);
+                        index_27.withdrawToken(this.address);
                     }
                 },
                 onToBeApproved: async (token) => {
-                    if (new eth_wallet_16.BigNumber(this.inputAmount.value).lte(eth_wallet_16.BigNumber.min(this.availableQty, this.balance, this.perAddressCap))) {
+                    if (new eth_wallet_7.BigNumber(this.inputAmount.value).lte(eth_wallet_7.BigNumber.min(this.availableQty, this.balance, this.perAddressCap))) {
                         this.btnApprove.caption = `Approve ${token.symbol}`;
                         this.btnApprove.visible = true;
                         this.btnApprove.enabled = true;
@@ -26917,23 +25968,23 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                 onToBePaid: async (token) => {
                     var _a;
                     this.btnApprove.visible = false;
-                    const isClosed = components_16.moment(((_a = this.stakingInfo) === null || _a === void 0 ? void 0 : _a.endOfEntryPeriod) || 0).diff(components_16.moment()) <= 0;
+                    const isClosed = components_7.moment(((_a = this.stakingInfo) === null || _a === void 0 ? void 0 : _a.endOfEntryPeriod) || 0).diff(components_7.moment()) <= 0;
                     if (this.currentMode === CurrentMode.STAKE) {
-                        const amount = new eth_wallet_16.BigNumber(this.inputAmount.value);
+                        const amount = new eth_wallet_7.BigNumber(this.inputAmount.value);
                         if (amount.gt(this.balance)) {
                             this.btnStake.caption = 'Insufficient Balance';
                             this.btnStake.enabled = false;
                             return;
                         }
                         this.btnStake.caption = 'Stake';
-                        if (amount.isNaN() || amount.lte(0) || amount.gt(eth_wallet_16.BigNumber.min(this.availableQty, this.balance, this.perAddressCap))) {
+                        if (amount.isNaN() || amount.lte(0) || amount.gt(eth_wallet_7.BigNumber.min(this.availableQty, this.balance, this.perAddressCap))) {
                             this.btnStake.enabled = false;
                         }
                         else {
                             this.btnStake.enabled = !isClosed;
                         }
                     }
-                    this.btnUnstake.enabled = this.stakingInfo.mode !== 'Stake' && new eth_wallet_16.BigNumber(this.stakeQty).gt(0);
+                    this.btnUnstake.enabled = this.stakingInfo.mode !== 'Stake' && new eth_wallet_7.BigNumber(this.stakeQty).gt(0);
                 },
                 onApproving: async (token, receipt) => {
                     if (receipt) {
@@ -26946,7 +25997,7 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                     }
                 },
                 onApproved: async (token) => {
-                    await index_32.tokenStore.updateAllTokenBalances();
+                    await scom_token_list_3.tokenStore.updateAllTokenBalances();
                     await this.updateEnableInput();
                     this.btnApprove.rightIcon.visible = false;
                     this.btnApprove.visible = false;
@@ -26954,7 +26005,7 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                 onApprovingError: async (token, err) => {
                     this.showResultMessage(this.stakingResult, 'error', err);
                     this.btnApprove.rightIcon.visible = false;
-                    this.btnMax.enabled = new eth_wallet_16.BigNumber(this.balance).gt(0);
+                    this.btnMax.enabled = new eth_wallet_7.BigNumber(this.balance).gt(0);
                     this.inputAmount.enabled = true;
                 },
                 onPaying: async (receipt) => {
@@ -26965,13 +26016,13 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                         if (this.currentMode === CurrentMode.STAKE) {
                             this.btnStake.caption = 'Staking';
                             this.btnStake.rightIcon.visible = true;
-                            index_32.setStakingStatus(this.actionKey, true, 'Staking');
+                            index_25.setStakingStatus(this.actionKey, true, 'Staking');
                             this.btnUnstake.enabled = false;
                         }
                         else {
                             this.btnUnstake.caption = 'Unstaking';
                             this.btnUnstake.rightIcon.visible = true;
-                            index_32.setStakingStatus(this.actionKey, true, 'Unstaking');
+                            index_25.setStakingStatus(this.actionKey, true, 'Unstaking');
                             this.btnStake.enabled = false;
                         }
                     }
@@ -26979,9 +26030,9 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                 onPaid: async () => {
                     const caption = this.currentMode === CurrentMode.STAKE ? 'Unstake' : 'Stake';
                     if (this.onRefresh) {
-                        await index_32.tokenStore.updateAllTokenBalances();
+                        await scom_token_list_3.tokenStore.updateAllTokenBalances();
                         await this.onRefresh();
-                        index_32.setStakingStatus(this.actionKey, false, caption);
+                        index_25.setStakingStatus(this.actionKey, false, caption);
                     }
                     if (this.currentMode === CurrentMode.STAKE) {
                         this.btnStake.caption = 'Stake';
@@ -26994,7 +26045,7 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                     await this.updateEnableInput();
                     this.inputAmount.value = '';
                     this.btnStake.enabled = false;
-                    this.btnUnstake.enabled = this.stakingInfo.mode !== 'Stake' && new eth_wallet_16.BigNumber(this.stakeQty).gt(0);
+                    this.btnUnstake.enabled = this.stakingInfo.mode !== 'Stake' && new eth_wallet_7.BigNumber(this.stakeQty).gt(0);
                 },
                 onPayingError: async (err) => {
                     await this.updateEnableInput();
@@ -27008,13 +26059,13 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                         this.btnUnstake.rightIcon.visible = false;
                     }
                     this.showResultMessage(this.stakingResult, 'error', err);
-                    index_32.setStakingStatus(this.actionKey, false, caption);
+                    index_25.setStakingStatus(this.actionKey, false, caption);
                 }
             });
         }
         init() {
             super.init();
-            this.stakingResult = new index_33.Result();
+            this.stakingResult = new index_26.Result();
             this.appendChild(this.stakingResult);
         }
         render() {
@@ -27032,7 +26083,7 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
         }
     };
     ManageStake = __decorate([
-        components_16.customElements('staking-manage-stake')
+        components_7.customElements('staking-manage-stake')
     ], ManageStake);
     exports.ManageStake = ManageStake;
 });
@@ -27042,7 +26093,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@sco
     exports.ManageStake = void 0;
     Object.defineProperty(exports, "ManageStake", { enumerable: true, get: function () { return manage_stake_1.ManageStake; } });
 });
-define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/components", "@scom/scom-staking/assets.ts", "@scom/scom-staking/store/index.ts"], function (require, exports, components_17, assets_4, index_35) {
+define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/components", "@scom/scom-staking/assets.ts", "@scom/scom-staking/store/index.ts"], function (require, exports, components_8, assets_3, index_28) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.stakingComponent = void 0;
@@ -27052,67 +26103,67 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
         darkBg: '#181E3E 0% 0% no-repeat padding-box',
         primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
     };
-    components_17.Styles.fontFace({
+    components_8.Styles.fontFace({
         fontFamily: "Apple SD Gothic Neo",
-        src: `url("${assets_4.default.fullPath('fonts/FontsFree-Net-Apple-SD-Gothic-Neo-Bold.ttf')}") format("truetype")`,
+        src: `url("${assets_3.default.fullPath('fonts/FontsFree-Net-Apple-SD-Gothic-Neo-Bold.ttf')}") format("truetype")`,
         fontWeight: 'bold',
         fontStyle: 'normal'
     });
-    components_17.Styles.fontFace({
+    components_8.Styles.fontFace({
         fontFamily: "Montserrat Regular",
-        src: `url("${assets_4.default.fullPath('fonts/montserrat/Montserrat-Regular.ttf')}") format("truetype")`,
+        src: `url("${assets_3.default.fullPath('fonts/montserrat/Montserrat-Regular.ttf')}") format("truetype")`,
         fontWeight: 'nomal',
         fontStyle: 'normal'
     });
-    components_17.Styles.fontFace({
+    components_8.Styles.fontFace({
         fontFamily: "Montserrat Bold",
-        src: `url("${assets_4.default.fullPath('fonts/montserrat/Montserrat-Bold.ttf')}") format("truetype")`,
+        src: `url("${assets_3.default.fullPath('fonts/montserrat/Montserrat-Bold.ttf')}") format("truetype")`,
         fontWeight: 'bold',
         fontStyle: 'normal'
     });
-    components_17.Styles.fontFace({
+    components_8.Styles.fontFace({
         fontFamily: "Montserrat Light",
-        src: `url("${assets_4.default.fullPath('fonts/montserrat/Montserrat-Light.ttf')}") format("truetype")`,
+        src: `url("${assets_3.default.fullPath('fonts/montserrat/Montserrat-Light.ttf')}") format("truetype")`,
         fontStyle: 'normal'
     });
-    components_17.Styles.fontFace({
+    components_8.Styles.fontFace({
         fontFamily: "Montserrat Medium",
-        src: `url("${assets_4.default.fullPath('fonts/montserrat/Montserrat-Medium.ttf')}") format("truetype")`,
+        src: `url("${assets_3.default.fullPath('fonts/montserrat/Montserrat-Medium.ttf')}") format("truetype")`,
         fontStyle: 'normal'
     });
-    components_17.Styles.fontFace({
+    components_8.Styles.fontFace({
         fontFamily: "Montserrat SemiBold",
-        src: `url("${assets_4.default.fullPath('fonts/montserrat/Montserrat-SemiBold.ttf')}") format("truetype")`,
+        src: `url("${assets_3.default.fullPath('fonts/montserrat/Montserrat-SemiBold.ttf')}") format("truetype")`,
         fontStyle: 'normal'
     });
-    components_17.Styles.fontFace({
+    components_8.Styles.fontFace({
         fontFamily: "Raleway Regular",
-        src: `url("${assets_4.default.fullPath('fonts/raleway/Raleway-Regular.ttf')}") format("truetype")`,
+        src: `url("${assets_3.default.fullPath('fonts/raleway/Raleway-Regular.ttf')}") format("truetype")`,
         fontWeight: 'nomal',
         fontStyle: 'normal'
     });
-    components_17.Styles.fontFace({
+    components_8.Styles.fontFace({
         fontFamily: "Raleway Bold",
-        src: `url("${assets_4.default.fullPath('fonts/raleway/Raleway-Bold.ttf')}") format("truetype")`,
+        src: `url("${assets_3.default.fullPath('fonts/raleway/Raleway-Bold.ttf')}") format("truetype")`,
         fontWeight: 'bold',
         fontStyle: 'normal'
     });
-    components_17.Styles.fontFace({
+    components_8.Styles.fontFace({
         fontFamily: "Raleway Light",
-        src: `url("${assets_4.default.fullPath('fonts/raleway/Raleway-Light.ttf')}") format("truetype")`,
+        src: `url("${assets_3.default.fullPath('fonts/raleway/Raleway-Light.ttf')}") format("truetype")`,
         fontStyle: 'normal'
     });
-    components_17.Styles.fontFace({
+    components_8.Styles.fontFace({
         fontFamily: "Raleway Medium",
-        src: `url("${assets_4.default.fullPath('fonts/raleway/Raleway-Medium.ttf')}") format("truetype")`,
+        src: `url("${assets_3.default.fullPath('fonts/raleway/Raleway-Medium.ttf')}") format("truetype")`,
         fontStyle: 'normal'
     });
-    components_17.Styles.fontFace({
+    components_8.Styles.fontFace({
         fontFamily: "Raleway SemiBold",
-        src: `url("${assets_4.default.fullPath('fonts/raleway/Raleway-SemiBold.ttf')}") format("truetype")`,
+        src: `url("${assets_3.default.fullPath('fonts/raleway/Raleway-SemiBold.ttf')}") format("truetype")`,
         fontStyle: 'normal'
     });
-    exports.stakingComponent = components_17.Styles.style({
+    exports.stakingComponent = components_8.Styles.style({
         $nest: {
             'i-label': {
                 fontFamily: 'Montserrat Regular',
@@ -27228,8 +26279,8 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
             '.wrapper': {
                 width: '100%',
                 height: '100%',
-                maxWidth: index_35.maxWidth,
-                maxHeight: index_35.maxHeight,
+                maxWidth: index_28.maxWidth,
+                maxHeight: index_28.maxHeight,
                 $nest: {
                     '.sticker': {
                         position: 'absolute',
@@ -27394,11 +26445,11 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
         }
     });
 });
-define("@scom/scom-staking/commissions/network-picker.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_18) {
+define("@scom/scom-staking/commissions/network-picker.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const Theme = components_18.Styles.Theme.ThemeVars;
-    exports.default = components_18.Styles.style({
+    const Theme = components_9.Styles.Theme.ThemeVars;
+    exports.default = components_9.Styles.style({
         $nest: {
             '::-webkit-scrollbar-track': {
                 borderRadius: '12px',
@@ -27488,11 +26539,11 @@ define("@scom/scom-staking/commissions/network-picker.css.ts", ["require", "expo
         }
     });
 });
-define("@scom/scom-staking/commissions/network-picker.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-staking/store/index.ts", "@scom/scom-staking/assets.ts", "@scom/scom-staking/commissions/network-picker.css.ts"], function (require, exports, components_19, index_36, assets_5, network_picker_css_1) {
+define("@scom/scom-staking/commissions/network-picker.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-staking/store/index.ts", "@scom/scom-staking/assets.ts", "@scom/scom-staking/commissions/network-picker.css.ts"], function (require, exports, components_10, index_29, assets_4, network_picker_css_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const Theme = components_19.Styles.Theme.ThemeVars;
-    let ScomNetworkPicker = class ScomNetworkPicker extends components_19.Module {
+    const Theme = components_10.Styles.Theme.ThemeVars;
+    let ScomNetworkPicker = class ScomNetworkPicker extends components_10.Module {
         constructor(parent, options) {
             super(parent, options);
             this._networkList = [];
@@ -27517,7 +26568,7 @@ define("@scom/scom-staking/commissions/network-picker.tsx", ["require", "exports
         async onNetworkSelected(network) {
             this.mdNetwork.visible = false;
             if (this._switchNetworkOnSelect) {
-                await index_36.switchNetwork(network === null || network === void 0 ? void 0 : network.chainId);
+                await index_29.switchNetwork(network === null || network === void 0 ? void 0 : network.chainId);
             }
             this.setNetwork(network);
             this._onCustomNetworkSelected && this._onCustomNetworkSelected(network);
@@ -27525,7 +26576,7 @@ define("@scom/scom-staking/commissions/network-picker.tsx", ["require", "exports
         setNetwork(network) {
             var _a, _b, _c;
             this._selectedNetwork = network;
-            const img = this._selectedNetwork.icon ? assets_5.default.fullPath(`img/network/${this._selectedNetwork.icon}`) : undefined;
+            const img = this._selectedNetwork.icon ? assets_4.default.fullPath(`img/network/${this._selectedNetwork.icon}`) : undefined;
             if (this.btnNetwork) {
                 this.btnNetwork.caption = `<i-hstack verticalAlignment="center" gap="1.125rem">
         <i-panel>
@@ -27549,7 +26600,7 @@ define("@scom/scom-staking/commissions/network-picker.tsx", ["require", "exports
             this.gridNetworkGroup.clearInnerHTML();
             this.networkMapper = new Map();
             this.gridNetworkGroup.append(...this._networkList.map((network) => {
-                const img = network.icon ? (this.$render("i-image", { url: assets_5.default.fullPath(`img/network/${network.icon}`), width: 16, height: 16 })) : ([]);
+                const img = network.icon ? (this.$render("i-image", { url: assets_4.default.fullPath(`img/network/${network.icon}`), width: 16, height: 16 })) : ([]);
                 const isActive = this._selectedNetwork ? this._selectedNetwork.chainId === network.chainId : false;
                 const hsNetwork = (this.$render("i-hstack", { onClick: this.onNetworkSelected.bind(this, network), background: { color: 'transparent' }, position: 'relative', class: isActive ? 'is-active list-item' : 'list-item', verticalAlignment: "center", overflow: "hidden", padding: { top: '5px', bottom: '5px', left: '0.75rem', right: '0.75rem' } },
                     this.$render("i-hstack", { verticalAlignment: 'center', gap: '1.125rem', lineHeight: 1.375 },
@@ -27578,13 +26629,13 @@ define("@scom/scom-staking/commissions/network-picker.tsx", ["require", "exports
             this.renderNetworks();
         }
         async renderCombobox() {
-            this.mdNetwork = await components_19.Modal.create({
+            this.mdNetwork = await components_10.Modal.create({
                 showBackdrop: false,
                 minWidth: 200,
                 popupPlacement: 'bottom'
             });
             this.mdNetwork.classList.add('full-width');
-            this.btnNetwork = await components_19.Button.create({
+            this.btnNetwork = await components_10.Button.create({
                 lineHeight: 1.875,
                 width: '100%',
                 padding: {
@@ -27639,17 +26690,17 @@ define("@scom/scom-staking/commissions/network-picker.tsx", ["require", "exports
         }
     };
     ScomNetworkPicker = __decorate([
-        components_19.customModule,
-        components_19.customElements('i-scom-staking-network-picker')
+        components_10.customModule,
+        components_10.customElements('i-scom-staking-network-picker')
     ], ScomNetworkPicker);
     exports.default = ScomNetworkPicker;
 });
-define("@scom/scom-staking/commissions/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_20) {
+define("@scom/scom-staking/commissions/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_11) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.tableStyle = exports.customStyle = void 0;
-    const Theme = components_20.Styles.Theme.ThemeVars;
-    exports.customStyle = components_20.Styles.style({
+    const Theme = components_11.Styles.Theme.ThemeVars;
+    exports.customStyle = components_11.Styles.style({
         $nest: {
             'input': {
                 paddingLeft: '10px'
@@ -27672,7 +26723,7 @@ define("@scom/scom-staking/commissions/index.css.ts", ["require", "exports", "@i
             }
         }
     });
-    exports.tableStyle = components_20.Styles.style({
+    exports.tableStyle = components_11.Styles.style({
         $nest: {
             '.i-table-header>tr>th': {
                 fontSize: '0.875rem !important',
@@ -27681,11 +26732,11 @@ define("@scom/scom-staking/commissions/index.css.ts", ["require", "exports", "@i
         }
     });
 });
-define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/store/index.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/commissions/index.css.ts", "@scom/scom-staking/assets.ts"], function (require, exports, components_21, eth_wallet_17, index_37, index_38, index_css_1, assets_6) {
+define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/store/index.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/commissions/index.css.ts", "@scom/scom-staking/assets.ts"], function (require, exports, components_12, eth_wallet_8, index_30, index_31, index_css_1, assets_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const Theme = components_21.Styles.Theme.ThemeVars;
-    let StakingConfig = class StakingConfig extends components_21.Module {
+    const Theme = components_12.Styles.Theme.ThemeVars;
+    let StakingConfig = class StakingConfig extends components_12.Module {
         constructor() {
             super(...arguments);
             this.commissionsTableColumns = [
@@ -27695,19 +26746,19 @@ define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijst
                     key: 'chainId',
                     textAlign: 'left',
                     onRenderCell: function (source, columnData, rowData) {
-                        const network = index_37.SupportedNetworks.find(net => net.chainId === columnData);
+                        const network = index_30.SupportedNetworks.find(net => net.chainId === columnData);
                         if (!network)
                             return this.$render("i-panel", null);
-                        const networkInfo = index_37.getNetworkInfo(network.chainId);
-                        const imgUrl = networkInfo.icon ? assets_6.default.fullPath(`img/network/${networkInfo.icon}`) : '';
-                        const hstack = new components_21.HStack(undefined, {
+                        const networkInfo = index_30.getNetworkInfo(network.chainId);
+                        const imgUrl = networkInfo.icon ? assets_5.default.fullPath(`img/network/${networkInfo.icon}`) : '';
+                        const hstack = new components_12.HStack(undefined, {
                             verticalAlignment: 'center',
                             gap: 5
                         });
-                        const imgEl = new components_21.Icon(hstack, {
+                        const imgEl = new components_12.Icon(hstack, {
                             image: { url: imgUrl, width: 16, height: 16 }
                         });
-                        const lbName = new components_21.Label(hstack, {
+                        const lbName = new components_12.Label(hstack, {
                             caption: networkInfo.name || '',
                             font: { size: '0.875rem' }
                         });
@@ -27722,7 +26773,7 @@ define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijst
                     onRenderCell: function (source, columnData, rowData) {
                         const replaced = columnData.slice(6, columnData.length - 9);
                         const caption = ((columnData === null || columnData === void 0 ? void 0 : columnData.length) < 15) ? columnData : columnData.replace(replaced, '...');
-                        return new components_21.Label(undefined, {
+                        return new components_12.Label(undefined, {
                             caption: caption || '',
                             font: { size: '0.875rem' },
                             tooltip: {
@@ -27737,7 +26788,7 @@ define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijst
                     key: '',
                     textAlign: 'center',
                     onRenderCell: async (source, data, rowData) => {
-                        const icon = new components_21.Icon(undefined, {
+                        const icon = new components_12.Icon(undefined, {
                             name: "edit",
                             fill: Theme.text.primary,
                             height: 14,
@@ -27758,7 +26809,7 @@ define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijst
                     key: '',
                     textAlign: 'center',
                     onRenderCell: async (source, data, rowData) => {
-                        const icon = new components_21.Icon(undefined, {
+                        const icon = new components_12.Icon(undefined, {
                             name: "times",
                             fill: Theme.colors.primary.main,
                             height: 14,
@@ -27786,8 +26837,8 @@ define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijst
         async init() {
             super.init();
             this.commissionInfoList = [];
-            const embedderFee = index_37.getEmbedderCommissionFee();
-            this.lbCommissionShare.caption = `${index_38.formatNumber(new eth_wallet_17.BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
+            const embedderFee = index_30.getEmbedderCommissionFee();
+            this.lbCommissionShare.caption = `${index_31.formatNumber(new eth_wallet_8.BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
         }
         get data() {
             const config = {};
@@ -27814,7 +26865,7 @@ define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijst
         }
         async onConfirmCommissionClicked() {
             var _a;
-            const embedderFee = index_37.getEmbedderCommissionFee();
+            const embedderFee = index_30.getEmbedderCommissionFee();
             this.commissionInfoList.push({
                 chainId: (_a = this.networkPicker.selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId,
                 walletAddress: this.inputWalletAddress.value,
@@ -27839,7 +26890,7 @@ define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijst
             else if (!this.inputWalletAddress.value) {
                 this.lbErrMsg.caption = 'Please enter wallet address';
             }
-            else if (!index_38.isWalletAddress(this.inputWalletAddress.value)) {
+            else if (!index_31.isWalletAddress(this.inputWalletAddress.value)) {
                 this.lbErrMsg.caption = 'Please enter valid wallet address';
             }
             else {
@@ -27892,7 +26943,7 @@ define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijst
                         this.$render("i-hstack", { width: '100%', horizontalAlignment: 'center', grid: { area: 'title' }, margin: { bottom: '1.5rem' } },
                             this.$render("i-label", { caption: "Add Wallet", font: { size: '1.5rem' } })),
                         this.$render("i-label", { caption: "Network", grid: { area: 'lbNetwork' }, font: { size: '1rem' } }),
-                        this.$render("i-scom-staking-network-picker", { id: 'networkPicker', grid: { area: 'network' }, display: "block", networks: index_37.SupportedNetworks, background: { color: Theme.combobox.background }, border: { radius: 8, width: '1px', style: 'solid', color: Theme.input.background }, onCustomNetworkSelected: this.onNetworkSelected, class: "staking-network-select" }),
+                        this.$render("i-scom-staking-network-picker", { id: 'networkPicker', grid: { area: 'network' }, display: "block", networks: index_30.SupportedNetworks, background: { color: Theme.combobox.background }, border: { radius: 8, width: '1px', style: 'solid', color: Theme.input.background }, onCustomNetworkSelected: this.onNetworkSelected, class: "staking-network-select" }),
                         this.$render("i-label", { caption: "Wallet Address", grid: { area: 'lbWalletAddress' }, font: { size: '1rem' } }),
                         this.$render("i-input", { id: 'inputWalletAddress', grid: { area: 'walletAddress' }, width: '100%', height: 45, border: { radius: 8, width: '1px', style: 'solid', color: Theme.divider }, onChanged: this.onInputWalletAddressChanged }),
                         this.$render("i-label", { id: 'lbErrMsg', font: { color: '#ed5748' }, grid: { area: 'errMsg' } }),
@@ -27901,15 +26952,15 @@ define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijst
         }
     };
     StakingConfig = __decorate([
-        components_21.customModule,
-        components_21.customElements("i-scom-staking-config")
+        components_12.customModule,
+        components_12.customElements("i-scom-staking-config")
     ], StakingConfig);
     exports.default = StakingConfig;
 });
-define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/common/index.tsx", "@scom/scom-staking/manage-stake/index.tsx", "@scom/scom-staking/contracts/oswap-time-is-money-contract/index.ts", "@scom/scom-staking/index.css.ts"], function (require, exports, components_22, eth_wallet_18, assets_7, index_39, index_40, index_41, index_42, index_43, index_44, index_css_2) {
+define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/common/index.tsx", "@scom/scom-staking/manage-stake/index.tsx", "@scom/scom-staking/contracts/oswap-time-is-money-contract/index.ts", "@scom/scom-staking/index.css.ts"], function (require, exports, components_13, eth_wallet_9, assets_6, index_32, index_33, scom_token_list_4, index_34, index_35, index_36, index_37, index_css_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    let ScomStaking = class ScomStaking extends components_22.Module {
+    let ScomStaking = class ScomStaking extends components_13.Module {
         // private convertCampaignData(data: ISingleStakingCampaign) {
         // 	if (data) {
         // 		const hourVal = 60 * 60;
@@ -27963,7 +27014,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 this.onSetupPage(connected);
             };
             this.onChainChange = async () => {
-                const isConnected = index_40.isWalletConnected();
+                const isConnected = index_33.isWalletConnected();
                 if (await this.isWalletValid(isConnected)) {
                     this.onSetupPage(isConnected);
                 }
@@ -27972,11 +27023,11 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 var _a;
                 if (this._data && isConnected) {
                     try {
-                        const wallet = eth_wallet_18.Wallet.getClientInstance();
+                        const wallet = eth_wallet_9.Wallet.getClientInstance();
                         const infoList = this._data[wallet.chainId];
                         const stakingAddress = infoList && ((_a = infoList[0].stakings[0]) === null || _a === void 0 ? void 0 : _a.address);
                         if (stakingAddress) {
-                            const timeIsMoney = new index_44.Contracts.TimeIsMoney(wallet, stakingAddress);
+                            const timeIsMoney = new index_37.Contracts.TimeIsMoney(wallet, stakingAddress);
                             await timeIsMoney.getCredit(wallet.address);
                         }
                         return true;
@@ -27988,7 +27039,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 return false;
             };
             this.updateStaking = () => {
-                this.onSetupPage(index_40.isWalletConnected());
+                this.onSetupPage(index_33.isWalletConnected());
             };
             this.onSetupPage = async (connected, hideLoading) => {
                 var _a, _b, _c, _d;
@@ -28004,9 +27055,10 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     networks: (_b = this._data.networks) !== null && _b !== void 0 ? _b : [],
                     showHeader: (_c = this._data.showHeader) !== null && _c !== void 0 ? _c : true
                 };
+                scom_token_list_4.tokenStore.updateTokenMapData();
                 if ((_d = this.dappContainer) === null || _d === void 0 ? void 0 : _d.setData)
                     this.dappContainer.setData(data);
-                this.campaigns = await index_41.getAllCampaignsInfo({ [this._data.chainId]: this._data });
+                this.campaigns = await index_34.getAllCampaignsInfo({ [this._data.chainId]: this._data });
                 await this.renderCampaigns(hideLoading);
                 if (!hideLoading && this.loadingElm) {
                     this.loadingElm.visible = false;
@@ -28038,17 +27090,17 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     }
                 };
                 const confirmationCallBack = async (receipt) => {
-                    await this.onSetupPage(index_40.isWalletConnected(), true);
+                    await this.onSetupPage(index_33.isWalletConnected(), true);
                     if (!btnClaim)
                         return;
                     btnClaim.rightIcon.visible = false;
                     btnClaim.enabled = true;
                 };
-                index_39.registerSendTxEvents({
+                index_32.registerSendTxEvents({
                     transactionHash: callBack,
                     confirmation: confirmationCallBack
                 });
-                index_41.claimToken(data.reward.address, callBack);
+                index_34.claimToken(data.reward.address, callBack);
             };
             // private onDeployCampaign = async () => {
             // 	if (this._data && this._data.isNew && this.checkValidation()) {
@@ -28099,7 +27151,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             };
             this.onDownload = (data) => {
                 if (data) {
-                    index_39.downloadJsonFile('campaign.json', Object.assign({}, data));
+                    index_32.downloadJsonFile('campaign.json', Object.assign({}, data));
                 }
             };
             this.removeTimer = () => {
@@ -28120,7 +27172,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     window.open(campaign.getTokenURL);
                 }
                 else {
-                    window.open(index_40.getTokenUrl ? index_40.getTokenUrl : `https:openswap.xyz/#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
+                    window.open(index_33.getTokenUrl ? index_33.getTokenUrl : `https:openswap.xyz/#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
                 }
             };
             this.updateButtonStatus = async (data) => {
@@ -28139,13 +27191,13 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             };
             this.initEmptyUI = async () => {
                 if (!this.noCampaignSection) {
-                    this.noCampaignSection = await components_22.Panel.create({ height: '100%' });
+                    this.noCampaignSection = await components_13.Panel.create({ height: '100%' });
                 }
-                const isConnected = index_40.isWalletConnected();
+                const isConnected = index_33.isWalletConnected();
                 this.noCampaignSection.clearInnerHTML();
                 this.noCampaignSection.appendChild(this.$render("i-panel", { class: "no-campaign", height: "100%", background: { color: '#192046' } },
                     this.$render("i-vstack", { gap: 10, verticalAlignment: "center" },
-                        this.$render("i-image", { url: assets_7.default.fullPath('img/staking/TrollTrooper.svg') }),
+                        this.$render("i-image", { url: assets_6.default.fullPath('img/staking/TrollTrooper.svg') }),
                         this.$render("i-label", { font: { color: '#FFFFFF' }, caption: isConnected ? 'No Campaigns' : 'Please connect with your wallet!' }),
                         !isConnected ? this.$render("i-button", { maxWidth: 220, caption: "Connect Wallet", class: "btn-os btn-stake", margin: { left: 'auto', right: 'auto', bottom: 0 }, font: { size: '14px' }, onClick: this.connectWallet }) : [])));
                 this.noCampaignSection.visible = true;
@@ -28164,9 +27216,9 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 if (!hideLoading) {
                     this.stakingElm.clearInnerHTML();
                 }
-                this.tokenMap = index_40.tokenStore.tokenMap;
-                const chainId = index_40.getChainId();
-                const network = index_40.getNetworkInfo(chainId);
+                this.tokenMap = scom_token_list_4.tokenStore.tokenMap;
+                const chainId = index_33.getChainId();
+                const network = index_33.getNetworkInfo(chainId);
                 await this.initEmptyUI();
                 this.noCampaignSection.visible = false;
                 if (this.campaigns && !this.campaigns.length) {
@@ -28182,12 +27234,12 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 for (let idx = 0; idx < campaigns.length; idx++) {
                     const campaign = this.campaigns[idx];
                     const _tag = this.tag || {};
-                    const colorCampaignText = index_40.isThemeApplied ? _tag.customColorCampaign || '#f15e61' : '#f15e61';
-                    const colorCampaignBackground = index_40.isThemeApplied ? _tag.customColorBackground || '#ffffff26' : '#ffffff26';
-                    const colorButton = index_40.isThemeApplied ? _tag.customColorButton : undefined;
-                    const colorText = index_40.isThemeApplied ? _tag.customColorText || '#fff' : '#fff';
-                    const colorTimeBackground = index_40.isThemeApplied ? _tag.customColorTimeBackground || '#F15E61' : '#F15E61';
-                    const containerSection = await components_22.Panel.create();
+                    const colorCampaignText = index_33.isThemeApplied ? _tag.customColorCampaign || '#f15e61' : '#f15e61';
+                    const colorCampaignBackground = index_33.isThemeApplied ? _tag.customColorBackground || '#ffffff26' : '#ffffff26';
+                    const colorButton = index_33.isThemeApplied ? _tag.customColorButton : undefined;
+                    const colorText = index_33.isThemeApplied ? _tag.customColorText || '#fff' : '#fff';
+                    const colorTimeBackground = index_33.isThemeApplied ? _tag.customColorTimeBackground || '#F15E61' : '#F15E61';
+                    const containerSection = await components_13.Panel.create();
                     containerSection.id = `campaign-${idx}`;
                     containerSection.classList.add('container');
                     const options = campaign.options;
@@ -28196,14 +27248,14 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         let lpTokenData = {};
                         let vaultTokenData = {};
                         if (opt.tokenAddress) {
-                            if (opt.lockTokenType == index_39.LockTokenType.LP_Token) {
+                            if (opt.lockTokenType == index_32.LockTokenType.LP_Token) {
                                 lpTokenData = {
-                                    'object': await index_41.getLPObject(opt.tokenAddress)
+                                    'object': await index_34.getLPObject(opt.tokenAddress)
                                 };
                             }
-                            else if (opt.lockTokenType == index_39.LockTokenType.VAULT_Token) {
+                            else if (opt.lockTokenType == index_32.LockTokenType.VAULT_Token) {
                                 vaultTokenData = {
-                                    'object': await index_41.getVaultObject(opt.tokenAddress)
+                                    'object': await index_34.getVaultObject(opt.tokenAddress)
                                 };
                             }
                         }
@@ -28215,15 +27267,15 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         options[optIdx] = Object.assign(Object.assign({}, options[optIdx]), { tokenInfo });
                     }
                     const stakingInfo = options ? options[0] : null;
-                    const lockedTokenObject = index_40.getLockedTokenObject(stakingInfo, stakingInfo.tokenInfo, this.tokenMap);
-                    const lockedTokenSymbol = index_40.getLockedTokenSymbol(stakingInfo, lockedTokenObject);
-                    const lockedTokenIconPaths = index_40.getLockedTokenIconPaths(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
+                    const lockedTokenObject = index_33.getLockedTokenObject(stakingInfo, stakingInfo.tokenInfo, this.tokenMap);
+                    const lockedTokenSymbol = index_33.getLockedTokenSymbol(stakingInfo, lockedTokenObject);
+                    const lockedTokenIconPaths = index_33.getLockedTokenIconPaths(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
                     const lockedTokenDecimals = (lockedTokenObject === null || lockedTokenObject === void 0 ? void 0 : lockedTokenObject.decimals) || 18;
                     const defaultDecimalsOffset = 18 - lockedTokenDecimals;
                     const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
                     const activeEndTime = stakingInfo ? stakingInfo.endOfEntryPeriod : 0;
-                    let isStarted = components_22.moment(activeStartTime).diff(components_22.moment()) <= 0;
-                    let isClosed = components_22.moment(activeEndTime).diff(components_22.moment()) <= 0;
+                    let isStarted = components_13.moment(activeStartTime).diff(components_13.moment()) <= 0;
+                    let isClosed = components_13.moment(activeEndTime).diff(components_13.moment()) <= 0;
                     let totalLocked = {};
                     const stakingElms = [];
                     const optionTimer = { background: { color: colorTimeBackground }, font: { color: colorText } };
@@ -28236,14 +27288,14 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     const stickerLabels = [];
                     const stickerIcons = [];
                     for (let i = 0; i < options.length; i++) {
-                        stakingElms[i] = await components_22.VStack.create({ visible: i === 0 });
-                        activeTimerRows[i] = await components_22.VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
-                        activeTimerElms[i] = await components_22.VStack.create();
+                        stakingElms[i] = await components_13.VStack.create({ visible: i === 0 });
+                        activeTimerRows[i] = await components_13.VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
+                        activeTimerElms[i] = await components_13.VStack.create();
                         activeTimerRows[i].appendChild(this.$render("i-label", { caption: "End Date", font: { size: '14px', color: colorText }, class: "opacity-50" }));
                         activeTimerRows[i].appendChild(activeTimerElms[i]);
-                        endHours[i] = await components_22.Label.create(optionTimer);
-                        endDays[i] = await components_22.Label.create(optionTimer);
-                        endMins[i] = await components_22.Label.create(optionTimer);
+                        endHours[i] = await components_13.Label.create(optionTimer);
+                        endDays[i] = await components_13.Label.create(optionTimer);
+                        endMins[i] = await components_13.Label.create(optionTimer);
                         endHours[i].classList.add('timer-value');
                         endDays[i].classList.add('timer-value');
                         endMins[i].classList.add('timer-value');
@@ -28255,9 +27307,9 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             endMins[i],
                             this.$render("i-label", { caption: "M", class: "timer-unit", font: { color: colorText } })));
                         // Sticker
-                        stickerSections[i] = await components_22.Panel.create({ visible: false });
-                        stickerLabels[i] = await components_22.Label.create();
-                        stickerIcons[i] = await components_22.Icon.create();
+                        stickerSections[i] = await components_13.Panel.create({ visible: false });
+                        stickerLabels[i] = await components_13.Label.create();
+                        stickerIcons[i] = await components_13.Icon.create();
                         stickerSections[i].classList.add('sticker');
                         stickerSections[i].appendChild(this.$render("i-vstack", { class: "sticker-text" },
                             stickerIcons[i],
@@ -28270,23 +27322,23 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         stakingElms[index].visible = true;
                     };
                     const setAvailableQty = async () => {
-                        if (!index_40.isWalletConnected())
+                        if (!index_33.isWalletConnected())
                             return;
                         let i = 0;
                         for (const o of options) {
-                            const _totalLocked = await index_41.getStakingTotalLocked(o.address);
+                            const _totalLocked = await index_34.getStakingTotalLocked(o.address);
                             totalLocked[o.address] = _totalLocked;
-                            const optionQty = new eth_wallet_18.BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
+                            const optionQty = new eth_wallet_9.BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
                             if (o.mode === 'Stake') {
                                 const keyStake = `#btn-stake-${o.address}`;
                                 const btnStake = this.querySelector(keyStake);
-                                const isStaking = index_40.getStakingStatus(keyStake).value;
+                                const isStaking = index_33.getStakingStatus(keyStake).value;
                                 if (btnStake) {
                                     let isValidInput = false;
                                     const inputElm = this.querySelector(`#input-${o.address}`);
                                     if (inputElm) {
                                         const manageStake = this.querySelector(`#manage-stake-${o.address}`);
-                                        const inputVal = new eth_wallet_18.BigNumber(inputElm.value || 0);
+                                        const inputVal = new eth_wallet_9.BigNumber(inputElm.value || 0);
                                         isValidInput = inputVal.gt(0) && inputVal.lte(manageStake.getBalance()) && !(manageStake === null || manageStake === void 0 ? void 0 : manageStake.needToBeApproval());
                                     }
                                     btnStake.enabled = !isStaking && isValidInput && (isStarted && !(optionQty.lte(0) || isClosed));
@@ -28295,7 +27347,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             else {
                                 const keyUnstake = `#btn-unstake-${o.address}`;
                                 const btnUnstake = this.querySelector(keyUnstake);
-                                const isUnstaking = index_40.getStakingStatus(keyUnstake).value;
+                                const isUnstaking = index_33.getStakingStatus(keyUnstake).value;
                                 if (btnUnstake) {
                                     const manageStake = this.querySelector(`#manage-stake-${o.address}`);
                                     btnUnstake.enabled = !isUnstaking && o.mode !== 'Stake' && Number(o.stakeQty) != 0 && !(manageStake === null || manageStake === void 0 ? void 0 : manageStake.needToBeApproval());
@@ -28330,8 +27382,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         ;
                     };
                     const setEndRemainingTime = () => {
-                        isStarted = components_22.moment(activeStartTime).diff(components_22.moment()) <= 0;
-                        isClosed = components_22.moment(activeEndTime).diff(components_22.moment()) <= 0;
+                        isStarted = components_13.moment(activeStartTime).diff(components_13.moment()) <= 0;
+                        isClosed = components_13.moment(activeEndTime).diff(components_13.moment()) <= 0;
                         for (let i = 0; i < options.length; i++) {
                             activeTimerRows[i].visible = isStarted && !isClosed;
                         }
@@ -28344,9 +27396,9 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             }
                         }
                         else {
-                            const days = components_22.moment(activeEndTime).diff(components_22.moment(), 'days');
-                            const hours = components_22.moment(activeEndTime).diff(components_22.moment(), 'hours') - days * 24;
-                            const mins = components_22.moment(activeEndTime).diff(components_22.moment(), 'minutes') - days * 24 * 60 - hours * 60;
+                            const days = components_13.moment(activeEndTime).diff(components_13.moment(), 'days');
+                            const hours = components_13.moment(activeEndTime).diff(components_13.moment(), 'hours') - days * 24;
+                            const mins = components_13.moment(activeEndTime).diff(components_13.moment(), 'minutes') - days * 24 * 60 - hours * 60;
                             for (let i = 0; i < options.length; i++) {
                                 endDays[i].caption = `${days}`;
                                 endHours[i].caption = `${hours}`;
@@ -28361,10 +27413,10 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     setTimer();
                     this.listActiveTimer.push(setInterval(setTimer, 2000));
                     const stakingsElm = await Promise.all(options.map(async (option, optionIdx) => {
-                        const manageStake = new index_43.ManageStake();
+                        const manageStake = new index_36.ManageStake();
                         manageStake.id = `manage-stake-${option.address}`;
                         manageStake.width = '100%';
-                        manageStake.onRefresh = () => this.onSetupPage(index_40.isWalletConnected(), true);
+                        manageStake.onRefresh = () => this.onSetupPage(index_33.isWalletConnected(), true);
                         this.manageStakeElm.clearInnerHTML();
                         this.manageStakeElm.appendChild(manageStake);
                         manageStake.setData(Object.assign(Object.assign(Object.assign({}, campaign), option), { customColorButton: colorButton, customColorText: colorText }));
@@ -28372,10 +27424,10 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         const rewardsData = [option.rewardsData[0]];
                         const rewardOptions = !isClaim ? rewardsData : [];
                         let aprInfo = {};
-                        const claimStakedRow = await components_22.HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
+                        const claimStakedRow = await components_13.HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
                         claimStakedRow.appendChild(this.$render("i-label", { caption: "You Staked", font: { size: '16px', color: colorText } }));
-                        claimStakedRow.appendChild(this.$render("i-label", { caption: `${index_39.formatNumber(new eth_wallet_18.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`, font: { size: '16px', name: 'Montserrat Regular', color: colorText } }));
-                        const rowRewards = await components_22.VStack.create({ gap: 8, verticalAlignment: 'center' });
+                        claimStakedRow.appendChild(this.$render("i-label", { caption: `${index_32.formatNumber(new eth_wallet_9.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`, font: { size: '16px', name: 'Montserrat Regular', color: colorText } }));
+                        const rowRewards = await components_13.VStack.create({ gap: 8, verticalAlignment: 'center' });
                         for (let idx = 0; idx < rewardsData.length; idx++) {
                             const reward = rewardsData[idx];
                             const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
@@ -28392,7 +27444,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             const rewardSymbol = rewardToken.symbol || '';
                             rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
                                 this.$render("i-label", { caption: `${rewardSymbol} Locked`, font: { size: '16px', color: colorText } }),
-                                this.$render("i-label", { caption: `${index_39.formatNumber(new eth_wallet_18.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '16px', name: 'Montserrat Regular', color: colorText } })));
+                                this.$render("i-label", { caption: `${index_32.formatNumber(new eth_wallet_9.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '16px', name: 'Montserrat Regular', color: colorText } })));
                             // rowRewards.appendChild(
                             // 	<i-hstack horizontalAlignment="space-between">
                             // 		<i-label caption={`${rewardSymbol} Vesting Start`} font={{ size: '16px', color: colorText }} />
@@ -28405,26 +27457,26 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             // 		<i-label caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
                             // 	</i-hstack>
                             // );
-                            const passClaimStartTime = !(reward.claimStartTime && components_22.moment().diff(components_22.moment.unix(reward.claimStartTime)) < 0);
+                            const passClaimStartTime = !(reward.claimStartTime && components_13.moment().diff(components_13.moment.unix(reward.claimStartTime)) < 0);
                             let rewardClaimable = `0 ${rewardSymbol}`;
                             if (passClaimStartTime && isClaim) {
-                                rewardClaimable = `${index_39.formatNumber(new eth_wallet_18.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
+                                rewardClaimable = `${index_32.formatNumber(new eth_wallet_9.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
                             }
                             let startClaimingText = '';
                             if (!(!reward.claimStartTime || passClaimStartTime) && isClaim) {
-                                const claimStart = components_22.moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
+                                const claimStart = components_13.moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
                                 startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
                             }
                             rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
                                 this.$render("i-label", { caption: `${rewardSymbol} Claimable`, font: { size: '16px', color: colorText } }),
                                 this.$render("i-label", { caption: rewardClaimable, font: { size: '16px', name: 'Montserrat Regular', color: colorText } }),
                                 startClaimingText ? this.$render("i-label", { caption: startClaimingText, font: { size: '16px', color: colorText } }) : []));
-                            const btnClaim = await components_22.Button.create({
+                            const btnClaim = await components_13.Button.create({
                                 rightIcon: { spin: true, fill: colorText, visible: false },
                                 caption: `Claim ${rewardSymbol}`,
                                 background: { color: `${colorButton} !important` },
                                 font: { color: colorText },
-                                enabled: !(!passClaimStartTime || new eth_wallet_18.BigNumber(reward.claimable).isZero()) && isClaim,
+                                enabled: !(!passClaimStartTime || new eth_wallet_9.BigNumber(reward.claimable).isZero()) && isClaim,
                                 margin: { left: 'auto', right: 'auto' }
                             });
                             btnClaim.id = `btnClaim-${idx}-${option.address}`;
@@ -28435,54 +27487,54 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         ;
                         const getAprValue = (rewardOption) => {
                             if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
-                                const apr = new eth_wallet_18.BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, eth_wallet_18.BigNumber.ROUND_DOWN);
+                                const apr = new eth_wallet_9.BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, eth_wallet_9.BigNumber.ROUND_DOWN);
                                 return `${apr}%`;
                             }
                             return '';
                         };
                         const durationDays = option.minLockTime / (60 * 60 * 24);
-                        const _lockedTokenObject = index_40.getLockedTokenObject(option, option.tokenInfo, this.tokenMap);
-                        const _lockedTokenIconPaths = index_40.getLockedTokenIconPaths(option, _lockedTokenObject, chainId, this.tokenMap);
+                        const _lockedTokenObject = index_33.getLockedTokenObject(option, option.tokenInfo, this.tokenMap);
+                        const _lockedTokenIconPaths = index_33.getLockedTokenIconPaths(option, _lockedTokenObject, chainId, this.tokenMap);
                         const pathsLength = _lockedTokenIconPaths.length;
                         const rewardToken = this.getRewardToken(rewardsData[0].rewardTokenAddress);
-                        const rewardIconPath = index_40.getTokenIconPath(rewardToken, chainId);
-                        stakingElms[optionIdx].appendChild(this.$render("i-vstack", { gap: 15, width: index_40.maxWidth, height: "100%", padding: { top: 10, bottom: 10, left: 20, right: 20 }, position: "relative" },
+                        const rewardIconPath = index_33.getTokenIconPath(rewardToken, chainId);
+                        stakingElms[optionIdx].appendChild(this.$render("i-vstack", { gap: 15, width: index_33.maxWidth, height: "100%", padding: { top: 10, bottom: 10, left: 20, right: 20 }, position: "relative" },
                             stickerSections[optionIdx],
                             this.$render("i-hstack", { gap: 10, width: "100%", verticalAlignment: "center" },
                                 this.$render("i-hstack", { gap: 10, width: "50%" },
                                     this.$render("i-hstack", { width: pathsLength === 1 ? 63.5 : 80, position: "relative", verticalAlignment: "center" },
-                                        this.$render("i-image", { width: 60, height: 60, url: assets_7.default.fullPath(rewardIconPath), fallbackUrl: index_40.fallBackUrl }),
+                                        this.$render("i-image", { width: 60, height: 60, url: assets_6.default.fullPath(rewardIconPath), fallbackUrl: index_33.fallBackUrl }),
                                         _lockedTokenIconPaths.map((v, idxImg) => {
-                                            return this.$render("i-image", { position: "absolute", width: 28, height: 28, bottom: 0, left: (idxImg * 20) + 35, url: assets_7.default.fullPath(v), fallbackUrl: index_40.fallBackUrl });
+                                            return this.$render("i-image", { position: "absolute", width: 28, height: 28, bottom: 0, left: (idxImg * 20) + 35, url: assets_6.default.fullPath(v), fallbackUrl: index_33.fallBackUrl });
                                         })),
                                     this.$render("i-vstack", { gap: 2, overflow: { x: 'hidden' }, verticalAlignment: "center" },
                                         this.$render("i-label", { visible: !!campaign.customName, caption: campaign.customName, font: { size: '20px', name: 'Montserrat Bold', color: colorCampaignText, bold: true }, class: "text-overflow" }),
                                         this.$render("i-label", { visible: !!campaign.customDesc, caption: campaign.customDesc, font: { size: '16px', name: 'Montserrat Regular', color: colorText }, class: "opacity-50 text-overflow" }))),
                                 await Promise.all(rewardOptions.map(async (rewardOption, idx) => {
-                                    const lbApr = await components_22.Label.create({ font: { size: '40px', name: 'Montserrat Medium', color: '#72F35D' } });
-                                    const lbRate = await components_22.Label.create({ font: { size: '16px', name: 'Montserrat Regular', color: colorText } });
+                                    const lbApr = await components_13.Label.create({ font: { size: '40px', name: 'Montserrat Medium', color: '#72F35D' } });
+                                    const lbRate = await components_13.Label.create({ font: { size: '16px', name: 'Montserrat Regular', color: colorText } });
                                     lbApr.classList.add('text-overflow');
                                     lbRate.classList.add('opacity-50');
                                     const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
                                     const rewardTokenDecimals = rewardToken.decimals || 18;
                                     const decimalsOffset = 18 - rewardTokenDecimals;
                                     const lockTokenType = option.lockTokenType;
-                                    const rateDesc = `1 ${lockTokenType === index_39.LockTokenType.LP_Token ? 'LP' : index_40.tokenSymbol(option.lockTokenAddress)} : ${new eth_wallet_18.BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${index_40.tokenSymbol(rewardOption.rewardTokenAddress)}`;
+                                    const rateDesc = `1 ${lockTokenType === index_32.LockTokenType.LP_Token ? 'LP' : index_33.tokenSymbol(option.lockTokenAddress)} : ${new eth_wallet_9.BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${index_33.tokenSymbol(rewardOption.rewardTokenAddress)}`;
                                     const updateApr = async () => {
                                         var _a, _b, _c, _d;
-                                        if (lockTokenType === index_39.LockTokenType.ERC20_Token) {
-                                            const apr = await index_41.getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, durationDays);
+                                        if (lockTokenType === index_32.LockTokenType.ERC20_Token) {
+                                            const apr = await index_34.getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, durationDays);
                                             if (!isNaN(parseFloat(apr))) {
                                                 aprInfo[rewardOption.rewardTokenAddress] = apr;
                                             }
                                         }
-                                        else if (lockTokenType === index_39.LockTokenType.LP_Token) {
+                                        else if (lockTokenType === index_32.LockTokenType.LP_Token) {
                                             if (rewardOption.referencePair) {
-                                                aprInfo[rewardOption.rewardTokenAddress] = await index_41.getLPRewardCurrentAPR(rewardOption, (_b = (_a = option.tokenInfo) === null || _a === void 0 ? void 0 : _a.lpToken) === null || _b === void 0 ? void 0 : _b.object, durationDays);
+                                                aprInfo[rewardOption.rewardTokenAddress] = await index_34.getLPRewardCurrentAPR(rewardOption, (_b = (_a = option.tokenInfo) === null || _a === void 0 ? void 0 : _a.lpToken) === null || _b === void 0 ? void 0 : _b.object, durationDays);
                                             }
                                         }
                                         else {
-                                            aprInfo[rewardOption.rewardTokenAddress] = await index_41.getVaultRewardCurrentAPR(rewardOption, (_d = (_c = option.tokenInfo) === null || _c === void 0 ? void 0 : _c.vaultToken) === null || _d === void 0 ? void 0 : _d.object, durationDays);
+                                            aprInfo[rewardOption.rewardTokenAddress] = await index_34.getVaultRewardCurrentAPR(rewardOption, (_d = (_c = option.tokenInfo) === null || _c === void 0 ? void 0 : _c.vaultToken) === null || _d === void 0 ? void 0 : _d.object, durationDays);
                                         }
                                         const aprValue = getAprValue(rewardOption);
                                         lbApr.caption = `APR ${aprValue}`;
@@ -28500,7 +27552,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             this.$render("i-hstack", { width: "100%", verticalAlignment: "center" },
                                 this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
                                     this.$render("i-label", { caption: "Start Date", font: { size: '14px', color: colorText }, class: "opacity-50" }),
-                                    this.$render("i-label", { caption: index_39.formatDate(option.startOfEntryPeriod, 'DD MMM, YYYY'), font: { size: '16px', name: 'Montserrat Regular', color: colorText } })),
+                                    this.$render("i-label", { caption: index_32.formatDate(option.startOfEntryPeriod, 'DD MMM, YYYY'), font: { size: '16px', name: 'Montserrat Regular', color: colorText } })),
                                 activeTimerRows[optionIdx],
                                 this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
                                     this.$render("i-label", { caption: "Stake Duration", font: { size: '14px', color: colorText }, class: "opacity-50" }),
@@ -28513,10 +27565,10 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                                         this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: colorText }),
                                         this.$render("i-label", { caption: `Get ${lockedTokenSymbol}`, font: { size: '13.6px', color: colorText } }),
                                         lockedTokenIconPaths.map((v) => {
-                                            return this.$render("i-image", { display: "flex", width: 15, height: 15, url: assets_7.default.fullPath(v), fallbackUrl: index_40.fallBackUrl });
+                                            return this.$render("i-image", { display: "flex", width: 15, height: 15, url: assets_6.default.fullPath(v), fallbackUrl: index_33.fallBackUrl });
                                         })),
                                     campaign.showContractLink ?
-                                        this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => index_39.viewOnExplorerByAddress(chainId, option.address) },
+                                        this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => index_32.viewOnExplorerByAddress(chainId, option.address) },
                                             this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: colorText, class: "inline-block" }),
                                             this.$render("i-label", { caption: "View Contract", font: { size: '13.6px', color: colorText } })) : [])),
                             this.$render("i-vstack", { gap: 8 },
@@ -28526,19 +27578,18 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         return stakingElms[optionIdx];
                     }));
                     nodeItems.push(containerSection);
-                    containerSection.appendChild(this.$render("i-hstack", { background: { color: colorCampaignBackground }, width: "100%", height: index_40.maxHeight }, stakingsElm));
+                    containerSection.appendChild(this.$render("i-hstack", { background: { color: colorCampaignBackground }, width: "100%", height: index_33.maxHeight }, stakingsElm));
                 }
                 ;
                 this.stakingElm.clearInnerHTML();
                 this.stakingElm.append(this.noCampaignSection, ...nodeItems);
             };
-            index_40.setDataFromSCConfig({ networks: Object.values(index_40.Networks), infuraId: index_40.InfuraId });
-            index_40.setTokenStore();
-            this.$eventBus = components_22.application.EventBus;
+            index_33.setDataFromSCConfig({ networks: Object.values(index_33.Networks), infuraId: index_33.InfuraId });
+            this.$eventBus = components_13.application.EventBus;
             this.registerEvent();
         }
         getPropertiesSchema(readOnly) {
-            const propertiesSchema = index_40.getSingleStakingSchema(readOnly);
+            const propertiesSchema = index_33.getSingleStakingSchema(readOnly);
             return propertiesSchema;
         }
         getThemeSchema(readOnly) {
@@ -28669,7 +27720,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             this._data = value;
             this.configDApp.data = value;
             // TODO - update proxy address
-            this.onSetupPage(index_40.isWalletConnected());
+            this.onSetupPage(index_33.isWalletConnected());
         }
         async getTag() {
             return this.tag;
@@ -28687,7 +27738,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
         async init() {
             this.isReadyCallbackQueued = true;
             super.init();
-            this.stakingResult = new index_42.Result();
+            this.stakingResult = new index_35.Result();
             this.stakingComponent.appendChild(this.stakingResult);
             this.stakingResult.visible = false;
             this.showResultMessage(this.stakingResult, 'warning', '');
@@ -28695,9 +27746,9 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 this.stakingResult.closeModal();
                 this.stakingResult.visible = true;
             }, 100);
-            index_40.setCurrentChainId(index_40.getDefaultChainId());
             const data = this.getAttribute('data', true);
             if (data) {
+                index_33.setCurrentChainId(data.chainId);
                 await this.setData(data);
             }
             else {
@@ -28709,20 +27760,19 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
         render() {
             return (this.$render("i-scom-dapp-container", { id: "dappContainer" },
                 this.$render("i-panel", { id: "stakingComponent", class: index_css_2.stakingComponent, minHeight: 200 },
-                    this.$render("i-panel", { id: "stakingLayout", class: "staking-layout", width: index_40.maxWidth, height: index_40.maxHeight, margin: { top: '1rem', bottom: '1rem', left: 'auto', right: 'auto' } },
+                    this.$render("i-panel", { id: "stakingLayout", class: "staking-layout", width: index_33.maxWidth, height: index_33.maxHeight, margin: { top: '1rem', bottom: '1rem', left: 'auto', right: 'auto' } },
                         this.$render("i-vstack", { id: "loadingElm", class: "i-loading-overlay" },
                             this.$render("i-vstack", { class: "i-loading-spinner", horizontalAlignment: "center", verticalAlignment: "center" },
-                                this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_7.default.fullPath('img/loading.svg'), width: 36, height: 36 } }),
+                                this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_6.default.fullPath('img/loading.svg'), width: 36, height: 36 } }),
                                 this.$render("i-label", { caption: "Loading...", font: { color: '#FD4A4C', size: '1.5em' }, class: "i-loading-spinner_text" }))),
                         this.$render("i-panel", { id: "stakingElm", class: "wrapper" })),
                     this.$render("i-panel", { id: "manageStakeElm" }),
-                    this.$render("staking-wallet", null),
                     this.$render("i-scom-staking-config", { id: "configDApp", visible: false }))));
         }
     };
     ScomStaking = __decorate([
-        components_22.customModule,
-        components_22.customElements('i-scom-staking')
+        components_13.customModule,
+        components_13.customElements('i-scom-staking')
     ], ScomStaking);
     exports.default = ScomStaking;
 });

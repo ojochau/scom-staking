@@ -1,4 +1,5 @@
 /// <reference path="@ijstech/eth-contract/index.d.ts" />
+/// <reference path="@scom/scom-token-list/index.d.ts" />
 /// <amd-module name="@scom/scom-staking/assets.ts" />
 declare module "@scom/scom-staking/assets.ts" {
     function fullPath(path: string): string;
@@ -10426,7 +10427,6 @@ declare module "@scom/scom-staking/store/utils.ts" {
     export function isWalletConnected(): boolean;
     export function switchNetwork(chainId: number): Promise<void>;
     export function getChainId(): number;
-    export const getDefaultChainId: () => number;
     export function getWalletProvider(): string;
     export const hasMetaMask: () => boolean;
     export function getErc20(address: string): Erc20;
@@ -10468,10 +10468,6 @@ declare module "@scom/scom-staking/store/utils.ts" {
     export const setWalletPluginProvider: (walletPlugin: WalletPlugin, wallet: IClientSideProvider) => void;
     export const getWalletPluginMap: () => Record<WalletPlugin, IClientSideProvider>;
     export const getWalletPluginProvider: (walletPlugin: WalletPlugin) => IClientSideProvider;
-    export const projectNativeToken: () => (ITokenObject & {
-        address: string;
-    }) | null;
-    export const projectNativeTokenSymbol: () => string;
     export const getTokenObject: (address: string, showBalance?: boolean) => Promise<{
         address: string;
         decimals: number;
@@ -10495,114 +10491,6 @@ declare module "@scom/scom-staking/store/utils.ts" {
     export const setAPIGatewayUrls: (urls: Record<string, string>) => void;
     export const getEmbedderCommissionFee: () => string;
 }
-/// <amd-module name="@scom/scom-staking/store/token.ts" />
-declare module "@scom/scom-staking/store/token.ts" {
-    import { ITokenObject, TokenMapType } from "@scom/scom-staking/global/index.ts";
-    export type DefaultTokensByChainType = Record<number, ITokenObject[]>;
-    export type TokenBalancesType = Record<string, string>;
-    export class TokenStore {
-        private _defaultTokensByChain;
-        private _tokenBalances;
-        private _tokenMap;
-        private _projectToken?;
-        constructor(defaultTokensByChain: DefaultTokensByChainType);
-        get tokenBalances(): TokenBalancesType;
-        get tokenMap(): TokenMapType;
-        get projectToken(): ITokenObject;
-        getTokenList(chainId: number): ITokenObject[];
-        private getERC20Balance;
-        getTokenBalance(token: ITokenObject): string;
-        getProjectTokenBalance(): string;
-        private _updateAllTokenBalances;
-        updateAllTokenBalances(): Promise<TokenBalancesType>;
-        updateTokenBalances(erc20TokenList: ITokenObject[]): Promise<TokenBalancesType>;
-        private _updateTokenMapData;
-        updateTokenMapData(): TokenMapType;
-    }
-    export let tokenStore: TokenStore;
-    export const setTokenStore: () => void;
-}
-/// <amd-module name="@scom/scom-staking/wallets/scom-coin98-wallet/index.ts" />
-declare module "@scom/scom-staking/wallets/scom-coin98-wallet/index.ts" {
-    import { EthereumProvider } from '@ijstech/eth-wallet';
-    export class Coin98Provider extends EthereumProvider {
-        get displayName(): string;
-        get image(): string;
-        get provider(): any;
-        get homepage(): string;
-        installed(): boolean;
-    }
-}
-/// <amd-module name="@scom/scom-staking/wallets/scom-trust-wallet/index.ts" />
-declare module "@scom/scom-staking/wallets/scom-trust-wallet/index.ts" {
-    import { EthereumProvider } from '@ijstech/eth-wallet';
-    export class TrustWalletProvider extends EthereumProvider {
-        get displayName(): string;
-        get image(): string;
-        get provider(): any;
-        get homepage(): string;
-        installed(): boolean;
-    }
-}
-/// <amd-module name="@scom/scom-staking/wallets/scom-binance-chain-wallet/index.ts" />
-declare module "@scom/scom-staking/wallets/scom-binance-chain-wallet/index.ts" {
-    import { EthereumProvider } from '@ijstech/eth-wallet';
-    export class BinanceChainWalletProvider extends EthereumProvider {
-        get displayName(): string;
-        get image(): string;
-        get provider(): any;
-        get homepage(): string;
-        installed(): boolean;
-    }
-}
-/// <amd-module name="@scom/scom-staking/wallets/scom-onto-wallet/index.ts" />
-declare module "@scom/scom-staking/wallets/scom-onto-wallet/index.ts" {
-    import { EthereumProvider } from '@ijstech/eth-wallet';
-    export class ONTOWalletProvider extends EthereumProvider {
-        get displayName(): string;
-        get image(): string;
-        get provider(): any;
-        get homepage(): string;
-        installed(): boolean;
-    }
-}
-/// <amd-module name="@scom/scom-staking/wallets/scom-bit-keep-wallet/index.ts" />
-declare module "@scom/scom-staking/wallets/scom-bit-keep-wallet/index.ts" {
-    import { EthereumProvider } from '@ijstech/eth-wallet';
-    export class BitKeepWalletProvider extends EthereumProvider {
-        get displayName(): string;
-        get image(): string;
-        get provider(): any;
-        get homepage(): string;
-        installed(): boolean;
-    }
-}
-/// <amd-module name="@scom/scom-staking/wallets/scom-frontier-wallet/index.ts" />
-declare module "@scom/scom-staking/wallets/scom-frontier-wallet/index.ts" {
-    import { EthereumProvider } from '@ijstech/eth-wallet';
-    export class FrontierWalletProvider extends EthereumProvider {
-        get displayName(): string;
-        get image(): string;
-        get provider(): any;
-        get homepage(): string;
-        installed(): boolean;
-    }
-}
-/// <amd-module name="@scom/scom-staking/store/wallet.ts" />
-declare module "@scom/scom-staking/store/wallet.ts" {
-    import { WalletPlugin } from "@scom/scom-staking/store/utils.ts";
-    import { IClientProviderOptions, IClientSideProvider, IClientSideProviderEvents, Wallet } from '@ijstech/eth-wallet';
-    export type WalletPluginItemType = {
-        provider: (wallet: Wallet, events?: IClientSideProviderEvents, options?: IClientProviderOptions) => IClientSideProvider;
-    };
-    export type WalletPluginConfigType = Record<WalletPlugin, WalletPluginItemType>;
-    export const WalletPluginConfig: WalletPluginConfigType;
-    export function initWalletPlugins(eventHandlers?: {
-        [key: string]: Function;
-    }): void;
-    export function connectWallet(walletPlugin: WalletPlugin): Promise<any>;
-    export function logoutWallet(): Promise<void>;
-}
 /// <amd-module name="@scom/scom-staking/store/index.ts" />
 declare module "@scom/scom-staking/store/index.ts" {
     export const fallBackUrl: string;
@@ -10618,9 +10506,7 @@ declare module "@scom/scom-staking/store/index.ts" {
     export const isMultiple = false;
     export const maxWidth = "690px";
     export const maxHeight = "321px";
-    export * from "@scom/scom-staking/store/token.ts";
     export * from "@scom/scom-staking/store/utils.ts";
-    export * from "@scom/scom-staking/store/wallet.ts";
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.json.ts" {
@@ -16387,7 +16273,7 @@ declare module "@scom/scom-staking/staking-utils/index.ts" {
         decimals: BigNumber;
         name: string;
         symbol: string;
-        assetToken: ITokenObject;
+        assetToken: import("@scom/scom-token-list/interface.ts").ITokenObject;
     } | {
         address?: undefined;
         decimals?: undefined;
@@ -16445,58 +16331,9 @@ declare module "@scom/scom-staking/common/result.tsx" {
         render(): any;
     }
 }
-/// <amd-module name="@scom/scom-staking/common/wallet.css.ts" />
-declare module "@scom/scom-staking/common/wallet.css.ts" {
-    export const walletModalStyle: string;
-}
-/// <amd-module name="@scom/scom-staking/common/wallet.tsx" />
-declare module "@scom/scom-staking/common/wallet.tsx" {
-    import { Module, ControlElement, Container } from '@ijstech/components';
-    import { WalletPlugin } from "@scom/scom-staking/store/index.ts";
-    global {
-        namespace JSX {
-            interface IntrinsicElements {
-                ["staking-wallet"]: ControlElement;
-            }
-        }
-    }
-    export class StakingWallet extends Module {
-        private switchModal;
-        private connectModal;
-        private wallet;
-        private walletConnectButton;
-        private networkGroup;
-        private walletListElm;
-        private $eventBus;
-        private noteNetworkLabel;
-        constructor(parent?: Container, options?: any);
-        registerEvent(): void;
-        onChainChanged: (chainId: number) => Promise<void>;
-        requestAccounts(): Promise<void>;
-        initData(): Promise<void>;
-        showModal(name: string, title?: string): void;
-        isLive(walletPlugin: WalletPlugin): boolean;
-        isNetworkLive(chainId: number): boolean;
-        switchNetwork(chainId: number): Promise<void>;
-        connectToProviderFunc(walletPlugin: WalletPlugin): Promise<void>;
-        renderWalletButton(): Promise<void>;
-        renderNetworks(): void;
-        openConnectModal: () => void;
-        renderWalletList(): void;
-        updateDot(parent: HTMLElement, connected: boolean, type: 'network' | 'wallet'): void;
-        isWalletEnabled(walletName: WalletPlugin): boolean;
-        updateListNetworkUI(): void;
-        updateList(connected: boolean): void;
-        connectedCallback(): void;
-        getElementProperty(name: string): any;
-        init(): Promise<void>;
-        render(): Promise<any>;
-    }
-}
 /// <amd-module name="@scom/scom-staking/common/index.tsx" />
 declare module "@scom/scom-staking/common/index.tsx" {
     export { Result } from "@scom/scom-staking/common/result.tsx";
-    export { StakingWallet } from "@scom/scom-staking/common/wallet.tsx";
 }
 /// <amd-module name="@scom/scom-staking/manage-stake/manage-stake.css.ts" />
 declare module "@scom/scom-staking/manage-stake/manage-stake.css.ts" {

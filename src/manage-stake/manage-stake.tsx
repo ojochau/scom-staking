@@ -1,7 +1,8 @@
 import { moment, Button, Input, Container, HStack, customElements, ControlElement, Module, Label } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
 import { ITokenObject, IERC20ApprovalAction, limitInputNumber } from '../global/index';
-import { isWalletConnected, LockTokenType, setStakingStatus, getLockedTokenObject, getLockedTokenSymbol, tokenStore } from '../store/index';
+import { isWalletConnected, LockTokenType, setStakingStatus, getLockedTokenObject, getLockedTokenSymbol} from '../store/index';
+import { tokenStore } from '@scom/scom-token-list';
 import { Result } from '../common/index';
 import {
   lockToken,
@@ -214,6 +215,7 @@ export class ManageStake extends Module {
     }
     this.tokenMap = tokenStore.tokenMap;
     await this.initApprovalModelAction();
+    await this.ready();
     await this.renderStakingInfo(this.stakingInfo);
   }
 
