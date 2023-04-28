@@ -13709,7 +13709,7 @@ define("@scom/scom-staking/store/data/index.ts", ["require", "exports", "@scom/s
 define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/scom-staking/global/index.ts", "@scom/scom-token-list", "@scom/scom-staking/contracts/oswap-openswap-contract/index.ts", "@scom/scom-network-list", "@scom/scom-staking/store/data/index.ts", "@ijstech/components"], function (require, exports, eth_wallet_4, index_7, scom_token_list_1, index_8, scom_network_list_1, index_9, components_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.getNetworkName = exports.getNetworkExplorerName = exports.getStakingStatus = exports.setStakingStatus = exports.hasUserToken = exports.setUserTokens = exports.getTokenObject = exports.getWalletPluginProvider = exports.getWalletPluginMap = exports.setWalletPluginProvider = exports.state = exports.getTokenList = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getErc20 = exports.hasMetaMask = exports.getWalletProvider = exports.getChainId = exports.switchNetwork = exports.isWalletConnected = exports.setDataFromSCConfig = exports.getWETH = exports.getChainNativeToken = exports.getCurrentChainId = exports.setCurrentChainId = exports.getNetworkInfo = exports.getSiteSupportedNetworks = exports.getInfuraId = exports.getSupportedNetworks = exports.addUserTokens = exports.getUserTokens = exports.INFINITE = exports.nullAddress = exports.WalletPlugin = void 0;
+    exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.getNetworkName = exports.getNetworkExplorerName = exports.getStakingStatus = exports.setStakingStatus = exports.hasUserToken = exports.setUserTokens = exports.getTokenObject = exports.getWalletPluginProvider = exports.getWalletPluginMap = exports.setWalletPluginProvider = exports.state = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getErc20 = exports.hasMetaMask = exports.getWalletProvider = exports.getChainId = exports.switchNetwork = exports.isWalletConnected = exports.setDataFromSCConfig = exports.getWETH = exports.getChainNativeToken = exports.getCurrentChainId = exports.setCurrentChainId = exports.getNetworkInfo = exports.getSiteSupportedNetworks = exports.getInfuraId = exports.getSupportedNetworks = exports.addUserTokens = exports.getUserTokens = exports.INFINITE = exports.nullAddress = exports.WalletPlugin = void 0;
     __exportStar(index_9, exports);
     var WalletPlugin;
     (function (WalletPlugin) {
@@ -13926,15 +13926,6 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
         exports.state.transactionDeadline = value;
     };
     exports.setTransactionDeadline = setTransactionDeadline;
-    const getTokenList = (chainId) => {
-        const tokenList = [...scom_token_list_1.DefaultTokens[chainId]];
-        const userCustomTokens = exports.getUserTokens(chainId);
-        if (userCustomTokens) {
-            userCustomTokens.forEach(v => tokenList.push(Object.assign(Object.assign({}, v), { isNew: false, isCustom: true })));
-        }
-        return tokenList;
-    };
-    exports.getTokenList = getTokenList;
     exports.state = {
         siteEnv: index_7.SITE_ENV.TESTNET,
         networkMap: {},
@@ -14067,7 +14058,7 @@ define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-s
         else {
             tokenObject = tokenMap[address.toLowerCase()];
         }
-        return assets_1.default.fullPath(scom_token_list_2.assets.getTokenIconPath(tokenObject, utils_1.getChainId()));
+        return scom_token_list_2.assets.fullPath(scom_token_list_2.assets.getTokenIconPath(tokenObject, utils_1.getChainId()));
     };
     exports.getTokenIcon = getTokenIcon;
     const tokenSymbol = (address) => {
@@ -24080,15 +24071,14 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         const _lockedTokenIconPaths = index_27.getLockedTokenIconPaths(option, _lockedTokenObject, chainId, this.tokenMap);
                         const pathsLength = _lockedTokenIconPaths.length;
                         const rewardToken = this.getRewardToken(rewardsData[0].rewardTokenAddress);
-                        const rewardIconPath = scom_token_list_5.assets.getTokenIconPath(rewardToken, chainId);
                         stakingElms[optionIdx].appendChild(this.$render("i-vstack", { gap: 15, width: index_27.maxWidth, height: "100%", padding: { top: 10, bottom: 10, left: 20, right: 20 }, position: "relative" },
                             stickerSections[optionIdx],
                             this.$render("i-hstack", { gap: 10, width: "100%", verticalAlignment: "center" },
                                 this.$render("i-hstack", { gap: 10, width: "50%" },
                                     this.$render("i-hstack", { width: pathsLength === 1 ? 63.5 : 80, position: "relative", verticalAlignment: "center" },
-                                        this.$render("i-image", { width: 60, height: 60, url: assets_4.default.fullPath(rewardIconPath), fallbackUrl: index_27.fallBackUrl }),
+                                        this.$render("i-image", { width: 60, height: 60, url: scom_token_list_5.assets.tokenPath(rewardToken, chainId), fallbackUrl: index_27.fallBackUrl }),
                                         _lockedTokenIconPaths.map((v, idxImg) => {
-                                            return this.$render("i-image", { position: "absolute", width: 28, height: 28, bottom: 0, left: (idxImg * 20) + 35, url: assets_4.default.fullPath(v), fallbackUrl: index_27.fallBackUrl });
+                                            return this.$render("i-image", { position: "absolute", width: 28, height: 28, bottom: 0, left: (idxImg * 20) + 35, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_27.fallBackUrl });
                                         })),
                                     this.$render("i-vstack", { gap: 2, overflow: { x: 'hidden' }, verticalAlignment: "center" },
                                         this.$render("i-label", { visible: !!campaign.customName, caption: campaign.customName, font: { size: '20px', name: 'Montserrat Bold', color: colorCampaignText, bold: true }, class: "text-overflow" }),
@@ -24148,7 +24138,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                                         this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: colorText }),
                                         this.$render("i-label", { caption: `Get ${lockedTokenSymbol}`, font: { size: '13.6px', color: colorText } }),
                                         lockedTokenIconPaths.map((v) => {
-                                            return this.$render("i-image", { display: "flex", width: 15, height: 15, url: assets_4.default.fullPath(v), fallbackUrl: index_27.fallBackUrl });
+                                            return this.$render("i-image", { display: "flex", width: 15, height: 15, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_27.fallBackUrl });
                                         })),
                                     campaign.showContractLink ?
                                         this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => index_26.viewOnExplorerByAddress(chainId, option.address) },

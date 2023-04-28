@@ -839,17 +839,16 @@ export default class ScomStaking extends Module implements PageBlock {
 				const _lockedTokenIconPaths = getLockedTokenIconPaths(option, _lockedTokenObject, chainId, this.tokenMap);
 				const pathsLength = _lockedTokenIconPaths.length;
 				const rewardToken = this.getRewardToken(rewardsData[0].rewardTokenAddress);
-				const rewardIconPath = tokenAssets.getTokenIconPath(rewardToken, chainId);
 				stakingElms[optionIdx].appendChild(
 					<i-vstack gap={15} width={maxWidth} height="100%" padding={{ top: 10, bottom: 10, left: 20, right: 20 }} position="relative">
 						{stickerSections[optionIdx]}
 						<i-hstack gap={10} width="100%" verticalAlignment="center">
 							<i-hstack gap={10} width="50%">
 								<i-hstack width={pathsLength === 1 ? 63.5 : 80} position="relative" verticalAlignment="center">
-									<i-image width={60} height={60} url={Assets.fullPath(rewardIconPath)} fallbackUrl={fallBackUrl} />
+									<i-image width={60} height={60} url={tokenAssets.tokenPath(rewardToken, chainId)} fallbackUrl={fallBackUrl} />
 									{
 										_lockedTokenIconPaths.map((v: string, idxImg: number) => {
-											return <i-image position="absolute" width={28} height={28} bottom={0} left={(idxImg * 20) + 35} url={Assets.fullPath(v)} fallbackUrl={fallBackUrl} />
+											return <i-image position="absolute" width={28} height={28} bottom={0} left={(idxImg * 20) + 35} url={tokenAssets.fullPath(v)} fallbackUrl={fallBackUrl} />
 										})
 									}
 								</i-hstack>
@@ -929,7 +928,7 @@ export default class ScomStaking extends Module implements PageBlock {
 									<i-label caption={`Get ${lockedTokenSymbol}`} font={{ size: '13.6px', color: colorText }} />
 									{
 										lockedTokenIconPaths.map((v: any) => {
-											return <i-image display="flex" width={15} height={15} url={Assets.fullPath(v)} fallbackUrl={fallBackUrl} />
+											return <i-image display="flex" width={15} height={15} url={tokenAssets.fullPath(v)} fallbackUrl={fallBackUrl} />
 										})
 									}
 								</i-hstack >

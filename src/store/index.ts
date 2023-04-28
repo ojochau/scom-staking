@@ -16,7 +16,7 @@ export const getTokenIcon = (address: string) => {
   } else {
     tokenObject = tokenMap[address.toLowerCase()];
   }
-  return Assets.fullPath(tokenAssets.getTokenIconPath(tokenObject, getChainId()));
+  return tokenAssets.fullPath(tokenAssets.getTokenIconPath(tokenObject, getChainId()));
 }
 
 export const tokenSymbol = (address: string) => {

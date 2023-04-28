@@ -16,7 +16,8 @@
     "@scom/scom-staking": "*",
     "@ijstech/eth-contract": "*",
     "@ijstech/eth-wallet": "*",
-    "@scom/scom-dapp-container": "*"
+    "@scom/scom-dapp-container": "*",
+    "@scom/scom-token-list": "*"
   },
   "menus": [
     {

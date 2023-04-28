@@ -241,14 +241,14 @@ export const setTransactionDeadline = (value: any) => {
   state.transactionDeadline = value
 }
 
-export const getTokenList = (chainId: number) => {
-  const tokenList = [...DefaultTokens[chainId]];
-  const userCustomTokens: any[] = getUserTokens(chainId);
-  if (userCustomTokens) {
-    userCustomTokens.forEach(v => tokenList.push({ ...v, isNew: false, isCustom: true }));
-  }
-  return tokenList;
-}
+// export const getTokenList = (chainId: number) => {
+//   const tokenList = [...DefaultTokens[chainId]];
+//   const userCustomTokens: any[] = getUserTokens(chainId);
+//   if (userCustomTokens) {
+//     userCustomTokens.forEach(v => tokenList.push({ ...v, isNew: false, isCustom: true }));
+//   }
+//   return tokenList;
+// }
 
 export type ProxyAddresses = { [key: number]: string };
 

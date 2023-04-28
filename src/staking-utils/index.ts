@@ -319,7 +319,7 @@ const getVaultObject = async (vaultAddress: string) => {
     let name = await vault.name();
     let decimals = await vault.decimals();
     let tokenMap = tokenStore.tokenMap;
-    let assetToken = tokenMap[vaultAddress.toLowerCase()]
+    let assetToken: any = tokenMap[vaultAddress.toLowerCase()]
     return {
       address: vaultAddress.toLowerCase(),
       decimals,
