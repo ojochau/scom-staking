@@ -1,5 +1,4 @@
 /// <reference path="@ijstech/eth-contract/index.d.ts" />
-/// <reference path="@scom/scom-token-list/index.d.ts" />
 /// <amd-module name="@scom/scom-staking/assets.ts" />
 declare module "@scom/scom-staking/assets.ts" {
     function fullPath(path: string): string;
@@ -9972,7 +9971,6 @@ declare module "@scom/scom-staking/store/utils.ts" {
     export const setSlippageTolerance: (value: any) => void;
     export const getTransactionDeadline: () => any;
     export const setTransactionDeadline: (value: any) => void;
-    export const getTokenList: (chainId: number) => import("@scom/scom-token-list/interface.ts").ITokenObject[];
     export type ProxyAddresses = {
         [key: number]: string;
     };
@@ -15841,7 +15839,7 @@ declare module "@scom/scom-staking/staking-utils/index.ts" {
         decimals: BigNumber;
         name: string;
         symbol: string;
-        assetToken: import("@scom/scom-token-list/interface.ts").ITokenObject;
+        assetToken: any;
     } | {
         address?: undefined;
         decimals?: undefined;
