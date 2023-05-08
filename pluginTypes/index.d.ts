@@ -16014,8 +16014,8 @@ declare module "@scom/scom-staking/commissions/index.tsx" {
 }
 /// <amd-module name="@scom/scom-staking" />
 declare module "@scom/scom-staking" {
-    import { Module, Container, ControlElement, IDataSchema } from '@ijstech/components';
-    import { PageBlock, ISingleStakingCampaign } from "@scom/scom-staking/global/index.ts";
+    import { Module, Container, ControlElement } from '@ijstech/components';
+    import { ISingleStakingCampaign } from "@scom/scom-staking/global/index.ts";
     import StakingConfig from "@scom/scom-staking/commissions/index.tsx";
     interface ScomStakingElement extends ControlElement {
         data?: ISingleStakingCampaign;
@@ -16027,7 +16027,7 @@ declare module "@scom/scom-staking" {
             }
         }
     }
-    export default class ScomStaking extends Module implements PageBlock {
+    export default class ScomStaking extends Module {
         private _oldData;
         private _data;
         private oldTag;
@@ -16053,37 +16053,21 @@ declare module "@scom/scom-staking" {
         private dappContainer;
         private getPropertiesSchema;
         private getThemeSchema;
-        getEmbedderActions(): {
+        private getActions;
+        private _getActions;
+        getConfigurators(): ({
             name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => Promise<void>;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
-        }[];
-        getActions(): {
-            name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => Promise<void>;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
-        }[];
-        _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema): {
-            name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => Promise<void>;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
-        }[];
-        getConfigurators(): {
+            target: string;
+            getActions: any;
+            getData: any;
+            setData: any;
+            getTag: any;
+            setTag: any;
+            elementName?: undefined;
+            getLinkParams?: undefined;
+            setLinkParams?: undefined;
+            bindOnChanged?: undefined;
+        } | {
             name: string;
             target: string;
             elementName: string;
@@ -16092,11 +16076,16 @@ declare module "@scom/scom-staking" {
             };
             setLinkParams: (params: any) => Promise<void>;
             bindOnChanged: (element: StakingConfig, callback: (data: any) => Promise<void>) => void;
-        }[];
-        getData(): Promise<ISingleStakingCampaign>;
-        setData(value: any): Promise<void>;
-        getTag(): Promise<any>;
-        setTag(value: any): Promise<void>;
+            getData: any;
+            setData: any;
+            getTag: any;
+            setTag: any;
+            getActions?: undefined;
+        })[];
+        private getData;
+        private setData;
+        private getTag;
+        private setTag;
         edit(): Promise<void>;
         confirm(): Promise<void>;
         discard(): Promise<void>;
