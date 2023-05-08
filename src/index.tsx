@@ -6,7 +6,6 @@ import {
 	formatDate,
 	registerSendTxEvents,
 	TokenMapType,
-	PageBlock,
 	EventId,
 	viewOnExplorerByAddress,
 	downloadJsonFile,
@@ -49,7 +48,7 @@ declare global {
 
 @customModule
 @customElements('i-scom-staking')
-export default class ScomStaking extends Module implements PageBlock {
+export default class ScomStaking extends Module {
 	private _oldData: ISingleStakingCampaign;
 	private _data: ISingleStakingCampaign;
 	private oldTag: any = {};
@@ -114,15 +113,11 @@ export default class ScomStaking extends Module implements PageBlock {
 		return themeSchema as IDataSchema;
 	}
 
-	getEmbedderActions() {
-		return this._getActions(this.getPropertiesSchema(true), this.getThemeSchema(true));
-	}
-
-	getActions() {
+	private getActions() {
 		return this._getActions(this.getPropertiesSchema(), this.getThemeSchema());
 	}
 
-	_getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema) {
+	private _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema) {
 		const actions = [
 			{
 				name: 'Settings',
@@ -151,7 +146,7 @@ export default class ScomStaking extends Module implements PageBlock {
 					return {
 						execute: async () => {
 							if (!userInputData) return;
-							this.oldTag = { ...this.tag };
+							this.oldTag = JSON.parse(JSON.stringify(this.tag));
 							this.setTag(userInputData);
 							if (builder) builder.setTag(userInputData);
 						},
@@ -173,8 +168,17 @@ export default class ScomStaking extends Module implements PageBlock {
 		let self = this;
 		return [
 			{
-				name: 'Commissions',
-				target: 'Embedders',
+				name: 'Builder Configurator',
+        target: 'Builders',
+				getActions: this.getActions.bind(this),
+				getData: this.getData.bind(this),
+        setData: this.setData.bind(this),
+        getTag: this.getTag.bind(this),
+        setTag: this.setTag.bind(this)
+			},
+			{
+				name: 'Emdedder Configurator',
+        target: 'Embedders',
 				elementName: 'i-scom-staking-config',
 				getLinkParams: () => {
 					const commissions = this._data.commissions || [];
@@ -202,16 +206,20 @@ export default class ScomStaking extends Module implements PageBlock {
 						await this.setData(resultingData);
 						await callback(data);
 					}
-				}
+				},
+				getData: this.getData.bind(this),
+        setData: this.setData.bind(this),
+        getTag: this.getTag.bind(this),
+        setTag: this.setTag.bind(this)
 			}
 		]
 	}
 
-	async getData() {
+	private async getData() {
 		return this._data;
 	}
 
-	async setData(value: any) {
+	private async setData(value: any) {
 		// this._data = this.convertCampaignData(value);
 		this._data = value;
 		this.configDApp.data = value;
@@ -219,11 +227,11 @@ export default class ScomStaking extends Module implements PageBlock {
 		this.onSetupPage(isWalletConnected());
 	}
 
-	async getTag() {
+	private async getTag() {
 		return this.tag;
 	}
 
-	async setTag(value: any) {
+	private async setTag(value: any) {
 		this.tag = value;
 		if (this.stakingElm) {
 			this.renderCampaigns();
@@ -321,6 +329,12 @@ export default class ScomStaking extends Module implements PageBlock {
 	}
 
 	private onSetupPage = async (connected: boolean, hideLoading?: boolean) => {
+		const data: any = {
+			wallets: this._data.wallets ?? [],
+			networks: this._data.networks ?? [],
+			showHeader: this._data.showHeader ?? true
+		}
+		if (this.dappContainer?.setData) this.dappContainer.setData(data)
 		if (!hideLoading && this.loadingElm) {
 			this.loadingElm.visible = true;
 		}
@@ -328,13 +342,7 @@ export default class ScomStaking extends Module implements PageBlock {
 			await this.renderEmpty();
 			return;
 		}
-		const data: any = {
-			wallets: this._data.wallets ?? [],
-			networks: this._data.networks ?? [],
-			showHeader: this._data.showHeader ?? true
-		}
 		tokenStore.updateTokenMapData();
-		if (this.dappContainer?.setData) this.dappContainer.setData(data)
 		this.campaigns = await getAllCampaignsInfo({ [this._data.chainId]: this._data });
 		await this.renderCampaigns(hideLoading);
 		if (!hideLoading && this.loadingElm) {

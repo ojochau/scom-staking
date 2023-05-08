@@ -23617,6 +23617,13 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             };
             this.onSetupPage = async (connected, hideLoading) => {
                 var _a, _b, _c, _d;
+                const data = {
+                    wallets: (_a = this._data.wallets) !== null && _a !== void 0 ? _a : [],
+                    networks: (_b = this._data.networks) !== null && _b !== void 0 ? _b : [],
+                    showHeader: (_c = this._data.showHeader) !== null && _c !== void 0 ? _c : true
+                };
+                if ((_d = this.dappContainer) === null || _d === void 0 ? void 0 : _d.setData)
+                    this.dappContainer.setData(data);
                 if (!hideLoading && this.loadingElm) {
                     this.loadingElm.visible = true;
                 }
@@ -23624,14 +23631,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     await this.renderEmpty();
                     return;
                 }
-                const data = {
-                    wallets: (_a = this._data.wallets) !== null && _a !== void 0 ? _a : [],
-                    networks: (_b = this._data.networks) !== null && _b !== void 0 ? _b : [],
-                    showHeader: (_c = this._data.showHeader) !== null && _c !== void 0 ? _c : true
-                };
                 scom_token_list_5.tokenStore.updateTokenMapData();
-                if ((_d = this.dappContainer) === null || _d === void 0 ? void 0 : _d.setData)
-                    this.dappContainer.setData(data);
                 this.campaigns = await index_28.getAllCampaignsInfo({ [this._data.chainId]: this._data });
                 await this.renderCampaigns(hideLoading);
                 if (!hideLoading && this.loadingElm) {
@@ -24198,9 +24198,6 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             };
             return themeSchema;
         }
-        getEmbedderActions() {
-            return this._getActions(this.getPropertiesSchema(true), this.getThemeSchema(true));
-        }
         getActions() {
             return this._getActions(this.getPropertiesSchema(), this.getThemeSchema());
         }
@@ -24234,7 +24231,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             execute: async () => {
                                 if (!userInputData)
                                     return;
-                                this.oldTag = Object.assign({}, this.tag);
+                                this.oldTag = JSON.parse(JSON.stringify(this.tag));
                                 this.setTag(userInputData);
                                 if (builder)
                                     builder.setTag(userInputData);
@@ -24258,7 +24255,16 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             let self = this;
             return [
                 {
-                    name: 'Commissions',
+                    name: 'Builder Configurator',
+                    target: 'Builders',
+                    getActions: this.getActions.bind(this),
+                    getData: this.getData.bind(this),
+                    setData: this.setData.bind(this),
+                    getTag: this.getTag.bind(this),
+                    setTag: this.setTag.bind(this)
+                },
+                {
+                    name: 'Emdedder Configurator',
                     target: 'Embedders',
                     elementName: 'i-scom-staking-config',
                     getLinkParams: () => {
@@ -24281,7 +24287,11 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             await this.setData(resultingData);
                             await callback(data);
                         };
-                    }
+                    },
+                    getData: this.getData.bind(this),
+                    setData: this.setData.bind(this),
+                    getTag: this.getTag.bind(this),
+                    setTag: this.setTag.bind(this)
                 }
             ];
         }
