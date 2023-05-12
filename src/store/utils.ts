@@ -160,7 +160,7 @@ export const getWETH = (chainId: number): ITokenObject => {
   return wrappedToken;
 };
 
-export const setDataFromSCConfig = (options: any) => {
+export const setDataFromConfig = (options: any) => {
   if (options.infuraId) {
     setInfuraId(options.infuraId)
   }

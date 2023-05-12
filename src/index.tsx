@@ -12,9 +12,9 @@ import {
 	ISingleStakingCampaign,
 	LockTokenType
 } from './global/index';
-import { getChainId, isWalletConnected, getNetworkInfo, setDataFromSCConfig, setCurrentChainId, tokenSymbol, getStakingStatus, fallBackUrl, getLockedTokenObject, getLockedTokenSymbol, getLockedTokenIconPaths, getTokenUrl, isThemeApplied, maxHeight, maxWidth, getSingleStakingSchema } from './store/index';
+import { getChainId, isWalletConnected, getNetworkInfo, setDataFromConfig, setCurrentChainId, tokenSymbol, getStakingStatus, fallBackUrl, getLockedTokenObject, getLockedTokenSymbol, getLockedTokenIconPaths, getTokenUrl, isThemeApplied, maxHeight, maxWidth, getSingleStakingSchema } from './store/index';
 import { tokenStore, assets as tokenAssets } from '@scom/scom-token-list';
-import scconfig from './scconfig.json';
+import configData from './data.json';
 
 import {
 	getStakingTotalLocked,
@@ -49,9 +49,7 @@ declare global {
 @customModule
 @customElements('i-scom-staking')
 export default class ScomStaking extends Module {
-	private _oldData: ISingleStakingCampaign;
 	private _data: ISingleStakingCampaign;
-	private oldTag: any = {};
 	tag: any = {};
 	defaultEdit: boolean = true;
 	readonly onEdit: () => Promise<void>;
@@ -62,7 +60,6 @@ export default class ScomStaking extends Module {
 	private loadingElm: Panel;
 	private campaigns: any = [];
 	private stakingComponent: Panel;
-	private stakingLayout: Panel;
 	private stakingElm: Panel;
 	private noCampaignSection: Panel;
 	private stakingResult: Result;
@@ -71,7 +68,6 @@ export default class ScomStaking extends Module {
 	private listActiveTimer: any = [];
 	private tokenMap: TokenMapType = {};
 	private configDApp: StakingConfig;
-	private contractAddress: string;
 	private dappContainer: ScomDappContainer;
 
 	private getPropertiesSchema(readOnly?: boolean) {
@@ -113,26 +109,40 @@ export default class ScomStaking extends Module {
 		return themeSchema as IDataSchema;
 	}
 
-	private getActions() {
-		return this._getActions(this.getPropertiesSchema(), this.getThemeSchema());
-	}
-
 	private _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema) {
 		const actions = [
 			{
 				name: 'Settings',
 				icon: 'cog',
 				command: (builder: any, userInputData: any) => {
+					let _oldData: ISingleStakingCampaign = {
+						chainId: 0,
+						customName: '',
+						stakings: undefined,
+						wallets: [],
+						networks: []
+					};
 					return {
 						execute: async () => {
-							this._oldData = { ...this._data };
+							_oldData = {...this._data};
+							if (userInputData?.chainId !== undefined) this._data.chainId = userInputData.chainId;
+							if (userInputData?.customName !== undefined) this._data.customName = userInputData.customName;
+							if (userInputData?.customDesc !== undefined) this._data.customDesc = userInputData.customDesc;
+							if (userInputData?.customLogo !== undefined) this._data.customLogo = userInputData.customLogo;
+							if (userInputData?.getTokenURL !== undefined) this._data.getTokenURL = userInputData.getTokenURL;
+							if (userInputData?.showContractLink !== undefined) this._data.showContractLink = userInputData.showContractLink;
+							if (userInputData?.stakings !== undefined) this._data.stakings = userInputData.stakings;
+							setCurrentChainId(this._data.chainId);
 							this.configDApp.data = this._data;
 							this.updateStaking();
+							if (builder?.setData) builder.setData(this._data);
 						},
-						undo: () => {
-							this._data = { ...this._oldData };
+						undo: async () => {
+							this._data = { ..._oldData };
+							setCurrentChainId(this._data.chainId);
 							this.configDApp.data = this._data;
 							this.updateStaking();
+							if (builder?.setData) builder.setData(this._data);
 						},
 						redo: () => { }
 					}
@@ -140,26 +150,30 @@ export default class ScomStaking extends Module {
 				userInputDataSchema: propertiesSchema
 			},
 			{
-				name: 'Theme Settings',
-				icon: 'palette',
-				command: (builder: any, userInputData: any) => {
-					return {
-						execute: async () => {
-							if (!userInputData) return;
-							this.oldTag = JSON.parse(JSON.stringify(this.tag));
-							this.setTag(userInputData);
-							if (builder) builder.setTag(userInputData);
-						},
-						undo: () => {
-							if (!userInputData) return;
-							this.setTag(this.oldTag);
-							if (builder) builder.setTag(this.oldTag);
-						},
-						redo: () => { }
-					}
-				},
-				userInputDataSchema: themeSchema
-			}
+        name: 'Theme Settings',
+        icon: 'palette',
+        command: (builder: any, userInputData: any) => {
+          let oldTag = {};
+          return {
+            execute: async () => {
+              if (!userInputData) return;
+              oldTag = JSON.parse(JSON.stringify(this.tag));
+              if (builder) builder.setTag(userInputData);
+              else this.setTag(userInputData);
+							if (this.dappContainer) this.dappContainer.setTag(userInputData);
+            },
+            undo: () => {
+              if (!userInputData) return;
+              this.tag = JSON.parse(JSON.stringify(oldTag));
+              if (builder) builder.setTag(this.tag);
+              else this.setTag(this.tag);
+							if (this.dappContainer) this.dappContainer.setTag(userInputData);
+            },
+            redo: () => { }
+          }
+        },
+        userInputDataSchema: themeSchema
+      }
 		]
 		return actions;
 	}
@@ -170,9 +184,14 @@ export default class ScomStaking extends Module {
 			{
 				name: 'Builder Configurator',
         target: 'Builders',
-				getActions: this.getActions.bind(this),
+				getActions: () => {
+					return this._getActions(this.getPropertiesSchema(), this.getThemeSchema());
+				},
 				getData: this.getData.bind(this),
-        setData: this.setData.bind(this),
+        setData: async (data: any) => {
+          const defaultData = configData.defaultBuilderData;
+					await this.setData({...defaultData, ...data});
+				},
         getTag: this.getTag.bind(this),
         setTag: this.setTag.bind(this)
 			},
@@ -223,6 +242,12 @@ export default class ScomStaking extends Module {
 		// this._data = this.convertCampaignData(value);
 		this._data = value;
 		this.configDApp.data = value;
+		const data: any = {
+			wallets: this._data.wallets ?? [],
+			networks: this._data.networks ?? [],
+			showHeader: this._data.showHeader ?? true
+		}
+		if (this.dappContainer?.setData) this.dappContainer.setData(data)
 		// TODO - update proxy address
 		this.onSetupPage(isWalletConnected());
 	}
@@ -232,19 +257,16 @@ export default class ScomStaking extends Module {
 	}
 
 	private async setTag(value: any) {
-		this.tag = value;
+		const newValue = value || {};
+    for (let prop in newValue) {
+      if (newValue.hasOwnProperty(prop)) {
+        this.tag[prop] = newValue[prop];
+      }
+    }
 		if (this.stakingElm) {
 			this.renderCampaigns();
 		}
 	}
-
-	async edit() { }
-
-	async confirm() { }
-
-	async discard() { }
-
-	async config() { }
 
 	// private convertCampaignData(data: ISingleStakingCampaign) {
 	// 	if (data) {
@@ -283,7 +305,7 @@ export default class ScomStaking extends Module {
 
 	constructor(parent?: Container, options?: ControlElement) {
 		super(parent, options);
-		setDataFromSCConfig(scconfig);
+		if (configData) setDataFromConfig(configData);
 		this.$eventBus = application.EventBus;
 		this.registerEvent();
 	}
@@ -329,12 +351,6 @@ export default class ScomStaking extends Module {
 	}
 
 	private onSetupPage = async (connected: boolean, hideLoading?: boolean) => {
-		const data: any = {
-			wallets: this._data.wallets ?? [],
-			networks: this._data.networks ?? [],
-			showHeader: this._data.showHeader ?? true
-		}
-		if (this.dappContainer?.setData) this.dappContainer.setData(data)
 		if (!hideLoading && this.loadingElm) {
 			this.loadingElm.visible = true;
 		}
@@ -560,6 +576,7 @@ export default class ScomStaking extends Module {
 		for (let idx = 0; idx < campaigns.length; idx++) {
 			const campaign = this.campaigns[idx];
 			const _tag = this.tag || {};
+			console.log(isThemeApplied, _tag.customColorCampaign)
 			const colorCampaignText = isThemeApplied ? _tag.customColorCampaign || '#f15e61' : '#f15e61';
 			const colorCampaignBackground = isThemeApplied ? _tag.customColorBackground || '#ffffff26' : '#ffffff26';
 			const colorButton = isThemeApplied ? _tag.customColorButton : undefined;
@@ -763,7 +780,7 @@ export default class ScomStaking extends Module {
 
 				const isClaim = option.mode === 'Claim';
 
-				const rewardsData = [option.rewardsData[0]];
+				const rewardsData = option.rewardsData[0] ? [option.rewardsData[0]] : [];
 				const rewardOptions = !isClaim ? rewardsData : [];
 				let aprInfo: any = {};
 
@@ -846,7 +863,7 @@ export default class ScomStaking extends Module {
 				const _lockedTokenObject = getLockedTokenObject(option, option.tokenInfo, this.tokenMap);
 				const _lockedTokenIconPaths = getLockedTokenIconPaths(option, _lockedTokenObject, chainId, this.tokenMap);
 				const pathsLength = _lockedTokenIconPaths.length;
-				const rewardToken = this.getRewardToken(rewardsData[0].rewardTokenAddress);
+				const rewardToken = rewardsData?.length ? this.getRewardToken(rewardsData[0].rewardTokenAddress) : null;
 				stakingElms[optionIdx].appendChild(
 					<i-vstack gap={15} width={maxWidth} height="100%" padding={{ top: 10, bottom: 10, left: 20, right: 20 }} position="relative">
 						{stickerSections[optionIdx]}

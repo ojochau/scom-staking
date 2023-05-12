@@ -9958,7 +9958,7 @@ declare module "@scom/scom-staking/store/utils.ts" {
     export const getCurrentChainId: () => number;
     export const getChainNativeToken: (chainId: number) => ITokenObject;
     export const getWETH: (chainId: number) => ITokenObject;
-    export const setDataFromSCConfig: (options: any) => void;
+    export const setDataFromConfig: (options: any) => void;
     export function isWalletConnected(): boolean;
     export function switchNetwork(chainId: number): Promise<void>;
     export function getChainId(): number;
@@ -10042,8 +10042,8 @@ declare module "@scom/scom-staking/store/index.ts" {
     export const maxHeight = "321px";
     export * from "@scom/scom-staking/store/utils.ts";
 }
-/// <amd-module name="@scom/scom-staking/scconfig.json.ts" />
-declare module "@scom/scom-staking/scconfig.json.ts" {
+/// <amd-module name="@scom/scom-staking/data.json.ts" />
+declare module "@scom/scom-staking/data.json.ts" {
     const _default_49: {
         infuraId: string;
         networks: ({
@@ -10071,6 +10071,27 @@ declare module "@scom/scom-staking/scconfig.json.ts" {
         };
         ipfsGatewayUrl: string;
         embedderCommissionFee: string;
+        defaultBuilderData: {
+            defaultChainId: number;
+            chainId: number;
+            customName: string;
+            customDesc: string;
+            showContractLink: boolean;
+            stakings: {
+                address: string;
+                lockTokenType: number;
+                rewards: {
+                    address: string;
+                    isCommonStartDate: boolean;
+                };
+            };
+            networks: {
+                chainId: number;
+            }[];
+            wallets: {
+                name: string;
+            }[];
+        };
     };
     export default _default_49;
 }
@@ -16014,7 +16035,7 @@ declare module "@scom/scom-staking/commissions/index.tsx" {
 }
 /// <amd-module name="@scom/scom-staking" />
 declare module "@scom/scom-staking" {
-    import { Module, Container, ControlElement } from '@ijstech/components';
+    import { Module, Container, ControlElement, IDataSchema } from '@ijstech/components';
     import { ISingleStakingCampaign } from "@scom/scom-staking/global/index.ts";
     import StakingConfig from "@scom/scom-staking/commissions/index.tsx";
     interface ScomStakingElement extends ControlElement {
@@ -16028,9 +16049,7 @@ declare module "@scom/scom-staking" {
         }
     }
     export default class ScomStaking extends Module {
-        private _oldData;
         private _data;
-        private oldTag;
         tag: any;
         defaultEdit: boolean;
         readonly onEdit: () => Promise<void>;
@@ -16040,7 +16059,6 @@ declare module "@scom/scom-staking" {
         private loadingElm;
         private campaigns;
         private stakingComponent;
-        private stakingLayout;
         private stakingElm;
         private noCampaignSection;
         private stakingResult;
@@ -16049,18 +16067,25 @@ declare module "@scom/scom-staking" {
         private listActiveTimer;
         private tokenMap;
         private configDApp;
-        private contractAddress;
         private dappContainer;
         private getPropertiesSchema;
         private getThemeSchema;
-        private getActions;
         private _getActions;
         getConfigurators(): ({
             name: string;
             target: string;
-            getActions: any;
+            getActions: () => {
+                name: string;
+                icon: string;
+                command: (builder: any, userInputData: any) => {
+                    execute: () => Promise<void>;
+                    undo: () => void;
+                    redo: () => void;
+                };
+                userInputDataSchema: IDataSchema;
+            }[];
             getData: any;
-            setData: any;
+            setData: (data: any) => Promise<void>;
             getTag: any;
             setTag: any;
             elementName?: undefined;
@@ -16086,10 +16111,6 @@ declare module "@scom/scom-staking" {
         private setData;
         private getTag;
         private setTag;
-        edit(): Promise<void>;
-        confirm(): Promise<void>;
-        discard(): Promise<void>;
-        config(): Promise<void>;
         constructor(parent?: Container, options?: ControlElement);
         private registerEvent;
         private onWalletConnect;
