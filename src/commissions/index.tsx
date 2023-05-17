@@ -15,21 +15,29 @@ import {
   HStack
 } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
-// import ScomNetworkPicker from './network-picker';
 import ScomNetworkPicker from '@scom/scom-network-picker';
 import { getEmbedderCommissionFee, getNetworkInfo, getSupportedNetworks } from '../store/index';
 import { IExtendedNetwork, formatNumber, isWalletAddress, ICommissionInfo, IEmbedData } from '../global/index';
 import { customStyle, tableStyle } from './index.css'
-import assets from '../assets';
 const Theme = Styles.Theme.ThemeVars;
+
+export interface ISupportedNetworks {
+  chainId: number;
+}
+
+interface ScomStakingConfigElement extends ControlElement {
+  commissions?: ICommissionInfo;
+}
 
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      ['i-scom-staking-config']: ControlElement;
+      ['i-scom-staking-config']: ScomStakingConfigElement;
     }
   }
 }
+
+const CommissionFeeTooltipText = "For each transaction, you'll receive a 1% commission fee based on the total amount. This fee will be transferred to a designated commission contract within the corresponding blockchain network.";
 
 @customModule
 @customElements("i-scom-staking-config")
@@ -142,9 +150,12 @@ export default class StakingConfig extends Module {
 
   async init() {
     super.init();
-    this.commissionInfoList = [];
     const embedderFee = getEmbedderCommissionFee();
     this.lbCommissionShare.caption = `${formatNumber(new BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
+    const commissions = this.getAttribute('commissions', true, []);
+    this.commissionInfoList = commissions;
+    this.tableCommissions.data = commissions;
+    this.toggleVisible();
   }
 
   get data(): IEmbedData {
@@ -253,7 +264,7 @@ export default class StakingConfig extends Module {
             <i-hstack gap="4px">
               <i-label caption="Commission Fee: " opacity={0.6} font={{ size: '1rem' }}></i-label>
               <i-label id="lbCommissionShare" font={{ size: '1rem' }}></i-label>
-              <i-icon name="question-circle" fill={Theme.background.modal} width={20} height={20}></i-icon>
+              <i-icon name="question-circle" fill={Theme.background.modal} width={20} height={20} tooltip={{ content: CommissionFeeTooltipText }}></i-icon>
             </i-hstack>
             <i-button
               id="btnAddWallet"
