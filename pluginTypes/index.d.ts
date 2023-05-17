@@ -15994,11 +15994,17 @@ declare module "@scom/scom-staking/commissions/index.css.ts" {
 /// <amd-module name="@scom/scom-staking/commissions/index.tsx" />
 declare module "@scom/scom-staking/commissions/index.tsx" {
     import { Module, ControlElement } from '@ijstech/components';
-    import { IExtendedNetwork, IEmbedData } from "@scom/scom-staking/global/index.ts";
+    import { IExtendedNetwork, ICommissionInfo, IEmbedData } from "@scom/scom-staking/global/index.ts";
+    export interface ISupportedNetworks {
+        chainId: number;
+    }
+    interface ScomStakingConfigElement extends ControlElement {
+        commissions?: ICommissionInfo;
+    }
     global {
         namespace JSX {
             interface IntrinsicElements {
-                ['i-scom-staking-config']: ControlElement;
+                ['i-scom-staking-config']: ScomStakingConfigElement;
             }
         }
     }
