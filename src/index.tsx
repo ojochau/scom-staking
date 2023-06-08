@@ -487,6 +487,12 @@ export default class ScomStaking extends Module {
 	async init() {
 		this.isReadyCallbackQueued = true;
 		super.init();
+    this.setTag({
+			customColorCampaign: '#f15e61',
+      customColorBackground: '#ffffff26',
+      customColorText: '#ffffff',
+			customColorTimeBackground: '#F15E61'
+		});
 		this.stakingResult = new Result();
 		this.stakingComponent.appendChild(this.stakingResult);
 		this.stakingResult.visible = false;
