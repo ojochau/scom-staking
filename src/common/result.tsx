@@ -1,14 +1,15 @@
-import { customElements, Module, ControlElement, Modal, Panel, Label, Image, Button, Container, VStack } from '@ijstech/components';
+import { customElements, Module, ControlElement, Modal, Panel, Label, Image, Button, Container, VStack, Styles } from '@ijstech/components';
 import { Wallet } from '@ijstech/eth-wallet';
 import { parseContractError, viewOnExplorerByTxHash } from '../global/index';
 import { getNetworkExplorerName } from '../store/index';
 import styleClass from './result.css';
 import Assets from '../assets';
+const Theme = Styles.Theme.ThemeVars;
 
 declare global {
 	namespace JSX {
 		interface IntrinsicElements {
-			['staking-result']: ControlElement;
+			['i-scom-staking-result']: ControlElement;
 		}
 	}
 };
@@ -167,10 +168,11 @@ export class Result extends Module {
 
       const button = new Button(mainSection, {
         width: '100%',
-        caption: 'Close'
+        caption: 'Close',
+        // font: { color: Theme.colors.primary.contrastText }
+        font: { color: '#fff' }
       });
       button.classList.add('btn-os');
-      button.classList.add('btn-approve');
       button.classList.add('mt-1');
       button.onClick = () => this.closeModal();
       mainSection.appendChild(button);
@@ -199,10 +201,11 @@ export class Result extends Module {
 
       const button = new Button(mainSection, {
         width: '100%',
-        caption: 'Cancel'
+        caption: 'Cancel',
+        // font: { color: Theme.colors.primary.contrastText }
+        font: { color: '#fff' }
       });
       button.classList.add('btn-os');
-      button.classList.add('btn-approve');
       button.classList.add('mt-1');
       button.onClick = () => this.closeModal();
       mainSection.appendChild(button);

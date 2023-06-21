@@ -1,17 +1,20 @@
 import { Styles } from '@ijstech/components';
+const Theme = Styles.Theme.ThemeVars;
 
 export default Styles.style({
   textAlign: 'center',
   $nest: {
     'i-label > *': {
-      color: '#fff',
+      // color: Theme.text.primary,
       fontSize: '.875rem',
       wordBreak: 'normal'
     },
     '.modal': {
       minWidth: '25%',
       maxWidth: '100%',
-      width: 455
+      width: 455,
+      background: Theme.background.modal,
+      borderRadius: 12
     },
     '.i-modal-close svg': {
       fill: '#F05E61'
@@ -51,6 +54,14 @@ export default Styles.style({
       padding: '.35rem 2.438rem',
       borderRadius: 5,
       background: '#2B304A 0% 0% no-repeat padding-box'
+    },
+    '.btn-os': {
+      background: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
+      fontFamily: 'Raleway Bold',
+      fontSize: '1rem',
+      fontWeight: 'bold',
+      color: '#fff'
+      // color: Theme.colors.primary.contrastText
     }
   }
 })

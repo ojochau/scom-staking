@@ -44,7 +44,8 @@ export default class Module1 extends Module {
                         {
                           "name": "metamask"
                         }
-                    ]
+                    ],
+                    defaultChainId: 43113
                 }} />
             </i-hstack>
         </i-panel>

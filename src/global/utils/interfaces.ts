@@ -26,7 +26,8 @@ export interface ISingleStakingCampaign {
   commissions?: ICommissionInfo[],
   wallets: IWalletPlugin[],
   networks: INetworkConfig[],
-  showHeader?: boolean
+  showHeader?: boolean,
+  defaultChainId?: number
 }
 
 export interface ISingleStaking {

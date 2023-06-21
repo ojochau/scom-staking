@@ -1,7 +1,7 @@
-import { moment, Button, Input, Container, HStack, customElements, ControlElement, Module, Label } from '@ijstech/components';
+import { moment, Button, Input, Container, HStack, customElements, ControlElement, Module, Label, Styles } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
 import { ITokenObject, IERC20ApprovalAction, limitInputNumber } from '../global/index';
-import { isWalletConnected, LockTokenType, setStakingStatus, getLockedTokenObject, getLockedTokenSymbol} from '../store/index';
+import { isWalletConnected, LockTokenType, setStakingStatus, getLockedTokenObject, getLockedTokenSymbol } from '../store/index';
 import { tokenStore } from '@scom/scom-token-list';
 import { Result } from '../common/index';
 import {
@@ -16,7 +16,7 @@ import {
 } from '../staking-utils/index';
 import { stakingManageStakeStyle } from './manage-stake.css';
 
-const isThemeApplied = false;
+const Theme = Styles.Theme.ThemeVars;
 
 enum CurrentMode {
   STAKE,
@@ -131,13 +131,6 @@ export class ManageStake extends Module {
       }
       return;
     };
-    const colorButton = isThemeApplied ? info.customColorButton : undefined;
-    const colorText = isThemeApplied ? info.customColorText || '#fff' : '#fff';
-    this.btnApprove.background = { color: `${colorButton} !important` };
-    this.btnStake.background = { color: `${colorButton} !important` };
-    this.btnUnstake.background = { color: `${colorButton} !important` };
-    this.btnMax.background = { color: `${colorButton} !important` };
-    this.lbToken.font = { color: colorText };
     this.btnStake.id = `btn-stake-${this.address}`;
     this.btnUnstake.id = `btn-unstake-${this.address}`;
     this.inputAmount.id = `input-${this.address}`;
@@ -360,7 +353,7 @@ export class ManageStake extends Module {
     return (
       <i-panel class={stakingManageStakeStyle}>
         <i-hstack gap={10} verticalAlignment="center" horizontalAlignment="center">
-          <i-hstack id="wrapperInputAmount" gap={4} width={280} height={36} padding={{ right: 8 }} background={{ color: '#232B5A' }} border={{ radius: 8 }} verticalAlignment="center" horizontalAlignment="space-between">
+          <i-hstack id="wrapperInputAmount" gap={4} width={280} height={36} padding={{ right: 8 }} background={{ color: Theme.input.background }} border={{ radius: 8 }} verticalAlignment="center" horizontalAlignment="space-between">
             <i-input
               id="inputAmount"
               inputType="number"
@@ -375,12 +368,14 @@ export class ManageStake extends Module {
                 id="btnMax"
                 caption="Max"
                 enabled={false}
+                // background={{ color: `${Theme.colors.primary.main} !important` }}
+                // font={{ color: Theme.colors.primary.contrastText }}
                 class="btn-os"
                 width={45}
                 minHeight={25}
                 onClick={() => this.setMaxBalance()}
               />
-              <i-label id="lbToken" font={{ size: '14px' }} class="opacity-50" />
+              <i-label id="lbToken" font={{ size: '14px', color: Theme.input.fontColor }} class="opacity-50" />
             </i-hstack>
           </i-hstack>
           <i-hstack gap={10} width="calc(100% - 290px)">
@@ -393,6 +388,9 @@ export class ManageStake extends Module {
               minHeight={36}
               border={{ radius: 12 }}
               rightIcon={{ spin: true, visible: false, fill: '#fff' }}
+              // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
+              // background={{ color: `${Theme.colors.primary.main} !important` }}
+              // font={{ color: Theme.colors.primary.contrastText }}
               class="btn-os"
               onClick={() => this.onApproveToken()}
             />
@@ -404,6 +402,9 @@ export class ManageStake extends Module {
               minHeight={36}
               border={{ radius: 12 }}
               rightIcon={{ spin: true, visible: false, fill: '#fff' }}
+              // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
+              // background={{ color: `${Theme.colors.primary.main} !important` }}
+              // font={{ color: Theme.colors.primary.contrastText }}
               class="btn-os"
               onClick={() => this.onStake()}
             />
@@ -415,6 +416,9 @@ export class ManageStake extends Module {
               minHeight={36}
               border={{ radius: 12 }}
               rightIcon={{ spin: true, visible: false, fill: '#fff' }}
+              // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
+              // background={{ color: `${Theme.colors.primary.main} !important` }}
+              // font={{ color: Theme.colors.primary.contrastText }}
               class="btn-os"
               onClick={() => this.onUnstake()}
             />

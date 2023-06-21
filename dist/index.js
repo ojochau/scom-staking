@@ -1,6 +1,10 @@
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -236,8 +240,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/OpenSwap.
             });
         }
     }
-    exports.OpenSwap = OpenSwap;
     OpenSwap._abi = OpenSwap_json_1.default.abi;
+    exports.OpenSwap = OpenSwap;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_ERC20.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -429,8 +433,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP
             });
         }
     }
-    exports.OSWAP_ERC20 = OSWAP_ERC20;
     OSWAP_ERC20._abi = OSWAP_ERC20_json_1.default.abi;
+    exports.OSWAP_ERC20 = OSWAP_ERC20;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Factory.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -707,8 +711,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP
             });
         }
     }
-    exports.OSWAP_Factory = OSWAP_Factory;
     OSWAP_Factory._abi = OSWAP_Factory_json_1.default.abi;
+    exports.OSWAP_Factory = OSWAP_Factory;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Pair.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -1220,8 +1224,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP
             });
         }
     }
-    exports.OSWAP_Pair = OSWAP_Pair;
     OSWAP_Pair._abi = OSWAP_Pair_json_1.default.abi;
+    exports.OSWAP_Pair = OSWAP_Pair;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_PairCreator.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -1265,8 +1269,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP
             });
         }
     }
-    exports.OSWAP_PairCreator = OSWAP_PairCreator;
     OSWAP_PairCreator._abi = OSWAP_PairCreator_json_1.default.abi;
+    exports.OSWAP_PairCreator = OSWAP_PairCreator;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Router.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -1678,8 +1682,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP
             });
         }
     }
-    exports.OSWAP_Router = OSWAP_Router;
     OSWAP_Router._abi = OSWAP_Router_json_1.default.abi;
+    exports.OSWAP_Router = OSWAP_Router;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_VotingExecutor1.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -1736,8 +1740,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP
             });
         }
     }
-    exports.OSWAP_VotingExecutor1 = OSWAP_VotingExecutor1;
     OSWAP_VotingExecutor1._abi = OSWAP_VotingExecutor1_json_1.default.abi;
+    exports.OSWAP_VotingExecutor1 = OSWAP_VotingExecutor1;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_FactoryBase.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -1911,8 +1915,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/O
             });
         }
     }
-    exports.OSWAP_FactoryBase = OSWAP_FactoryBase;
     OSWAP_FactoryBase._abi = OSWAP_FactoryBase_json_1.default.abi;
+    exports.OSWAP_FactoryBase = OSWAP_FactoryBase;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausableFactory.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -2029,8 +2033,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/O
             });
         }
     }
-    exports.OSWAP_PausableFactory = OSWAP_PausableFactory;
     OSWAP_PausableFactory._abi = OSWAP_PausableFactory_json_1.default.abi;
+    exports.OSWAP_PausableFactory = OSWAP_PausableFactory;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausablePair.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -2087,8 +2091,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/O
             });
         }
     }
-    exports.OSWAP_PausablePair = OSWAP_PausablePair;
     OSWAP_PausablePair._abi = OSWAP_PausablePair_json_1.default.abi;
+    exports.OSWAP_PausablePair = OSWAP_PausablePair;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Administrator.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -2537,8 +2541,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDE
             });
         }
     }
-    exports.OAXDEX_Administrator = OAXDEX_Administrator;
     OAXDEX_Administrator._abi = OAXDEX_Administrator_json_1.default.abi;
+    exports.OAXDEX_Administrator = OAXDEX_Administrator;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Governance.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -3221,8 +3225,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDE
             });
         }
     }
-    exports.OAXDEX_Governance = OAXDEX_Governance;
     OAXDEX_Governance._abi = OAXDEX_Governance_json_1.default.abi;
+    exports.OAXDEX_Governance = OAXDEX_Governance;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingContract.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -3468,8 +3472,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDE
             });
         }
     }
-    exports.OAXDEX_VotingContract = OAXDEX_VotingContract;
     OAXDEX_VotingContract._abi = OAXDEX_VotingContract_json_1.default.abi;
+    exports.OAXDEX_VotingContract = OAXDEX_VotingContract;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingExecutor.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -3526,8 +3530,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDE
             });
         }
     }
-    exports.OAXDEX_VotingExecutor = OAXDEX_VotingExecutor;
     OAXDEX_VotingExecutor._abi = OAXDEX_VotingExecutor_json_1.default.abi;
+    exports.OAXDEX_VotingExecutor = OAXDEX_VotingExecutor;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingRegistry.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -3579,8 +3583,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDE
             });
         }
     }
-    exports.OAXDEX_VotingRegistry = OAXDEX_VotingRegistry;
     OAXDEX_VotingRegistry._abi = OAXDEX_VotingRegistry_json_1.default.abi;
+    exports.OAXDEX_VotingRegistry = OAXDEX_VotingRegistry;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/libraries/ERC20.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -3761,8 +3765,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/libraries
             });
         }
     }
-    exports.ERC20 = ERC20;
     ERC20._abi = ERC20_json_1.default.abi;
+    exports.ERC20 = ERC20;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_CertiKSecurityOracle.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -3802,8 +3806,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OS
             this.oracleAddress = oracleAddress_call;
         }
     }
-    exports.OSWAP_CertiKSecurityOracle = OSWAP_CertiKSecurityOracle;
     OSWAP_CertiKSecurityOracle._abi = OSWAP_CertiKSecurityOracle_json_1.default.abi;
+    exports.OSWAP_CertiKSecurityOracle = OSWAP_CertiKSecurityOracle;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleFactory.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -4402,8 +4406,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OS
             });
         }
     }
-    exports.OSWAP_OracleFactory = OSWAP_OracleFactory;
     OSWAP_OracleFactory._abi = OSWAP_OracleFactory_json_1.default.abi;
+    exports.OSWAP_OracleFactory = OSWAP_OracleFactory;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleLiquidityProvider.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -4564,8 +4568,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OS
             });
         }
     }
-    exports.OSWAP_OracleLiquidityProvider = OSWAP_OracleLiquidityProvider;
     OSWAP_OracleLiquidityProvider._abi = OSWAP_OracleLiquidityProvider_json_1.default.abi;
+    exports.OSWAP_OracleLiquidityProvider = OSWAP_OracleLiquidityProvider;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePair.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -5215,8 +5219,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OS
             });
         }
     }
-    exports.OSWAP_OraclePair = OSWAP_OraclePair;
     OSWAP_OraclePair._abi = OSWAP_OraclePair_json_1.default.abi;
+    exports.OSWAP_OraclePair = OSWAP_OraclePair;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePairCreator.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -5260,8 +5264,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OS
             });
         }
     }
-    exports.OSWAP_OraclePairCreator = OSWAP_OraclePairCreator;
     OSWAP_OraclePairCreator._abi = OSWAP_OraclePairCreator_json_1.default.abi;
+    exports.OSWAP_OraclePairCreator = OSWAP_OraclePairCreator;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_VotingExecutor2.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -5318,8 +5322,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OS
             });
         }
     }
-    exports.OSWAP_VotingExecutor2 = OSWAP_VotingExecutor2;
     OSWAP_VotingExecutor2._abi = OSWAP_VotingExecutor2_json_1.default.abi;
+    exports.OSWAP_VotingExecutor2 = OSWAP_VotingExecutor2;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeFactory.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -5706,8 +5710,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSW
             });
         }
     }
-    exports.OSWAP_RangeFactory = OSWAP_RangeFactory;
     OSWAP_RangeFactory._abi = OSWAP_RangeFactory_json_1.default.abi;
+    exports.OSWAP_RangeFactory = OSWAP_RangeFactory;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeLiquidityProvider.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -5886,8 +5890,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSW
             });
         }
     }
-    exports.OSWAP_RangeLiquidityProvider = OSWAP_RangeLiquidityProvider;
     OSWAP_RangeLiquidityProvider._abi = OSWAP_RangeLiquidityProvider_json_1.default.abi;
+    exports.OSWAP_RangeLiquidityProvider = OSWAP_RangeLiquidityProvider;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePair.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -6431,8 +6435,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSW
             });
         }
     }
-    exports.OSWAP_RangePair = OSWAP_RangePair;
     OSWAP_RangePair._abi = OSWAP_RangePair_json_1.default.abi;
+    exports.OSWAP_RangePair = OSWAP_RangePair;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePairCreator.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -6476,8 +6480,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSW
             });
         }
     }
-    exports.OSWAP_RangePairCreator = OSWAP_RangePairCreator;
     OSWAP_RangePairCreator._abi = OSWAP_RangePairCreator_json_1.default.abi;
+    exports.OSWAP_RangePairCreator = OSWAP_RangePairCreator;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_VotingExecutor3.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -6540,8 +6544,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSW
             });
         }
     }
-    exports.OSWAP_VotingExecutor3 = OSWAP_VotingExecutor3;
     OSWAP_VotingExecutor3._abi = OSWAP_VotingExecutor3_json_1.default.abi;
+    exports.OSWAP_VotingExecutor3 = OSWAP_VotingExecutor3;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_ConfigStore.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -6647,8 +6651,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             });
         }
     }
-    exports.OSWAP_ConfigStore = OSWAP_ConfigStore;
     OSWAP_ConfigStore._abi = OSWAP_ConfigStore_json_1.default.abi;
+    exports.OSWAP_ConfigStore = OSWAP_ConfigStore;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcLiquidityProvider.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -6863,8 +6867,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             });
         }
     }
-    exports.OSWAP_OtcLiquidityProvider = OSWAP_OtcLiquidityProvider;
     OSWAP_OtcLiquidityProvider._abi = OSWAP_OtcLiquidityProvider_json_1.default.abi;
+    exports.OSWAP_OtcLiquidityProvider = OSWAP_OtcLiquidityProvider;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairOracle.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -6928,8 +6932,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             this.isSupported = isSupported_call;
         }
     }
-    exports.OSWAP_OtcPairOracle = OSWAP_OtcPairOracle;
     OSWAP_OtcPairOracle._abi = OSWAP_OtcPairOracle_json_1.default.abi;
+    exports.OSWAP_OtcPairOracle = OSWAP_OtcPairOracle;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedFactory.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -7395,8 +7399,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             });
         }
     }
-    exports.OSWAP_RestrictedFactory = OSWAP_RestrictedFactory;
     OSWAP_RestrictedFactory._abi = OSWAP_RestrictedFactory_json_1.default.abi;
+    exports.OSWAP_RestrictedFactory = OSWAP_RestrictedFactory;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider1.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -7611,8 +7615,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             });
         }
     }
-    exports.OSWAP_RestrictedLiquidityProvider1 = OSWAP_RestrictedLiquidityProvider1;
     OSWAP_RestrictedLiquidityProvider1._abi = OSWAP_RestrictedLiquidityProvider1_json_1.default.abi;
+    exports.OSWAP_RestrictedLiquidityProvider1 = OSWAP_RestrictedLiquidityProvider1;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider3.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -7787,8 +7791,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             });
         }
     }
-    exports.OSWAP_RestrictedLiquidityProvider3 = OSWAP_RestrictedLiquidityProvider3;
     OSWAP_RestrictedLiquidityProvider3._abi = OSWAP_RestrictedLiquidityProvider3_json_1.default.abi;
+    exports.OSWAP_RestrictedLiquidityProvider3 = OSWAP_RestrictedLiquidityProvider3;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider4.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -7963,8 +7967,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             });
         }
     }
-    exports.OSWAP_RestrictedLiquidityProvider4 = OSWAP_RestrictedLiquidityProvider4;
     OSWAP_RestrictedLiquidityProvider4._abi = OSWAP_RestrictedLiquidityProvider4_json_1.default.abi;
+    exports.OSWAP_RestrictedLiquidityProvider4 = OSWAP_RestrictedLiquidityProvider4;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -8450,8 +8454,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             });
         }
     }
-    exports.OSWAP_RestrictedPair = OSWAP_RestrictedPair;
     OSWAP_RestrictedPair._abi = OSWAP_RestrictedPair_json_1.default.abi;
+    exports.OSWAP_RestrictedPair = OSWAP_RestrictedPair;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairOracle.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -8515,8 +8519,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             this.isSupported = isSupported_call;
         }
     }
-    exports.OSWAP_RestrictedPairOracle = OSWAP_RestrictedPairOracle;
     OSWAP_RestrictedPairOracle._abi = OSWAP_RestrictedPairOracle_json_1.default.abi;
+    exports.OSWAP_RestrictedPairOracle = OSWAP_RestrictedPairOracle;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_VotingExecutor4.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -8579,8 +8583,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             });
         }
     }
-    exports.OSWAP_VotingExecutor4 = OSWAP_VotingExecutor4;
     OSWAP_VotingExecutor4._abi = OSWAP_VotingExecutor4_json_1.default.abi;
+    exports.OSWAP_VotingExecutor4 = OSWAP_VotingExecutor4;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -8804,8 +8808,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OS
             });
         }
     }
-    exports.OSWAP_HybridRouter = OSWAP_HybridRouter;
     OSWAP_HybridRouter._abi = OSWAP_HybridRouter_json_1.default.abi;
+    exports.OSWAP_HybridRouter = OSWAP_HybridRouter;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouterRegistry.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -9234,8 +9238,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OS
             });
         }
     }
-    exports.OSWAP_HybridRouterRegistry = OSWAP_HybridRouterRegistry;
     OSWAP_HybridRouterRegistry._abi = OSWAP_HybridRouterRegistry_json_1.default.abi;
+    exports.OSWAP_HybridRouterRegistry = OSWAP_HybridRouterRegistry;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_OracleRouter.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -9479,8 +9483,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OS
             });
         }
     }
-    exports.OSWAP_OracleRouter = OSWAP_OracleRouter;
     OSWAP_OracleRouter._abi = OSWAP_OracleRouter_json_1.default.abi;
+    exports.OSWAP_OracleRouter = OSWAP_OracleRouter;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPair.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -10115,8 +10119,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             });
         }
     }
-    exports.OSWAP_OtcPair = OSWAP_OtcPair;
     OSWAP_OtcPair._abi = OSWAP_OtcPair_json_1.default.abi;
+    exports.OSWAP_OtcPair = OSWAP_OtcPair;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairCreator.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -10160,8 +10164,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             });
         }
     }
-    exports.OSWAP_OtcPairCreator = OSWAP_OtcPairCreator;
     OSWAP_OtcPairCreator._abi = OSWAP_OtcPairCreator_json_1.default.abi;
+    exports.OSWAP_OtcPairCreator = OSWAP_OtcPairCreator;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair1.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -10791,8 +10795,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             });
         }
     }
-    exports.OSWAP_RestrictedPair1 = OSWAP_RestrictedPair1;
     OSWAP_RestrictedPair1._abi = OSWAP_RestrictedPair1_json_1.default.abi;
+    exports.OSWAP_RestrictedPair1 = OSWAP_RestrictedPair1;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair3.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -11424,8 +11428,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             });
         }
     }
-    exports.OSWAP_RestrictedPair3 = OSWAP_RestrictedPair3;
     OSWAP_RestrictedPair3._abi = OSWAP_RestrictedPair3_json_1.default.abi;
+    exports.OSWAP_RestrictedPair3 = OSWAP_RestrictedPair3;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair4.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -12104,8 +12108,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             });
         }
     }
-    exports.OSWAP_RestrictedPair4 = OSWAP_RestrictedPair4;
     OSWAP_RestrictedPair4._abi = OSWAP_RestrictedPair4_json_1.default.abi;
+    exports.OSWAP_RestrictedPair4 = OSWAP_RestrictedPair4;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator1.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -12149,8 +12153,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             });
         }
     }
-    exports.OSWAP_RestrictedPairCreator1 = OSWAP_RestrictedPairCreator1;
     OSWAP_RestrictedPairCreator1._abi = OSWAP_RestrictedPairCreator1_json_1.default.abi;
+    exports.OSWAP_RestrictedPairCreator1 = OSWAP_RestrictedPairCreator1;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator4.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -12194,8 +12198,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricte
             });
         }
     }
-    exports.OSWAP_RestrictedPairCreator4 = OSWAP_RestrictedPairCreator4;
     OSWAP_RestrictedPairCreator4._abi = OSWAP_RestrictedPairCreator4_json_1.default.abi;
+    exports.OSWAP_RestrictedPairCreator4 = OSWAP_RestrictedPairCreator4;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter2.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -12458,8 +12462,8 @@ define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OS
             });
         }
     }
-    exports.OSWAP_HybridRouter2 = OSWAP_HybridRouter2;
     OSWAP_HybridRouter2._abi = OSWAP_HybridRouter2_json_1.default.abi;
+    exports.OSWAP_HybridRouter2 = OSWAP_HybridRouter2;
 });
 define("@scom/scom-staking/contracts/oswap-openswap-contract/contracts/index.ts", ["require", "exports", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/OpenSwap.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_ERC20.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Factory.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Pair.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_PairCreator.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Router.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_VotingExecutor1.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_FactoryBase.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausableFactory.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausablePair.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Administrator.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Governance.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingContract.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingExecutor.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingRegistry.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/libraries/ERC20.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_CertiKSecurityOracle.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleFactory.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleLiquidityProvider.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePair.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePairCreator.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_VotingExecutor2.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeFactory.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeLiquidityProvider.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePair.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePairCreator.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_VotingExecutor3.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_ConfigStore.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcLiquidityProvider.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairOracle.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedFactory.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider1.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider3.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider4.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairOracle.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_VotingExecutor4.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouterRegistry.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_OracleRouter.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPair.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairCreator.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair1.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair3.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair4.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator1.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator4.ts", "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter2.ts"], function (require, exports, OpenSwap_1, OSWAP_ERC20_1, OSWAP_Factory_1, OSWAP_Pair_1, OSWAP_PairCreator_1, OSWAP_Router_1, OSWAP_VotingExecutor1_1, OSWAP_FactoryBase_1, OSWAP_PausableFactory_1, OSWAP_PausablePair_1, OAXDEX_Administrator_1, OAXDEX_Governance_1, OAXDEX_VotingContract_1, OAXDEX_VotingExecutor_1, OAXDEX_VotingRegistry_1, ERC20_1, OSWAP_CertiKSecurityOracle_1, OSWAP_OracleFactory_1, OSWAP_OracleLiquidityProvider_1, OSWAP_OraclePair_1, OSWAP_OraclePairCreator_1, OSWAP_VotingExecutor2_1, OSWAP_RangeFactory_1, OSWAP_RangeLiquidityProvider_1, OSWAP_RangePair_1, OSWAP_RangePairCreator_1, OSWAP_VotingExecutor3_1, OSWAP_ConfigStore_1, OSWAP_OtcLiquidityProvider_1, OSWAP_OtcPairOracle_1, OSWAP_RestrictedFactory_1, OSWAP_RestrictedLiquidityProvider1_1, OSWAP_RestrictedLiquidityProvider3_1, OSWAP_RestrictedLiquidityProvider4_1, OSWAP_RestrictedPair_1, OSWAP_RestrictedPairOracle_1, OSWAP_VotingExecutor4_1, OSWAP_HybridRouter_1, OSWAP_HybridRouterRegistry_1, OSWAP_OracleRouter_1, OSWAP_OtcPair_1, OSWAP_OtcPairCreator_1, OSWAP_RestrictedPair1_1, OSWAP_RestrictedPair3_1, OSWAP_RestrictedPair4_1, OSWAP_RestrictedPairCreator1_1, OSWAP_RestrictedPairCreator4_1, OSWAP_HybridRouter2_1) {
     "use strict";
@@ -12995,7 +12999,7 @@ define("@scom/scom-staking/global/utils/common.ts", ["require", "exports", "@ijs
         let wallet = eth_wallet_1.Wallet.getClientInstance();
         let amount = new eth_wallet_1.BigNumber(2).pow(256).minus(1);
         let erc20 = new index_3.Contracts.ERC20(wallet, token.address);
-        exports.registerSendTxEvents({
+        (0, exports.registerSendTxEvents)({
             transactionHash: callback,
             confirmation: confirmationCallback
         });
@@ -13069,24 +13073,24 @@ define("@scom/scom-staking/global/utils/helper.ts", ["require", "exports", "@ijs
     exports.DefaultDateFormat = 'DD/MM/YYYY';
     const formatDate = (date, customType, showTimezone) => {
         const formatType = customType || exports.DefaultDateFormat;
-        const formatted = components_2.moment(date).format(formatType);
+        const formatted = (0, components_2.moment)(date).format(formatType);
         if (showTimezone) {
-            return `${formatted} (UTC+${components_2.moment().utcOffset() / 60})`;
+            return `${formatted} (UTC+${(0, components_2.moment)().utcOffset() / 60})`;
         }
         return formatted;
     };
     exports.formatDate = formatDate;
     const formatUTCDate = (date, customType, showTimezone) => {
         const formatType = customType || exports.DefaultDateFormat;
-        const formatted = components_2.moment(date).utc().format(formatType);
+        const formatted = (0, components_2.moment)(date).utc().format(formatType);
         return showTimezone ? `${formatted} (UTC)` : formatted;
     };
     exports.formatUTCDate = formatUTCDate;
     const compareDate = (fromDate, toDate) => {
         if (!toDate) {
-            toDate = components_2.moment();
+            toDate = (0, components_2.moment)();
         }
-        return components_2.moment(fromDate).isSameOrBefore(toDate);
+        return (0, components_2.moment)(fromDate).isSameOrBefore(toDate);
     };
     exports.compareDate = compareDate;
     const formatNumber = (value, decimals) => {
@@ -13101,7 +13105,7 @@ define("@scom/scom-staking/global/utils/helper.ts", ["require", "exports", "@ijs
         if (val != 0 && new eth_wallet_2.BigNumber(val).lt(minValue)) {
             return `<${minValue}`;
         }
-        return exports.formatNumberWithSeparators(val, decimals || 4);
+        return (0, exports.formatNumberWithSeparators)(val, decimals || 4);
     };
     exports.formatNumber = formatNumber;
     const formatPercentNumber = (value, decimals) => {
@@ -13112,7 +13116,7 @@ define("@scom/scom-staking/global/utils/helper.ts", ["require", "exports", "@ijs
         else if (typeof value === 'object') {
             val = value.toNumber();
         }
-        return exports.formatNumberWithSeparators(val, decimals || 2);
+        return (0, exports.formatNumberWithSeparators)(val, decimals || 2);
     };
     exports.formatPercentNumber = formatPercentNumber;
     const formatNumberWithSeparators = (value, precision) => {
@@ -13156,12 +13160,12 @@ define("@scom/scom-staking/global/utils/helper.ts", ["require", "exports", "@ijs
     exports.isInvalidInput = isInvalidInput;
     const limitInputNumber = (input, decimals) => {
         const amount = input.value;
-        if (exports.isInvalidInput(amount)) {
+        if ((0, exports.isInvalidInput)(amount)) {
             input.value = '0';
             return;
         }
         if (!new eth_wallet_2.BigNumber(amount).isNaN()) {
-            input.value = exports.limitDecimals(amount, decimals || 18);
+            input.value = (0, exports.limitDecimals)(amount, decimals || 18);
         }
     };
     exports.limitInputNumber = limitInputNumber;
@@ -13238,7 +13242,7 @@ define("@scom/scom-staking/global/utils/helper.ts", ["require", "exports", "@ijs
             v = value.toString(16);
         }
         v = v.replace("0x", "");
-        v = exports.padLeft(v, 64);
+        v = (0, exports.padLeft)(v, 64);
         if (prefix)
             v = '0x' + v;
         return v;
@@ -13385,7 +13389,7 @@ define("@scom/scom-staking/global/utils/helper.ts", ["require", "exports", "@ijs
     };
     exports.getWeekDays = getWeekDays;
     const renderBalanceTooltip = (params, tokenMap, isBold) => {
-        const data = exports.formatNumberValue(params, tokenMap);
+        const data = (0, exports.formatNumberValue)(params, tokenMap);
         if (typeof data === "object") {
             const { result, tooltip } = data;
             if (isBold) {
@@ -13513,7 +13517,7 @@ define("@scom/scom-staking/global/utils/approvalModel.ts", ["require", "exports"
                 onPayingError: async (err) => { }
             };
             this.checkAllowance = async (token, inputAmount) => {
-                let allowance = await common_1.getERC20Allowance(token, this.options.spenderAddress);
+                let allowance = await (0, common_1.getERC20Allowance)(token, this.options.spenderAddress);
                 if (!allowance) {
                     await this.options.onToBePaid.bind(this.options.sender)(token);
                 }
@@ -13537,7 +13541,7 @@ define("@scom/scom-staking/global/utils/approvalModel.ts", ["require", "exports"
                     await this.options.onApproved.bind(this.options.sender)(token, data);
                     await this.checkAllowance(token, inputAmount);
                 };
-                common_1.approveERC20Max(token, this.options.spenderAddress, txHashCallback, confirmationCallback);
+                (0, common_1.approveERC20Max)(token, this.options.spenderAddress, txHashCallback, confirmationCallback);
             };
             this.doPayAction = async (data) => {
                 const txHashCallback = async (err, receipt) => {
@@ -13551,7 +13555,7 @@ define("@scom/scom-staking/global/utils/approvalModel.ts", ["require", "exports"
                 const confirmationCallback = async (receipt) => {
                     await this.options.onPaid.bind(this.options.sender)(data);
                 };
-                common_1.registerSendTxEvents({
+                (0, common_1.registerSendTxEvents)({
                     transactionHash: txHashCallback,
                     confirmation: confirmationCallback
                 });
@@ -13790,7 +13794,7 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
     }
     const getSiteSupportedNetworks = () => {
         let networkFullList = Object.values(exports.state.networkMap);
-        let list = networkFullList.filter(network => !exports.getNetworkInfo(network.chainId).isDisabled);
+        let list = networkFullList.filter(network => !(0, exports.getNetworkInfo)(network.chainId).isDisabled);
         return list;
         // const siteEnv = getSiteEnv();
         // if (siteEnv === SITE_ENV.TESTNET) {
@@ -13805,7 +13809,7 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
     const setNetworkList = (networkList, infuraId) => {
         const wallet = eth_wallet_4.Wallet.getClientInstance();
         exports.state.networkMap = {};
-        const defaultNetworkList = scom_network_list_1.default();
+        const defaultNetworkList = (0, scom_network_list_1.default)();
         const defaultNetworkMap = defaultNetworkList.reduce((acc, cur) => {
             acc[cur.chainId] = cur;
             return acc;
@@ -13852,13 +13856,13 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
             setNetworkList(options.networks, options.infuraId);
         }
         if (options.proxyAddresses) {
-            exports.setProxyAddresses(options.proxyAddresses);
+            (0, exports.setProxyAddresses)(options.proxyAddresses);
         }
         if (options.ipfsGatewayUrl) {
-            exports.setIPFSGatewayUrl(options.ipfsGatewayUrl);
+            (0, exports.setIPFSGatewayUrl)(options.ipfsGatewayUrl);
         }
         if (options.apiGatewayUrls) {
-            exports.setAPIGatewayUrls(options.apiGatewayUrls);
+            (0, exports.setAPIGatewayUrls)(options.apiGatewayUrls);
         }
         if (options.embedderCommissionFee) {
             setEmbedderCommissionFee(options.embedderCommissionFee);
@@ -13873,9 +13877,9 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
     async function switchNetwork(chainId) {
         var _a;
         if (!isWalletConnected()) {
-            exports.setCurrentChainId(chainId);
+            (0, exports.setCurrentChainId)(chainId);
             eth_wallet_4.Wallet.getClientInstance().chainId = chainId;
-            components_3.application.EventBus.dispatch("chainChanged" /* chainChanged */, chainId);
+            components_3.application.EventBus.dispatch("chainChanged" /* EventId.chainChanged */, chainId);
             return;
         }
         const wallet = eth_wallet_4.Wallet.getClientInstance();
@@ -13893,7 +13897,7 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
     }
     exports.getWalletProvider = getWalletProvider;
     const hasMetaMask = function () {
-        const provider = exports.getWalletPluginProvider(WalletPlugin.MetaMask);
+        const provider = (0, exports.getWalletPluginProvider)(WalletPlugin.MetaMask);
         return provider === null || provider === void 0 ? void 0 : provider.installed();
     };
     exports.hasMetaMask = hasMetaMask;
@@ -13988,7 +13992,7 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
     exports.hasUserToken = hasUserToken;
     const setStakingStatus = (key, value, text) => {
         exports.state.stakingStatusMap[key] = { value, text };
-        components_3.application.EventBus.dispatch("stakingEmitButtonStatus" /* EmitButtonStatus */, { key, value, text });
+        components_3.application.EventBus.dispatch("stakingEmitButtonStatus" /* EventId.EmitButtonStatus */, { key, value, text });
     };
     exports.setStakingStatus = setStakingStatus;
     const getStakingStatus = (key) => {
@@ -13996,15 +14000,15 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
     };
     exports.getStakingStatus = getStakingStatus;
     const getNetworkExplorerName = (chainId) => {
-        if (exports.getNetworkInfo(chainId)) {
-            return exports.getNetworkInfo(chainId).explorerName;
+        if ((0, exports.getNetworkInfo)(chainId)) {
+            return (0, exports.getNetworkInfo)(chainId).explorerName;
         }
         return 'Unknown';
     };
     exports.getNetworkExplorerName = getNetworkExplorerName;
     const getNetworkName = (chainId) => {
         var _a;
-        return ((_a = exports.getSiteSupportedNetworks().find(v => v.chainId === chainId)) === null || _a === void 0 ? void 0 : _a.chainName) || '';
+        return ((_a = (0, exports.getSiteSupportedNetworks)().find(v => v.chainId === chainId)) === null || _a === void 0 ? void 0 : _a.chainName) || '';
     };
     exports.getNetworkName = getNetworkName;
     const setProxyAddresses = (data) => {
@@ -14051,14 +14055,14 @@ define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-s
         const tokenMap = scom_token_list_2.tokenStore.tokenMap;
         let ChainNativeToken;
         let tokenObject;
-        if (utils_1.isWalletConnected()) {
-            ChainNativeToken = utils_1.getChainNativeToken(utils_1.getChainId());
+        if ((0, utils_1.isWalletConnected)()) {
+            ChainNativeToken = (0, utils_1.getChainNativeToken)((0, utils_1.getChainId)());
             tokenObject = address == ChainNativeToken.symbol ? ChainNativeToken : tokenMap[address.toLowerCase()];
         }
         else {
             tokenObject = tokenMap[address.toLowerCase()];
         }
-        return scom_token_list_2.assets.fullPath(scom_token_list_2.assets.getTokenIconPath(tokenObject, utils_1.getChainId()));
+        return scom_token_list_2.assets.fullPath(scom_token_list_2.assets.getTokenIconPath(tokenObject, (0, utils_1.getChainId)()));
     };
     exports.getTokenIcon = getTokenIcon;
     const tokenSymbol = (address) => {
@@ -14129,8 +14133,8 @@ define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-s
     };
     exports.getLockedTokenIconPaths = getLockedTokenIconPaths;
     const getTokenDecimals = (address) => {
-        let chainId = utils_1.getChainId();
-        const ChainNativeToken = utils_1.getChainNativeToken(chainId);
+        let chainId = (0, utils_1.getChainId)();
+        const ChainNativeToken = (0, utils_1.getChainNativeToken)(chainId);
         const tokenObject = (!address || address.toLowerCase() === scom_token_list_2.WETHByChainId[chainId].address.toLowerCase()) ? ChainNativeToken : scom_token_list_2.tokenStore.tokenMap[address.toLowerCase()];
         return tokenObject ? tokenObject.decimals : 18;
     };
@@ -14140,7 +14144,7 @@ define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-s
     exports.isThemeApplied = false;
     exports.isMultiple = false;
     exports.maxWidth = '690px';
-    exports.maxHeight = '321px';
+    exports.maxHeight = 321;
     __exportStar(utils_2, exports);
 });
 define("@scom/scom-staking/data.json.ts", ["require", "exports"], function (require, exports) {
@@ -14376,8 +14380,8 @@ define("@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewa
             });
         }
     }
-    exports.Rewards = Rewards;
     Rewards._abi = Rewards_json_1.default.abi;
+    exports.Rewards = Rewards;
 });
 define("@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -14556,8 +14560,8 @@ define("@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewa
             });
         }
     }
-    exports.RewardsCommonStartDate = RewardsCommonStartDate;
     RewardsCommonStartDate._abi = RewardsCommonStartDate_json_1.default.abi;
+    exports.RewardsCommonStartDate = RewardsCommonStartDate;
 });
 define("@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -14706,8 +14710,8 @@ define("@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Time
             });
         }
     }
-    exports.TimeIsMoney = TimeIsMoney;
     TimeIsMoney._abi = TimeIsMoney_json_1.default.abi;
+    exports.TimeIsMoney = TimeIsMoney;
 });
 define("@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -14850,8 +14854,8 @@ define("@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Time
             });
         }
     }
-    exports.TimeIsMoneyEther = TimeIsMoneyEther;
     TimeIsMoneyEther._abi = TimeIsMoneyEther_json_1.default.abi;
+    exports.TimeIsMoneyEther = TimeIsMoneyEther;
 });
 define("@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/index.ts", ["require", "exports", "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.ts", "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.ts", "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.ts", "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.ts"], function (require, exports, Rewards_1, RewardsCommonStartDate_1, TimeIsMoney_1, TimeIsMoneyEther_1) {
     "use strict";
@@ -15119,8 +15123,8 @@ define("@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/Aggregat
             });
         }
     }
-    exports.AggregatorProxy = AggregatorProxy;
     AggregatorProxy._abi = AggregatorProxy_json_1.default.abi;
+    exports.AggregatorProxy = AggregatorProxy;
 });
 define("@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/EACAggregatorProxy.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -15390,8 +15394,8 @@ define("@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/EACAggre
             });
         }
     }
-    exports.EACAggregatorProxy = EACAggregatorProxy;
     EACAggregatorProxy._abi = EACAggregatorProxy_json_1.default.abi;
+    exports.EACAggregatorProxy = EACAggregatorProxy;
 });
 define("@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/Owned.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -15473,8 +15477,8 @@ define("@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/Owned.ts
             });
         }
     }
-    exports.Owned = Owned;
     Owned._abi = Owned_json_1.default.abi;
+    exports.Owned = Owned;
 });
 define("@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/index.ts", ["require", "exports", "@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/AggregatorProxy.ts", "@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/EACAggregatorProxy.ts", "@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/Owned.ts"], function (require, exports, AggregatorProxy_1, EACAggregatorProxy_1, Owned_1) {
     "use strict";
@@ -15553,8 +15557,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
         assign() {
         }
     }
-    exports.ERC1967Proxy = ERC1967Proxy;
     ERC1967Proxy._abi = ERC1967Proxy_json_1.default.abi;
+    exports.ERC1967Proxy = ERC1967Proxy;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/token/ERC20/ERC20.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -15710,8 +15714,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.ERC20 = ERC20;
     ERC20._abi = ERC20_json_2.default.abi;
+    exports.ERC20 = ERC20;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -15751,8 +15755,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.ERC721Holder = ERC721Holder;
     ERC721Holder._abi = ERC721Holder_json_1.default.abi;
+    exports.ERC721Holder = ERC721Holder;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/Authorization.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -15890,8 +15894,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.Authorization = Authorization;
     Authorization._abi = Authorization_json_1.default.abi;
+    exports.Authorization = Authorization;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/MOCK_TrollRegistry.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -16548,8 +16552,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.MOCK_TrollRegistry = MOCK_TrollRegistry;
     MOCK_TrollRegistry._abi = MOCK_TrollRegistry_json_1.default.abi;
+    exports.MOCK_TrollRegistry = MOCK_TrollRegistry;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/MintableToken.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -16853,8 +16857,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.MintableToken = MintableToken;
     MintableToken._abi = MintableToken_json_1.default.abi;
+    exports.MintableToken = MintableToken;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_BridgeVaultTrollRegistry.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -17199,8 +17203,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.OSWAP_BridgeVaultTrollRegistry = OSWAP_BridgeVaultTrollRegistry;
     OSWAP_BridgeVaultTrollRegistry._abi = OSWAP_BridgeVaultTrollRegistry_json_1.default.abi;
+    exports.OSWAP_BridgeVaultTrollRegistry = OSWAP_BridgeVaultTrollRegistry;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ChainRegistry.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -17525,8 +17529,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.OSWAP_ChainRegistry = OSWAP_ChainRegistry;
     OSWAP_ChainRegistry._abi = OSWAP_ChainRegistry_json_1.default.abi;
+    exports.OSWAP_ChainRegistry = OSWAP_ChainRegistry;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ChainRegistryExecutor.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -17589,8 +17593,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.OSWAP_ChainRegistryExecutor = OSWAP_ChainRegistryExecutor;
     OSWAP_ChainRegistryExecutor._abi = OSWAP_ChainRegistryExecutor_json_1.default.abi;
+    exports.OSWAP_ChainRegistryExecutor = OSWAP_ChainRegistryExecutor;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ConfigStore.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -17998,8 +18002,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.OSWAP_ConfigStore = OSWAP_ConfigStore;
     OSWAP_ConfigStore._abi = OSWAP_ConfigStore_json_2.default.abi;
+    exports.OSWAP_ConfigStore = OSWAP_ConfigStore;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ConfigStoreTradeVault.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -18098,8 +18102,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.OSWAP_ConfigStoreTradeVault = OSWAP_ConfigStoreTradeVault;
     OSWAP_ConfigStoreTradeVault._abi = OSWAP_ConfigStoreTradeVault_json_1.default.abi;
+    exports.OSWAP_ConfigStoreTradeVault = OSWAP_ConfigStoreTradeVault;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ContractProxy.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -18305,8 +18309,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.OSWAP_ContractProxy = OSWAP_ContractProxy;
     OSWAP_ContractProxy._abi = OSWAP_ContractProxy_json_1.default.abi;
+    exports.OSWAP_ContractProxy = OSWAP_ContractProxy;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_MainChainTrollRegistry.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -19066,8 +19070,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.OSWAP_MainChainTrollRegistry = OSWAP_MainChainTrollRegistry;
     OSWAP_MainChainTrollRegistry._abi = OSWAP_MainChainTrollRegistry_json_1.default.abi;
+    exports.OSWAP_MainChainTrollRegistry = OSWAP_MainChainTrollRegistry;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_MainChainVotingExecutor.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -19148,8 +19152,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.OSWAP_MainChainVotingExecutor = OSWAP_MainChainVotingExecutor;
     OSWAP_MainChainVotingExecutor._abi = OSWAP_MainChainVotingExecutor_json_1.default.abi;
+    exports.OSWAP_MainChainVotingExecutor = OSWAP_MainChainVotingExecutor;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_RouterVaultWrapper.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -19292,8 +19296,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.OSWAP_RouterVaultWrapper = OSWAP_RouterVaultWrapper;
     OSWAP_RouterVaultWrapper._abi = OSWAP_RouterVaultWrapper_json_1.default.abi;
+    exports.OSWAP_RouterVaultWrapper = OSWAP_RouterVaultWrapper;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_SideChainTrollRegistry.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -19999,8 +20003,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.OSWAP_SideChainTrollRegistry = OSWAP_SideChainTrollRegistry;
     OSWAP_SideChainTrollRegistry._abi = OSWAP_SideChainTrollRegistry_json_1.default.abi;
+    exports.OSWAP_SideChainTrollRegistry = OSWAP_SideChainTrollRegistry;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_SideChainVotingExecutor.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -20077,8 +20081,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.OSWAP_SideChainVotingExecutor = OSWAP_SideChainVotingExecutor;
     OSWAP_SideChainVotingExecutor._abi = OSWAP_SideChainVotingExecutor_json_1.default.abi;
+    exports.OSWAP_SideChainVotingExecutor = OSWAP_SideChainVotingExecutor;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingContract.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -20316,8 +20320,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.OSWAP_VotingContract = OSWAP_VotingContract;
     OSWAP_VotingContract._abi = OSWAP_VotingContract_json_1.default.abi;
+    exports.OSWAP_VotingContract = OSWAP_VotingContract;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingManager.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -20933,8 +20937,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.OSWAP_VotingManager = OSWAP_VotingManager;
     OSWAP_VotingManager._abi = OSWAP_VotingManager_json_1.default.abi;
+    exports.OSWAP_VotingManager = OSWAP_VotingManager;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingRegistry.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -20987,8 +20991,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.OSWAP_VotingRegistry = OSWAP_VotingRegistry;
     OSWAP_VotingRegistry._abi = OSWAP_VotingRegistry_json_1.default.abi;
+    exports.OSWAP_VotingRegistry = OSWAP_VotingRegistry;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_BridgeVault.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -21798,8 +21802,8 @@ define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts
             });
         }
     }
-    exports.OSWAP_BridgeVault = OSWAP_BridgeVault;
     OSWAP_BridgeVault._abi = OSWAP_BridgeVault_json_1.default.abi;
+    exports.OSWAP_BridgeVault = OSWAP_BridgeVault;
 });
 define("@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/index.ts", ["require", "exports", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/token/ERC20/ERC20.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/Authorization.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/MOCK_TrollRegistry.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/MintableToken.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_BridgeVaultTrollRegistry.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ChainRegistry.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ChainRegistryExecutor.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ConfigStore.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ConfigStoreTradeVault.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_ContractProxy.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_MainChainTrollRegistry.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_MainChainVotingExecutor.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_RouterVaultWrapper.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_SideChainTrollRegistry.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_SideChainVotingExecutor.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingContract.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingManager.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_VotingRegistry.ts", "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/contracts/OSWAP_BridgeVault.ts"], function (require, exports, ERC1967Proxy_1, ERC20_2, ERC721Holder_1, Authorization_1, MOCK_TrollRegistry_1, MintableToken_1, OSWAP_BridgeVaultTrollRegistry_1, OSWAP_ChainRegistry_1, OSWAP_ChainRegistryExecutor_1, OSWAP_ConfigStore_2, OSWAP_ConfigStoreTradeVault_1, OSWAP_ContractProxy_1, OSWAP_MainChainTrollRegistry_1, OSWAP_MainChainVotingExecutor_1, OSWAP_RouterVaultWrapper_1, OSWAP_SideChainTrollRegistry_1, OSWAP_SideChainVotingExecutor_1, OSWAP_VotingContract_1, OSWAP_VotingManager_1, OSWAP_VotingRegistry_1, OSWAP_BridgeVault_1) {
     "use strict";
@@ -21888,13 +21892,13 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
         }
         else {
             if (token0.toLowerCase() == token.toLowerCase()) { //for other reference pair
-                let token1Price = await exports.getTokenPrice(token1);
+                let token1Price = await (0, exports.getTokenPrice)(token1);
                 if (!token1Price)
                     return null;
                 tokenPrice = new eth_wallet_5.BigNumber(token1Price).times(reserves._reserve1).div(reserves._reserve0).toFixed();
             }
             else {
-                let token0Price = await exports.getTokenPrice(token0);
+                let token0Price = await (0, exports.getTokenPrice)(token0);
                 if (!token0Price)
                     return null;
                 tokenPrice = new eth_wallet_5.BigNumber(token0Price).times(reserves._reserve0).div(reserves._reserve1).toFixed();
@@ -21936,7 +21940,7 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
             }
             catch (err) { }
             let tokenAddress = await timeIsMoney.token();
-            let stakingDecimals = 18 - index_16.getTokenDecimals(tokenAddress.toLocaleLowerCase());
+            let stakingDecimals = 18 - (0, index_16.getTokenDecimals)(tokenAddress.toLocaleLowerCase());
             let endOfEntryPeriod = (await timeIsMoney.endOfEntryPeriod()).toFixed();
             let perAddressCapWei = await timeIsMoney.perAddressCap();
             let maxTotalLock = eth_wallet_5.Utils.fromDecimals(maximumTotalLock).shiftedBy(stakingDecimals).toFixed();
@@ -22141,8 +22145,8 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
         if (!usdPeggedTokenAddress)
             return '';
         let APR = "";
-        let rewardPrice = await exports.getTokenPrice(rewardOption.rewardTokenAddress);
-        let lockedTokenPrice = await exports.getTokenPrice(lockedToken.address);
+        let rewardPrice = await (0, exports.getTokenPrice)(rewardOption.rewardTokenAddress);
+        let lockedTokenPrice = await (0, exports.getTokenPrice)(lockedToken.address);
         if (!rewardPrice || !lockedTokenPrice)
             return null;
         APR = new eth_wallet_5.BigNumber(rewardOption.multiplier).times(new eth_wallet_5.BigNumber(rewardPrice).times(365)).div(new eth_wallet_5.BigNumber(lockedTokenPrice).times(lockedDays)).toFixed();
@@ -22241,8 +22245,8 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
     const getVaultRewardCurrentAPR = async (rewardOption, vaultObject, lockedDays) => {
         let APR = '';
         try {
-            let rewardPrice = await exports.getTokenPrice(rewardOption.rewardTokenAddress);
-            let assetTokenPrice = await exports.getTokenPrice(vaultObject.assetToken.address);
+            let rewardPrice = await (0, exports.getTokenPrice)(rewardOption.rewardTokenAddress);
+            let assetTokenPrice = await (0, exports.getTokenPrice)(vaultObject.assetToken.address);
             if (!assetTokenPrice || !rewardPrice)
                 return '';
             let wallet = eth_wallet_5.Wallet.getClientInstance();
@@ -22313,18 +22317,21 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
 define("@scom/scom-staking/common/result.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const Theme = components_4.Styles.Theme.ThemeVars;
     exports.default = components_4.Styles.style({
         textAlign: 'center',
         $nest: {
             'i-label > *': {
-                color: '#fff',
+                // color: Theme.text.primary,
                 fontSize: '.875rem',
                 wordBreak: 'normal'
             },
             '.modal': {
                 minWidth: '25%',
                 maxWidth: '100%',
-                width: 455
+                width: 455,
+                background: Theme.background.modal,
+                borderRadius: 12
             },
             '.i-modal-close svg': {
                 fill: '#F05E61'
@@ -22364,6 +22371,14 @@ define("@scom/scom-staking/common/result.css.ts", ["require", "exports", "@ijste
                 padding: '.35rem 2.438rem',
                 borderRadius: 5,
                 background: '#2B304A 0% 0% no-repeat padding-box'
+            },
+            '.btn-os': {
+                background: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
+                fontFamily: 'Raleway Bold',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                color: '#fff'
+                // color: Theme.colors.primary.contrastText
             }
         }
     });
@@ -22372,17 +22387,18 @@ define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Result = void 0;
+    const Theme = components_5.Styles.Theme.ThemeVars;
     ;
     let Result = class Result extends components_5.Module {
-        constructor(parent, options) {
-            super(parent, options);
-        }
         get message() {
             return this._message;
         }
         set message(value) {
             this._message = value;
             this.renderUI();
+        }
+        constructor(parent, options) {
+            super(parent, options);
         }
         ;
         async init() {
@@ -22418,7 +22434,7 @@ define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/
         async buildLink() {
             if (this.message.txtHash) {
                 const chainId = await eth_wallet_6.Wallet.getClientInstance().getChainId();
-                index_17.viewOnExplorerByTxHash(chainId, this.message.txtHash);
+                (0, index_17.viewOnExplorerByTxHash)(chainId, this.message.txtHash);
             }
         }
         async renderUI() {
@@ -22453,7 +22469,7 @@ define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/
             }
             else if (this.message.status === 'success') {
                 const chainId = await eth_wallet_6.Wallet.getClientInstance().getChainId();
-                const explorerName = index_18.getNetworkExplorerName(chainId);
+                const explorerName = (0, index_18.getNetworkExplorerName)(chainId);
                 const image = await components_5.Image.create({
                     width: '50px',
                     url: assets_2.default.fullPath('img/success-icon.svg')
@@ -22492,10 +22508,11 @@ define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/
                 }
                 const button = new components_5.Button(mainSection, {
                     width: '100%',
-                    caption: 'Close'
+                    caption: 'Close',
+                    // font: { color: Theme.colors.primary.contrastText }
+                    font: { color: '#fff' }
                 });
                 button.classList.add('btn-os');
-                button.classList.add('btn-approve');
                 button.classList.add('mt-1');
                 button.onClick = () => this.closeModal();
                 mainSection.appendChild(button);
@@ -22522,10 +22539,11 @@ define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/
                 mainSection.appendChild(section);
                 const button = new components_5.Button(mainSection, {
                     width: '100%',
-                    caption: 'Cancel'
+                    caption: 'Cancel',
+                    // font: { color: Theme.colors.primary.contrastText }
+                    font: { color: '#fff' }
                 });
                 button.classList.add('btn-os');
-                button.classList.add('btn-approve');
                 button.classList.add('mt-1');
                 button.onClick = () => this.closeModal();
                 mainSection.appendChild(button);
@@ -22539,7 +22557,7 @@ define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/
             if (this.message.content.message && this.message.content.message.includes('Internal JSON-RPC error.')) {
                 this.message.content.message = JSON.parse(this.message.content.message.replace('Internal JSON-RPC error.\n', '')).message;
             }
-            return await index_17.parseContractError(this.message.content.message, this.message.obj);
+            return await (0, index_17.parseContractError)(this.message.content.message, this.message.obj);
         }
         render() {
             return (this.$render("i-modal", { id: "confirmModal", closeIcon: { name: 'times' }, class: "confirm-modal", minHeight: "280px" },
@@ -22547,7 +22565,7 @@ define("@scom/scom-staking/common/result.tsx", ["require", "exports", "@ijstech/
         }
     };
     Result = __decorate([
-        components_5.customElements('staking-result')
+        (0, components_5.customElements)('staking-result')
     ], Result);
     exports.Result = Result;
     ;
@@ -22562,6 +22580,7 @@ define("@scom/scom-staking/manage-stake/manage-stake.css.ts", ["require", "expor
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.stakingManageStakeStyle = void 0;
+    const Theme = components_6.Styles.Theme.ThemeVars;
     exports.stakingManageStakeStyle = components_6.Styles.style({
         $nest: {
             'input': {
@@ -22581,7 +22600,7 @@ define("@scom/scom-staking/manage-stake/manage-stake.css.ts", ["require", "expor
                 width: '100% !important',
                 height: '100% !important',
                 backgroundColor: 'transparent',
-                color: '#fff',
+                color: Theme.input.fontColor,
                 fontSize: '1rem',
                 textAlign: 'left',
                 paddingInline: 8,
@@ -22593,7 +22612,7 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ManageStake = void 0;
-    const isThemeApplied = false;
+    const Theme = components_7.Styles.Theme.ThemeVars;
     var CurrentMode;
     (function (CurrentMode) {
         CurrentMode[CurrentMode["STAKE"] = 0] = "STAKE";
@@ -22617,7 +22636,7 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
             this.setData = (data) => {
                 this.address = data.address;
                 this.stakingInfo = data;
-                this.onSetupPage(index_20.isWalletConnected());
+                this.onSetupPage((0, index_20.isWalletConnected)());
             };
             this.getBalance = () => {
                 return this.balance;
@@ -22655,34 +22674,27 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                 if (this.inputAmount.enabled === false)
                     return;
                 this.currentMode = CurrentMode.STAKE;
-                index_19.limitInputNumber(this.inputAmount, ((_a = this.lockedTokenObject) === null || _a === void 0 ? void 0 : _a.decimals) || 18);
+                (0, index_19.limitInputNumber)(this.inputAmount, ((_a = this.lockedTokenObject) === null || _a === void 0 ? void 0 : _a.decimals) || 18);
                 this.approvalModelAction.checkAllowance(this.lockedTokenObject, this.inputAmount.value);
             };
             this.setMaxBalance = () => {
                 var _a;
                 this.currentMode = CurrentMode.STAKE;
                 this.inputAmount.value = eth_wallet_7.BigNumber.min(this.availableQty, this.balance, this.perAddressCap).toFixed();
-                index_19.limitInputNumber(this.inputAmount, ((_a = this.lockedTokenObject) === null || _a === void 0 ? void 0 : _a.decimals) || 18);
+                (0, index_19.limitInputNumber)(this.inputAmount, ((_a = this.lockedTokenObject) === null || _a === void 0 ? void 0 : _a.decimals) || 18);
                 this.approvalModelAction.checkAllowance(this.lockedTokenObject, this.inputAmount.value);
             };
             this.renderStakingInfo = async (info) => {
                 var _a;
                 if (!info || !Object.keys(info).length) {
                     this.btnApprove.visible = false;
-                    if (!index_20.isWalletConnected()) {
+                    if (!(0, index_20.isWalletConnected)()) {
                         this.btnMax.visible = false;
                         this.inputAmount.enabled = false;
                     }
                     return;
                 }
                 ;
-                const colorButton = isThemeApplied ? info.customColorButton : undefined;
-                const colorText = isThemeApplied ? info.customColorText || '#fff' : '#fff';
-                this.btnApprove.background = { color: `${colorButton} !important` };
-                this.btnStake.background = { color: `${colorButton} !important` };
-                this.btnUnstake.background = { color: `${colorButton} !important` };
-                this.btnMax.background = { color: `${colorButton} !important` };
-                this.lbToken.font = { color: colorText };
                 this.btnStake.id = `btn-stake-${this.address}`;
                 this.btnUnstake.id = `btn-unstake-${this.address}`;
                 this.inputAmount.id = `input-${this.address}`;
@@ -22692,14 +22704,14 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                 if (tokenAddress && mode === 'Stake') {
                     if (lockTokenType == index_20.LockTokenType.LP_Token) {
                         lpTokenData = {
-                            'object': await index_22.getLPObject(tokenAddress),
-                            'balance': await index_22.getLPBalance(tokenAddress)
+                            'object': await (0, index_22.getLPObject)(tokenAddress),
+                            'balance': await (0, index_22.getLPBalance)(tokenAddress)
                         };
                     }
                     else if (lockTokenType == index_20.LockTokenType.VAULT_Token) {
                         vaultTokenData = {
-                            'object': await index_22.getVaultObject(tokenAddress),
-                            'balance': await index_22.getVaultBalance(tokenAddress)
+                            'object': await (0, index_22.getVaultObject)(tokenAddress),
+                            'balance': await (0, index_22.getVaultBalance)(tokenAddress)
                         };
                     }
                 }
@@ -22708,9 +22720,9 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                     lpToken: lpTokenData,
                     vaultToken: vaultTokenData
                 };
-                this.lockedTokenObject = index_20.getLockedTokenObject(info, tokenInfo, this.tokenMap);
+                this.lockedTokenObject = (0, index_20.getLockedTokenObject)(info, tokenInfo, this.tokenMap);
                 const defaultDecimalsOffset = 18 - (((_a = this.lockedTokenObject) === null || _a === void 0 ? void 0 : _a.decimals) || 18);
-                const symbol = index_20.getLockedTokenSymbol(info, this.lockedTokenObject);
+                const symbol = (0, index_20.getLockedTokenSymbol)(info, this.lockedTokenObject);
                 this.tokenSymbol = symbol;
                 this.perAddressCap = new eth_wallet_7.BigNumber(info.perAddressCap).shiftedBy(defaultDecimalsOffset).toFixed();
                 this.maxQty = new eth_wallet_7.BigNumber(info.maxTotalLock).shiftedBy(defaultDecimalsOffset).toNumber();
@@ -22770,14 +22782,14 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                 var _a, _b;
                 if (((_a = this.stakingInfo) === null || _a === void 0 ? void 0 : _a.mode) !== 'Stake')
                     return;
-                const totalLocked = await index_22.getStakingTotalLocked(this.address);
+                const totalLocked = await (0, index_22.getStakingTotalLocked)(this.address);
                 const activeStartTime = this.stakingInfo ? this.stakingInfo.startOfEntryPeriod : 0;
                 const activeEndTime = this.stakingInfo ? this.stakingInfo.endOfEntryPeriod : 0;
                 const lockedTokenDecimals = ((_b = this.lockedTokenObject) === null || _b === void 0 ? void 0 : _b.decimals) || 18;
                 const defaultDecimalsOffset = 18 - lockedTokenDecimals;
                 const optionQty = new eth_wallet_7.BigNumber(this.stakingInfo.maxTotalLock).minus(totalLocked).shiftedBy(defaultDecimalsOffset);
-                const isStarted = components_7.moment(activeStartTime).diff(components_7.moment()) <= 0;
-                const isClosed = components_7.moment(activeEndTime).diff(components_7.moment()) <= 0;
+                const isStarted = (0, components_7.moment)(activeStartTime).diff((0, components_7.moment)()) <= 0;
+                const isClosed = (0, components_7.moment)(activeEndTime).diff((0, components_7.moment)()) <= 0;
                 const enabled = (isStarted && !(optionQty.lte(0) || isClosed));
                 this.inputAmount.enabled = enabled;
                 this.btnMax.enabled = enabled && new eth_wallet_7.BigNumber(this.balance).gt(0);
@@ -22790,15 +22802,15 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
             return `#btn-unstake-${this.address}`;
         }
         async initApprovalModelAction() {
-            this.approvalModelAction = index_22.getApprovalModelAction(this.address, {
+            this.approvalModelAction = (0, index_22.getApprovalModelAction)(this.address, {
                 sender: this,
                 payAction: async () => {
                     this.showResultMessage(this.stakingResult, 'warning', `${this.currentMode === CurrentMode.STAKE ? 'Stake' : 'Unlock'} ${this.tokenSymbol}`);
                     if (this.currentMode === CurrentMode.STAKE) {
-                        index_22.lockToken(this.lockedTokenObject, this.inputAmount.value, this.address);
+                        (0, index_22.lockToken)(this.lockedTokenObject, this.inputAmount.value, this.address);
                     }
                     else {
-                        index_22.withdrawToken(this.address);
+                        (0, index_22.withdrawToken)(this.address);
                     }
                 },
                 onToBeApproved: async (token) => {
@@ -22816,7 +22828,7 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                 onToBePaid: async (token) => {
                     var _a;
                     this.btnApprove.visible = false;
-                    const isClosed = components_7.moment(((_a = this.stakingInfo) === null || _a === void 0 ? void 0 : _a.endOfEntryPeriod) || 0).diff(components_7.moment()) <= 0;
+                    const isClosed = (0, components_7.moment)(((_a = this.stakingInfo) === null || _a === void 0 ? void 0 : _a.endOfEntryPeriod) || 0).diff((0, components_7.moment)()) <= 0;
                     if (this.currentMode === CurrentMode.STAKE) {
                         const amount = new eth_wallet_7.BigNumber(this.inputAmount.value);
                         if (amount.gt(this.balance)) {
@@ -22864,13 +22876,13 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                         if (this.currentMode === CurrentMode.STAKE) {
                             this.btnStake.caption = 'Staking';
                             this.btnStake.rightIcon.visible = true;
-                            index_20.setStakingStatus(this.actionKey, true, 'Staking');
+                            (0, index_20.setStakingStatus)(this.actionKey, true, 'Staking');
                             this.btnUnstake.enabled = false;
                         }
                         else {
                             this.btnUnstake.caption = 'Unstaking';
                             this.btnUnstake.rightIcon.visible = true;
-                            index_20.setStakingStatus(this.actionKey, true, 'Unstaking');
+                            (0, index_20.setStakingStatus)(this.actionKey, true, 'Unstaking');
                             this.btnStake.enabled = false;
                         }
                     }
@@ -22880,7 +22892,7 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                     if (this.onRefresh) {
                         await scom_token_list_4.tokenStore.updateAllTokenBalances();
                         await this.onRefresh();
-                        index_20.setStakingStatus(this.actionKey, false, caption);
+                        (0, index_20.setStakingStatus)(this.actionKey, false, caption);
                     }
                     if (this.currentMode === CurrentMode.STAKE) {
                         this.btnStake.caption = 'Stake';
@@ -22907,7 +22919,7 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
                         this.btnUnstake.rightIcon.visible = false;
                     }
                     this.showResultMessage(this.stakingResult, 'error', err);
-                    index_20.setStakingStatus(this.actionKey, false, caption);
+                    (0, index_20.setStakingStatus)(this.actionKey, false, caption);
                 }
             });
         }
@@ -22919,19 +22931,34 @@ define("@scom/scom-staking/manage-stake/manage-stake.tsx", ["require", "exports"
         render() {
             return (this.$render("i-panel", { class: manage_stake_css_1.stakingManageStakeStyle },
                 this.$render("i-hstack", { gap: 10, verticalAlignment: "center", horizontalAlignment: "center" },
-                    this.$render("i-hstack", { id: "wrapperInputAmount", gap: 4, width: 280, height: 36, padding: { right: 8 }, background: { color: '#232B5A' }, border: { radius: 8 }, verticalAlignment: "center", horizontalAlignment: "space-between" },
+                    this.$render("i-hstack", { id: "wrapperInputAmount", gap: 4, width: 280, height: 36, padding: { right: 8 }, background: { color: Theme.input.background }, border: { radius: 8 }, verticalAlignment: "center", horizontalAlignment: "space-between" },
                         this.$render("i-input", { id: "inputAmount", inputType: "number", placeholder: "0.0", class: "staking-token-input", width: "100%", height: "100%", onChanged: () => this.onInputAmount() }),
                         this.$render("i-hstack", { gap: 4, verticalAlignment: "center" },
-                            this.$render("i-button", { id: "btnMax", caption: "Max", enabled: false, class: "btn-os", width: 45, minHeight: 25, onClick: () => this.setMaxBalance() }),
-                            this.$render("i-label", { id: "lbToken", font: { size: '14px' }, class: "opacity-50" }))),
+                            this.$render("i-button", { id: "btnMax", caption: "Max", enabled: false, 
+                                // background={{ color: `${Theme.colors.primary.main} !important` }}
+                                // font={{ color: Theme.colors.primary.contrastText }}
+                                class: "btn-os", width: 45, minHeight: 25, onClick: () => this.setMaxBalance() }),
+                            this.$render("i-label", { id: "lbToken", font: { size: '14px', color: Theme.input.fontColor }, class: "opacity-50" }))),
                     this.$render("i-hstack", { gap: 10, width: "calc(100% - 290px)" },
-                        this.$render("i-button", { id: "btnApprove", caption: "Approve", enabled: false, visible: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, class: "btn-os", onClick: () => this.onApproveToken() }),
-                        this.$render("i-button", { id: "btnStake", caption: "Stake", enabled: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, class: "btn-os", onClick: () => this.onStake() }),
-                        this.$render("i-button", { id: "btnUnstake", caption: "Unstake", enabled: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, class: "btn-os", onClick: () => this.onUnstake() })))));
+                        this.$render("i-button", { id: "btnApprove", caption: "Approve", enabled: false, visible: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, 
+                            // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
+                            // background={{ color: `${Theme.colors.primary.main} !important` }}
+                            // font={{ color: Theme.colors.primary.contrastText }}
+                            class: "btn-os", onClick: () => this.onApproveToken() }),
+                        this.$render("i-button", { id: "btnStake", caption: "Stake", enabled: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, 
+                            // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
+                            // background={{ color: `${Theme.colors.primary.main} !important` }}
+                            // font={{ color: Theme.colors.primary.contrastText }}
+                            class: "btn-os", onClick: () => this.onStake() }),
+                        this.$render("i-button", { id: "btnUnstake", caption: "Unstake", enabled: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, 
+                            // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
+                            // background={{ color: `${Theme.colors.primary.main} !important` }}
+                            // font={{ color: Theme.colors.primary.contrastText }}
+                            class: "btn-os", onClick: () => this.onUnstake() })))));
         }
     };
     ManageStake = __decorate([
-        components_7.customElements('staking-manage-stake')
+        (0, components_7.customElements)('staking-manage-stake')
     ], ManageStake);
     exports.ManageStake = ManageStake;
 });
@@ -22944,7 +22971,8 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@sco
 define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/components", "@scom/scom-staking/assets.ts", "@scom/scom-staking/store/index.ts"], function (require, exports, components_8, assets_3, index_23) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.stakingComponent = void 0;
+    exports.stakingComponent = exports.stakingDappContainer = void 0;
+    const Theme = components_8.Styles.Theme.ThemeVars;
     const colorVar = {
         primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
         primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
@@ -23011,6 +23039,28 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
         src: `url("${assets_3.default.fullPath('fonts/raleway/Raleway-SemiBold.ttf')}") format("truetype")`,
         fontStyle: 'normal'
     });
+    exports.stakingDappContainer = components_8.Styles.style({
+        $nest: {
+            'dapp-container-body': {
+                $nest: {
+                    '&::-webkit-scrollbar': {
+                        width: '6px',
+                        height: '6px'
+                    },
+                    '&::-webkit-scrollbar-track': {
+                        borderRadius: '10px',
+                        border: '1px solid transparent',
+                        background: `${Theme.divider} !important`
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                        background: `${Theme.colors.primary.main} !important`,
+                        borderRadius: '10px',
+                        outline: '1px solid transparent'
+                    }
+                }
+            }
+        }
+    });
     exports.stakingComponent = components_8.Styles.style({
         $nest: {
             'i-label': {
@@ -23020,22 +23070,19 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
                 letterSpacing: '0.15px',
             },
             '#stakingElm': {
-                background: '#0c1234',
+                background: Theme.background.main,
             },
             '.i-loading-overlay': {
-                background: '#0c1234',
+                background: Theme.background.main,
             },
             '.overflow-inherit': {
                 overflow: 'inherit',
-            },
-            '::selection': {
-                color: '#fff',
-                background: '#1890ff'
             },
             '.btn-os': {
                 background: colorVar.primaryButton,
                 height: 'auto !important',
                 color: '#fff',
+                // color: Theme.colors.primary.contrastText,
                 transition: 'background .3s ease',
                 fontSize: '1rem',
                 fontWeight: 'bold',
@@ -23046,6 +23093,10 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
                         width: '16px !important',
                         height: '16px !important',
                     },
+                    'svg': {
+                        // fill: `${Theme.colors.primary.contrastText} !important`
+                        fill: `#fff !important`
+                    }
                 },
             },
             '.btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus': {
@@ -23148,8 +23199,11 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
                                         color: '#f7d064 !important',
                                     },
                                     'i-icon': {
-                                        fill: '#f7d064',
+                                        fill: '#f7d064'
                                     },
+                                    'svg': {
+                                        fill: '#f7d064'
+                                    }
                                 }
                             },
                             '.sticker-text': {
@@ -23271,7 +23325,7 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
                 }
             },
             'i-modal .modal': {
-                background: '#192046',
+                background: Theme.background.modal,
             },
             '#loadingElm.i-loading--active': {
                 marginTop: '2rem',
@@ -23289,7 +23343,7 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
                 display: 'block',
                 textAlign: 'center',
                 paddingTop: '1rem',
-            },
+            }
         }
     });
 });
@@ -23345,11 +23399,11 @@ define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijst
                     key: 'chainId',
                     textAlign: 'left',
                     onRenderCell: function (source, columnData, rowData) {
-                        const supportedNetworks = index_24.getSupportedNetworks();
+                        const supportedNetworks = (0, index_24.getSupportedNetworks)();
                         const network = supportedNetworks.find(net => net.chainId === columnData);
                         if (!network)
                             return this.$render("i-panel", null);
-                        const networkInfo = index_24.getNetworkInfo(network.chainId);
+                        const networkInfo = (0, index_24.getNetworkInfo)(network.chainId);
                         const imgUrl = networkInfo.image || '';
                         const hstack = new components_10.HStack(undefined, {
                             verticalAlignment: 'center',
@@ -23436,8 +23490,8 @@ define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijst
         }
         async init() {
             super.init();
-            const embedderFee = index_24.getEmbedderCommissionFee();
-            this.lbCommissionShare.caption = `${index_25.formatNumber(new eth_wallet_8.BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
+            const embedderFee = (0, index_24.getEmbedderCommissionFee)();
+            this.lbCommissionShare.caption = `${(0, index_25.formatNumber)(new eth_wallet_8.BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
             const commissions = this.getAttribute('commissions', true, []);
             this.commissionInfoList = commissions;
             this.tableCommissions.data = commissions;
@@ -23468,7 +23522,7 @@ define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijst
         }
         async onConfirmCommissionClicked() {
             var _a;
-            const embedderFee = index_24.getEmbedderCommissionFee();
+            const embedderFee = (0, index_24.getEmbedderCommissionFee)();
             this.commissionInfoList.push({
                 chainId: (_a = this.networkPicker.selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId,
                 walletAddress: this.inputWalletAddress.value,
@@ -23493,7 +23547,7 @@ define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijst
             else if (!this.inputWalletAddress.value) {
                 this.lbErrMsg.caption = 'Please enter wallet address';
             }
-            else if (!index_25.isWalletAddress(this.inputWalletAddress.value)) {
+            else if (!(0, index_25.isWalletAddress)(this.inputWalletAddress.value)) {
                 this.lbErrMsg.caption = 'Please enter valid wallet address';
             }
             else {
@@ -23509,7 +23563,7 @@ define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijst
             }
         }
         getSupportedChainIds() {
-            return index_24.getSupportedNetworks().map(v => ({ chainId: v.chainId }));
+            return (0, index_24.getSupportedNetworks)().map(v => ({ chainId: v.chainId }));
         }
         onNetworkSelected(network) {
             this.validateModalFields();
@@ -23559,665 +23613,72 @@ define("@scom/scom-staking/commissions/index.tsx", ["require", "exports", "@ijst
     };
     StakingConfig = __decorate([
         components_10.customModule,
-        components_10.customElements("i-scom-staking-config")
+        (0, components_10.customElements)("i-scom-staking-config")
     ], StakingConfig);
     exports.default = StakingConfig;
 });
 define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/data.json.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/common/index.tsx", "@scom/scom-staking/manage-stake/index.tsx", "@scom/scom-staking/contracts/oswap-time-is-money-contract/index.ts", "@scom/scom-staking/index.css.ts"], function (require, exports, components_11, eth_wallet_9, assets_4, index_26, index_27, scom_token_list_5, data_json_1, index_28, index_29, index_30, index_31, index_css_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const currentTheme = components_11.Styles.Theme.currentTheme;
+    const Theme = components_11.Styles.Theme.ThemeVars;
     let ScomStaking = class ScomStaking extends components_11.Module {
-        // private convertCampaignData(data: ISingleStakingCampaign) {
-        // 	if (data) {
-        // 		const hourVal = 60 * 60;
-        // 		const { stakings, campaignStart, campaignEnd } = data;
-        // 		const { perAddressCap, minLockTime, maxTotalLock, rewards } = stakings;
-        // 		const { multiplier } = rewards;
-        // 		const _maxTotalLock = new BigNumber(maxTotalLock);
-        // 		const _rewardAmount = new BigNumber(multiplier || 0).multipliedBy(_maxTotalLock);
-        // 		const _rewards: Reward = {
-        // 			...rewards,
-        // 			multiplier: new BigNumber(rewards.multiplier),
-        // 			initialReward: new BigNumber(rewards.initialReward),
-        // 			vestingPeriod: new BigNumber(rewards.vestingPeriod).multipliedBy(rewards.vestingPeriodUnit).multipliedBy(hourVal),
-        // 			claimDeadline: new BigNumber(rewards.claimDeadline),
-        // 			vestingStartDate: new BigNumber(rewards.vestingStartDate || 0),
-        // 			rewardAmount: _rewardAmount
-        // 		}
-        // 		const _stakings: Staking = {
-        // 			...stakings,
-        // 			minLockTime: new BigNumber(minLockTime),
-        // 			perAddressCap: new BigNumber(perAddressCap),
-        // 			maxTotalLock: _maxTotalLock,
-        // 			rewards: [_rewards]
-        // 		}
-        // 		let _data: IStakingCampaign = {
-        // 			...data,
-        // 			campaignStart: new BigNumber(campaignStart),
-        // 			campaignEnd: new BigNumber(campaignEnd),
-        // 			stakings: [_stakings]
-        // 		};
-        // 		return _data;
-        // 	}
-        // 	return null;
-        // }
-        constructor(parent, options) {
-            super(parent, options);
-            this.tag = {};
-            this.defaultEdit = true;
-            this.campaigns = [];
-            this.listAprTimer = [];
-            this.listActiveTimer = [];
-            this.tokenMap = {};
-            this.registerEvent = () => {
-                this.$eventBus.register(this, "isWalletConnected" /* IsWalletConnected */, this.onWalletConnect);
-                this.$eventBus.register(this, "IsWalletDisconnected" /* IsWalletDisconnected */, this.onWalletConnect);
-                this.$eventBus.register(this, "chainChanged" /* chainChanged */, this.onChainChange);
-                this.$eventBus.register(this, "stakingEmitButtonStatus" /* EmitButtonStatus */, this.updateButtonStatus);
-            };
-            this.onWalletConnect = async (connected) => {
-                this.onSetupPage(connected);
-            };
-            this.onChainChange = async () => {
-                const isConnected = index_27.isWalletConnected();
-                if (await this.isWalletValid(isConnected)) {
-                    this.onSetupPage(isConnected);
-                }
-            };
-            this.isWalletValid = async (isConnected) => {
-                var _a;
-                if (this._data && isConnected) {
-                    try {
-                        const wallet = eth_wallet_9.Wallet.getClientInstance();
-                        const infoList = this._data[wallet.chainId];
-                        const stakingAddress = infoList && ((_a = infoList[0].stakings[0]) === null || _a === void 0 ? void 0 : _a.address);
-                        if (stakingAddress) {
-                            const timeIsMoney = new index_31.Contracts.TimeIsMoney(wallet, stakingAddress);
-                            await timeIsMoney.getCredit(wallet.address);
-                        }
-                        return true;
-                    }
-                    catch (_b) {
-                        return false;
-                    }
-                }
-                return false;
-            };
-            this.updateStaking = () => {
-                this.onSetupPage(index_27.isWalletConnected());
-            };
-            this.onSetupPage = async (connected, hideLoading) => {
-                if (!hideLoading && this.loadingElm) {
-                    this.loadingElm.visible = true;
-                }
-                if (!connected || !this._data || !this.checkValidation()) {
-                    await this.renderEmpty();
-                    return;
-                }
-                scom_token_list_5.tokenStore.updateTokenMapData();
-                this.campaigns = await index_28.getAllCampaignsInfo({ [this._data.chainId]: this._data });
-                await this.renderCampaigns(hideLoading);
-                if (!hideLoading && this.loadingElm) {
-                    this.loadingElm.visible = false;
-                }
-            };
-            this.showResultMessage = (result, status, content) => {
-                if (!result)
-                    return;
-                let params = { status };
-                if (status === 'success') {
-                    params.txtHash = content;
-                }
-                else {
-                    params.content = content;
-                }
-                result.message = Object.assign({}, params);
-                result.showModal();
-            };
-            this.onClaim = async (btnClaim, data) => {
-                this.showResultMessage(this.stakingResult, 'warning', `Claim ${data.rewardSymbol}`);
-                const callBack = async (err, reply) => {
-                    if (err) {
-                        this.showResultMessage(this.stakingResult, 'error', err);
-                    }
-                    else {
-                        this.showResultMessage(this.stakingResult, 'success', reply);
-                        btnClaim.enabled = false;
-                        btnClaim.rightIcon.visible = true;
-                    }
-                };
-                const confirmationCallBack = async (receipt) => {
-                    await this.onSetupPage(index_27.isWalletConnected(), true);
-                    if (!btnClaim)
-                        return;
-                    btnClaim.rightIcon.visible = false;
-                    btnClaim.enabled = true;
-                };
-                index_26.registerSendTxEvents({
-                    transactionHash: callBack,
-                    confirmation: confirmationCallBack
-                });
-                index_28.claimToken(data.reward.address, callBack);
-            };
-            // private onDeployCampaign = async () => {
-            // 	if (this._data && this._data.isNew && this.checkValidation()) {
-            // 		const campaign = this._data;
-            // 		const chainId = getChainId();
-            // 		let result: IStakingCampaign | null;
-            // 		this.showResultMessage(this.stakingResult, 'warning', `Deploying ${campaign.customName}`);
-            // 		const callBack = async (err: any, reply: any) => {
-            // 			if (err) {
-            // 				this.showResultMessage(this.stakingResult, 'error', err);
-            // 			} else {
-            // 				this.showResultMessage(this.stakingResult, 'success', reply);
-            // 			}
-            // 		};
-            // 		const confirmationCallBack = async (receipt: any) => {
-            // 			if (!result) return;
-            // 		};
-            // 		registerSendTxEvents({
-            // 			transactionHash: callBack,
-            // 			confirmation: confirmationCallBack
-            // 		});
-            // 		result = await deployCampaign(campaign, callBack);
-            // 		if (result) {
-            // 			this.stakingResult.closeModal();
-            // 			const obj = { [chainId]: [{ ...result }] };
-            // 			this.onSetupPage(isWalletConnected());
-            // 			confirmationCallBack(true);
-            // 			this.onDownload(obj);
-            // 		}
-            // 	}
-            // }
-            this.checkValidation = () => {
-                if (!this._data)
-                    return false;
-                const { chainId, customName, stakings } = this._data;
-                if (!chainId || !customName || !stakings)
-                    return false;
-                const { address, rewards, lockTokenType } = stakings;
-                if (!address || !rewards || !rewards.address || lockTokenType === undefined)
-                    return false;
-                // const { chainId, customName, campaignStart, campaignEnd, admin, stakings } = this._data;
-                // if (!chainId || !customName || !campaignStart?.gt(0) || !campaignEnd?.gt(0) || !admin || !stakings) return false;
-                // const { lockTokenAddress, minLockTime, perAddressCap, maxTotalLock, rewards } = stakings[0];
-                // if (!lockTokenAddress || !minLockTime?.gt(0) || !perAddressCap?.gt(0) || !maxTotalLock?.gt(0) || !rewards) return false;
-                // const { rewardTokenAddress, multiplier, initialReward, vestingPeriod, claimDeadline } = rewards[0];
-                // if (!rewardTokenAddress || !multiplier?.gt(0) || initialReward?.isNaN() || !vestingPeriod?.gt(0) || !claimDeadline) return false;
-                return true;
-            };
-            this.onDownload = (data) => {
-                if (data) {
-                    index_26.downloadJsonFile('campaign.json', Object.assign({}, data));
-                }
-            };
-            this.removeTimer = () => {
-                for (const timer of this.listAprTimer) {
-                    clearInterval(timer);
-                }
-                this.listAprTimer = [];
-                for (const timer of this.listActiveTimer) {
-                    clearInterval(timer);
-                }
-                this.listActiveTimer = [];
-            };
-            this.getRewardToken = (tokenAddress) => {
-                return this.tokenMap[tokenAddress] || this.tokenMap[tokenAddress === null || tokenAddress === void 0 ? void 0 : tokenAddress.toLocaleLowerCase()] || {};
-            };
-            this.getLPToken = (campaign, token, chainId) => {
-                if (campaign.getTokenURL) {
-                    window.open(campaign.getTokenURL);
-                }
-                else {
-                    window.open(index_27.getTokenUrl ? index_27.getTokenUrl : `https:openswap.xyz/#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
-                }
-            };
-            this.updateButtonStatus = async (data) => {
-                var _a;
-                if (data) {
-                    const { value, key, text } = data;
-                    const elm = (_a = this.stakingElm) === null || _a === void 0 ? void 0 : _a.querySelector(key);
-                    if (elm) {
-                        elm.rightIcon.visible = value;
-                        elm.caption = text;
-                    }
-                }
-            };
-            this.connectWallet = () => {
-                this.$eventBus.dispatch("stakingConnectWallet" /* ConnectWallet */);
-            };
-            this.initEmptyUI = async () => {
-                if (!this.noCampaignSection) {
-                    this.noCampaignSection = await components_11.Panel.create({ height: '100%' });
-                }
-                const isConnected = index_27.isWalletConnected();
-                this.noCampaignSection.clearInnerHTML();
-                this.noCampaignSection.appendChild(this.$render("i-panel", { class: "no-campaign", height: "100%", background: { color: '#192046' } },
-                    this.$render("i-vstack", { gap: 10, verticalAlignment: "center" },
-                        this.$render("i-image", { url: assets_4.default.fullPath('img/staking/TrollTrooper.svg') }),
-                        this.$render("i-label", { font: { color: '#FFFFFF' }, caption: isConnected ? 'No Campaigns' : 'Please connect with your wallet!' }),
-                        !isConnected ? this.$render("i-button", { maxWidth: 220, caption: "Connect Wallet", class: "btn-os btn-stake", margin: { left: 'auto', right: 'auto', bottom: 0 }, font: { size: '14px' }, onClick: this.connectWallet }) : [])));
-                this.noCampaignSection.visible = true;
-            };
-            this.renderEmpty = async () => {
-                await this.initEmptyUI();
-                if (this.stakingElm) {
-                    this.stakingElm.clearInnerHTML();
-                    this.stakingElm.appendChild(this.noCampaignSection);
-                }
-                if (this.loadingElm) {
-                    this.loadingElm.visible = false;
-                }
-            };
-            this.renderCampaigns = async (hideLoading) => {
-                if (!hideLoading) {
-                    this.stakingElm.clearInnerHTML();
-                }
-                this.tokenMap = scom_token_list_5.tokenStore.tokenMap;
-                const chainId = index_27.getChainId();
-                const network = index_27.getNetworkInfo(chainId);
-                await this.initEmptyUI();
-                this.noCampaignSection.visible = false;
-                if (this.campaigns && !this.campaigns.length) {
-                    this.stakingElm.clearInnerHTML();
-                    this.stakingElm.appendChild(this.noCampaignSection);
-                    this.noCampaignSection.visible = true;
-                    this.removeTimer();
-                    return;
-                }
-                let nodeItems = [];
-                this.removeTimer();
-                const campaigns = [this.campaigns[0]];
-                for (let idx = 0; idx < campaigns.length; idx++) {
-                    const campaign = this.campaigns[idx];
-                    const _tag = this.tag || {};
-                    console.log(index_27.isThemeApplied, _tag.customColorCampaign);
-                    const colorCampaignText = index_27.isThemeApplied ? _tag.customColorCampaign || '#f15e61' : '#f15e61';
-                    const colorCampaignBackground = index_27.isThemeApplied ? _tag.customColorBackground || '#ffffff26' : '#ffffff26';
-                    const colorButton = index_27.isThemeApplied ? _tag.customColorButton : undefined;
-                    const colorText = index_27.isThemeApplied ? _tag.customColorText || '#fff' : '#fff';
-                    const colorTimeBackground = index_27.isThemeApplied ? _tag.customColorTimeBackground || '#F15E61' : '#F15E61';
-                    const containerSection = await components_11.Panel.create();
-                    containerSection.id = `campaign-${idx}`;
-                    containerSection.classList.add('container');
-                    const options = campaign.options;
-                    for (let optIdx = 0; optIdx < options.length; optIdx++) {
-                        const opt = options[optIdx];
-                        let lpTokenData = {};
-                        let vaultTokenData = {};
-                        if (opt.tokenAddress) {
-                            if (opt.lockTokenType == index_26.LockTokenType.LP_Token) {
-                                lpTokenData = {
-                                    'object': await index_28.getLPObject(opt.tokenAddress)
-                                };
-                            }
-                            else if (opt.lockTokenType == index_26.LockTokenType.VAULT_Token) {
-                                vaultTokenData = {
-                                    'object': await index_28.getVaultObject(opt.tokenAddress)
-                                };
-                            }
-                        }
-                        const tokenInfo = {
-                            tokenAddress: campaign.tokenAddress,
-                            lpToken: lpTokenData,
-                            vaultToken: vaultTokenData
-                        };
-                        options[optIdx] = Object.assign(Object.assign({}, options[optIdx]), { tokenInfo });
-                    }
-                    const stakingInfo = options ? options[0] : null;
-                    const lockedTokenObject = index_27.getLockedTokenObject(stakingInfo, stakingInfo.tokenInfo, this.tokenMap);
-                    const lockedTokenSymbol = index_27.getLockedTokenSymbol(stakingInfo, lockedTokenObject);
-                    const lockedTokenIconPaths = index_27.getLockedTokenIconPaths(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
-                    const lockedTokenDecimals = (lockedTokenObject === null || lockedTokenObject === void 0 ? void 0 : lockedTokenObject.decimals) || 18;
-                    const defaultDecimalsOffset = 18 - lockedTokenDecimals;
-                    const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
-                    const activeEndTime = stakingInfo ? stakingInfo.endOfEntryPeriod : 0;
-                    let isStarted = components_11.moment(activeStartTime).diff(components_11.moment()) <= 0;
-                    let isClosed = components_11.moment(activeEndTime).diff(components_11.moment()) <= 0;
-                    let totalLocked = {};
-                    const stakingElms = [];
-                    const optionTimer = { background: { color: colorTimeBackground }, font: { color: colorText } };
-                    const activeTimerRows = [];
-                    const activeTimerElms = [];
-                    const endHours = [];
-                    const endDays = [];
-                    const endMins = [];
-                    const stickerSections = [];
-                    const stickerLabels = [];
-                    const stickerIcons = [];
-                    for (let i = 0; i < options.length; i++) {
-                        stakingElms[i] = await components_11.VStack.create({ visible: i === 0 });
-                        activeTimerRows[i] = await components_11.VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
-                        activeTimerElms[i] = await components_11.VStack.create();
-                        activeTimerRows[i].appendChild(this.$render("i-label", { caption: "End Date", font: { size: '14px', color: colorText }, class: "opacity-50" }));
-                        activeTimerRows[i].appendChild(activeTimerElms[i]);
-                        endHours[i] = await components_11.Label.create(optionTimer);
-                        endDays[i] = await components_11.Label.create(optionTimer);
-                        endMins[i] = await components_11.Label.create(optionTimer);
-                        endHours[i].classList.add('timer-value');
-                        endDays[i].classList.add('timer-value');
-                        endMins[i].classList.add('timer-value');
-                        activeTimerElms[i].appendChild(this.$render("i-hstack", { gap: 4, class: "custom-timer" },
-                            endDays[i],
-                            this.$render("i-label", { caption: "D", class: "timer-unit", font: { color: colorText } }),
-                            endHours[i],
-                            this.$render("i-label", { caption: "H", class: "timer-unit", font: { color: colorText } }),
-                            endMins[i],
-                            this.$render("i-label", { caption: "M", class: "timer-unit", font: { color: colorText } })));
-                        // Sticker
-                        stickerSections[i] = await components_11.Panel.create({ visible: false });
-                        stickerLabels[i] = await components_11.Label.create();
-                        stickerIcons[i] = await components_11.Icon.create();
-                        stickerSections[i].classList.add('sticker');
-                        stickerSections[i].appendChild(this.$render("i-vstack", { class: "sticker-text" },
-                            stickerIcons[i],
-                            stickerLabels[i]));
-                    }
-                    const onChangeStake = (index) => {
-                        stakingElms.forEach((elm) => {
-                            elm.visible = false;
-                        });
-                        stakingElms[index].visible = true;
-                    };
-                    const setAvailableQty = async () => {
-                        if (!index_27.isWalletConnected())
-                            return;
-                        let i = 0;
-                        for (const o of options) {
-                            const _totalLocked = await index_28.getStakingTotalLocked(o.address);
-                            totalLocked[o.address] = _totalLocked;
-                            const optionQty = new eth_wallet_9.BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
-                            if (o.mode === 'Stake') {
-                                const keyStake = `#btn-stake-${o.address}`;
-                                const btnStake = this.querySelector(keyStake);
-                                const isStaking = index_27.getStakingStatus(keyStake).value;
-                                if (btnStake) {
-                                    let isValidInput = false;
-                                    const inputElm = this.querySelector(`#input-${o.address}`);
-                                    if (inputElm) {
-                                        const manageStake = this.querySelector(`#manage-stake-${o.address}`);
-                                        const inputVal = new eth_wallet_9.BigNumber(inputElm.value || 0);
-                                        isValidInput = inputVal.gt(0) && inputVal.lte(manageStake.getBalance()) && !(manageStake === null || manageStake === void 0 ? void 0 : manageStake.needToBeApproval());
-                                    }
-                                    btnStake.enabled = !isStaking && isValidInput && (isStarted && !(optionQty.lte(0) || isClosed));
-                                }
-                            }
-                            else {
-                                const keyUnstake = `#btn-unstake-${o.address}`;
-                                const btnUnstake = this.querySelector(keyUnstake);
-                                const isUnstaking = index_27.getStakingStatus(keyUnstake).value;
-                                if (btnUnstake) {
-                                    const manageStake = this.querySelector(`#manage-stake-${o.address}`);
-                                    btnUnstake.enabled = !isUnstaking && o.mode !== 'Stake' && Number(o.stakeQty) != 0 && !(manageStake === null || manageStake === void 0 ? void 0 : manageStake.needToBeApproval());
-                                }
-                            }
-                            if (isClosed) {
-                                if (stickerLabels[i].caption !== 'Closed') {
-                                    stickerSections[i].classList.add('closed');
-                                    stickerSections[i].classList.remove('sold-out');
-                                    stickerLabels[i].caption = 'Closed';
-                                    stickerIcons[i].name = 'check-square';
-                                }
-                            }
-                            else if (optionQty.lte(0)) {
-                                if (stickerLabels[i].caption !== 'Sold Out') {
-                                    stickerLabels[i].caption = 'Sold Out';
-                                    stickerIcons[i].name = 'star';
-                                    stickerSections[i].classList.add('sold-out');
-                                }
-                            }
-                            else {
-                                if (stickerLabels[i].caption !== 'Active') {
-                                    stickerLabels[i].caption = 'Active';
-                                    stickerIcons[i].name = 'star';
-                                }
-                            }
-                            if (!stickerSections[i].visible) {
-                                stickerSections[i].visible = true;
-                            }
-                            i++;
-                        }
-                        ;
-                    };
-                    const setEndRemainingTime = () => {
-                        isStarted = components_11.moment(activeStartTime).diff(components_11.moment()) <= 0;
-                        isClosed = components_11.moment(activeEndTime).diff(components_11.moment()) <= 0;
-                        for (let i = 0; i < options.length; i++) {
-                            activeTimerRows[i].visible = isStarted && !isClosed;
-                        }
-                        if (activeEndTime == 0) {
-                            for (let i = 0; i < options.length; i++) {
-                                endDays[i].caption = endHours[i].caption = endMins[i].caption = '0';
-                            }
-                            if (this.listActiveTimer[idx]) {
-                                clearInterval(this.listActiveTimer[idx]);
-                            }
-                        }
-                        else {
-                            const days = components_11.moment(activeEndTime).diff(components_11.moment(), 'days');
-                            const hours = components_11.moment(activeEndTime).diff(components_11.moment(), 'hours') - days * 24;
-                            const mins = components_11.moment(activeEndTime).diff(components_11.moment(), 'minutes') - days * 24 * 60 - hours * 60;
-                            for (let i = 0; i < options.length; i++) {
-                                endDays[i].caption = `${days}`;
-                                endHours[i].caption = `${hours}`;
-                                endMins[i].caption = `${mins}`;
-                            }
-                        }
-                    };
-                    const setTimer = () => {
-                        setEndRemainingTime();
-                        setAvailableQty();
-                    };
-                    setTimer();
-                    this.listActiveTimer.push(setInterval(setTimer, 2000));
-                    const stakingsElm = await Promise.all(options.map(async (option, optionIdx) => {
-                        const manageStake = new index_30.ManageStake();
-                        manageStake.id = `manage-stake-${option.address}`;
-                        manageStake.width = '100%';
-                        manageStake.onRefresh = () => this.onSetupPage(index_27.isWalletConnected(), true);
-                        this.manageStakeElm.clearInnerHTML();
-                        this.manageStakeElm.appendChild(manageStake);
-                        manageStake.setData(Object.assign(Object.assign(Object.assign({}, campaign), option), { customColorButton: colorButton, customColorText: colorText }));
-                        const isClaim = option.mode === 'Claim';
-                        const rewardsData = option.rewardsData[0] ? [option.rewardsData[0]] : [];
-                        const rewardOptions = !isClaim ? rewardsData : [];
-                        let aprInfo = {};
-                        const claimStakedRow = await components_11.HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
-                        claimStakedRow.appendChild(this.$render("i-label", { caption: "You Staked", font: { size: '16px', color: colorText } }));
-                        claimStakedRow.appendChild(this.$render("i-label", { caption: `${index_26.formatNumber(new eth_wallet_9.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`, font: { size: '16px', name: 'Montserrat Regular', color: colorText } }));
-                        const rowRewards = await components_11.VStack.create({ gap: 8, verticalAlignment: 'center' });
-                        for (let idx = 0; idx < rewardsData.length; idx++) {
-                            const reward = rewardsData[idx];
-                            const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
-                            const rewardTokenDecimals = rewardToken.decimals || 18;
-                            let decimalsOffset = 18 - rewardTokenDecimals;
-                            let rewardLockedDecimalsOffset = decimalsOffset;
-                            if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
-                                rewardLockedDecimalsOffset = decimalsOffset * 2;
-                            }
-                            else if (lockedTokenDecimals !== 18 && rewardTokenDecimals === 18) {
-                                rewardLockedDecimalsOffset = rewardTokenDecimals - lockedTokenDecimals;
-                                decimalsOffset = 18 - lockedTokenDecimals;
-                            }
-                            const rewardSymbol = rewardToken.symbol || '';
-                            rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
-                                this.$render("i-label", { caption: `${rewardSymbol} Locked`, font: { size: '16px', color: colorText } }),
-                                this.$render("i-label", { caption: `${index_26.formatNumber(new eth_wallet_9.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '16px', name: 'Montserrat Regular', color: colorText } })));
-                            // rowRewards.appendChild(
-                            // 	<i-hstack horizontalAlignment="space-between">
-                            // 		<i-label caption={`${rewardSymbol} Vesting Start`} font={{ size: '16px', color: colorText }} />
-                            // 		<i-label caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
-                            // 	</i-hstack>
-                            // );
-                            // rowRewards.appendChild(
-                            // 	<i-hstack horizontalAlignment="space-between">
-                            // 		<i-label caption={`${rewardSymbol} Vesting End`} font={{ size: '16px', color: colorText }} />
-                            // 		<i-label caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
-                            // 	</i-hstack>
-                            // );
-                            const passClaimStartTime = !(reward.claimStartTime && components_11.moment().diff(components_11.moment.unix(reward.claimStartTime)) < 0);
-                            let rewardClaimable = `0 ${rewardSymbol}`;
-                            if (passClaimStartTime && isClaim) {
-                                rewardClaimable = `${index_26.formatNumber(new eth_wallet_9.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
-                            }
-                            let startClaimingText = '';
-                            if (!(!reward.claimStartTime || passClaimStartTime) && isClaim) {
-                                const claimStart = components_11.moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
-                                startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
-                            }
-                            rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
-                                this.$render("i-label", { caption: `${rewardSymbol} Claimable`, font: { size: '16px', color: colorText } }),
-                                this.$render("i-label", { caption: rewardClaimable, font: { size: '16px', name: 'Montserrat Regular', color: colorText } }),
-                                startClaimingText ? this.$render("i-label", { caption: startClaimingText, font: { size: '16px', color: colorText } }) : []));
-                            const btnClaim = await components_11.Button.create({
-                                rightIcon: { spin: true, fill: colorText, visible: false },
-                                caption: `Claim ${rewardSymbol}`,
-                                background: { color: `${colorButton} !important` },
-                                font: { color: colorText },
-                                enabled: !(!passClaimStartTime || new eth_wallet_9.BigNumber(reward.claimable).isZero()) && isClaim,
-                                margin: { left: 'auto', right: 'auto' }
-                            });
-                            btnClaim.id = `btnClaim-${idx}-${option.address}`;
-                            btnClaim.classList.add('btn-os', 'btn-stake');
-                            btnClaim.onClick = () => this.onClaim(btnClaim, { reward, rewardSymbol });
-                            rowRewards.appendChild(btnClaim);
-                        }
-                        ;
-                        const getAprValue = (rewardOption) => {
-                            if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
-                                const apr = new eth_wallet_9.BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, eth_wallet_9.BigNumber.ROUND_DOWN);
-                                return `${apr}%`;
-                            }
-                            return '';
-                        };
-                        const durationDays = option.minLockTime / (60 * 60 * 24);
-                        const _lockedTokenObject = index_27.getLockedTokenObject(option, option.tokenInfo, this.tokenMap);
-                        const _lockedTokenIconPaths = index_27.getLockedTokenIconPaths(option, _lockedTokenObject, chainId, this.tokenMap);
-                        const pathsLength = _lockedTokenIconPaths.length;
-                        const rewardToken = (rewardsData === null || rewardsData === void 0 ? void 0 : rewardsData.length) ? this.getRewardToken(rewardsData[0].rewardTokenAddress) : null;
-                        stakingElms[optionIdx].appendChild(this.$render("i-vstack", { gap: 15, width: index_27.maxWidth, height: "100%", padding: { top: 10, bottom: 10, left: 20, right: 20 }, position: "relative" },
-                            stickerSections[optionIdx],
-                            this.$render("i-hstack", { gap: 10, width: "100%", verticalAlignment: "center" },
-                                this.$render("i-hstack", { gap: 10, width: "50%" },
-                                    this.$render("i-hstack", { width: pathsLength === 1 ? 63.5 : 80, position: "relative", verticalAlignment: "center" },
-                                        this.$render("i-image", { width: 60, height: 60, url: scom_token_list_5.assets.tokenPath(rewardToken, chainId), fallbackUrl: index_27.fallBackUrl }),
-                                        _lockedTokenIconPaths.map((v, idxImg) => {
-                                            return this.$render("i-image", { position: "absolute", width: 28, height: 28, bottom: 0, left: (idxImg * 20) + 35, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_27.fallBackUrl });
-                                        })),
-                                    this.$render("i-vstack", { gap: 2, overflow: { x: 'hidden' }, verticalAlignment: "center" },
-                                        this.$render("i-label", { visible: !!campaign.customName, caption: campaign.customName, font: { size: '20px', name: 'Montserrat Bold', color: colorCampaignText, bold: true }, class: "text-overflow" }),
-                                        this.$render("i-label", { visible: !!campaign.customDesc, caption: campaign.customDesc, font: { size: '16px', name: 'Montserrat Regular', color: colorText }, class: "opacity-50 text-overflow" }))),
-                                await Promise.all(rewardOptions.map(async (rewardOption, idx) => {
-                                    const lbApr = await components_11.Label.create({ font: { size: '40px', name: 'Montserrat Medium', color: '#72F35D' } });
-                                    const lbRate = await components_11.Label.create({ font: { size: '16px', name: 'Montserrat Regular', color: colorText } });
-                                    lbApr.classList.add('text-overflow');
-                                    lbRate.classList.add('opacity-50');
-                                    const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
-                                    const rewardTokenDecimals = rewardToken.decimals || 18;
-                                    const decimalsOffset = 18 - rewardTokenDecimals;
-                                    const lockTokenType = option.lockTokenType;
-                                    const rateDesc = `1 ${lockTokenType === index_26.LockTokenType.LP_Token ? 'LP' : index_27.tokenSymbol(option.lockTokenAddress)} : ${new eth_wallet_9.BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${index_27.tokenSymbol(rewardOption.rewardTokenAddress)}`;
-                                    const updateApr = async () => {
-                                        var _a, _b, _c, _d;
-                                        if (lockTokenType === index_26.LockTokenType.ERC20_Token) {
-                                            const apr = await index_28.getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, durationDays);
-                                            if (!isNaN(parseFloat(apr))) {
-                                                aprInfo[rewardOption.rewardTokenAddress] = apr;
-                                            }
-                                        }
-                                        else if (lockTokenType === index_26.LockTokenType.LP_Token) {
-                                            if (rewardOption.referencePair) {
-                                                aprInfo[rewardOption.rewardTokenAddress] = await index_28.getLPRewardCurrentAPR(rewardOption, (_b = (_a = option.tokenInfo) === null || _a === void 0 ? void 0 : _a.lpToken) === null || _b === void 0 ? void 0 : _b.object, durationDays);
-                                            }
-                                        }
-                                        else {
-                                            aprInfo[rewardOption.rewardTokenAddress] = await index_28.getVaultRewardCurrentAPR(rewardOption, (_d = (_c = option.tokenInfo) === null || _c === void 0 ? void 0 : _c.vaultToken) === null || _d === void 0 ? void 0 : _d.object, durationDays);
-                                        }
-                                        const aprValue = getAprValue(rewardOption);
-                                        lbApr.caption = `APR ${aprValue}`;
-                                        lbRate.caption = rateDesc;
-                                    };
-                                    updateApr();
-                                    this.listAprTimer.push(setInterval(updateApr, 10000));
-                                    const aprValue = getAprValue(rewardOption);
-                                    lbApr.caption = `APR ${aprValue}`;
-                                    lbRate.caption = rateDesc;
-                                    return this.$render("i-vstack", { verticalAlignment: "center" },
-                                        lbApr,
-                                        lbRate);
-                                }))),
-                            this.$render("i-hstack", { width: "100%", verticalAlignment: "center" },
-                                this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
-                                    this.$render("i-label", { caption: "Start Date", font: { size: '14px', color: colorText }, class: "opacity-50" }),
-                                    this.$render("i-label", { caption: index_26.formatDate(option.startOfEntryPeriod, 'DD MMM, YYYY'), font: { size: '16px', name: 'Montserrat Regular', color: colorText } })),
-                                activeTimerRows[optionIdx],
-                                this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
-                                    this.$render("i-label", { caption: "Stake Duration", font: { size: '14px', color: colorText }, class: "opacity-50" }),
-                                    this.$render("i-hstack", { gap: 4, verticalAlignment: "center" }, options.map((_option, _optionIdx) => {
-                                        const isCurrentIdx = optionIdx === _optionIdx;
-                                        return this.$render("i-button", { caption: durationDays < 1 ? '< 1 Day' : `${durationDays} Days`, class: `btn-os ${isCurrentIdx ? 'cursor-default' : ''}`, border: { radius: 12, width: 1, style: 'solid', color: isCurrentIdx ? 'transparent' : '#8994A3' }, font: { size: '12px', name: 'Montserrat Regular', color: isCurrentIdx ? colorText : '#8994A3' }, padding: { top: 2.5, bottom: 2.5, left: 8, right: 8 }, background: { color: isCurrentIdx ? '#f15e61 !important' : 'transparent !important' }, onClick: () => onChangeStake(_optionIdx) });
-                                    }))),
-                                this.$render("i-vstack", { gap: 4, width: "25%", margin: { left: 'auto' }, verticalAlignment: "center", horizontalAlignment: "end" },
-                                    this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => this.getLPToken(campaign, lockedTokenSymbol, chainId) },
-                                        this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: colorText }),
-                                        this.$render("i-label", { caption: `Get ${lockedTokenSymbol}`, font: { size: '13.6px', color: colorText } }),
-                                        lockedTokenIconPaths.map((v) => {
-                                            return this.$render("i-image", { display: "flex", width: 15, height: 15, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_27.fallBackUrl });
-                                        })),
-                                    campaign.showContractLink ?
-                                        this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => index_26.viewOnExplorerByAddress(chainId, option.address) },
-                                            this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: colorText, class: "inline-block" }),
-                                            this.$render("i-label", { caption: "View Contract", font: { size: '13.6px', color: colorText } })) : [])),
-                            this.$render("i-vstack", { gap: 8 },
-                                claimStakedRow,
-                                this.$render("i-vstack", { verticalAlignment: "center", horizontalAlignment: "center" }, manageStake),
-                                rowRewards)));
-                        return stakingElms[optionIdx];
-                    }));
-                    nodeItems.push(containerSection);
-                    containerSection.appendChild(this.$render("i-hstack", { background: { color: colorCampaignBackground }, width: "100%", height: index_27.maxHeight }, stakingsElm));
-                }
-                ;
-                this.stakingElm.clearInnerHTML();
-                this.stakingElm.append(this.noCampaignSection, ...nodeItems);
-            };
-            if (data_json_1.default)
-                index_27.setDataFromConfig(data_json_1.default);
-            this.$eventBus = components_11.application.EventBus;
-            this.registerEvent();
-        }
-        getPropertiesSchema(readOnly) {
-            const propertiesSchema = index_27.getSingleStakingSchema(readOnly);
+        getPropertiesSchema() {
+            const propertiesSchema = (0, index_27.getSingleStakingSchema)();
             return propertiesSchema;
         }
-        getThemeSchema(readOnly) {
+        getThemeSchema() {
+            const _props = {
+                backgroundColor: {
+                    type: 'string',
+                    format: 'color'
+                },
+                fontColor: {
+                    type: 'string',
+                    format: 'color'
+                },
+                textSecondary: {
+                    type: 'string',
+                    title: 'Campaign Font Color',
+                    format: 'color'
+                },
+                inputBackgroundColor: {
+                    type: 'string',
+                    format: 'color'
+                },
+                inputFontColor: {
+                    type: 'string',
+                    format: 'color'
+                },
+                // buttonBackgroundColor: {
+                // 	type: 'string',
+                // 	format: 'color'
+                // },
+                // buttonFontColor: {
+                // 	type: 'string',
+                // 	format: 'color'
+                // },
+                secondaryColor: {
+                    type: 'string',
+                    title: 'Timer Background Color',
+                    format: 'color'
+                },
+                secondaryFontColor: {
+                    type: 'string',
+                    title: 'Timer Font Color',
+                    format: 'color'
+                }
+            };
             const themeSchema = {
                 type: 'object',
                 properties: {
-                    customColorCampaign: {
-                        type: 'string',
-                        format: 'color',
-                        readOnly
+                    'dark': {
+                        type: 'object',
+                        properties: _props
                     },
-                    customColorBackground: {
-                        type: 'string',
-                        format: 'color',
-                        readOnly
-                    },
-                    customColorButton: {
-                        type: 'string',
-                        format: 'color',
-                        readOnly
-                    },
-                    customColorText: {
-                        type: 'string',
-                        format: 'color',
-                        readOnly
-                    },
-                    customColorTimeBackground: {
-                        type: 'string',
-                        format: 'color',
-                        readOnly
+                    'light': {
+                        type: 'object',
+                        properties: _props
                     }
                 }
             };
@@ -24253,7 +23714,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                                     this._data.showContractLink = userInputData.showContractLink;
                                 if ((userInputData === null || userInputData === void 0 ? void 0 : userInputData.stakings) !== undefined)
                                     this._data.stakings = userInputData.stakings;
-                                index_27.setCurrentChainId(this._data.chainId);
+                                (0, index_27.setCurrentChainId)(this._data.chainId);
                                 this.configDApp.data = this._data;
                                 this.updateStaking();
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
@@ -24261,7 +23722,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             },
                             undo: async () => {
                                 this._data = Object.assign({}, _oldData);
-                                index_27.setCurrentChainId(this._data.chainId);
+                                (0, index_27.setCurrentChainId)(this._data.chainId);
                                 this.configDApp.data = this._data;
                                 this.updateStaking();
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
@@ -24321,6 +23782,10 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     setData: async (data) => {
                         const defaultData = data_json_1.default.defaultBuilderData;
                         await this.setData(Object.assign(Object.assign({}, defaultData), data));
+                        if (this.mdWallet) {
+                            this.mdWallet.networks = this._data.networks;
+                            this.mdWallet.wallets = this._data.wallets;
+                        }
                     },
                     getTag: this.getTag.bind(this),
                     setTag: this.setTag.bind(this)
@@ -24361,42 +23826,697 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             return this._data;
         }
         async setData(value) {
-            var _a, _b, _c, _d;
+            var _a, _b, _c, _d, _e;
             // this._data = this.convertCampaignData(value);
             this._data = value;
             this.configDApp.data = value;
             const data = {
-                wallets: (_a = this._data.wallets) !== null && _a !== void 0 ? _a : [],
-                networks: (_b = this._data.networks) !== null && _b !== void 0 ? _b : [],
-                showHeader: (_c = this._data.showHeader) !== null && _c !== void 0 ? _c : true
+                defaultChainId: (_a = this._data.defaultChainId) !== null && _a !== void 0 ? _a : undefined,
+                wallets: (_b = this._data.wallets) !== null && _b !== void 0 ? _b : [],
+                networks: (_c = this._data.networks) !== null && _c !== void 0 ? _c : [],
+                showHeader: (_d = this._data.showHeader) !== null && _d !== void 0 ? _d : true
             };
-            if ((_d = this.dappContainer) === null || _d === void 0 ? void 0 : _d.setData)
+            if ((_e = this.dappContainer) === null || _e === void 0 ? void 0 : _e.setData)
                 this.dappContainer.setData(data);
+            if (this.mdWallet) {
+                this.mdWallet.networks = value.networks;
+                this.mdWallet.wallets = value.wallets;
+            }
             // TODO - update proxy address
-            this.onSetupPage(index_27.isWalletConnected());
+            this.onSetupPage((0, index_27.isWalletConnected)());
         }
         async getTag() {
             return this.tag;
+        }
+        updateTag(type, value) {
+            var _a;
+            this.tag[type] = (_a = this.tag[type]) !== null && _a !== void 0 ? _a : {};
+            for (let prop in value) {
+                if (value.hasOwnProperty(prop))
+                    this.tag[type][prop] = value[prop];
+            }
         }
         async setTag(value) {
             const newValue = value || {};
             for (let prop in newValue) {
                 if (newValue.hasOwnProperty(prop)) {
-                    this.tag[prop] = newValue[prop];
+                    if (prop === 'light' || prop === 'dark')
+                        this.updateTag(prop, newValue[prop]);
+                    else
+                        this.tag[prop] = newValue[prop];
                 }
             }
+            if (this.dappContainer)
+                this.dappContainer.setTag(this.tag);
+            this.updateTheme();
             if (this.stakingElm) {
                 this.renderCampaigns();
             }
+        }
+        updateStyle(name, value) {
+            value ?
+                this.style.setProperty(name, value) :
+                this.style.removeProperty(name);
+        }
+        updateTheme() {
+            var _a, _b, _c, _d, _e, _f, _g, _h;
+            const themeVar = ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.theme) || 'light';
+            this.updateStyle('--text-primary', (_b = this.tag[themeVar]) === null || _b === void 0 ? void 0 : _b.fontColor);
+            this.updateStyle('--background-main', (_c = this.tag[themeVar]) === null || _c === void 0 ? void 0 : _c.backgroundColor);
+            this.updateStyle('--text-secondary', (_d = this.tag[themeVar]) === null || _d === void 0 ? void 0 : _d.textSecondary);
+            // this.updateStyle('--colors-primary-main', this.tag[themeVar]?.buttonBackgroundColor);
+            // this.updateStyle('--colors-primary-contrast_text', this.tag[themeVar]?.buttonFontColor);
+            this.updateStyle('--colors-secondary-main', (_e = this.tag[themeVar]) === null || _e === void 0 ? void 0 : _e.secondaryColor);
+            this.updateStyle('--colors-secondary-contrast_text', (_f = this.tag[themeVar]) === null || _f === void 0 ? void 0 : _f.secondaryFontColor);
+            this.updateStyle('--input-font_color', (_g = this.tag[themeVar]) === null || _g === void 0 ? void 0 : _g.inputFontColor);
+            this.updateStyle('--input-background', (_h = this.tag[themeVar]) === null || _h === void 0 ? void 0 : _h.inputBackgroundColor);
+        }
+        // private convertCampaignData(data: ISingleStakingCampaign) {
+        // 	if (data) {
+        // 		const hourVal = 60 * 60;
+        // 		const { stakings, campaignStart, campaignEnd } = data;
+        // 		const { perAddressCap, minLockTime, maxTotalLock, rewards } = stakings;
+        // 		const { multiplier } = rewards;
+        // 		const _maxTotalLock = new BigNumber(maxTotalLock);
+        // 		const _rewardAmount = new BigNumber(multiplier || 0).multipliedBy(_maxTotalLock);
+        // 		const _rewards: Reward = {
+        // 			...rewards,
+        // 			multiplier: new BigNumber(rewards.multiplier),
+        // 			initialReward: new BigNumber(rewards.initialReward),
+        // 			vestingPeriod: new BigNumber(rewards.vestingPeriod).multipliedBy(rewards.vestingPeriodUnit).multipliedBy(hourVal),
+        // 			claimDeadline: new BigNumber(rewards.claimDeadline),
+        // 			vestingStartDate: new BigNumber(rewards.vestingStartDate || 0),
+        // 			rewardAmount: _rewardAmount
+        // 		}
+        // 		const _stakings: Staking = {
+        // 			...stakings,
+        // 			minLockTime: new BigNumber(minLockTime),
+        // 			perAddressCap: new BigNumber(perAddressCap),
+        // 			maxTotalLock: _maxTotalLock,
+        // 			rewards: [_rewards]
+        // 		}
+        // 		let _data: IStakingCampaign = {
+        // 			...data,
+        // 			campaignStart: new BigNumber(campaignStart),
+        // 			campaignEnd: new BigNumber(campaignEnd),
+        // 			stakings: [_stakings]
+        // 		};
+        // 		return _data;
+        // 	}
+        // 	return null;
+        // }
+        constructor(parent, options) {
+            super(parent, options);
+            this.tag = {};
+            this.defaultEdit = true;
+            this.campaigns = [];
+            this.listAprTimer = [];
+            this.listActiveTimer = [];
+            this.tokenMap = {};
+            this.registerEvent = () => {
+                this.$eventBus.register(this, "isWalletConnected" /* EventId.IsWalletConnected */, this.onWalletConnect);
+                this.$eventBus.register(this, "IsWalletDisconnected" /* EventId.IsWalletDisconnected */, this.onWalletConnect);
+                this.$eventBus.register(this, "chainChanged" /* EventId.chainChanged */, this.onChainChange);
+                this.$eventBus.register(this, "stakingEmitButtonStatus" /* EventId.EmitButtonStatus */, this.updateButtonStatus);
+            };
+            this.onWalletConnect = async (connected) => {
+                this.onSetupPage(connected);
+            };
+            this.onChainChange = async () => {
+                const isConnected = (0, index_27.isWalletConnected)();
+                if (await this.isWalletValid(isConnected)) {
+                    this.onSetupPage(isConnected);
+                }
+            };
+            this.isWalletValid = async (isConnected) => {
+                var _a;
+                if (this._data && isConnected) {
+                    try {
+                        const wallet = eth_wallet_9.Wallet.getClientInstance();
+                        const infoList = this._data[wallet.chainId];
+                        const stakingAddress = infoList && ((_a = infoList[0].stakings[0]) === null || _a === void 0 ? void 0 : _a.address);
+                        if (stakingAddress) {
+                            const timeIsMoney = new index_31.Contracts.TimeIsMoney(wallet, stakingAddress);
+                            await timeIsMoney.getCredit(wallet.address);
+                        }
+                        return true;
+                    }
+                    catch (_b) {
+                        return false;
+                    }
+                }
+                return false;
+            };
+            this.updateStaking = () => {
+                this.onSetupPage((0, index_27.isWalletConnected)());
+            };
+            this.onSetupPage = async (connected, hideLoading) => {
+                if (!hideLoading && this.loadingElm) {
+                    this.loadingElm.visible = true;
+                }
+                if (!connected || !this._data || !this.checkValidation()) {
+                    await this.renderEmpty();
+                    return;
+                }
+                scom_token_list_5.tokenStore.updateTokenMapData();
+                this.campaigns = await (0, index_28.getAllCampaignsInfo)({ [this._data.chainId]: this._data });
+                await this.renderCampaigns(hideLoading);
+                if (!hideLoading && this.loadingElm) {
+                    this.loadingElm.visible = false;
+                }
+            };
+            this.showResultMessage = (result, status, content) => {
+                if (!result)
+                    return;
+                let params = { status };
+                if (status === 'success') {
+                    params.txtHash = content;
+                }
+                else {
+                    params.content = content;
+                }
+                result.message = Object.assign({}, params);
+                result.showModal();
+            };
+            this.onClaim = async (btnClaim, data) => {
+                this.showResultMessage(this.stakingResult, 'warning', `Claim ${data.rewardSymbol}`);
+                const callBack = async (err, reply) => {
+                    if (err) {
+                        this.showResultMessage(this.stakingResult, 'error', err);
+                    }
+                    else {
+                        this.showResultMessage(this.stakingResult, 'success', reply);
+                        btnClaim.enabled = false;
+                        btnClaim.rightIcon.visible = true;
+                    }
+                };
+                const confirmationCallBack = async (receipt) => {
+                    await this.onSetupPage((0, index_27.isWalletConnected)(), true);
+                    if (!btnClaim)
+                        return;
+                    btnClaim.rightIcon.visible = false;
+                    btnClaim.enabled = true;
+                };
+                (0, index_26.registerSendTxEvents)({
+                    transactionHash: callBack,
+                    confirmation: confirmationCallBack
+                });
+                (0, index_28.claimToken)(data.reward.address, callBack);
+            };
+            // private onDeployCampaign = async () => {
+            // 	if (this._data && this._data.isNew && this.checkValidation()) {
+            // 		const campaign = this._data;
+            // 		const chainId = getChainId();
+            // 		let result: IStakingCampaign | null;
+            // 		this.showResultMessage(this.stakingResult, 'warning', `Deploying ${campaign.customName}`);
+            // 		const callBack = async (err: any, reply: any) => {
+            // 			if (err) {
+            // 				this.showResultMessage(this.stakingResult, 'error', err);
+            // 			} else {
+            // 				this.showResultMessage(this.stakingResult, 'success', reply);
+            // 			}
+            // 		};
+            // 		const confirmationCallBack = async (receipt: any) => {
+            // 			if (!result) return;
+            // 		};
+            // 		registerSendTxEvents({
+            // 			transactionHash: callBack,
+            // 			confirmation: confirmationCallBack
+            // 		});
+            // 		result = await deployCampaign(campaign, callBack);
+            // 		if (result) {
+            // 			this.stakingResult.closeModal();
+            // 			const obj = { [chainId]: [{ ...result }] };
+            // 			this.onSetupPage(isWalletConnected());
+            // 			confirmationCallBack(true);
+            // 			this.onDownload(obj);
+            // 		}
+            // 	}
+            // }
+            this.checkValidation = () => {
+                if (!this._data)
+                    return false;
+                const { chainId, customName, stakings } = this._data;
+                if (!chainId || !customName || !stakings)
+                    return false;
+                const { address, rewards, lockTokenType } = stakings;
+                if (!address || !rewards || !rewards.address || lockTokenType === undefined)
+                    return false;
+                // const { chainId, customName, campaignStart, campaignEnd, admin, stakings } = this._data;
+                // if (!chainId || !customName || !campaignStart?.gt(0) || !campaignEnd?.gt(0) || !admin || !stakings) return false;
+                // const { lockTokenAddress, minLockTime, perAddressCap, maxTotalLock, rewards } = stakings[0];
+                // if (!lockTokenAddress || !minLockTime?.gt(0) || !perAddressCap?.gt(0) || !maxTotalLock?.gt(0) || !rewards) return false;
+                // const { rewardTokenAddress, multiplier, initialReward, vestingPeriod, claimDeadline } = rewards[0];
+                // if (!rewardTokenAddress || !multiplier?.gt(0) || initialReward?.isNaN() || !vestingPeriod?.gt(0) || !claimDeadline) return false;
+                return true;
+            };
+            this.onDownload = (data) => {
+                if (data) {
+                    (0, index_26.downloadJsonFile)('campaign.json', Object.assign({}, data));
+                }
+            };
+            this.removeTimer = () => {
+                for (const timer of this.listAprTimer) {
+                    clearInterval(timer);
+                }
+                this.listAprTimer = [];
+                for (const timer of this.listActiveTimer) {
+                    clearInterval(timer);
+                }
+                this.listActiveTimer = [];
+            };
+            this.getRewardToken = (tokenAddress) => {
+                return this.tokenMap[tokenAddress] || this.tokenMap[tokenAddress === null || tokenAddress === void 0 ? void 0 : tokenAddress.toLocaleLowerCase()] || {};
+            };
+            this.getLPToken = (campaign, token, chainId) => {
+                if (campaign.getTokenURL) {
+                    window.open(campaign.getTokenURL);
+                }
+                else {
+                    window.open(index_27.getTokenUrl ? index_27.getTokenUrl : `https:openswap.xyz/#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
+                }
+            };
+            this.updateButtonStatus = async (data) => {
+                var _a;
+                if (data) {
+                    const { value, key, text } = data;
+                    const elm = (_a = this.stakingElm) === null || _a === void 0 ? void 0 : _a.querySelector(key);
+                    if (elm) {
+                        elm.rightIcon.visible = value;
+                        elm.caption = text;
+                    }
+                }
+            };
+            this.connectWallet = () => {
+                this.mdWallet.showModal();
+            };
+            this.initEmptyUI = async () => {
+                if (!this.noCampaignSection) {
+                    this.noCampaignSection = await components_11.Panel.create({ height: '100%' });
+                }
+                const isConnected = (0, index_27.isWalletConnected)();
+                this.noCampaignSection.clearInnerHTML();
+                this.noCampaignSection.appendChild(this.$render("i-panel", { class: "no-campaign", height: "100%", background: { color: Theme.background.main } },
+                    this.$render("i-vstack", { gap: 10, verticalAlignment: "center" },
+                        this.$render("i-image", { url: assets_4.default.fullPath('img/staking/TrollTrooper.svg') }),
+                        this.$render("i-label", { caption: isConnected ? 'No Campaigns' : 'Please connect with your wallet!' }),
+                        !isConnected ? this.$render("i-button", { maxWidth: 220, caption: "Connect Wallet", class: "btn-os btn-stake" /*background={{ color: `${Theme.colors.primary.main} !important` }}*/, margin: { left: 'auto', right: 'auto', bottom: 0 }, font: { size: '14px', /*color: Theme.colors.primary.contrastText*/ }, onClick: this.connectWallet }) : [])));
+                this.noCampaignSection.visible = true;
+            };
+            this.renderEmpty = async () => {
+                await this.initEmptyUI();
+                if (this.stakingElm) {
+                    this.stakingElm.clearInnerHTML();
+                    this.stakingElm.appendChild(this.noCampaignSection);
+                }
+                if (this.loadingElm) {
+                    this.loadingElm.visible = false;
+                }
+            };
+            this.renderCampaigns = async (hideLoading) => {
+                if (!hideLoading) {
+                    this.stakingElm.clearInnerHTML();
+                }
+                this.tokenMap = scom_token_list_5.tokenStore.tokenMap;
+                const chainId = (0, index_27.getChainId)();
+                const network = (0, index_27.getNetworkInfo)(chainId);
+                await this.initEmptyUI();
+                this.noCampaignSection.visible = false;
+                if (this.campaigns && !this.campaigns.length) {
+                    this.stakingElm.clearInnerHTML();
+                    this.stakingElm.appendChild(this.noCampaignSection);
+                    this.noCampaignSection.visible = true;
+                    this.removeTimer();
+                    return;
+                }
+                let nodeItems = [];
+                this.removeTimer();
+                const campaigns = [this.campaigns[0]];
+                for (let idx = 0; idx < campaigns.length; idx++) {
+                    const campaign = this.campaigns[idx];
+                    const containerSection = await components_11.Panel.create();
+                    containerSection.id = `campaign-${idx}`;
+                    containerSection.classList.add('container');
+                    const options = campaign.options;
+                    for (let optIdx = 0; optIdx < options.length; optIdx++) {
+                        const opt = options[optIdx];
+                        let lpTokenData = {};
+                        let vaultTokenData = {};
+                        if (opt.tokenAddress) {
+                            if (opt.lockTokenType == index_26.LockTokenType.LP_Token) {
+                                lpTokenData = {
+                                    'object': await (0, index_28.getLPObject)(opt.tokenAddress)
+                                };
+                            }
+                            else if (opt.lockTokenType == index_26.LockTokenType.VAULT_Token) {
+                                vaultTokenData = {
+                                    'object': await (0, index_28.getVaultObject)(opt.tokenAddress)
+                                };
+                            }
+                        }
+                        const tokenInfo = {
+                            tokenAddress: campaign.tokenAddress,
+                            lpToken: lpTokenData,
+                            vaultToken: vaultTokenData
+                        };
+                        options[optIdx] = Object.assign(Object.assign({}, options[optIdx]), { tokenInfo });
+                    }
+                    const stakingInfo = options ? options[0] : null;
+                    const lockedTokenObject = (0, index_27.getLockedTokenObject)(stakingInfo, stakingInfo.tokenInfo, this.tokenMap);
+                    const lockedTokenSymbol = (0, index_27.getLockedTokenSymbol)(stakingInfo, lockedTokenObject);
+                    const lockedTokenIconPaths = (0, index_27.getLockedTokenIconPaths)(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
+                    const lockedTokenDecimals = (lockedTokenObject === null || lockedTokenObject === void 0 ? void 0 : lockedTokenObject.decimals) || 18;
+                    const defaultDecimalsOffset = 18 - lockedTokenDecimals;
+                    const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
+                    const activeEndTime = stakingInfo ? stakingInfo.endOfEntryPeriod : 0;
+                    let isStarted = (0, components_11.moment)(activeStartTime).diff((0, components_11.moment)()) <= 0;
+                    let isClosed = (0, components_11.moment)(activeEndTime).diff((0, components_11.moment)()) <= 0;
+                    let totalLocked = {};
+                    const stakingElms = [];
+                    const optionTimer = { background: { color: Theme.colors.secondary.main }, font: { color: Theme.colors.secondary.contrastText } };
+                    const activeTimerRows = [];
+                    const activeTimerElms = [];
+                    const endHours = [];
+                    const endDays = [];
+                    const endMins = [];
+                    const stickerSections = [];
+                    const stickerLabels = [];
+                    const stickerIcons = [];
+                    for (let i = 0; i < options.length; i++) {
+                        stakingElms[i] = await components_11.VStack.create({ visible: i === 0 });
+                        activeTimerRows[i] = await components_11.VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
+                        activeTimerElms[i] = await components_11.VStack.create();
+                        activeTimerRows[i].appendChild(this.$render("i-label", { caption: "End Date", font: { size: '14px' }, class: "opacity-50" }));
+                        activeTimerRows[i].appendChild(activeTimerElms[i]);
+                        endHours[i] = await components_11.Label.create(optionTimer);
+                        endDays[i] = await components_11.Label.create(optionTimer);
+                        endMins[i] = await components_11.Label.create(optionTimer);
+                        endHours[i].classList.add('timer-value');
+                        endDays[i].classList.add('timer-value');
+                        endMins[i].classList.add('timer-value');
+                        activeTimerElms[i].appendChild(this.$render("i-hstack", { gap: 4, class: "custom-timer" },
+                            endDays[i],
+                            this.$render("i-label", { caption: "D", class: "timer-unit" }),
+                            endHours[i],
+                            this.$render("i-label", { caption: "H", class: "timer-unit" }),
+                            endMins[i],
+                            this.$render("i-label", { caption: "M", class: "timer-unit" })));
+                        // Sticker
+                        stickerSections[i] = await components_11.Panel.create({ visible: false });
+                        stickerLabels[i] = await components_11.Label.create();
+                        stickerIcons[i] = await components_11.Icon.create({ fill: '#fff' });
+                        stickerSections[i].classList.add('sticker');
+                        stickerSections[i].appendChild(this.$render("i-vstack", { class: "sticker-text" },
+                            stickerIcons[i],
+                            stickerLabels[i]));
+                    }
+                    const onChangeStake = (index) => {
+                        stakingElms.forEach((elm) => {
+                            elm.visible = false;
+                        });
+                        stakingElms[index].visible = true;
+                    };
+                    const setAvailableQty = async () => {
+                        if (!(0, index_27.isWalletConnected)())
+                            return;
+                        let i = 0;
+                        for (const o of options) {
+                            const _totalLocked = await (0, index_28.getStakingTotalLocked)(o.address);
+                            totalLocked[o.address] = _totalLocked;
+                            const optionQty = new eth_wallet_9.BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
+                            if (o.mode === 'Stake') {
+                                const keyStake = `#btn-stake-${o.address}`;
+                                const btnStake = this.querySelector(keyStake);
+                                const isStaking = (0, index_27.getStakingStatus)(keyStake).value;
+                                if (btnStake) {
+                                    let isValidInput = false;
+                                    const inputElm = this.querySelector(`#input-${o.address}`);
+                                    if (inputElm) {
+                                        const manageStake = this.querySelector(`#manage-stake-${o.address}`);
+                                        const inputVal = new eth_wallet_9.BigNumber(inputElm.value || 0);
+                                        isValidInput = inputVal.gt(0) && inputVal.lte(manageStake.getBalance()) && !(manageStake === null || manageStake === void 0 ? void 0 : manageStake.needToBeApproval());
+                                    }
+                                    btnStake.enabled = !isStaking && isValidInput && (isStarted && !(optionQty.lte(0) || isClosed));
+                                }
+                            }
+                            else {
+                                const keyUnstake = `#btn-unstake-${o.address}`;
+                                const btnUnstake = this.querySelector(keyUnstake);
+                                const isUnstaking = (0, index_27.getStakingStatus)(keyUnstake).value;
+                                if (btnUnstake) {
+                                    const manageStake = this.querySelector(`#manage-stake-${o.address}`);
+                                    btnUnstake.enabled = !isUnstaking && o.mode !== 'Stake' && Number(o.stakeQty) != 0 && !(manageStake === null || manageStake === void 0 ? void 0 : manageStake.needToBeApproval());
+                                }
+                            }
+                            if (isClosed) {
+                                if (stickerLabels[i].caption !== 'Closed') {
+                                    stickerSections[i].classList.add('closed');
+                                    stickerSections[i].classList.remove('sold-out');
+                                    stickerLabels[i].caption = 'Closed';
+                                    stickerIcons[i].name = 'check-square';
+                                }
+                            }
+                            else if (optionQty.lte(0)) {
+                                if (stickerLabels[i].caption !== 'Sold Out') {
+                                    stickerLabels[i].caption = 'Sold Out';
+                                    stickerIcons[i].name = 'star';
+                                    stickerSections[i].classList.add('sold-out');
+                                }
+                            }
+                            else {
+                                if (stickerLabels[i].caption !== 'Active') {
+                                    stickerLabels[i].caption = 'Active';
+                                    stickerIcons[i].name = 'star';
+                                }
+                            }
+                            if (!stickerSections[i].visible) {
+                                stickerSections[i].visible = true;
+                            }
+                            i++;
+                        }
+                        ;
+                    };
+                    const setEndRemainingTime = () => {
+                        isStarted = (0, components_11.moment)(activeStartTime).diff((0, components_11.moment)()) <= 0;
+                        isClosed = (0, components_11.moment)(activeEndTime).diff((0, components_11.moment)()) <= 0;
+                        for (let i = 0; i < options.length; i++) {
+                            activeTimerRows[i].visible = isStarted && !isClosed;
+                        }
+                        if (activeEndTime == 0) {
+                            for (let i = 0; i < options.length; i++) {
+                                endDays[i].caption = endHours[i].caption = endMins[i].caption = '0';
+                            }
+                            if (this.listActiveTimer[idx]) {
+                                clearInterval(this.listActiveTimer[idx]);
+                            }
+                        }
+                        else {
+                            const days = (0, components_11.moment)(activeEndTime).diff((0, components_11.moment)(), 'days');
+                            const hours = (0, components_11.moment)(activeEndTime).diff((0, components_11.moment)(), 'hours') - days * 24;
+                            const mins = (0, components_11.moment)(activeEndTime).diff((0, components_11.moment)(), 'minutes') - days * 24 * 60 - hours * 60;
+                            for (let i = 0; i < options.length; i++) {
+                                endDays[i].caption = `${days}`;
+                                endHours[i].caption = `${hours}`;
+                                endMins[i].caption = `${mins}`;
+                            }
+                        }
+                    };
+                    const setTimer = () => {
+                        setEndRemainingTime();
+                        setAvailableQty();
+                    };
+                    setTimer();
+                    this.listActiveTimer.push(setInterval(setTimer, 2000));
+                    const stakingsElm = await Promise.all(options.map(async (option, optionIdx) => {
+                        const manageStake = new index_30.ManageStake();
+                        manageStake.id = `manage-stake-${option.address}`;
+                        manageStake.width = '100%';
+                        manageStake.onRefresh = () => this.onSetupPage((0, index_27.isWalletConnected)(), true);
+                        this.manageStakeElm.clearInnerHTML();
+                        this.manageStakeElm.appendChild(manageStake);
+                        manageStake.setData(Object.assign(Object.assign({}, campaign), option));
+                        const isClaim = option.mode === 'Claim';
+                        const rewardsData = option.rewardsData[0] ? [option.rewardsData[0]] : [];
+                        const rewardOptions = !isClaim ? rewardsData : [];
+                        let aprInfo = {};
+                        const claimStakedRow = await components_11.HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
+                        claimStakedRow.appendChild(this.$render("i-label", { caption: "You Staked", font: { size: '16px' } }));
+                        claimStakedRow.appendChild(this.$render("i-label", { caption: `${(0, index_26.formatNumber)(new eth_wallet_9.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`, font: { size: '16px', name: 'Montserrat Regular' } }));
+                        const rowRewards = await components_11.VStack.create({ gap: 8, verticalAlignment: 'center' });
+                        for (let idx = 0; idx < rewardsData.length; idx++) {
+                            const reward = rewardsData[idx];
+                            const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
+                            const rewardTokenDecimals = rewardToken.decimals || 18;
+                            let decimalsOffset = 18 - rewardTokenDecimals;
+                            let rewardLockedDecimalsOffset = decimalsOffset;
+                            if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
+                                rewardLockedDecimalsOffset = decimalsOffset * 2;
+                            }
+                            else if (lockedTokenDecimals !== 18 && rewardTokenDecimals === 18) {
+                                rewardLockedDecimalsOffset = rewardTokenDecimals - lockedTokenDecimals;
+                                decimalsOffset = 18 - lockedTokenDecimals;
+                            }
+                            const rewardSymbol = rewardToken.symbol || '';
+                            rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
+                                this.$render("i-label", { caption: `${rewardSymbol} Locked`, font: { size: '16px', color: Theme.text.primary } }),
+                                this.$render("i-label", { caption: `${(0, index_26.formatNumber)(new eth_wallet_9.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '16px', name: 'Montserrat Regular' } })));
+                            // rowRewards.appendChild(
+                            // 	<i-hstack horizontalAlignment="space-between">
+                            // 		<i-label caption={`${rewardSymbol} Vesting Start`} font={{ size: '16px', color: colorText }} />
+                            // 		<i-label caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
+                            // 	</i-hstack>
+                            // );
+                            // rowRewards.appendChild(
+                            // 	<i-hstack horizontalAlignment="space-between">
+                            // 		<i-label caption={`${rewardSymbol} Vesting End`} font={{ size: '16px', color: colorText }} />
+                            // 		<i-label caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
+                            // 	</i-hstack>
+                            // );
+                            const passClaimStartTime = !(reward.claimStartTime && (0, components_11.moment)().diff(components_11.moment.unix(reward.claimStartTime)) < 0);
+                            let rewardClaimable = `0 ${rewardSymbol}`;
+                            if (passClaimStartTime && isClaim) {
+                                rewardClaimable = `${(0, index_26.formatNumber)(new eth_wallet_9.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
+                            }
+                            let startClaimingText = '';
+                            if (!(!reward.claimStartTime || passClaimStartTime) && isClaim) {
+                                const claimStart = components_11.moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
+                                startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
+                            }
+                            rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
+                                this.$render("i-label", { caption: `${rewardSymbol} Claimable`, font: { size: '16px' } }),
+                                this.$render("i-label", { caption: rewardClaimable, font: { size: '16px', name: 'Montserrat Regular' } }),
+                                startClaimingText ? this.$render("i-label", { caption: startClaimingText, font: { size: '16px' } }) : []));
+                            const btnClaim = await components_11.Button.create({
+                                // rightIcon: { spin: true, fill: Theme.colors.primary.contrastText, visible: false },
+                                rightIcon: { spin: true, fill: '#fff', visible: false },
+                                caption: `Claim ${rewardSymbol}`,
+                                // background: { color: `${Theme.colors.primary.main} !important` },
+                                // font: { color: Theme.colors.primary.contrastText },
+                                enabled: !(!passClaimStartTime || new eth_wallet_9.BigNumber(reward.claimable).isZero()) && isClaim,
+                                margin: { left: 'auto', right: 'auto' }
+                            });
+                            btnClaim.id = `btnClaim-${idx}-${option.address}`;
+                            btnClaim.classList.add('btn-os', 'btn-stake');
+                            btnClaim.onClick = () => this.onClaim(btnClaim, { reward, rewardSymbol });
+                            rowRewards.appendChild(btnClaim);
+                        }
+                        ;
+                        const getAprValue = (rewardOption) => {
+                            if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
+                                const apr = new eth_wallet_9.BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, eth_wallet_9.BigNumber.ROUND_DOWN);
+                                return `${apr}%`;
+                            }
+                            return '';
+                        };
+                        const durationDays = option.minLockTime / (60 * 60 * 24);
+                        const _lockedTokenObject = (0, index_27.getLockedTokenObject)(option, option.tokenInfo, this.tokenMap);
+                        const _lockedTokenIconPaths = (0, index_27.getLockedTokenIconPaths)(option, _lockedTokenObject, chainId, this.tokenMap);
+                        const pathsLength = _lockedTokenIconPaths.length;
+                        const rewardToken = (rewardsData === null || rewardsData === void 0 ? void 0 : rewardsData.length) ? this.getRewardToken(rewardsData[0].rewardTokenAddress) : null;
+                        stakingElms[optionIdx].appendChild(this.$render("i-vstack", { gap: 15, width: index_27.maxWidth, height: "100%", padding: { top: 10, bottom: 10, left: 20, right: 20 }, position: "relative" },
+                            stickerSections[optionIdx],
+                            this.$render("i-hstack", { gap: 10, width: "100%", verticalAlignment: "center" },
+                                this.$render("i-hstack", { gap: 10, width: "50%" },
+                                    this.$render("i-hstack", { width: pathsLength === 1 ? 63.5 : 80, position: "relative", verticalAlignment: "center" },
+                                        this.$render("i-image", { width: 60, height: 60, url: scom_token_list_5.assets.tokenPath(rewardToken, chainId), fallbackUrl: index_27.fallBackUrl }),
+                                        _lockedTokenIconPaths.map((v, idxImg) => {
+                                            return this.$render("i-image", { position: "absolute", width: 28, height: 28, bottom: 0, left: (idxImg * 20) + 35, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_27.fallBackUrl });
+                                        })),
+                                    this.$render("i-vstack", { gap: 2, overflow: { x: 'hidden' }, verticalAlignment: "center" },
+                                        this.$render("i-label", { visible: !!campaign.customName, caption: campaign.customName, font: { size: '20px', name: 'Montserrat Bold', color: Theme.text.secondary, bold: true }, class: "text-overflow" }),
+                                        this.$render("i-label", { visible: !!campaign.customDesc, caption: campaign.customDesc, font: { size: '16px', name: 'Montserrat Regular' }, class: "opacity-50 text-overflow" }))),
+                                await Promise.all(rewardOptions.map(async (rewardOption, idx) => {
+                                    const lbApr = await components_11.Label.create({ font: { size: '40px', name: 'Montserrat Medium', color: Theme.text.secondary } });
+                                    const lbRate = await components_11.Label.create({ font: { size: '16px', name: 'Montserrat Regular' } });
+                                    lbApr.classList.add('text-overflow');
+                                    lbRate.classList.add('opacity-50');
+                                    const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
+                                    const rewardTokenDecimals = rewardToken.decimals || 18;
+                                    const decimalsOffset = 18 - rewardTokenDecimals;
+                                    const lockTokenType = option.lockTokenType;
+                                    const rateDesc = `1 ${lockTokenType === index_26.LockTokenType.LP_Token ? 'LP' : (0, index_27.tokenSymbol)(option.lockTokenAddress)} : ${new eth_wallet_9.BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${(0, index_27.tokenSymbol)(rewardOption.rewardTokenAddress)}`;
+                                    const updateApr = async () => {
+                                        var _a, _b, _c, _d;
+                                        if (lockTokenType === index_26.LockTokenType.ERC20_Token) {
+                                            const apr = await (0, index_28.getERC20RewardCurrentAPR)(rewardOption, lockedTokenObject, durationDays);
+                                            if (!isNaN(parseFloat(apr))) {
+                                                aprInfo[rewardOption.rewardTokenAddress] = apr;
+                                            }
+                                        }
+                                        else if (lockTokenType === index_26.LockTokenType.LP_Token) {
+                                            if (rewardOption.referencePair) {
+                                                aprInfo[rewardOption.rewardTokenAddress] = await (0, index_28.getLPRewardCurrentAPR)(rewardOption, (_b = (_a = option.tokenInfo) === null || _a === void 0 ? void 0 : _a.lpToken) === null || _b === void 0 ? void 0 : _b.object, durationDays);
+                                            }
+                                        }
+                                        else {
+                                            aprInfo[rewardOption.rewardTokenAddress] = await (0, index_28.getVaultRewardCurrentAPR)(rewardOption, (_d = (_c = option.tokenInfo) === null || _c === void 0 ? void 0 : _c.vaultToken) === null || _d === void 0 ? void 0 : _d.object, durationDays);
+                                        }
+                                        const aprValue = getAprValue(rewardOption);
+                                        lbApr.caption = `APR ${aprValue}`;
+                                        lbRate.caption = rateDesc;
+                                    };
+                                    updateApr();
+                                    this.listAprTimer.push(setInterval(updateApr, 10000));
+                                    const aprValue = getAprValue(rewardOption);
+                                    lbApr.caption = `APR ${aprValue}`;
+                                    lbRate.caption = rateDesc;
+                                    return this.$render("i-vstack", { verticalAlignment: "center" },
+                                        lbApr,
+                                        lbRate);
+                                }))),
+                            this.$render("i-hstack", { width: "100%", verticalAlignment: "center" },
+                                this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
+                                    this.$render("i-label", { caption: "Start Date", font: { size: '14px' }, class: "opacity-50" }),
+                                    this.$render("i-label", { caption: (0, index_26.formatDate)(option.startOfEntryPeriod, 'DD MMM, YYYY'), font: { size: '16px', name: 'Montserrat Regular' } })),
+                                activeTimerRows[optionIdx],
+                                this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
+                                    this.$render("i-label", { caption: "Stake Duration", font: { size: '14px' }, class: "opacity-50" }),
+                                    this.$render("i-hstack", { gap: 4, verticalAlignment: "center" }, options.map((_option, _optionIdx) => {
+                                        const isCurrentIdx = optionIdx === _optionIdx;
+                                        return this.$render("i-button", { caption: durationDays < 1 ? '< 1 Day' : `${durationDays} Days`, class: `btn-os ${isCurrentIdx ? 'cursor-default' : ''}`, border: { radius: 12, width: 1, style: 'solid', color: isCurrentIdx ? 'transparent' : '#8994A3' }, font: { size: '12px', name: 'Montserrat Regular', color: isCurrentIdx ? Theme.colors.secondary.contrastText : '#8994A3' }, padding: { top: 2.5, bottom: 2.5, left: 8, right: 8 }, background: { color: isCurrentIdx ? `${Theme.colors.secondary.main} !important` : 'transparent' }, onClick: () => onChangeStake(_optionIdx) });
+                                    }))),
+                                this.$render("i-vstack", { gap: 4, width: "25%", margin: { left: 'auto' }, verticalAlignment: "center", horizontalAlignment: "end" },
+                                    this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => this.getLPToken(campaign, lockedTokenSymbol, chainId) },
+                                        this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: Theme.text.primary }),
+                                        this.$render("i-label", { caption: `Get ${lockedTokenSymbol}`, font: { size: '13.6px' } }),
+                                        lockedTokenIconPaths.map((v) => {
+                                            return this.$render("i-image", { display: "flex", width: 15, height: 15, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_27.fallBackUrl });
+                                        })),
+                                    campaign.showContractLink ?
+                                        this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => (0, index_26.viewOnExplorerByAddress)(chainId, option.address) },
+                                            this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: Theme.text.primary, class: "inline-block" }),
+                                            this.$render("i-label", { caption: "View Contract", font: { size: '13.6px' } })) : [])),
+                            this.$render("i-vstack", { gap: 8 },
+                                claimStakedRow,
+                                this.$render("i-vstack", { verticalAlignment: "center", horizontalAlignment: "center" }, manageStake),
+                                rowRewards)));
+                        return stakingElms[optionIdx];
+                    }));
+                    nodeItems.push(containerSection);
+                    containerSection.appendChild(this.$render("i-hstack", { background: { color: Theme.background.main }, width: "100%", height: index_27.maxHeight, border: { width: 1, style: 'solid', color: '#7979794a' } }, stakingsElm));
+                }
+                ;
+                this.stakingElm.clearInnerHTML();
+                this.stakingElm.append(this.noCampaignSection, ...nodeItems);
+            };
+            if (data_json_1.default)
+                (0, index_27.setDataFromConfig)(data_json_1.default);
+            this.$eventBus = components_11.application.EventBus;
+            this.registerEvent();
         }
         async init() {
             this.isReadyCallbackQueued = true;
             super.init();
             this.setTag({
-                customColorCampaign: '#f15e61',
-                customColorBackground: '#ffffff26',
-                customColorText: '#ffffff',
-                customColorTimeBackground: '#F15E61'
+                backgoundColor: currentTheme.background.main,
+                fontColor: currentTheme.text.primary,
+                textSecondary: currentTheme.text.secondary,
+                // buttonBackgroundColor: currentTheme.colors.primary.main,
+                // buttonFontColor: currentTheme.colors.primary.contrastText,
+                inputBackgroundColor: currentTheme.input.background,
+                inputFontColor: currentTheme.input.fontColor,
+                secondaryFontColor: currentTheme.colors.secondary.contrastText,
+                secondaryColor: currentTheme.colors.secondary.main
             });
             this.stakingResult = new index_29.Result();
             this.stakingComponent.appendChild(this.stakingResult);
@@ -24408,7 +24528,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             }, 100);
             const data = this.getAttribute('data', true);
             if (data) {
-                index_27.setCurrentChainId(data.chainId);
+                (0, index_27.setCurrentChainId)(data.chainId);
                 await this.setData(data);
             }
             else {
@@ -24418,21 +24538,22 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             this.executeReadyCallback();
         }
         render() {
-            return (this.$render("i-scom-dapp-container", { id: "dappContainer" },
+            return (this.$render("i-scom-dapp-container", { id: "dappContainer", class: index_css_2.stakingDappContainer },
                 this.$render("i-panel", { id: "stakingComponent", class: index_css_2.stakingComponent, minHeight: 200 },
-                    this.$render("i-panel", { id: "stakingLayout", class: "staking-layout", width: index_27.maxWidth, height: index_27.maxHeight, margin: { top: '1rem', bottom: '1rem', left: 'auto', right: 'auto' } },
+                    this.$render("i-panel", { id: "stakingLayout", class: "staking-layout", width: index_27.maxWidth, height: index_27.maxHeight, margin: { left: 'auto', right: 'auto' } },
                         this.$render("i-vstack", { id: "loadingElm", class: "i-loading-overlay" },
                             this.$render("i-vstack", { class: "i-loading-spinner", horizontalAlignment: "center", verticalAlignment: "center" },
                                 this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_4.default.fullPath('img/loading.svg'), width: 36, height: 36 } }),
                                 this.$render("i-label", { caption: "Loading...", font: { color: '#FD4A4C', size: '1.5em' }, class: "i-loading-spinner_text" }))),
                         this.$render("i-panel", { id: "stakingElm", class: "wrapper" })),
                     this.$render("i-panel", { id: "manageStakeElm" }),
-                    this.$render("i-scom-staking-config", { id: "configDApp", visible: false }))));
+                    this.$render("i-scom-staking-config", { id: "configDApp", visible: false }),
+                    this.$render("i-scom-wallet-modal", { id: "mdWallet", wallets: [] }))));
         }
     };
     ScomStaking = __decorate([
         components_11.customModule,
-        components_11.customElements('i-scom-staking')
+        (0, components_11.customElements)('i-scom-staking')
     ], ScomStaking);
     exports.default = ScomStaking;
 });

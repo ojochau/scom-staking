@@ -1,4 +1,4 @@
-import { moment, Module, Panel, Icon, Button, Label, VStack, HStack, Container, ControlElement, IEventBus, application, customModule, Input, customElements, IDataSchema } from '@ijstech/components';
+import { moment, Module, Panel, Icon, Button, Label, VStack, HStack, Container, ControlElement, IEventBus, application, customModule, Input, customElements, IDataSchema, Styles } from '@ijstech/components';
 import { BigNumber, Wallet } from '@ijstech/eth-wallet';
 import Assets from './assets';
 import {
@@ -12,7 +12,7 @@ import {
 	ISingleStakingCampaign,
 	LockTokenType
 } from './global/index';
-import { getChainId, isWalletConnected, getNetworkInfo, setDataFromConfig, setCurrentChainId, tokenSymbol, getStakingStatus, fallBackUrl, getLockedTokenObject, getLockedTokenSymbol, getLockedTokenIconPaths, getTokenUrl, isThemeApplied, maxHeight, maxWidth, getSingleStakingSchema } from './store/index';
+import { getChainId, isWalletConnected, getNetworkInfo, setDataFromConfig, setCurrentChainId, tokenSymbol, getStakingStatus, fallBackUrl, getLockedTokenObject, getLockedTokenSymbol, getLockedTokenIconPaths, getTokenUrl, maxHeight, maxWidth, getSingleStakingSchema } from './store/index';
 import { tokenStore, assets as tokenAssets } from '@scom/scom-token-list';
 import configData from './data.json';
 
@@ -30,9 +30,13 @@ import {
 import { Result } from './common/index';
 import { ManageStake } from './manage-stake/index';
 import { Contracts } from './contracts/oswap-time-is-money-contract/index';
-import { stakingComponent } from './index.css';
+import { stakingComponent, stakingDappContainer } from './index.css';
 import StakingConfig from './commissions/index';
 import ScomDappContainer from '@scom/scom-dapp-container';
+import ScomWalletModal from '@scom/scom-wallet-modal';
+
+const currentTheme = Styles.Theme.currentTheme;
+const Theme = Styles.Theme.ThemeVars;
 
 interface ScomStakingElement extends ControlElement {
 	data?: ISingleStakingCampaign;
@@ -69,40 +73,65 @@ export default class ScomStaking extends Module {
 	private tokenMap: TokenMapType = {};
 	private configDApp: StakingConfig;
 	private dappContainer: ScomDappContainer;
+	private mdWallet: ScomWalletModal;
 
-	private getPropertiesSchema(readOnly?: boolean) {
-		const propertiesSchema = getSingleStakingSchema(readOnly);
-		return propertiesSchema as IDataSchema;
+	private getPropertiesSchema() {
+		const propertiesSchema: any = getSingleStakingSchema();
+		return propertiesSchema;
 	}
 
-	private getThemeSchema(readOnly?: boolean) {
+	private getThemeSchema() {
+		const _props = {
+			backgroundColor: {
+				type: 'string',
+				format: 'color'
+			},
+			fontColor: {
+				type: 'string',
+				format: 'color'
+			},
+			textSecondary: {
+				type: 'string',
+				title: 'Campaign Font Color',
+				format: 'color'
+			},
+			inputBackgroundColor: {
+				type: 'string',
+				format: 'color'
+			},
+			inputFontColor: {
+				type: 'string',
+				format: 'color'
+			},
+			// buttonBackgroundColor: {
+			// 	type: 'string',
+			// 	format: 'color'
+			// },
+			// buttonFontColor: {
+			// 	type: 'string',
+			// 	format: 'color'
+			// },
+			secondaryColor: {
+				type: 'string',
+				title: 'Timer Background Color',
+				format: 'color'
+			},
+			secondaryFontColor: {
+				type: 'string',
+				title: 'Timer Font Color',
+				format: 'color'
+			}
+		}
 		const themeSchema = {
 			type: 'object',
 			properties: {
-				customColorCampaign: {
-					type: 'string',
-					format: 'color',
-					readOnly
+				'dark': {
+					type: 'object',
+					properties: _props
 				},
-				customColorBackground: {
-					type: 'string',
-					format: 'color',
-					readOnly
-				},
-				customColorButton: {
-					type: 'string',
-					format: 'color',
-					readOnly
-				},
-				customColorText: {
-					type: 'string',
-					format: 'color',
-					readOnly
-				},
-				customColorTimeBackground: {
-					type: 'string',
-					format: 'color',
-					readOnly
+				'light': {
+					type: 'object',
+					properties: _props
 				}
 			}
 		}
@@ -124,7 +153,7 @@ export default class ScomStaking extends Module {
 					};
 					return {
 						execute: async () => {
-							_oldData = {...this._data};
+							_oldData = { ...this._data };
 							if (userInputData?.chainId !== undefined) this._data.chainId = userInputData.chainId;
 							if (userInputData?.customName !== undefined) this._data.customName = userInputData.customName;
 							if (userInputData?.customDesc !== undefined) this._data.customDesc = userInputData.customDesc;
@@ -150,30 +179,30 @@ export default class ScomStaking extends Module {
 				userInputDataSchema: propertiesSchema
 			},
 			{
-        name: 'Theme Settings',
-        icon: 'palette',
-        command: (builder: any, userInputData: any) => {
-          let oldTag = {};
-          return {
-            execute: async () => {
-              if (!userInputData) return;
-              oldTag = JSON.parse(JSON.stringify(this.tag));
-              if (builder) builder.setTag(userInputData);
-              else this.setTag(userInputData);
+				name: 'Theme Settings',
+				icon: 'palette',
+				command: (builder: any, userInputData: any) => {
+					let oldTag = {};
+					return {
+						execute: async () => {
+							if (!userInputData) return;
+							oldTag = JSON.parse(JSON.stringify(this.tag));
+							if (builder) builder.setTag(userInputData);
+							else this.setTag(userInputData);
 							if (this.dappContainer) this.dappContainer.setTag(userInputData);
-            },
-            undo: () => {
-              if (!userInputData) return;
-              this.tag = JSON.parse(JSON.stringify(oldTag));
-              if (builder) builder.setTag(this.tag);
-              else this.setTag(this.tag);
+						},
+						undo: () => {
+							if (!userInputData) return;
+							this.tag = JSON.parse(JSON.stringify(oldTag));
+							if (builder) builder.setTag(this.tag);
+							else this.setTag(this.tag);
 							if (this.dappContainer) this.dappContainer.setTag(userInputData);
-            },
-            redo: () => { }
-          }
-        },
-        userInputDataSchema: themeSchema
-      }
+						},
+						redo: () => { }
+					}
+				},
+				userInputDataSchema: themeSchema
+			}
 		]
 		return actions;
 	}
@@ -183,21 +212,25 @@ export default class ScomStaking extends Module {
 		return [
 			{
 				name: 'Builder Configurator',
-        target: 'Builders',
+				target: 'Builders',
 				getActions: () => {
 					return this._getActions(this.getPropertiesSchema(), this.getThemeSchema());
 				},
 				getData: this.getData.bind(this),
-        setData: async (data: any) => {
-          const defaultData = configData.defaultBuilderData;
-					await this.setData({...defaultData, ...data});
+				setData: async (data: any) => {
+					const defaultData = configData.defaultBuilderData;
+					await this.setData({ ...defaultData, ...data });
+					if (this.mdWallet) {
+						this.mdWallet.networks = this._data.networks;
+						this.mdWallet.wallets = this._data.wallets;
+					}
 				},
-        getTag: this.getTag.bind(this),
-        setTag: this.setTag.bind(this)
+				getTag: this.getTag.bind(this),
+				setTag: this.setTag.bind(this)
 			},
 			{
 				name: 'Emdedder Configurator',
-        target: 'Embedders',
+				target: 'Embedders',
 				elementName: 'i-scom-staking-config',
 				getLinkParams: () => {
 					const commissions = this._data.commissions || [];
@@ -227,9 +260,9 @@ export default class ScomStaking extends Module {
 					}
 				},
 				getData: this.getData.bind(this),
-        setData: this.setData.bind(this),
-        getTag: this.getTag.bind(this),
-        setTag: this.setTag.bind(this)
+				setData: this.setData.bind(this),
+				getTag: this.getTag.bind(this),
+				setTag: this.setTag.bind(this)
 			}
 		]
 	}
@@ -243,11 +276,16 @@ export default class ScomStaking extends Module {
 		this._data = value;
 		this.configDApp.data = value;
 		const data: any = {
+			defaultChainId: this._data.defaultChainId ?? undefined,
 			wallets: this._data.wallets ?? [],
 			networks: this._data.networks ?? [],
 			showHeader: this._data.showHeader ?? true
 		}
-		if (this.dappContainer?.setData) this.dappContainer.setData(data)
+		if (this.dappContainer?.setData) this.dappContainer.setData(data);
+		if (this.mdWallet) {
+			this.mdWallet.networks = value.networks;
+			this.mdWallet.wallets = value.wallets;
+		}
 		// TODO - update proxy address
 		this.onSetupPage(isWalletConnected());
 	}
@@ -256,16 +294,49 @@ export default class ScomStaking extends Module {
 		return this.tag;
 	}
 
+	private updateTag(type: 'light' | 'dark', value: any) {
+		this.tag[type] = this.tag[type] ?? {};
+		for (let prop in value) {
+			if (value.hasOwnProperty(prop))
+				this.tag[type][prop] = value[prop];
+		}
+	}
+
 	private async setTag(value: any) {
 		const newValue = value || {};
-    for (let prop in newValue) {
-      if (newValue.hasOwnProperty(prop)) {
-        this.tag[prop] = newValue[prop];
-      }
-    }
+		for (let prop in newValue) {
+			if (newValue.hasOwnProperty(prop)) {
+				if (prop === 'light' || prop === 'dark')
+					this.updateTag(prop, newValue[prop]);
+				else
+					this.tag[prop] = newValue[prop];
+			}
+		}
+		if (this.dappContainer)
+			this.dappContainer.setTag(this.tag);
+		this.updateTheme();
 		if (this.stakingElm) {
 			this.renderCampaigns();
 		}
+	}
+
+	private updateStyle(name: string, value: any) {
+		value ?
+			this.style.setProperty(name, value) :
+			this.style.removeProperty(name);
+	}
+
+	private updateTheme() {
+		const themeVar = this.dappContainer?.theme || 'light';
+		this.updateStyle('--text-primary', this.tag[themeVar]?.fontColor);
+		this.updateStyle('--background-main', this.tag[themeVar]?.backgroundColor);
+		this.updateStyle('--text-secondary', this.tag[themeVar]?.textSecondary);
+		// this.updateStyle('--colors-primary-main', this.tag[themeVar]?.buttonBackgroundColor);
+		// this.updateStyle('--colors-primary-contrast_text', this.tag[themeVar]?.buttonFontColor);
+		this.updateStyle('--colors-secondary-main', this.tag[themeVar]?.secondaryColor);
+		this.updateStyle('--colors-secondary-contrast_text', this.tag[themeVar]?.secondaryFontColor);
+		this.updateStyle('--input-font_color', this.tag[themeVar]?.inputFontColor);
+		this.updateStyle('--input-background', this.tag[themeVar]?.inputBackgroundColor);
 	}
 
 	// private convertCampaignData(data: ISingleStakingCampaign) {
@@ -487,11 +558,16 @@ export default class ScomStaking extends Module {
 	async init() {
 		this.isReadyCallbackQueued = true;
 		super.init();
-    this.setTag({
-			customColorCampaign: '#f15e61',
-      customColorBackground: '#ffffff26',
-      customColorText: '#ffffff',
-			customColorTimeBackground: '#F15E61'
+		this.setTag({
+			backgoundColor: currentTheme.background.main,
+			fontColor: currentTheme.text.primary,
+			textSecondary: currentTheme.text.secondary,
+			// buttonBackgroundColor: currentTheme.colors.primary.main,
+			// buttonFontColor: currentTheme.colors.primary.contrastText,
+			inputBackgroundColor: currentTheme.input.background,
+			inputFontColor: currentTheme.input.fontColor,
+			secondaryFontColor: currentTheme.colors.secondary.contrastText,
+			secondaryColor: currentTheme.colors.secondary.main
 		});
 		this.stakingResult = new Result();
 		this.stakingComponent.appendChild(this.stakingResult);
@@ -525,7 +601,7 @@ export default class ScomStaking extends Module {
 	}
 
 	private connectWallet = () => {
-		this.$eventBus.dispatch(EventId.ConnectWallet);
+		this.mdWallet.showModal();
 	}
 
 	private initEmptyUI = async () => {
@@ -535,12 +611,12 @@ export default class ScomStaking extends Module {
 		const isConnected = isWalletConnected();
 		this.noCampaignSection.clearInnerHTML();
 		this.noCampaignSection.appendChild(
-			<i-panel class="no-campaign" height="100%" background={{ color: '#192046' }}>
+			<i-panel class="no-campaign" height="100%" background={{ color: Theme.background.main }}>
 				<i-vstack gap={10} verticalAlignment="center">
 					<i-image url={Assets.fullPath('img/staking/TrollTrooper.svg')} />
-					<i-label font={{ color: '#FFFFFF' }} caption={isConnected ? 'No Campaigns' : 'Please connect with your wallet!'} />
+					<i-label caption={isConnected ? 'No Campaigns' : 'Please connect with your wallet!'} />
 					{
-						!isConnected ? <i-button maxWidth={220} caption="Connect Wallet" class="btn-os btn-stake" margin={{ left: 'auto', right: 'auto', bottom: 0 }} font={{ size: '14px' }} onClick={this.connectWallet} /> : []
+						!isConnected ? <i-button maxWidth={220} caption="Connect Wallet" class="btn-os btn-stake" /*background={{ color: `${Theme.colors.primary.main} !important` }}*/ margin={{ left: 'auto', right: 'auto', bottom: 0 }} font={{ size: '14px', /*color: Theme.colors.primary.contrastText*/ }} onClick={this.connectWallet} /> : []
 					}
 				</i-vstack>
 			</i-panel>
@@ -581,13 +657,6 @@ export default class ScomStaking extends Module {
 		const campaigns = [this.campaigns[0]];
 		for (let idx = 0; idx < campaigns.length; idx++) {
 			const campaign = this.campaigns[idx];
-			const _tag = this.tag || {};
-			console.log(isThemeApplied, _tag.customColorCampaign)
-			const colorCampaignText = isThemeApplied ? _tag.customColorCampaign || '#f15e61' : '#f15e61';
-			const colorCampaignBackground = isThemeApplied ? _tag.customColorBackground || '#ffffff26' : '#ffffff26';
-			const colorButton = isThemeApplied ? _tag.customColorButton : undefined;
-			const colorText = isThemeApplied ? _tag.customColorText || '#fff' : '#fff';
-			const colorTimeBackground = isThemeApplied ? _tag.customColorTimeBackground || '#F15E61' : '#F15E61';
 			const containerSection = await Panel.create();
 			containerSection.id = `campaign-${idx}`;
 			containerSection.classList.add('container');
@@ -629,7 +698,7 @@ export default class ScomStaking extends Module {
 			let isClosed = moment(activeEndTime).diff(moment()) <= 0;
 			let totalLocked: any = {};
 			const stakingElms: VStack[] = [];
-			const optionTimer = { background: { color: colorTimeBackground }, font: { color: colorText } };
+			const optionTimer = { background: { color: Theme.colors.secondary.main }, font: { color: Theme.colors.secondary.contrastText } };
 			const activeTimerRows: VStack[] = [];
 			const activeTimerElms: VStack[] = [];
 			const endHours: Label[] = [];
@@ -642,7 +711,7 @@ export default class ScomStaking extends Module {
 				stakingElms[i] = await VStack.create({ visible: i === 0 });
 				activeTimerRows[i] = await VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
 				activeTimerElms[i] = await VStack.create();
-				activeTimerRows[i].appendChild(<i-label caption="End Date" font={{ size: '14px', color: colorText }} class="opacity-50" />);
+				activeTimerRows[i].appendChild(<i-label caption="End Date" font={{ size: '14px' }} class="opacity-50" />);
 				activeTimerRows[i].appendChild(activeTimerElms[i]);
 				endHours[i] = await Label.create(optionTimer);
 				endDays[i] = await Label.create(optionTimer);
@@ -653,18 +722,18 @@ export default class ScomStaking extends Module {
 				activeTimerElms[i].appendChild(
 					<i-hstack gap={4} class="custom-timer">
 						{endDays[i]}
-						<i-label caption="D" class="timer-unit" font={{ color: colorText }} />
+						<i-label caption="D" class="timer-unit" />
 						{endHours[i]}
-						<i-label caption="H" class="timer-unit" font={{ color: colorText }} />
+						<i-label caption="H" class="timer-unit" />
 						{endMins[i]}
-						<i-label caption="M" class="timer-unit" font={{ color: colorText }} />
+						<i-label caption="M" class="timer-unit" />
 					</i-hstack>
 				);
 
 				// Sticker
 				stickerSections[i] = await Panel.create({ visible: false });
 				stickerLabels[i] = await Label.create();
-				stickerIcons[i] = await Icon.create();
+				stickerIcons[i] = await Icon.create({ fill: '#fff' });
 				stickerSections[i].classList.add('sticker');
 				stickerSections[i].appendChild(
 					<i-vstack class="sticker-text">
@@ -780,8 +849,6 @@ export default class ScomStaking extends Module {
 				manageStake.setData({
 					...campaign,
 					...option,
-					customColorButton: colorButton,
-					customColorText: colorText
 				});
 
 				const isClaim = option.mode === 'Claim';
@@ -791,8 +858,8 @@ export default class ScomStaking extends Module {
 				let aprInfo: any = {};
 
 				const claimStakedRow = await HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
-				claimStakedRow.appendChild(<i-label caption="You Staked" font={{ size: '16px', color: colorText }} />);
-				claimStakedRow.appendChild(<i-label caption={`${formatNumber(new BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`} font={{ size: '16px', name: 'Montserrat Regular', color: colorText }} />);
+				claimStakedRow.appendChild(<i-label caption="You Staked" font={{ size: '16px' }} />);
+				claimStakedRow.appendChild(<i-label caption={`${formatNumber(new BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`} font={{ size: '16px', name: 'Montserrat Regular' }} />);
 
 				const rowRewards = await VStack.create({ gap: 8, verticalAlignment: 'center' });
 				for (let idx = 0; idx < rewardsData.length; idx++) {
@@ -810,8 +877,8 @@ export default class ScomStaking extends Module {
 					const rewardSymbol = rewardToken.symbol || '';
 					rowRewards.appendChild(
 						<i-hstack horizontalAlignment="space-between">
-							<i-label caption={`${rewardSymbol} Locked`} font={{ size: '16px', color: colorText }} />
-							<i-label caption={`${formatNumber(new BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`} font={{ size: '16px', name: 'Montserrat Regular', color: colorText }} />
+							<i-label caption={`${rewardSymbol} Locked`} font={{ size: '16px', color: Theme.text.primary }} />
+							<i-label caption={`${formatNumber(new BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`} font={{ size: '16px', name: 'Montserrat Regular' }} />
 						</i-hstack>
 					);
 					// rowRewards.appendChild(
@@ -838,16 +905,17 @@ export default class ScomStaking extends Module {
 					}
 					rowRewards.appendChild(
 						<i-hstack horizontalAlignment="space-between">
-							<i-label caption={`${rewardSymbol} Claimable`} font={{ size: '16px', color: colorText }} />
-							<i-label caption={rewardClaimable} font={{ size: '16px', name: 'Montserrat Regular', color: colorText }} />
-							{startClaimingText ? <i-label caption={startClaimingText} font={{ size: '16px', color: colorText }} /> : []}
+							<i-label caption={`${rewardSymbol} Claimable`} font={{ size: '16px' }} />
+							<i-label caption={rewardClaimable} font={{ size: '16px', name: 'Montserrat Regular' }} />
+							{startClaimingText ? <i-label caption={startClaimingText} font={{ size: '16px' }} /> : []}
 						</i-hstack>
 					);
 					const btnClaim = await Button.create({
-						rightIcon: { spin: true, fill: colorText, visible: false },
+						// rightIcon: { spin: true, fill: Theme.colors.primary.contrastText, visible: false },
+						rightIcon: { spin: true, fill: '#fff', visible: false },
 						caption: `Claim ${rewardSymbol}`,
-						background: { color: `${colorButton} !important` },
-						font: { color: colorText },
+						// background: { color: `${Theme.colors.primary.main} !important` },
+						// font: { color: Theme.colors.primary.contrastText },
 						enabled: !(!passClaimStartTime || new BigNumber(reward.claimable).isZero()) && isClaim,
 						margin: { left: 'auto', right: 'auto' }
 					})
@@ -884,14 +952,14 @@ export default class ScomStaking extends Module {
 									}
 								</i-hstack>
 								<i-vstack gap={2} overflow={{ x: 'hidden' }} verticalAlignment="center">
-									<i-label visible={!!campaign.customName} caption={campaign.customName} font={{ size: '20px', name: 'Montserrat Bold', color: colorCampaignText, bold: true }} class="text-overflow" />
-									<i-label visible={!!campaign.customDesc} caption={campaign.customDesc} font={{ size: '16px', name: 'Montserrat Regular', color: colorText }} class="opacity-50 text-overflow" />
+									<i-label visible={!!campaign.customName} caption={campaign.customName} font={{ size: '20px', name: 'Montserrat Bold', color: Theme.text.secondary, bold: true }} class="text-overflow" />
+									<i-label visible={!!campaign.customDesc} caption={campaign.customDesc} font={{ size: '16px', name: 'Montserrat Regular' }} class="opacity-50 text-overflow" />
 								</i-vstack>
 							</i-hstack>
 							{
 								await Promise.all(rewardOptions.map(async (rewardOption: any, idx: number) => {
-									const lbApr = await Label.create({ font: { size: '40px', name: 'Montserrat Medium', color: '#72F35D' } });
-									const lbRate = await Label.create({ font: { size: '16px', name: 'Montserrat Regular', color: colorText } });
+									const lbApr = await Label.create({ font: { size: '40px', name: 'Montserrat Medium', color: Theme.text.secondary } });
+									const lbRate = await Label.create({ font: { size: '16px', name: 'Montserrat Regular' } });
 									lbApr.classList.add('text-overflow');
 									lbRate.classList.add('opacity-50');
 									const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
@@ -930,12 +998,12 @@ export default class ScomStaking extends Module {
 						</i-hstack>
 						<i-hstack width="100%" verticalAlignment="center">
 							<i-vstack gap={2} width="25%" verticalAlignment="center">
-								<i-label caption="Start Date" font={{ size: '14px', color: colorText }} class="opacity-50" />
-								<i-label caption={formatDate(option.startOfEntryPeriod, 'DD MMM, YYYY')} font={{ size: '16px', name: 'Montserrat Regular', color: colorText }} />
+								<i-label caption="Start Date" font={{ size: '14px' }} class="opacity-50" />
+								<i-label caption={formatDate(option.startOfEntryPeriod, 'DD MMM, YYYY')} font={{ size: '16px', name: 'Montserrat Regular' }} />
 							</i-vstack>
 							{activeTimerRows[optionIdx]}
 							<i-vstack gap={2} width="25%" verticalAlignment="center">
-								<i-label caption="Stake Duration" font={{ size: '14px', color: colorText }} class="opacity-50" />
+								<i-label caption="Stake Duration" font={{ size: '14px' }} class="opacity-50" />
 								<i-hstack gap={4} verticalAlignment="center">
 									{
 										options.map((_option: any, _optionIdx: number) => {
@@ -944,9 +1012,9 @@ export default class ScomStaking extends Module {
 												caption={durationDays < 1 ? '< 1 Day' : `${durationDays} Days`}
 												class={`btn-os ${isCurrentIdx ? 'cursor-default' : ''}`}
 												border={{ radius: 12, width: 1, style: 'solid', color: isCurrentIdx ? 'transparent' : '#8994A3' }}
-												font={{ size: '12px', name: 'Montserrat Regular', color: isCurrentIdx ? colorText : '#8994A3' }}
+												font={{ size: '12px', name: 'Montserrat Regular', color: isCurrentIdx ? Theme.colors.secondary.contrastText : '#8994A3' }}
 												padding={{ top: 2.5, bottom: 2.5, left: 8, right: 8 }}
-												background={{ color: isCurrentIdx ? '#f15e61 !important' : 'transparent !important' }}
+												background={{ color: isCurrentIdx ? `${Theme.colors.secondary.main} !important` : 'transparent' }}
 												onClick={() => onChangeStake(_optionIdx)}
 											/>
 										})
@@ -955,8 +1023,8 @@ export default class ScomStaking extends Module {
 							</i-vstack>
 							<i-vstack gap={4} width="25%" margin={{ left: 'auto' }} verticalAlignment="center" horizontalAlignment="end">
 								<i-hstack gap={4} class="pointer" width="fit-content" verticalAlignment="center" onClick={() => this.getLPToken(campaign, lockedTokenSymbol, chainId)}>
-									<i-icon name="external-link-alt" width={12} height={12} fill={colorText} />
-									<i-label caption={`Get ${lockedTokenSymbol}`} font={{ size: '13.6px', color: colorText }} />
+									<i-icon name="external-link-alt" width={12} height={12} fill={Theme.text.primary} />
+									<i-label caption={`Get ${lockedTokenSymbol}`} font={{ size: '13.6px' }} />
 									{
 										lockedTokenIconPaths.map((v: any) => {
 											return <i-image display="flex" width={15} height={15} url={tokenAssets.fullPath(v)} fallbackUrl={fallBackUrl} />
@@ -966,8 +1034,8 @@ export default class ScomStaking extends Module {
 								{
 									campaign.showContractLink ?
 										<i-hstack gap={4} class="pointer" width="fit-content" verticalAlignment="center" onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
-											<i-icon name="external-link-alt" width={12} height={12} fill={colorText} class="inline-block" />
-											<i-label caption="View Contract" font={{ size: '13.6px', color: colorText }} />
+											<i-icon name="external-link-alt" width={12} height={12} fill={Theme.text.primary} class="inline-block" />
+											<i-label caption="View Contract" font={{ size: '13.6px' }} />
 										</i-hstack> : []
 								}
 								{/* {
@@ -1013,7 +1081,7 @@ export default class ScomStaking extends Module {
 
 			nodeItems.push(containerSection);
 			containerSection.appendChild(
-				<i-hstack background={{ color: colorCampaignBackground }} width="100%" height={maxHeight}>
+				<i-hstack background={{ color: Theme.background.main }} width="100%" height={maxHeight} border={{ width: 1, style: 'solid', color: '#7979794a' }}>
 					{stakingsElm}
 				</i-hstack>
 			)
@@ -1024,9 +1092,9 @@ export default class ScomStaking extends Module {
 
 	render() {
 		return (
-			<i-scom-dapp-container id="dappContainer">
+			<i-scom-dapp-container id="dappContainer" class={stakingDappContainer}>
 				<i-panel id="stakingComponent" class={stakingComponent} minHeight={200}>
-					<i-panel id="stakingLayout" class="staking-layout" width={maxWidth} height={maxHeight} margin={{ top: '1rem', bottom: '1rem', left: 'auto', right: 'auto' }}>
+					<i-panel id="stakingLayout" class="staking-layout" width={maxWidth} height={maxHeight} margin={{ left: 'auto', right: 'auto' }}>
 						<i-vstack id="loadingElm" class="i-loading-overlay">
 							<i-vstack class="i-loading-spinner" horizontalAlignment="center" verticalAlignment="center">
 								<i-icon
@@ -1043,6 +1111,7 @@ export default class ScomStaking extends Module {
 					</i-panel>
 					<i-panel id="manageStakeElm" />
 					<i-scom-staking-config id="configDApp" visible={false} />
+					<i-scom-wallet-modal id="mdWallet" wallets={[]} />
 				</i-panel>
 			</i-scom-dapp-container>
 		)
