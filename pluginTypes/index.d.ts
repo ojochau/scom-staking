@@ -9742,6 +9742,7 @@ declare module "@scom/scom-staking/global/utils/interfaces.ts" {
         wallets: IWalletPlugin[];
         networks: INetworkConfig[];
         showHeader?: boolean;
+        defaultChainId?: number;
     }
     export interface ISingleStaking {
         address: string;
@@ -9837,8 +9838,6 @@ declare module "@scom/scom-staking/global/index.ts" {
         env?: string;
     }
     export const enum EventId {
-        ConnectWallet = "stakingConnectWallet",
-        ChangeNetwork = "stakingChangeNetwork",
         IsWalletConnected = "isWalletConnected",
         IsWalletDisconnected = "IsWalletDisconnected",
         Paid = "Paid",
@@ -9855,7 +9854,7 @@ declare module "@scom/scom-staking/store/data/staking/index.ts" {
     const USDPeggedTokenAddressMap: {
         [key: number]: string;
     };
-    const getSingleStakingSchema: (readOnly: boolean) => {
+    const getSingleStakingSchema: (readOnly?: boolean) => {
         type: string;
         properties: {
             chainId: {
@@ -10039,7 +10038,7 @@ declare module "@scom/scom-staking/store/index.ts" {
     export const isThemeApplied = false;
     export const isMultiple = false;
     export const maxWidth = "690px";
-    export const maxHeight = "321px";
+    export const maxHeight = 321;
     export * from "@scom/scom-staking/store/utils.ts";
 }
 /// <amd-module name="@scom/scom-staking/data.json.ts" />
@@ -15889,7 +15888,7 @@ declare module "@scom/scom-staking/common/result.tsx" {
     global {
         namespace JSX {
             interface IntrinsicElements {
-                ['staking-result']: ControlElement;
+                ['i-scom-staking-result']: ControlElement;
             }
         }
     }
@@ -15984,6 +15983,7 @@ declare module "@scom/scom-staking/manage-stake/index.tsx" {
 }
 /// <amd-module name="@scom/scom-staking/index.css.ts" />
 declare module "@scom/scom-staking/index.css.ts" {
+    export const stakingDappContainer: string;
     export const stakingComponent: string;
 }
 /// <amd-module name="@scom/scom-staking/commissions/index.css.ts" />
@@ -16074,6 +16074,7 @@ declare module "@scom/scom-staking" {
         private tokenMap;
         private configDApp;
         private dappContainer;
+        private mdWallet;
         private getPropertiesSchema;
         private getThemeSchema;
         private _getActions;
@@ -16116,7 +16117,10 @@ declare module "@scom/scom-staking" {
         private getData;
         private setData;
         private getTag;
+        private updateTag;
         private setTag;
+        private updateStyle;
+        private updateTheme;
         constructor(parent?: Container, options?: ControlElement);
         private registerEvent;
         private onWalletConnect;

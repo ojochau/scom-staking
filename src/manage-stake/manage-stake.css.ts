@@ -1,4 +1,5 @@
 import { Styles } from '@ijstech/components';
+const Theme = Styles.Theme.ThemeVars;
 
 export const stakingManageStakeStyle = Styles.style({
   $nest: {
@@ -19,7 +20,7 @@ export const stakingManageStakeStyle = Styles.style({
       width: '100% !important',
       height: '100% !important',
       backgroundColor: 'transparent',
-      color: '#fff',
+      color: Theme.input.fontColor,
       fontSize: '1rem',
       textAlign: 'left',
       paddingInline: 8,

@@ -1,6 +1,7 @@
 import { Styles } from '@ijstech/components';
 import Assets from './assets';
 import { maxWidth, maxHeight } from './store/index';
+const Theme = Styles.Theme.ThemeVars;
 
 const colorVar = {
   primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
@@ -80,6 +81,29 @@ Styles.fontFace({
   fontStyle: 'normal'
 })
 
+export const stakingDappContainer = Styles.style({
+  $nest: {
+    'dapp-container-body': {
+      $nest: {
+        '&::-webkit-scrollbar': {
+          width: '6px',
+          height: '6px'
+        },
+        '&::-webkit-scrollbar-track': {
+          borderRadius: '10px',
+          border: '1px solid transparent',
+          background: `${Theme.divider} !important`
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: `${Theme.colors.primary.main} !important`,
+          borderRadius: '10px',
+          outline: '1px solid transparent'
+        }
+      }
+    }
+  }
+})
+
 export const stakingComponent = Styles.style({
   $nest: {
     'i-label': {
@@ -89,22 +113,19 @@ export const stakingComponent = Styles.style({
       letterSpacing: '0.15px',
     },
     '#stakingElm': {
-      background: '#0c1234',
+      background: Theme.background.main,
     },
     '.i-loading-overlay': {
-      background: '#0c1234',
+      background: Theme.background.main,
     },
     '.overflow-inherit': {
       overflow: 'inherit',
-    },
-    '::selection': {
-      color: '#fff',
-      background: '#1890ff'
     },
     '.btn-os': {
       background: colorVar.primaryButton,
       height: 'auto !important',
       color: '#fff',
+      // color: Theme.colors.primary.contrastText,
       transition: 'background .3s ease',
       fontSize: '1rem',
       fontWeight: 'bold',
@@ -115,6 +136,10 @@ export const stakingComponent = Styles.style({
           width: '16px !important',
           height: '16px !important',
         },
+        'svg': {
+          // fill: `${Theme.colors.primary.contrastText} !important`
+          fill: `#fff !important`
+        }
       },
     },
     '.btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus': {
@@ -217,8 +242,11 @@ export const stakingComponent = Styles.style({
                   color: '#f7d064 !important',
                 },
                 'i-icon': {
-                  fill: '#f7d064',
+                  fill: '#f7d064'
                 },
+                'svg': {
+                  fill: '#f7d064'
+                }
               }
             },
             '.sticker-text': {
@@ -340,7 +368,7 @@ export const stakingComponent = Styles.style({
       }
     },
     'i-modal .modal': {
-      background: '#192046',
+      background: Theme.background.modal,
     },
     '#loadingElm.i-loading--active': {
       marginTop: '2rem',
@@ -358,6 +386,6 @@ export const stakingComponent = Styles.style({
       display: 'block',
       textAlign: 'center',
       paddingTop: '1rem',
-    },
+    }
   }
 })

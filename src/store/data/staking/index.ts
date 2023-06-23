@@ -7,7 +7,7 @@ const USDPeggedTokenAddressMap: { [key: number]: string } = {
   43114: '0xc7198437980c041c805a1edcba50c1ce5db95118', //USDT.e
 }
 
-const getSingleStakingSchema = (readOnly: boolean) => {
+const getSingleStakingSchema = (readOnly?: boolean) => {
   return {
     type: 'object',
     properties: {
