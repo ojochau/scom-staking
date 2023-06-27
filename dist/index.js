@@ -24507,17 +24507,6 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
         async init() {
             this.isReadyCallbackQueued = true;
             super.init();
-            this.setTag({
-                backgoundColor: currentTheme.background.main,
-                fontColor: currentTheme.text.primary,
-                textSecondary: currentTheme.text.secondary,
-                // buttonBackgroundColor: currentTheme.colors.primary.main,
-                // buttonFontColor: currentTheme.colors.primary.contrastText,
-                inputBackgroundColor: currentTheme.input.background,
-                inputFontColor: currentTheme.input.fontColor,
-                secondaryFontColor: currentTheme.colors.secondary.contrastText,
-                secondaryColor: currentTheme.colors.secondary.main
-            });
             this.stakingResult = new index_29.Result();
             this.stakingComponent.appendChild(this.stakingResult);
             this.stakingResult.visible = false;
@@ -24526,13 +24515,27 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 this.stakingResult.closeModal();
                 this.stakingResult.visible = true;
             }, 100);
-            const data = this.getAttribute('data', true);
-            if (data) {
-                (0, index_27.setCurrentChainId)(data.chainId);
-                await this.setData(data);
-            }
-            else {
-                this.renderEmpty();
+            const lazyLoad = this.getAttribute('lazyLoad', true, false);
+            if (!lazyLoad) {
+                const data = this.getAttribute('data', true);
+                if (data) {
+                    (0, index_27.setCurrentChainId)(data.chainId);
+                    await this.setData(data);
+                }
+                else {
+                    this.renderEmpty();
+                }
+                this.setTag({
+                    backgoundColor: currentTheme.background.main,
+                    fontColor: currentTheme.text.primary,
+                    textSecondary: currentTheme.text.secondary,
+                    // buttonBackgroundColor: currentTheme.colors.primary.main,
+                    // buttonFontColor: currentTheme.colors.primary.contrastText,
+                    inputBackgroundColor: currentTheme.input.background,
+                    inputFontColor: currentTheme.input.fontColor,
+                    secondaryFontColor: currentTheme.colors.secondary.contrastText,
+                    secondaryColor: currentTheme.colors.secondary.main
+                });
             }
             this.isReadyCallbackQueued = false;
             this.executeReadyCallback();

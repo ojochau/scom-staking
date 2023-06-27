@@ -40,6 +40,7 @@ const Theme = Styles.Theme.ThemeVars;
 
 interface ScomStakingElement extends ControlElement {
 	data?: ISingleStakingCampaign;
+	lazyLoad?: boolean;
 }
 
 declare global {
@@ -558,17 +559,6 @@ export default class ScomStaking extends Module {
 	async init() {
 		this.isReadyCallbackQueued = true;
 		super.init();
-		this.setTag({
-			backgoundColor: currentTheme.background.main,
-			fontColor: currentTheme.text.primary,
-			textSecondary: currentTheme.text.secondary,
-			// buttonBackgroundColor: currentTheme.colors.primary.main,
-			// buttonFontColor: currentTheme.colors.primary.contrastText,
-			inputBackgroundColor: currentTheme.input.background,
-			inputFontColor: currentTheme.input.fontColor,
-			secondaryFontColor: currentTheme.colors.secondary.contrastText,
-			secondaryColor: currentTheme.colors.secondary.main
-		});
 		this.stakingResult = new Result();
 		this.stakingComponent.appendChild(this.stakingResult);
 		this.stakingResult.visible = false;
@@ -577,14 +567,27 @@ export default class ScomStaking extends Module {
 			this.stakingResult.closeModal();
 			this.stakingResult.visible = true;
 		}, 100);
-		const data = this.getAttribute('data', true);
-		if (data) {
-			setCurrentChainId(data.chainId);
-			await this.setData(data);
-		} else {
-			this.renderEmpty();
+		const lazyLoad = this.getAttribute('lazyLoad', true, false);
+		if (!lazyLoad) {
+			const data = this.getAttribute('data', true);
+			if (data) {
+				setCurrentChainId(data.chainId);
+				await this.setData(data);
+			} else {
+				this.renderEmpty();
+			}
+			this.setTag({
+				backgoundColor: currentTheme.background.main,
+				fontColor: currentTheme.text.primary,
+				textSecondary: currentTheme.text.secondary,
+				// buttonBackgroundColor: currentTheme.colors.primary.main,
+				// buttonFontColor: currentTheme.colors.primary.contrastText,
+				inputBackgroundColor: currentTheme.input.background,
+				inputFontColor: currentTheme.input.fontColor,
+				secondaryFontColor: currentTheme.colors.secondary.contrastText,
+				secondaryColor: currentTheme.colors.secondary.main
+			});
 		}
-
 		this.isReadyCallbackQueued = false;
 		this.executeReadyCallback();
 	}
