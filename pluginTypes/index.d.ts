@@ -16046,6 +16046,7 @@ declare module "@scom/scom-staking" {
     import StakingConfig from "@scom/scom-staking/commissions/index.tsx";
     interface ScomStakingElement extends ControlElement {
         data?: ISingleStakingCampaign;
+        lazyLoad?: boolean;
     }
     global {
         namespace JSX {
