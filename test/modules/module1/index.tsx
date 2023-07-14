@@ -1,4 +1,7 @@
-import { Module, customModule, Container, VStack } from '@ijstech/components';
+import { Module, customModule, Container, VStack, application } from '@ijstech/components';
+import { getMulticallInfoList } from '@scom/scom-multicall';
+import { INetwork } from '@ijstech/eth-wallet';
+import getNetworkList from '@scom/scom-network-list';
 import ScomStaking from '@scom/scom-staking';
 
 @customModule
@@ -8,6 +11,38 @@ export default class Module1 extends Module {
 
     constructor(parent?: Container, options?: any) {
         super(parent, options);
+        const multicalls = getMulticallInfoList();
+        const networkMap = this.getNetworkMap(options.infuraId);
+        application.store = {
+            infuraId: options.infuraId,
+            multicalls,
+            networkMap
+        }
+    }
+
+    private getNetworkMap = (infuraId?: string) => {
+        const networkMap = {};
+        const defaultNetworkList: INetwork[] = getNetworkList();
+        const defaultNetworkMap: Record<number, INetwork> = defaultNetworkList.reduce((acc, cur) => {
+            acc[cur.chainId] = cur;
+            return acc;
+        }, {});
+        for (const chainId in defaultNetworkMap) {
+            const networkInfo = defaultNetworkMap[chainId];
+            const explorerUrl = networkInfo.blockExplorerUrls && networkInfo.blockExplorerUrls.length ? networkInfo.blockExplorerUrls[0] : "";
+            if (infuraId && networkInfo.rpcUrls && networkInfo.rpcUrls.length > 0) {
+                for (let i = 0; i < networkInfo.rpcUrls.length; i++) {
+                    networkInfo.rpcUrls[i] = networkInfo.rpcUrls[i].replace(/{INFURA_ID}/g, infuraId);
+                }
+            }
+            networkMap[networkInfo.chainId] = {
+                ...networkInfo,
+                symbol: networkInfo.nativeCurrency?.symbol || "",
+                explorerTxUrl: explorerUrl ? `${explorerUrl}${explorerUrl.endsWith("/") ? "" : "/"}tx/` : "",
+                explorerAddressUrl: explorerUrl ? `${explorerUrl}${explorerUrl.endsWith("/") ? "" : "/"}address/` : ""
+            }
+        }
+        return networkMap;
     }
 
     async init() {
@@ -20,29 +55,29 @@ export default class Module1 extends Module {
                 <i-scom-staking data={{
                     "chainId": 43113,
                     "customName": "Scom-Staking",
-                    "customDesc": "Earn OSWAP",
+                    "customDesc": "Earn USDT.e",
                     "showContractLink": true,
                     "stakings":
                     {
-                        "address": "0x03C22D12eb6E5ea3a06F46Fc0e1857438BB7DCae",
+                        "address": "0x0314297AdfE7012b9c6Cc0FDaB0c0a7C6E89285A",
                         "lockTokenType": 0,
                         "rewards":
                         {
-                            "address": "0x10B846B7A1807B3610ee94c1b120D9c5E87C148d",
+                            "address": "0x35DE68B1eD3Edc32Bf41A53A3e7c37c17E50ce03",
                             "isCommonStartDate": false,
                         }
                     },
                     "networks": [
                         {
-                          "chainId": 43113
+                            "chainId": 43113
                         },
                         {
-                          "chainId": 97
+                            "chainId": 97
                         }
                     ],
                     "wallets": [
                         {
-                          "name": "metamask"
+                            "name": "metamask"
                         }
                     ],
                     defaultChainId: 43113

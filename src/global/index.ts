@@ -19,8 +19,6 @@ export const enum EventId {
     Paid = 'Paid',
     chainChanged = 'chainChanged',
     EmitButtonStatus = 'stakingEmitButtonStatus',
-    EmitInput = 'stakingEmitInput',
-    EmitNewToken = 'emitNewToken',
 }
 
 export * from './utils/index';

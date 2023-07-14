@@ -118,9 +118,6 @@ export const stakingComponent = Styles.style({
     '.i-loading-overlay': {
       background: Theme.background.main,
     },
-    '.overflow-inherit': {
-      overflow: 'inherit',
-    },
     '.btn-os': {
       background: colorVar.primaryButton,
       height: 'auto !important',
@@ -164,51 +161,13 @@ export const stakingComponent = Styles.style({
       boxShadow: 'none',
       backgroundColor: 'transparent'
     },
-    '.mr-0-5': {
-      marginRight: '.5rem'
-    },
-    '.ml-0-5': {
-      marginLeft: '.5rem'
-    },
-    '.mb-0-5': {
-      marginBottom: '.5rem'
-    },
     '.hidden': {
       display: 'none !important'
-    },
-    '.no-wrap': {
-      whiteSpace: 'nowrap'
-    },
-    '.flex-nowrap': {
-      flexWrap: 'nowrap',
-    },
-    '.py-1': {
-      paddingTop: '1rem',
-      paddingBottom: '1rem'
-    },
-    '.px-1': {
-      paddingLeft: '1rem',
-      paddingRight: '1rem'
-    },
-    '.align-middle': {
-      alignItems: 'center'
     },
     '.staking-layout': {
       width: '100%',
       marginInline: 'auto',
       overflow: 'hidden',
-    },
-    'i-link': {
-      display: 'flex',
-      $nest: {
-        '&:hover *': {
-          color: '#fff',
-          opacity: 0.9,
-        },
-      },
-    },
-    '.opacity-50': {
-      opacity: 0.5
     },
     '.cursor-default': {
       cursor: 'default',
@@ -331,42 +290,6 @@ export const stakingComponent = Styles.style({
         }
       },
     },
-    '.ml-auto': {
-      marginLeft: 'auto',
-    },
-    '.mr-025': {
-      marginRight: '0.25rem',
-    },
-    '.input-disabled': {
-      opacity: 0.4,
-      cursor: 'default',
-      $nest: {
-        '*': {
-          cursor: 'default',
-        }
-      }
-    },
-    '#importFileErrModal': {
-      $nest: {
-        '.modal': {
-          borderRadius: 12,
-        },
-        '.i-modal_header': {
-          marginBottom: '1.5rem',
-          paddingBottom: '0.5rem',
-          borderBottom: `2px solid #F15E61`,
-          color: '#F15E61',
-          fontSize: '1.25rem',
-          fontWeight: 700,
-        },
-        '.i-modal_header > i-icon': {
-          fill: `#F15E61 !important`
-        },
-        '#importFileErr span': {
-          fontSize: '16px !important'
-        }
-      }
-    },
     'i-modal .modal': {
       background: Theme.background.modal,
     },
@@ -381,11 +304,6 @@ export const stakingComponent = Styles.style({
           marginTop: '2rem',
         },
       },
-    },
-    '.connect-wallet': {
-      display: 'block',
-      textAlign: 'center',
-      paddingTop: '1rem',
     }
   }
 })

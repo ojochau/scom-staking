@@ -1,5 +1,5 @@
 import { moment, Module, Panel, Icon, Button, Label, VStack, HStack, Container, ControlElement, IEventBus, application, customModule, Input, customElements, IDataSchema, Styles } from '@ijstech/components';
-import { BigNumber, Wallet } from '@ijstech/eth-wallet';
+import { BigNumber, Constants, IEventBusRegistry, Wallet } from '@ijstech/eth-wallet';
 import Assets from './assets';
 import {
 	formatNumber,
@@ -8,12 +8,31 @@ import {
 	TokenMapType,
 	EventId,
 	viewOnExplorerByAddress,
-	downloadJsonFile,
 	ISingleStakingCampaign,
 	LockTokenType
 } from './global/index';
-import { getChainId, isWalletConnected, getNetworkInfo, setDataFromConfig, setCurrentChainId, tokenSymbol, getStakingStatus, fallBackUrl, getLockedTokenObject, getLockedTokenSymbol, getLockedTokenIconPaths, getTokenUrl, maxHeight, maxWidth, getSingleStakingSchema } from './store/index';
-import { tokenStore, assets as tokenAssets } from '@scom/scom-token-list';
+import {
+	getChainId,
+	getNetworkInfo,
+	setDataFromConfig,
+	setCurrentChainId,
+	tokenSymbol,
+	getStakingStatus,
+	fallBackUrl,
+	getLockedTokenObject,
+	getLockedTokenSymbol,
+	getLockedTokenIconPaths,
+	getTokenUrl,
+	maxHeight,
+	maxWidth,
+	getSingleStakingSchema,
+	getEmbedderCommissionFee,
+	initRpcWallet,
+	getRpcWallet,
+	isRpcWalletConnected,
+	isClientWalletConnected
+} from './store/index';
+import { tokenStore, assets as tokenAssets, ITokenObject } from '@scom/scom-token-list';
 import configData from './data.json';
 
 import {
@@ -25,17 +44,16 @@ import {
 	getVaultRewardCurrentAPR,
 	claimToken,
 	getAllCampaignsInfo,
-	// deployCampaign,
 } from './staking-utils/index';
-import { Result } from './common/index';
+import { Alert } from './alert/index';
 import { ManageStake } from './manage-stake/index';
 import { Contracts } from './contracts/oswap-time-is-money-contract/index';
 import { stakingComponent, stakingDappContainer } from './index.css';
-import StakingConfig from './commissions/index';
 import ScomDappContainer from '@scom/scom-dapp-container';
-import ScomWalletModal from '@scom/scom-wallet-modal';
+import ScomWalletModal, { IWalletPlugin } from '@scom/scom-wallet-modal';
+import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
+import { INetworkConfig } from '@scom/scom-network-picker';
 
-const currentTheme = Styles.Theme.currentTheme;
 const Theme = Styles.Theme.ThemeVars;
 
 interface ScomStakingElement extends ControlElement {
@@ -57,9 +75,6 @@ export default class ScomStaking extends Module {
 	private _data: ISingleStakingCampaign;
 	tag: any = {};
 	defaultEdit: boolean = true;
-	readonly onEdit: () => Promise<void>;
-	readonly onConfirm: () => Promise<void>;
-	readonly onDiscard: () => Promise<void>;
 
 	private $eventBus: IEventBus;
 	private loadingElm: Panel;
@@ -67,14 +82,16 @@ export default class ScomStaking extends Module {
 	private stakingComponent: Panel;
 	private stakingElm: Panel;
 	private noCampaignSection: Panel;
-	private stakingResult: Result;
+	private stakingAlert: Alert;
 	private manageStakeElm: Panel;
 	private listAprTimer: any = [];
 	private listActiveTimer: any = [];
 	private tokenMap: TokenMapType = {};
-	private configDApp: StakingConfig;
 	private dappContainer: ScomDappContainer;
 	private mdWallet: ScomWalletModal;
+
+	private rpcWalletEvents: IEventBusRegistry[] = [];
+	private clientEvents: any[] = [];
 
 	private getPropertiesSchema() {
 		const propertiesSchema: any = getSingleStakingSchema();
@@ -139,72 +156,126 @@ export default class ScomStaking extends Module {
 		return themeSchema as IDataSchema;
 	}
 
-	private _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema) {
+	private _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema, category?: string) {
 		const actions = [
-			{
-				name: 'Settings',
-				icon: 'cog',
-				command: (builder: any, userInputData: any) => {
-					let _oldData: ISingleStakingCampaign = {
-						chainId: 0,
-						customName: '',
-						stakings: undefined,
-						wallets: [],
-						networks: []
-					};
-					return {
-						execute: async () => {
-							_oldData = { ...this._data };
-							if (userInputData?.chainId !== undefined) this._data.chainId = userInputData.chainId;
-							if (userInputData?.customName !== undefined) this._data.customName = userInputData.customName;
-							if (userInputData?.customDesc !== undefined) this._data.customDesc = userInputData.customDesc;
-							if (userInputData?.customLogo !== undefined) this._data.customLogo = userInputData.customLogo;
-							if (userInputData?.getTokenURL !== undefined) this._data.getTokenURL = userInputData.getTokenURL;
-							if (userInputData?.showContractLink !== undefined) this._data.showContractLink = userInputData.showContractLink;
-							if (userInputData?.stakings !== undefined) this._data.stakings = userInputData.stakings;
-							setCurrentChainId(this._data.chainId);
-							this.configDApp.data = this._data;
-							this.updateStaking();
-							if (builder?.setData) builder.setData(this._data);
-						},
-						undo: async () => {
-							this._data = { ..._oldData };
-							setCurrentChainId(this._data.chainId);
-							this.configDApp.data = this._data;
-							this.updateStaking();
-							if (builder?.setData) builder.setData(this._data);
-						},
-						redo: () => { }
-					}
-				},
-				userInputDataSchema: propertiesSchema
-			},
-			{
-				name: 'Theme Settings',
-				icon: 'palette',
-				command: (builder: any, userInputData: any) => {
-					let oldTag = {};
-					return {
-						execute: async () => {
-							if (!userInputData) return;
-							oldTag = JSON.parse(JSON.stringify(this.tag));
-							if (builder) builder.setTag(userInputData);
-							else this.setTag(userInputData);
-							if (this.dappContainer) this.dappContainer.setTag(userInputData);
-						},
-						undo: () => {
-							if (!userInputData) return;
-							this.tag = JSON.parse(JSON.stringify(oldTag));
-							if (builder) builder.setTag(this.tag);
-							else this.setTag(this.tag);
-							if (this.dappContainer) this.dappContainer.setTag(userInputData);
-						},
-						redo: () => { }
-					}
-				},
-				userInputDataSchema: themeSchema
-			}
-		]
+			// {
+			// 	name: 'Commissions',
+			// 	icon: 'dollar-sign',
+			// 	command: (builder: any, userInputData: any) => {
+			// 		let _oldData: IBuybackCampaign = {
+			// 			chainId: 0,
+			// 			projectName: '',
+			// 			offerIndex: 0,
+			// 			tokenIn: '',
+			// 			tokenOut: '',
+			// 			wallets: [],
+			// 			networks: []
+			// 		}
+			// 		return {
+			// 			execute: async () => {
+			// 				_oldData = { ...this._data };
+			// 				if (userInputData.commissions) this._data.commissions = userInputData.commissions;
+			// 				this.refreshUI();
+			// 				if (builder?.setData) builder.setData(this._data);
+			// 			},
+			// 			undo: () => {
+			// 				this._data = { ..._oldData };
+			// 				this.refreshUI();
+			// 				if (builder?.setData) builder.setData(this._data);
+			// 			},
+			// 			redo: () => { }
+			// 		}
+			// 	},
+			// 	customUI: {
+			// 		render: (data?: any, onConfirm?: (result: boolean, data: any) => void) => {
+			// 			const vstack = new VStack();
+			// 			const config = new ScomCommissionFeeSetup(null, {
+			//         commissions: self._data.commissions,
+			//         fee: getEmbedderCommissionFee(),
+			//         networks: self._data.networks
+			//       });
+			//       const button = new Button(null, {
+			//         caption: 'Confirm',
+			//       });
+			//       vstack.append(config);
+			//       vstack.append(button);
+			//       button.onClick = async () => {
+			//         const commissions = config.commissions;
+			//         if (onConfirm) onConfirm(true, {commissions});
+			//       }
+			//       return vstack;
+			// 		}
+			// 	}
+			// },
+		];
+		if (category && category !== 'offers') {
+			actions.push(
+				{
+					name: 'Settings',
+					icon: 'cog',
+					command: (builder: any, userInputData: any) => {
+						let _oldData: ISingleStakingCampaign = {
+							chainId: 0,
+							customName: '',
+							stakings: undefined,
+							wallets: [],
+							networks: []
+						};
+						return {
+							execute: async () => {
+								_oldData = { ...this._data };
+								if (userInputData?.chainId !== undefined) this._data.chainId = userInputData.chainId;
+								if (userInputData?.customName !== undefined) this._data.customName = userInputData.customName;
+								if (userInputData?.customDesc !== undefined) this._data.customDesc = userInputData.customDesc;
+								if (userInputData?.customLogo !== undefined) this._data.customLogo = userInputData.customLogo;
+								if (userInputData?.getTokenURL !== undefined) this._data.getTokenURL = userInputData.getTokenURL;
+								if (userInputData?.showContractLink !== undefined) this._data.showContractLink = userInputData.showContractLink;
+								if (userInputData?.stakings !== undefined) this._data.stakings = userInputData.stakings;
+								setCurrentChainId(this._data.chainId);
+								this.refreshUI();
+								if (builder?.setData) builder.setData(this._data);
+							},
+							undo: async () => {
+								this._data = { ..._oldData };
+								setCurrentChainId(this._data.chainId);
+								this.refreshUI();
+								if (builder?.setData) builder.setData(this._data);
+							},
+							redo: () => { }
+						}
+					},
+					userInputDataSchema: propertiesSchema
+				}
+			);
+
+			actions.push(
+				{
+					name: 'Theme Settings',
+					icon: 'palette',
+					command: (builder: any, userInputData: any) => {
+						let oldTag = {};
+						return {
+							execute: async () => {
+								if (!userInputData) return;
+								oldTag = JSON.parse(JSON.stringify(this.tag));
+								if (builder) builder.setTag(userInputData);
+								else this.setTag(userInputData);
+								if (this.dappContainer) this.dappContainer.setTag(userInputData);
+							},
+							undo: () => {
+								if (!userInputData) return;
+								this.tag = JSON.parse(JSON.stringify(oldTag));
+								if (builder) builder.setTag(this.tag);
+								else this.setTag(this.tag);
+								if (this.dappContainer) this.dappContainer.setTag(userInputData);
+							},
+							redo: () => { }
+						}
+					},
+					userInputDataSchema: themeSchema
+				}
+			);
+		}
 		return actions;
 	}
 
@@ -214,17 +285,13 @@ export default class ScomStaking extends Module {
 			{
 				name: 'Builder Configurator',
 				target: 'Builders',
-				getActions: () => {
-					return this._getActions(this.getPropertiesSchema(), this.getThemeSchema());
+				getActions: (category?: string) => {
+					return this._getActions(this.getPropertiesSchema(), this.getThemeSchema(), category);
 				},
 				getData: this.getData.bind(this),
 				setData: async (data: any) => {
 					const defaultData = configData.defaultBuilderData;
 					await this.setData({ ...defaultData, ...data });
-					if (this.mdWallet) {
-						this.mdWallet.networks = this._data.networks;
-						this.mdWallet.wallets = this._data.wallets;
-					}
 				},
 				getTag: this.getTag.bind(this),
 				setTag: this.setTag.bind(this)
@@ -232,7 +299,7 @@ export default class ScomStaking extends Module {
 			{
 				name: 'Emdedder Configurator',
 				target: 'Embedders',
-				elementName: 'i-scom-staking-config',
+				elementName: 'i-scom-commission-fee-setup',
 				getLinkParams: () => {
 					const commissions = this._data.commissions || [];
 					return {
@@ -250,8 +317,8 @@ export default class ScomStaking extends Module {
 						await this.setData(resultingData);
 					}
 				},
-				bindOnChanged: (element: StakingConfig, callback: (data: any) => Promise<void>) => {
-					element.onCustomCommissionsChanged = async (data: any) => {
+				bindOnChanged: (element: ScomCommissionFeeSetup, callback: (data: any) => Promise<void>) => {
+					element.onChanged = async (data: any) => {
 						let resultingData = {
 							...self._data,
 							...data
@@ -260,7 +327,10 @@ export default class ScomStaking extends Module {
 						await callback(data);
 					}
 				},
-				getData: this.getData.bind(this),
+				getData: () => {
+					const fee = getEmbedderCommissionFee();
+					return { ...this.getData(), fee }
+				},
 				setData: this.setData.bind(this),
 				getTag: this.getTag.bind(this),
 				setTag: this.setTag.bind(this)
@@ -273,22 +343,25 @@ export default class ScomStaking extends Module {
 	}
 
 	private async setData(value: any) {
-		// this._data = this.convertCampaignData(value);
 		this._data = value;
-		this.configDApp.data = value;
-		const data: any = {
-			defaultChainId: this._data.defaultChainId ?? undefined,
-			wallets: this._data.wallets ?? [],
-			networks: this._data.networks ?? [],
-			showHeader: this._data.showHeader ?? true
+		const rpcWalletId = initRpcWallet(this.defaultChainId);
+		const rpcWallet = getRpcWallet();
+		const event = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.Connected, async (connected: boolean) => {
+			await this.initializeWidgetConfig();
+		});
+		this.rpcWalletEvents.push(event);
+
+		const data = {
+			defaultChainId: this.defaultChainId,
+			wallets: this.wallets,
+			networks: this.networks,
+			showHeader: this.showHeader,
+			rpcWalletId: rpcWallet.instanceId
 		}
 		if (this.dappContainer?.setData) this.dappContainer.setData(data);
-		if (this.mdWallet) {
-			this.mdWallet.networks = value.networks;
-			this.mdWallet.wallets = value.wallets;
-		}
+
 		// TODO - update proxy address
-		this.onSetupPage(isWalletConnected());
+		this.initializeWidgetConfig();
 	}
 
 	private async getTag() {
@@ -340,40 +413,37 @@ export default class ScomStaking extends Module {
 		this.updateStyle('--input-background', this.tag[themeVar]?.inputBackgroundColor);
 	}
 
-	// private convertCampaignData(data: ISingleStakingCampaign) {
-	// 	if (data) {
-	// 		const hourVal = 60 * 60;
-	// 		const { stakings, campaignStart, campaignEnd } = data;
-	// 		const { perAddressCap, minLockTime, maxTotalLock, rewards } = stakings;
-	// 		const { multiplier } = rewards;
-	// 		const _maxTotalLock = new BigNumber(maxTotalLock);
-	// 		const _rewardAmount = new BigNumber(multiplier || 0).multipliedBy(_maxTotalLock);
-	// 		const _rewards: Reward = {
-	// 			...rewards,
-	// 			multiplier: new BigNumber(rewards.multiplier),
-	// 			initialReward: new BigNumber(rewards.initialReward),
-	// 			vestingPeriod: new BigNumber(rewards.vestingPeriod).multipliedBy(rewards.vestingPeriodUnit).multipliedBy(hourVal),
-	// 			claimDeadline: new BigNumber(rewards.claimDeadline),
-	// 			vestingStartDate: new BigNumber(rewards.vestingStartDate || 0),
-	// 			rewardAmount: _rewardAmount
-	// 		}
-	// 		const _stakings: Staking = {
-	// 			...stakings,
-	// 			minLockTime: new BigNumber(minLockTime),
-	// 			perAddressCap: new BigNumber(perAddressCap),
-	// 			maxTotalLock: _maxTotalLock,
-	// 			rewards: [_rewards]
-	// 		}
-	// 		let _data: IStakingCampaign = {
-	// 			...data,
-	// 			campaignStart: new BigNumber(campaignStart),
-	// 			campaignEnd: new BigNumber(campaignEnd),
-	// 			stakings: [_stakings]
-	// 		};
-	// 		return _data;
-	// 	}
-	// 	return null;
-	// }
+	get defaultChainId() {
+		return this._data.defaultChainId;
+	}
+
+	set defaultChainId(value: number) {
+		this._data.defaultChainId = value;
+	}
+
+	get wallets() {
+		return this._data.wallets ?? [];
+	}
+
+	set wallets(value: IWalletPlugin[]) {
+		this._data.wallets = value;
+	}
+
+	get networks() {
+		return this._data.networks ?? [];
+	}
+
+	set networks(value: INetworkConfig[]) {
+		this._data.networks = value;
+	}
+
+	get showHeader() {
+		return this._data.showHeader ?? true;
+	}
+
+	set showHeader(value: boolean) {
+		this._data.showHeader = value;
+	}
 
 	constructor(parent?: Container, options?: ControlElement) {
 		super(parent, options);
@@ -382,26 +452,32 @@ export default class ScomStaking extends Module {
 		this.registerEvent();
 	}
 
+	onHide() {
+		this.dappContainer.onHide();
+		const rpcWallet = getRpcWallet();
+		for (let event of this.rpcWalletEvents) {
+			rpcWallet.unregisterWalletEvent(event);
+		}
+		this.rpcWalletEvents = [];
+		for (let event of this.clientEvents) {
+			event.unregister();
+		}
+		this.clientEvents = [];
+	}
+
 	private registerEvent = () => {
-		this.$eventBus.register(this, EventId.IsWalletConnected, this.onWalletConnect);
-		this.$eventBus.register(this, EventId.IsWalletDisconnected, this.onWalletConnect);
-		this.$eventBus.register(this, EventId.chainChanged, this.onChainChange);
-		this.$eventBus.register(this, EventId.EmitButtonStatus, this.updateButtonStatus);
+		this.clientEvents.push(this.$eventBus.register(this, EventId.chainChanged, this.onChainChanged));
+		this.clientEvents.push(this.$eventBus.register(this, EventId.EmitButtonStatus, this.updateButtonStatus));
 	}
 
-	private onWalletConnect = async (connected: boolean) => {
-		this.onSetupPage(connected);
-	}
-
-	private onChainChange = async () => {
-		const isConnected = isWalletConnected();
-		if (await this.isWalletValid(isConnected)) {
-			this.onSetupPage(isConnected);
+	private onChainChanged = async () => {
+		if (await this.isWalletValid()) {
+			this.initializeWidgetConfig();
 		}
 	}
 
-	private isWalletValid = async (isConnected: boolean) => {
-		if (this._data && isConnected) {
+	private isWalletValid = async () => {
+		if (this._data && isClientWalletConnected()) {
 			try {
 				const wallet = Wallet.getClientInstance();
 				const infoList = this._data[wallet.chainId];
@@ -418,52 +494,59 @@ export default class ScomStaking extends Module {
 		return false;
 	}
 
-	private updateStaking = () => {
-		this.onSetupPage(isWalletConnected());
+	private refreshUI = () => {
+		this.initializeWidgetConfig();
 	}
 
-	private onSetupPage = async (connected: boolean, hideLoading?: boolean) => {
-		if (!hideLoading && this.loadingElm) {
-			this.loadingElm.visible = true;
-		}
-		if (!connected || !this._data || !this.checkValidation()) {
-			await this.renderEmpty();
-			return;
-		}
-		tokenStore.updateTokenMapData();
-		this.campaigns = await getAllCampaignsInfo({ [this._data.chainId]: this._data });
-		await this.renderCampaigns(hideLoading);
-		if (!hideLoading && this.loadingElm) {
-			this.loadingElm.visible = false;
-		}
+	private initializeWidgetConfig = async (hideLoading?: boolean) => {
+		setTimeout(async () => {
+			if (!hideLoading && this.loadingElm) {
+				this.loadingElm.visible = true;
+			}
+			if (!isClientWalletConnected() || !this._data || !this.checkValidation()) {
+				await this.renderEmpty();
+				return;
+			}
+			tokenStore.updateTokenMapData(getChainId());
+			const rpcWallet = getRpcWallet();
+			if (rpcWallet.address) {
+				tokenStore.updateAllTokenBalances(rpcWallet);
+			}
+			await Wallet.getClientInstance().init();
+			this.campaigns = await getAllCampaignsInfo({ [this._data.chainId]: this._data });
+			await this.renderCampaigns(hideLoading);
+			if (!hideLoading && this.loadingElm) {
+				this.loadingElm.visible = false;
+			}
+		})
 	}
 
-	private showResultMessage = (result: Result, status: 'warning' | 'success' | 'error', content?: string | Error) => {
-		if (!result) return;
+	private showMessage = (status: 'warning' | 'success' | 'error', content?: string | Error) => {
+		if (!this.stakingAlert) return;
 		let params: any = { status };
 		if (status === 'success') {
 			params.txtHash = content;
 		} else {
 			params.content = content;
 		}
-		result.message = { ...params };
-		result.showModal();
+		this.stakingAlert.message = { ...params };
+		this.stakingAlert.showModal();
 	}
 
 	private onClaim = async (btnClaim: Button, data: any) => {
-		this.showResultMessage(this.stakingResult, 'warning', `Claim ${data.rewardSymbol}`);
+		this.showMessage('warning', `Claim ${data.rewardSymbol}`);
 		const callBack = async (err: any, reply: any) => {
 			if (err) {
-				this.showResultMessage(this.stakingResult, 'error', err);
+				this.showMessage('error', err);
 			} else {
-				this.showResultMessage(this.stakingResult, 'success', reply);
+				this.showMessage('success', reply);
 				btnClaim.enabled = false;
 				btnClaim.rightIcon.visible = true;
 			}
 		};
 
 		const confirmationCallBack = async (receipt: any) => {
-			await this.onSetupPage(isWalletConnected(), true);
+			await this.initializeWidgetConfig(true);
 			if (!btnClaim) return;
 			btnClaim.rightIcon.visible = false;
 			btnClaim.enabled = true;
@@ -476,41 +559,6 @@ export default class ScomStaking extends Module {
 
 		claimToken(data.reward.address, callBack);
 	}
-
-	// private onDeployCampaign = async () => {
-	// 	if (this._data && this._data.isNew && this.checkValidation()) {
-	// 		const campaign = this._data;
-	// 		const chainId = getChainId();
-	// 		let result: IStakingCampaign | null;
-	// 		this.showResultMessage(this.stakingResult, 'warning', `Deploying ${campaign.customName}`);
-
-	// 		const callBack = async (err: any, reply: any) => {
-	// 			if (err) {
-	// 				this.showResultMessage(this.stakingResult, 'error', err);
-	// 			} else {
-	// 				this.showResultMessage(this.stakingResult, 'success', reply);
-	// 			}
-	// 		};
-
-	// 		const confirmationCallBack = async (receipt: any) => {
-	// 			if (!result) return;
-	// 		};
-
-	// 		registerSendTxEvents({
-	// 			transactionHash: callBack,
-	// 			confirmation: confirmationCallBack
-	// 		});
-
-	// 		result = await deployCampaign(campaign, callBack);
-	// 		if (result) {
-	// 			this.stakingResult.closeModal();
-	// 			const obj = { [chainId]: [{ ...result }] };
-	// 			this.onSetupPage(isWalletConnected());
-	// 			confirmationCallBack(true);
-	// 			this.onDownload(obj);
-	// 		}
-	// 	}
-	// }
 
 	private checkValidation = () => {
 		if (!this._data) return false;
@@ -527,12 +575,6 @@ export default class ScomStaking extends Module {
 		return true;
 	}
 
-	private onDownload = (data?: any) => {
-		if (data) {
-			downloadJsonFile('campaign.json', { ...data });
-		}
-	}
-
 	private removeTimer = () => {
 		for (const timer of this.listAprTimer) {
 			clearInterval(timer);
@@ -545,7 +587,7 @@ export default class ScomStaking extends Module {
 	}
 
 	private getRewardToken = (tokenAddress: string) => {
-		return this.tokenMap[tokenAddress] || this.tokenMap[tokenAddress?.toLocaleLowerCase()] || {} as any;
+		return this.tokenMap[tokenAddress] || this.tokenMap[tokenAddress?.toLocaleLowerCase()] || {} as ITokenObject;
 	}
 
 	private getLPToken = (campaign: any, token: string, chainId?: number) => {
@@ -559,14 +601,8 @@ export default class ScomStaking extends Module {
 	async init() {
 		this.isReadyCallbackQueued = true;
 		super.init();
-		this.stakingResult = new Result();
-		this.stakingComponent.appendChild(this.stakingResult);
-		this.stakingResult.visible = false;
-		this.showResultMessage(this.stakingResult, 'warning', '');
-		setTimeout(() => {
-			this.stakingResult.closeModal();
-			this.stakingResult.visible = true;
-		}, 100);
+		this.stakingAlert = new Alert();
+		this.stakingComponent.appendChild(this.stakingAlert);
 		const lazyLoad = this.getAttribute('lazyLoad', true, false);
 		if (!lazyLoad) {
 			const data = this.getAttribute('data', true);
@@ -576,17 +612,6 @@ export default class ScomStaking extends Module {
 			} else {
 				this.renderEmpty();
 			}
-			this.setTag({
-				backgoundColor: currentTheme.background.main,
-				fontColor: currentTheme.text.primary,
-				textSecondary: currentTheme.text.secondary,
-				// buttonBackgroundColor: currentTheme.colors.primary.main,
-				// buttonFontColor: currentTheme.colors.primary.contrastText,
-				inputBackgroundColor: currentTheme.input.background,
-				inputFontColor: currentTheme.input.fontColor,
-				secondaryFontColor: currentTheme.colors.secondary.contrastText,
-				secondaryColor: currentTheme.colors.secondary.main
-			});
 		}
 		this.isReadyCallbackQueued = false;
 		this.executeReadyCallback();
@@ -603,23 +628,44 @@ export default class ScomStaking extends Module {
 		}
 	}
 
-	private connectWallet = () => {
-		this.mdWallet.showModal();
+	private connectWallet = async () => {
+		if (!isClientWalletConnected()) {
+			if (this.mdWallet) {
+				await application.loadPackage('@scom/scom-wallet-modal', '*');
+				this.mdWallet.networks = this.networks;
+				this.mdWallet.wallets = this.wallets;
+				this.mdWallet.showModal();
+			}
+			return;
+		}
+		if (!isRpcWalletConnected()) {
+			const chainId = getChainId();
+			const clientWallet = Wallet.getClientInstance();
+			await clientWallet.switchNetwork(chainId);
+		}
 	}
 
 	private initEmptyUI = async () => {
 		if (!this.noCampaignSection) {
 			this.noCampaignSection = await Panel.create({ height: '100%' });
 		}
-		const isConnected = isWalletConnected();
+		const isClientConnected = isClientWalletConnected();
+		const isRpcConnected = isRpcWalletConnected();
 		this.noCampaignSection.clearInnerHTML();
 		this.noCampaignSection.appendChild(
 			<i-panel class="no-campaign" height="100%" background={{ color: Theme.background.main }}>
 				<i-vstack gap={10} verticalAlignment="center">
 					<i-image url={Assets.fullPath('img/staking/TrollTrooper.svg')} />
-					<i-label caption={isConnected ? 'No Campaigns' : 'Please connect with your wallet!'} />
+					<i-label caption={isClientConnected ? 'No Campaigns' : 'Please connect with your wallet!'} />
 					{
-						!isConnected ? <i-button maxWidth={220} caption="Connect Wallet" class="btn-os btn-stake" /*background={{ color: `${Theme.colors.primary.main} !important` }}*/ margin={{ left: 'auto', right: 'auto', bottom: 0 }} font={{ size: '14px', /*color: Theme.colors.primary.contrastText*/ }} onClick={this.connectWallet} /> : []
+						// !isClientConnected || !isRpcConnected ? <i-button
+						// caption={!isClientConnected ? 'Connect Wallet' : 'Switch Network'}
+						// class="btn-os btn-stake"
+						// maxWidth={220}
+						// // background={{ color: `${Theme.colors.primary.main} !important` }}
+						// font={{ size: '14px', /*color: Theme.colors.primary.contrastText*/ }}
+						// margin={{ left: 'auto', right: 'auto', bottom: 0 }}
+						// onClick={this.connectWallet} /> : []
 					}
 				</i-vstack>
 			</i-panel>
@@ -644,7 +690,6 @@ export default class ScomStaking extends Module {
 		}
 		this.tokenMap = tokenStore.tokenMap;
 		const chainId = getChainId();
-		const network = getNetworkInfo(chainId);
 		await this.initEmptyUI();
 		this.noCampaignSection.visible = false;
 		if (this.campaigns && !this.campaigns.length) {
@@ -654,6 +699,7 @@ export default class ScomStaking extends Module {
 			this.removeTimer();
 			return;
 		}
+		const rpcWalletConnected = isRpcWalletConnected();
 
 		let nodeItems: HTMLElement[] = [];
 		this.removeTimer();
@@ -714,7 +760,7 @@ export default class ScomStaking extends Module {
 				stakingElms[i] = await VStack.create({ visible: i === 0 });
 				activeTimerRows[i] = await VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
 				activeTimerElms[i] = await VStack.create();
-				activeTimerRows[i].appendChild(<i-label caption="End Date" font={{ size: '14px' }} class="opacity-50" />);
+				activeTimerRows[i].appendChild(<i-label caption="End Date" font={{ size: '14px' }} opacity={0.5} />);
 				activeTimerRows[i].appendChild(activeTimerElms[i]);
 				endHours[i] = await Label.create(optionTimer);
 				endDays[i] = await Label.create(optionTimer);
@@ -754,7 +800,7 @@ export default class ScomStaking extends Module {
 			}
 
 			const setAvailableQty = async () => {
-				if (!isWalletConnected()) return;
+				if (!isRpcWalletConnected()) return;
 				let i = 0;
 				for (const o of options) {
 					const _totalLocked = await getStakingTotalLocked(o.address);
@@ -846,7 +892,7 @@ export default class ScomStaking extends Module {
 				const manageStake = new ManageStake();
 				manageStake.id = `manage-stake-${option.address}`;
 				manageStake.width = '100%';
-				manageStake.onRefresh = () => this.onSetupPage(isWalletConnected(), true);
+				manageStake.onRefresh = () => this.initializeWidgetConfig(true);
 				this.manageStakeElm.clearInnerHTML();
 				this.manageStakeElm.appendChild(manageStake);
 				manageStake.setData({
@@ -916,15 +962,15 @@ export default class ScomStaking extends Module {
 					const btnClaim = await Button.create({
 						// rightIcon: { spin: true, fill: Theme.colors.primary.contrastText, visible: false },
 						rightIcon: { spin: true, fill: '#fff', visible: false },
-						caption: `Claim ${rewardSymbol}`,
+						caption: rpcWalletConnected ? `Claim ${rewardSymbol}` : 'Switch Network',
 						// background: { color: `${Theme.colors.primary.main} !important` },
 						// font: { color: Theme.colors.primary.contrastText },
-						enabled: !(!passClaimStartTime || new BigNumber(reward.claimable).isZero()) && isClaim,
-						margin: { left: 'auto', right: 'auto' }
+						enabled: !rpcWalletConnected || (rpcWalletConnected && !(!passClaimStartTime || new BigNumber(reward.claimable).isZero()) && isClaim),
+						margin: { left: 'auto', right: 'auto', bottom: 10 }
 					})
 					btnClaim.id = `btnClaim-${idx}-${option.address}`;
 					btnClaim.classList.add('btn-os', 'btn-stake');
-					btnClaim.onClick = () => this.onClaim(btnClaim, { reward, rewardSymbol });
+					btnClaim.onClick = () => rpcWalletConnected ? this.onClaim(btnClaim, { reward, rewardSymbol }) : this.connectWallet();
 					rowRewards.appendChild(btnClaim);
 				};
 
@@ -956,20 +1002,20 @@ export default class ScomStaking extends Module {
 								</i-hstack>
 								<i-vstack gap={2} overflow={{ x: 'hidden' }} verticalAlignment="center">
 									<i-label visible={!!campaign.customName} caption={campaign.customName} font={{ size: '20px', name: 'Montserrat Bold', color: Theme.text.secondary, bold: true }} class="text-overflow" />
-									<i-label visible={!!campaign.customDesc} caption={campaign.customDesc} font={{ size: '16px', name: 'Montserrat Regular' }} class="opacity-50 text-overflow" />
+									<i-label visible={!!campaign.customDesc} caption={campaign.customDesc} font={{ size: '16px', name: 'Montserrat Regular' }} opacity={0.5} class="text-overflow" />
 								</i-vstack>
 							</i-hstack>
 							{
 								await Promise.all(rewardOptions.map(async (rewardOption: any, idx: number) => {
-									const lbApr = await Label.create({ font: { size: '40px', name: 'Montserrat Medium', color: Theme.text.secondary } });
-									const lbRate = await Label.create({ font: { size: '16px', name: 'Montserrat Regular' } });
+									const lbApr = await Label.create({ font: { size: '32px', name: 'Montserrat Medium', color: Theme.text.secondary } });
+									const lbRate = await Label.create({ font: { size: '16px', name: 'Montserrat Regular' }, opacity: 0.5 });
 									lbApr.classList.add('text-overflow');
-									lbRate.classList.add('opacity-50');
 									const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
 									const rewardTokenDecimals = rewardToken.decimals || 18;
 									const decimalsOffset = 18 - rewardTokenDecimals;
 									const lockTokenType = option.lockTokenType;
-									const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
+									// const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
+									const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(option.lockTokenAddress)} : ${rewardOption.multiplier} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
 									const updateApr = async () => {
 										if (lockTokenType === LockTokenType.ERC20_Token) {
 											const apr: any = await getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, durationDays);
@@ -1001,12 +1047,12 @@ export default class ScomStaking extends Module {
 						</i-hstack>
 						<i-hstack width="100%" verticalAlignment="center">
 							<i-vstack gap={2} width="25%" verticalAlignment="center">
-								<i-label caption="Start Date" font={{ size: '14px' }} class="opacity-50" />
+								<i-label caption="Start Date" font={{ size: '14px' }} opacity={0.5} />
 								<i-label caption={formatDate(option.startOfEntryPeriod, 'DD MMM, YYYY')} font={{ size: '16px', name: 'Montserrat Regular' }} />
 							</i-vstack>
 							{activeTimerRows[optionIdx]}
 							<i-vstack gap={2} width="25%" verticalAlignment="center">
-								<i-label caption="Stake Duration" font={{ size: '14px' }} class="opacity-50" />
+								<i-label caption="Stake Duration" font={{ size: '14px' }} opacity={0.5} />
 								<i-hstack gap={4} verticalAlignment="center">
 									{
 										options.map((_option: any, _optionIdx: number) => {
@@ -1113,7 +1159,7 @@ export default class ScomStaking extends Module {
 						<i-panel id="stakingElm" class="wrapper" />
 					</i-panel>
 					<i-panel id="manageStakeElm" />
-					<i-scom-staking-config id="configDApp" visible={false} />
+					<i-scom-commission-fee-setup id="configDApp" visible={false} />
 					<i-scom-wallet-modal id="mdWallet" wallets={[]} />
 				</i-panel>
 			</i-scom-dapp-container>

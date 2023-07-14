@@ -1,9 +1,9 @@
 import { moment, Button, Input, Container, HStack, customElements, ControlElement, Module, Label, Styles } from '@ijstech/components';
-import { BigNumber } from '@ijstech/eth-wallet';
-import { ITokenObject, IERC20ApprovalAction, limitInputNumber } from '../global/index';
-import { isWalletConnected, LockTokenType, setStakingStatus, getLockedTokenObject, getLockedTokenSymbol } from '../store/index';
-import { tokenStore } from '@scom/scom-token-list';
-import { Result } from '../common/index';
+import { BigNumber, Wallet } from '@ijstech/eth-wallet';
+import { IERC20ApprovalAction, limitInputNumber } from '../global/index';
+import { LockTokenType, setStakingStatus, getLockedTokenObject, getLockedTokenSymbol, isRpcWalletConnected, getRpcWallet, getChainNativeToken, getChainId, isClientWalletConnected } from '../store/index';
+import { ITokenObject, tokenStore } from '@scom/scom-token-list';
+import { Alert } from '../alert/index';
 import {
   lockToken,
   withdrawToken,
@@ -52,7 +52,7 @@ export class ManageStake extends Module {
   private btnStake: Button;
   private btnUnstake: Button;
   private btnMax: Button;
-  private stakingResult: Result;
+  private stakingAlert: Alert;
   private approvalModelAction: IERC20ApprovalAction;
   public onRefresh: any;
 
@@ -63,11 +63,11 @@ export class ManageStake extends Module {
   setData = (data: any) => {
     this.address = data.address;
     this.stakingInfo = data;
-    this.onSetupPage(isWalletConnected());
+    this.onSetupPage();
   }
 
   getBalance = () => {
-    return this.balance;
+    return BigNumber.min(this.availableQty, this.balance, this.perAddressCap);
   }
 
   needToBeApproval = () => {
@@ -81,20 +81,20 @@ export class ManageStake extends Module {
     return `#btn-unstake-${this.address}`;
   }
 
-  private showResultMessage = (result: Result, status: 'warning' | 'success' | 'error', content?: string | Error) => {
-    if (!result) return;
+  private showMessage = (status: 'warning' | 'success' | 'error', content?: string | Error) => {
+    if (!this.stakingAlert) return;
     let params: any = { status };
     if (status === 'success') {
       params.txtHash = content;
     } else {
       params.content = content;
     }
-    result.message = { ...params };
-    result.showModal();
+    this.stakingAlert.message = { ...params };
+    this.stakingAlert.showModal();
   }
 
   private onApproveToken = async () => {
-    this.showResultMessage(this.stakingResult, 'warning', `Approve ${this.tokenSymbol}`);
+    this.showMessage('warning', `Approve ${this.tokenSymbol}`);
     this.approvalModelAction.doApproveAction(this.lockedTokenObject, this.inputAmount.value);
   }
 
@@ -125,7 +125,7 @@ export class ManageStake extends Module {
   private renderStakingInfo = async (info: any) => {
     if (!info || !Object.keys(info).length) {
       this.btnApprove.visible = false;
-      if (!isWalletConnected()) {
+      if (!isRpcWalletConnected()) {
         this.btnMax.visible = false;
         this.inputAmount.enabled = false;
       }
@@ -167,7 +167,9 @@ export class ManageStake extends Module {
     this.btnApprove.visible = false;
     // Unstake
     if ((CurrentMode as any)[mode.toUpperCase()] !== CurrentMode.STAKE) {
-      this.approvalModelAction.checkAllowance(this.lockedTokenObject, this.stakeQty);
+      if (isRpcWalletConnected()) {
+        this.approvalModelAction.checkAllowance(this.lockedTokenObject, this.stakeQty);
+      }
       this.btnStake.visible = false;
       this.wrapperInputAmount.visible = false;
       this.btnUnstake.visible = true;
@@ -179,7 +181,10 @@ export class ManageStake extends Module {
     // Stake
     if (tokenAddress && mode === 'Stake') {
       if (lockTokenType == LockTokenType.ERC20_Token) {
-        await tokenStore.updateAllTokenBalances();
+        const rpcWallet = getRpcWallet();
+        if (rpcWallet.address) {
+          await tokenStore.updateAllTokenBalances(rpcWallet);
+        }
         let balances = tokenStore.tokenBalances;
         this.tokenBalances = Object.keys(balances).reduce((accumulator: any, key) => {
           accumulator[key.toLowerCase()] = balances[key];
@@ -194,11 +199,15 @@ export class ManageStake extends Module {
       this.btnMax.visible = true;
       this.lbToken.caption = symbol;
     }
-    this.updateEnableInput();
+    await this.updateEnableInput();
+    if (!isRpcWalletConnected()) {
+      this.btnMax.enabled = false;
+      this.inputAmount.enabled = false;
+    }
   }
 
-  private onSetupPage = async (connected: boolean) => {
-    if (!connected) {
+  private onSetupPage = async () => {
+    if (!isClientWalletConnected()) {
       this.btnStake.enabled = false;
       this.btnUnstake.enabled = false;
       this.btnApprove.visible = false;
@@ -207,7 +216,9 @@ export class ManageStake extends Module {
       return;
     }
     this.tokenMap = tokenStore.tokenMap;
-    await this.initApprovalModelAction();
+    if (isRpcWalletConnected()) {
+      await this.initApprovalModelAction();
+    }
     await this.ready();
     await this.renderStakingInfo(this.stakingInfo);
   }
@@ -227,15 +238,19 @@ export class ManageStake extends Module {
     this.btnMax.enabled = enabled && new BigNumber(this.balance).gt(0);
   }
 
+  private callback = (err: any) => {
+    this.showMessage('error', err);
+  }
+
   async initApprovalModelAction() {
     this.approvalModelAction = getApprovalModelAction(this.address, {
       sender: this,
       payAction: async () => {
-        this.showResultMessage(this.stakingResult, 'warning', `${this.currentMode === CurrentMode.STAKE ? 'Stake' : 'Unlock'} ${this.tokenSymbol}`);
+        this.showMessage('warning', `${this.currentMode === CurrentMode.STAKE ? 'Stake' : 'Unlock'} ${this.tokenSymbol}`);
         if (this.currentMode === CurrentMode.STAKE) {
-          lockToken(this.lockedTokenObject, this.inputAmount.value, this.address);
+          lockToken(this.lockedTokenObject, this.inputAmount.value, this.address, this.callback);
         } else {
-          withdrawToken(this.address);
+          withdrawToken(this.address, this.callback);
         }
       },
       onToBeApproved: async (token: ITokenObject) => {
@@ -270,7 +285,7 @@ export class ManageStake extends Module {
       },
       onApproving: async (token: ITokenObject, receipt?: string) => {
         if (receipt) {
-          this.showResultMessage(this.stakingResult, 'success', receipt);
+          this.showMessage('success', receipt);
           this.btnApprove.caption = `Approving`;
           this.btnApprove.enabled = false;
           this.btnApprove.rightIcon.visible = true;
@@ -279,20 +294,23 @@ export class ManageStake extends Module {
         }
       },
       onApproved: async (token: ITokenObject) => {
-        await tokenStore.updateAllTokenBalances();
+        const rpcWallet = getRpcWallet();
+        if (rpcWallet.address) {
+          await tokenStore.updateTokenBalances(rpcWallet, [getChainNativeToken(getChainId())]);
+        }
         await this.updateEnableInput();
         this.btnApprove.rightIcon.visible = false;
         this.btnApprove.visible = false;
       },
       onApprovingError: async (token: ITokenObject, err: Error) => {
-        this.showResultMessage(this.stakingResult, 'error', err);
+        this.showMessage('error', err);
         this.btnApprove.rightIcon.visible = false;
         this.btnMax.enabled = new BigNumber(this.balance).gt(0);
         this.inputAmount.enabled = true;
       },
       onPaying: async (receipt?: string) => {
         if (receipt) {
-          this.showResultMessage(this.stakingResult, 'success', receipt);
+          this.showMessage('success', receipt);
           this.inputAmount.enabled = false;
           this.btnMax.enabled = false;
           if (this.currentMode === CurrentMode.STAKE) {
@@ -311,7 +329,10 @@ export class ManageStake extends Module {
       onPaid: async () => {
         const caption = this.currentMode === CurrentMode.STAKE ? 'Unstake' : 'Stake';
         if (this.onRefresh) {
-          await tokenStore.updateAllTokenBalances();
+          const rpcWallet = getRpcWallet();
+          if (rpcWallet.address) {
+            await tokenStore.updateAllTokenBalances(rpcWallet);
+          }
           await this.onRefresh();
           setStakingStatus(this.actionKey, false, caption);
         }
@@ -337,7 +358,7 @@ export class ManageStake extends Module {
           this.btnUnstake.caption = 'Unstake';
           this.btnUnstake.rightIcon.visible = false;
         }
-        this.showResultMessage(this.stakingResult, 'error', err);
+        this.showMessage('error', err);
         setStakingStatus(this.actionKey, false, caption);
       }
     });
@@ -345,8 +366,8 @@ export class ManageStake extends Module {
 
   init() {
     super.init();
-    this.stakingResult = new Result();
-    this.appendChild(this.stakingResult);
+    this.stakingAlert = new Alert();
+    this.appendChild(this.stakingAlert);
   }
 
   render() {
@@ -375,7 +396,7 @@ export class ManageStake extends Module {
                 minHeight={25}
                 onClick={() => this.setMaxBalance()}
               />
-              <i-label id="lbToken" font={{ size: '14px', color: Theme.input.fontColor }} class="opacity-50" />
+              <i-label id="lbToken" font={{ size: '14px', color: Theme.input.fontColor }} opacity={0.5} />
             </i-hstack>
           </i-hstack>
           <i-hstack gap={10} width="calc(100% - 290px)">
