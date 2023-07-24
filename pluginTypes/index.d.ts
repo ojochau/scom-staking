@@ -1,4 +1,6 @@
 /// <reference path="@ijstech/eth-contract/index.d.ts" />
+/// <reference path="@ijstech/eth-wallet/index.d.ts" />
+/// <reference path="@scom/scom-dapp-container/@ijstech/eth-wallet/index.d.ts" />
 /// <amd-module name="@scom/scom-staking/assets.ts" />
 declare module "@scom/scom-staking/assets.ts" {
     function fullPath(path: string): string;
@@ -6,6 +8,28 @@ declare module "@scom/scom-staking/assets.ts" {
         fullPath: typeof fullPath;
     };
     export default _default;
+}
+/// <amd-module name="@scom/scom-staking/global/utils/helper.ts" />
+declare module "@scom/scom-staking/global/utils/helper.ts" {
+    export const explorerTxUrlsByChainId: {
+        [key: number]: string;
+    };
+    export const explorerAddressUrlsByChainId: {
+        [key: number]: string;
+    };
+    export const DefaultDateFormat = "DD/MM/YYYY";
+    export const formatDate: (date: any, customType?: string, showTimezone?: boolean) => string;
+    export const formatNumber: (value: any, decimals?: number) => string;
+    export const formatNumberWithSeparators: (value: number, precision?: number) => string;
+    export const isInvalidInput: (val: any) => boolean;
+    export const limitInputNumber: (input: any, decimals?: number) => void;
+    export const limitDecimals: (value: any, decimals: number) => any;
+    export const viewOnExplorerByTxHash: (chainId: number, txHash: string) => void;
+    export const viewOnExplorerByAddress: (chainId: number, address: string) => void;
+}
+/// <amd-module name="@scom/scom-staking/global/utils/error.ts" />
+declare module "@scom/scom-staking/global/utils/error.ts" {
+    export function parseContractError(oMessage: string, tokens: string[]): Promise<string>;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/OpenSwap.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/OpenSwap.json.ts" {
@@ -9579,109 +9603,18 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/index.ts" {
 }
 /// <amd-module name="@scom/scom-staking/global/utils/common.ts" />
 declare module "@scom/scom-staking/global/utils/common.ts" {
-    import { Wallet, BigNumber, ISendTxEventsOptions } from "@ijstech/eth-wallet";
-    export interface ITokenObject {
-        address?: string;
-        name: string;
-        decimals: number;
-        symbol: string;
-        status?: boolean | null;
-        logoURI?: string;
-        isCommon?: boolean | null;
-        balance?: string | number;
-        isNative?: boolean | null;
-        isWETH?: boolean | null;
-        isNew?: boolean | null;
-    }
+    import { BigNumber, ISendTxEventsOptions } from "@ijstech/eth-wallet";
+    import { ITokenObject } from "@scom/scom-token-list";
     export type TokenMapType = {
         [token: string]: ITokenObject;
     };
-    export const isTransactionConfirmed: (txHash: string) => Promise<boolean>;
     export const registerSendTxEvents: (sendTxEventHandlers: ISendTxEventsOptions) => void;
-    export function getERC20Amount(wallet: Wallet, token: string, decimals: number): Promise<BigNumber>;
     export const approveERC20Max: (token: ITokenObject, spenderAddress: string, callback?: any, confirmationCallback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     export const getERC20Allowance: (token: ITokenObject, spenderAddress: string) => Promise<BigNumber>;
-    export const isAddressValid: (address: string) => Promise<any>;
-}
-/// <amd-module name="@scom/scom-staking/global/utils/helper.ts" />
-declare module "@scom/scom-staking/global/utils/helper.ts" {
-    import { BigNumber } from "@ijstech/eth-wallet";
-    import { TokenMapType } from "@scom/scom-staking/global/utils/common.ts";
-    export enum SITE_ENV {
-        DEV = "dev",
-        TESTNET = "testnet",
-        MAINNET = "mainnet"
-    }
-    export const explorerTxUrlsByChainId: {
-        [key: number]: string;
-    };
-    export const explorerAddressUrlsByChainId: {
-        [key: number]: string;
-    };
-    export const DefaultDateTimeFormat = "DD/MM/YYYY HH:mm:ss";
-    export const DefaultDateFormat = "DD/MM/YYYY";
-    export const formatDate: (date: any, customType?: string, showTimezone?: boolean) => string;
-    export const formatUTCDate: (date: any, customType?: string, showTimezone?: boolean) => string;
-    export const compareDate: (fromDate: any, toDate?: any) => boolean;
-    export const formatNumber: (value: any, decimals?: number) => string;
-    export const formatPercentNumber: (value: any, decimals?: number) => string;
-    export const formatNumberWithSeparators: (value: number, precision?: number) => string;
-    export const isValidNumber: (value: string | number) => boolean;
-    export const isInvalidInput: (val: any) => boolean;
-    export const limitInputNumber: (input: any, decimals?: number) => void;
-    export const limitDecimals: (value: any, decimals: number) => any;
-    export function getAPI(url: string, paramsObj?: any): Promise<any>;
-    export const toWeiInv: (n: string, unit?: number) => BigNumber;
-    export const padLeft: (string: string, chars: number, sign?: string) => string;
-    export const numberToBytes32: (value: any, prefix?: string) => any;
-    export const getParamsFromUrl: () => URLSearchParams;
-    export const formatNumberValue: (data: any, tokenMap: TokenMapType) => any;
-    export const uniqWith: (array: any[], compareFn: (cur: any, oth: any) => boolean) => any;
-    export const getWeekDays: () => any[];
-    export const renderBalanceTooltip: (params: any, tokenMap: TokenMapType, isBold?: boolean) => any;
-    export const downloadJsonFile: (name: string, obj: any) => void;
-    export const viewOnExplorerByTxHash: (chainId: number, txHash: string) => void;
-    export const viewOnExplorerByAddress: (chainId: number, address: string) => void;
-    export function isWalletAddress(address: string): boolean;
-}
-/// <amd-module name="@scom/scom-staking/global/utils/error.ts" />
-declare module "@scom/scom-staking/global/utils/error.ts" {
-    export function parseContractError(oMessage: string, tokens: string[]): Promise<string>;
-}
-/// <amd-module name="@scom/scom-staking/global/utils/pageBlock.ts" />
-declare module "@scom/scom-staking/global/utils/pageBlock.ts" {
-    export interface PageBlock {
-        getData: () => any;
-        setData: (data: any) => Promise<void>;
-        getTag: () => any;
-        setTag: (tag: any) => Promise<void>;
-        validate?: () => boolean;
-        defaultEdit?: boolean;
-        tag?: any;
-        readonly onEdit: () => Promise<void>;
-        readonly onConfirm: () => Promise<void>;
-        readonly onDiscard: () => Promise<void>;
-        edit: () => Promise<void>;
-        confirm: () => Promise<void>;
-        discard: () => Promise<void>;
-        config: () => Promise<void>;
-    }
 }
 /// <amd-module name="@scom/scom-staking/global/utils/approvalModel.ts" />
 declare module "@scom/scom-staking/global/utils/approvalModel.ts" {
-    interface ITokenObject {
-        address?: string;
-        name: string;
-        decimals: number;
-        symbol: string;
-        status?: boolean | null;
-        logoURI?: string;
-        isCommon?: boolean | null;
-        balance?: string | number;
-        isNative?: boolean | null;
-        isWETH?: boolean | null;
-        isNew?: boolean | null;
-    }
+    import { ITokenObject } from '@scom/scom-token-list';
     export enum ApprovalStatus {
         TO_BE_APPROVED = 0,
         APPROVING = 1,
@@ -9817,176 +9750,45 @@ declare module "@scom/scom-staking/global/utils/interfaces.ts" {
 declare module "@scom/scom-staking/global/utils/index.ts" {
     export * from "@scom/scom-staking/global/utils/helper.ts";
     export { parseContractError } from "@scom/scom-staking/global/utils/error.ts";
-    export { PageBlock } from "@scom/scom-staking/global/utils/pageBlock.ts";
-    export { isTransactionConfirmed, registerSendTxEvents, approveERC20Max, getERC20Allowance, isAddressValid, getERC20Amount, ITokenObject, TokenMapType } from "@scom/scom-staking/global/utils/common.ts";
+    export { registerSendTxEvents, approveERC20Max, getERC20Allowance, TokenMapType } from "@scom/scom-staking/global/utils/common.ts";
     export { ApprovalStatus, IERC20ApprovalEventOptions, IERC20ApprovalOptions, IERC20ApprovalAction, ERC20ApprovalModel } from "@scom/scom-staking/global/utils/approvalModel.ts";
     export * from "@scom/scom-staking/global/utils/interfaces.ts";
 }
 /// <amd-module name="@scom/scom-staking/global/index.ts" />
 declare module "@scom/scom-staking/global/index.ts" {
-    import { INetwork } from '@ijstech/eth-wallet';
-    export interface IExtendedNetwork extends INetwork {
-        shortName?: string;
-        isDisabled?: boolean;
-        isMainChain?: boolean;
-        isCrossChainSupported?: boolean;
-        explorerName?: string;
-        explorerTxUrl?: string;
-        explorerAddressUrl?: string;
-        isTestnet?: boolean;
-        symbol?: string;
-        env?: string;
-    }
     export const enum EventId {
         IsWalletConnected = "isWalletConnected",
         IsWalletDisconnected = "IsWalletDisconnected",
         Paid = "Paid",
         chainChanged = "chainChanged",
-        EmitButtonStatus = "stakingEmitButtonStatus",
-        EmitInput = "stakingEmitInput",
-        EmitNewToken = "emitNewToken"
+        EmitButtonStatus = "stakingEmitButtonStatus"
     }
     export * from "@scom/scom-staking/global/utils/index.ts";
 }
-/// <amd-module name="@scom/scom-staking/store/data/staking/index.ts" />
-declare module "@scom/scom-staking/store/data/staking/index.ts" {
-    import { LockTokenType } from "@scom/scom-staking/global/index.ts";
+/// <amd-module name="@scom/scom-staking/store/data/index.ts" />
+declare module "@scom/scom-staking/store/data/index.ts" {
     const USDPeggedTokenAddressMap: {
         [key: number]: string;
     };
-    const getSingleStakingSchema: (readOnly?: boolean) => {
-        type: string;
-        properties: {
-            chainId: {
-                type: string;
-                enum: number[];
-                required: boolean;
-                readOnly: boolean;
-            };
-            customName: {
-                type: string;
-                label: string;
-                required: boolean;
-                readOnly: boolean;
-            };
-            customDesc: {
-                type: string;
-                label: string;
-                readOnly: boolean;
-            };
-            customLogo: {
-                type: string;
-                title: string;
-                readOnly: boolean;
-            };
-            getTokenURL: {
-                type: string;
-                title: string;
-                readOnly: boolean;
-            };
-            showContractLink: {
-                type: string;
-                readOnly: boolean;
-            };
-            stakings: {
-                type: string;
-                properties: {
-                    address: {
-                        type: string;
-                        required: boolean;
-                        readOnly: boolean;
-                    };
-                    lockTokenType: {
-                        type: string;
-                        oneOf: {
-                            title: string;
-                            const: LockTokenType;
-                        }[];
-                        required: boolean;
-                        readOnly: boolean;
-                    };
-                    rewards: {
-                        type: string;
-                        properties: {
-                            address: {
-                                type: string;
-                                required: boolean;
-                                readOnly: boolean;
-                            };
-                            isCommonStartDate: {
-                                type: string;
-                                title: string;
-                                readOnly: boolean;
-                            };
-                        };
-                    };
-                };
-            };
-        };
-    };
-    export { getSingleStakingSchema, LockTokenType, USDPeggedTokenAddressMap };
-}
-/// <amd-module name="@scom/scom-staking/store/data/index.ts" />
-declare module "@scom/scom-staking/store/data/index.ts" {
-    export { getSingleStakingSchema, LockTokenType, USDPeggedTokenAddressMap, } from "@scom/scom-staking/store/data/staking/index.ts";
+    export { USDPeggedTokenAddressMap };
 }
 /// <amd-module name="@scom/scom-staking/store/utils.ts" />
 declare module "@scom/scom-staking/store/utils.ts" {
-    import { Erc20, IClientSideProvider } from '@ijstech/eth-wallet';
-    import { IExtendedNetwork, ITokenObject, SITE_ENV } from "@scom/scom-staking/global/index.ts";
+    import { Erc20, INetwork } from '@ijstech/eth-wallet';
+    import { ITokenObject } from '@scom/scom-token-list';
     export * from "@scom/scom-staking/store/data/index.ts";
-    export enum WalletPlugin {
-        MetaMask = "metamask",
-        Coin98 = "coin98",
-        TrustWallet = "trustwallet",
-        BinanceChainWallet = "binancechainwallet",
-        ONTOWallet = "onto",
-        WalletConnect = "walletconnect",
-        BitKeepWallet = "bitkeepwallet",
-        FrontierWallet = "frontierwallet"
-    }
-    export const nullAddress = "0x0000000000000000000000000000000000000000";
-    export const INFINITE = "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
-    export const getUserTokens: (chainId: number) => any;
-    export const addUserTokens: (token: ITokenObject) => void;
-    export const getSupportedNetworks: () => IExtendedNetwork[];
     export const getInfuraId: () => string;
-    export const getSiteSupportedNetworks: () => IExtendedNetwork[];
-    export const getNetworkInfo: (chainId: number) => IExtendedNetwork;
-    export const setCurrentChainId: (value: number) => void;
-    export const getCurrentChainId: () => number;
     export const getChainNativeToken: (chainId: number) => ITokenObject;
-    export const getWETH: (chainId: number) => ITokenObject;
     export const setDataFromConfig: (options: any) => void;
-    export function isWalletConnected(): boolean;
-    export function switchNetwork(chainId: number): Promise<void>;
-    export function getChainId(): number;
-    export function getWalletProvider(): string;
-    export const hasMetaMask: () => boolean;
     export function getErc20(address: string): Erc20;
-    export const isExpertMode: () => boolean;
-    export function toggleExpertMode(): void;
-    export const getSlippageTolerance: () => any;
-    export const setSlippageTolerance: (value: any) => void;
-    export const getTransactionDeadline: () => any;
-    export const setTransactionDeadline: (value: any) => void;
     export type ProxyAddresses = {
         [key: number]: string;
     };
     export const state: {
-        siteEnv: SITE_ENV;
         networkMap: {
-            [key: number]: IExtendedNetwork;
+            [key: number]: INetwork;
         };
-        currentChainId: number;
-        isExpertMode: boolean;
-        slippageTolerance: number;
-        transactionDeadline: number;
         infuraId: string;
-        userTokens: {
-            [key: string]: ITokenObject[];
-        };
-        walletPluginMap: Record<WalletPlugin, IClientSideProvider>;
         stakingStatusMap: {
             [key: string]: {
                 value: boolean;
@@ -9994,40 +9796,27 @@ declare module "@scom/scom-staking/store/utils.ts" {
             };
         };
         proxyAddresses: ProxyAddresses;
-        ipfsGatewayUrl: string;
-        apiGatewayUrls: Record<string, string>;
         embedderCommissionFee: string;
+        rpcWalletId: string;
     };
-    export const setWalletPluginProvider: (walletPlugin: WalletPlugin, wallet: IClientSideProvider) => void;
-    export const getWalletPluginMap: () => Record<WalletPlugin, IClientSideProvider>;
-    export const getWalletPluginProvider: (walletPlugin: WalletPlugin) => IClientSideProvider;
-    export const getTokenObject: (address: string, showBalance?: boolean) => Promise<{
-        address: string;
-        decimals: number;
-        name: string;
-        symbol: string;
-        balance: any;
-    }>;
-    export const setUserTokens: (token: ITokenObject, chainId: number) => void;
-    export const hasUserToken: (address: string, chainId: number) => boolean;
     export const setStakingStatus: (key: string, value: boolean, text: string) => void;
     export const getStakingStatus: (key: string) => {
         value: boolean;
         text: string;
     };
-    export const getNetworkExplorerName: (chainId: number) => string;
-    export const getNetworkName: (chainId: number) => string;
     export const setProxyAddresses: (data: ProxyAddresses) => void;
     export const getProxyAddress: (chainId?: number) => string;
-    export const setIPFSGatewayUrl: (url: string) => void;
-    export const getIPFSGatewayUrl: () => string;
-    export const setAPIGatewayUrls: (urls: Record<string, string>) => void;
     export const getEmbedderCommissionFee: () => string;
+    export function isClientWalletConnected(): boolean;
+    export function isRpcWalletConnected(): boolean;
+    export function getChainId(): number;
+    export function initRpcWallet(defaultChainId: number): string;
+    export function getRpcWallet(): import("@ijstech/eth-wallet").IRpcWallet;
+    export function getClientWallet(): import("@ijstech/eth-wallet").IClientWallet;
 }
 /// <amd-module name="@scom/scom-staking/store/index.ts" />
 declare module "@scom/scom-staking/store/index.ts" {
     export const fallBackUrl: string;
-    export const getTokenIcon: (address: string) => string;
     export const tokenSymbol: (address: string) => string;
     export const getLockedTokenObject: (info: any, tokenInfo: any, tokenMap?: any) => any;
     export const getLockedTokenSymbol: (info: any, token: any) => any;
@@ -10035,8 +9824,6 @@ declare module "@scom/scom-staking/store/index.ts" {
     export const getTokenDecimals: (address: string) => number;
     export const baseUrl = "https://openswap.xyz/#";
     export const getTokenUrl: string;
-    export const isThemeApplied = false;
-    export const isMultiple = false;
     export const maxWidth = "690px";
     export const maxHeight = 321;
     export * from "@scom/scom-staking/store/utils.ts";
@@ -10045,30 +9832,16 @@ declare module "@scom/scom-staking/store/index.ts" {
 declare module "@scom/scom-staking/data.json.ts" {
     const _default_49: {
         infuraId: string;
-        networks: ({
+        networks: {
             chainId: number;
-            isMainChain: boolean;
-            isCrossChainSupported: boolean;
             explorerName: string;
             explorerTxUrl: string;
             explorerAddressUrl: string;
-            isTestnet: boolean;
-            shortName?: undefined;
-        } | {
-            chainId: number;
-            shortName: string;
-            isCrossChainSupported: boolean;
-            explorerName: string;
-            explorerTxUrl: string;
-            explorerAddressUrl: string;
-            isTestnet: boolean;
-            isMainChain?: undefined;
-        })[];
+        }[];
         proxyAddresses: {
             "97": string;
             "43113": string;
         };
-        ipfsGatewayUrl: string;
         embedderCommissionFee: string;
         defaultBuilderData: {
             defaultChainId: number;
@@ -15839,7 +15612,8 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/i
 /// <amd-module name="@scom/scom-staking/staking-utils/index.ts" />
 declare module "@scom/scom-staking/staking-utils/index.ts" {
     import { BigNumber } from "@ijstech/eth-wallet";
-    import { IERC20ApprovalEventOptions, ITokenObject, ISingleStakingCampaign } from "@scom/scom-staking/global/index.ts";
+    import { IERC20ApprovalEventOptions, ISingleStakingCampaign } from "@scom/scom-staking/global/index.ts";
+    import { ITokenObject } from '@scom/scom-token-list';
     export const getTokenPrice: (token: string) => Promise<string>;
     const getAllCampaignsInfo: (stakingInfo: {
         [key: number]: ISingleStakingCampaign;
@@ -15873,22 +15647,22 @@ declare module "@scom/scom-staking/staking-utils/index.ts" {
     const getVaultRewardCurrentAPR: (rewardOption: any, vaultObject: any, lockedDays: number) => Promise<string>;
     const withdrawToken: (contractAddress: string, callback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     const claimToken: (contractAddress: string, callback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
-    const lockToken: (token: ITokenObject, amount: string, contractAddress: string) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
+    const lockToken: (token: ITokenObject, amount: string, contractAddress: string, callback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     const getApprovalModelAction: (contractAddress: string, options: IERC20ApprovalEventOptions) => import("@scom/scom-staking/global/index.ts").IERC20ApprovalAction;
     export { getAllCampaignsInfo, getStakingTotalLocked, getLPObject, getLPBalance, getVaultObject, getVaultBalance, getERC20RewardCurrentAPR, getLPRewardCurrentAPR, getVaultRewardCurrentAPR, withdrawToken, claimToken, lockToken, getApprovalModelAction, };
 }
-/// <amd-module name="@scom/scom-staking/common/result.css.ts" />
-declare module "@scom/scom-staking/common/result.css.ts" {
+/// <amd-module name="@scom/scom-staking/alert/index.css.ts" />
+declare module "@scom/scom-staking/alert/index.css.ts" {
     const _default_78: string;
     export default _default_78;
 }
-/// <amd-module name="@scom/scom-staking/common/result.tsx" />
-declare module "@scom/scom-staking/common/result.tsx" {
+/// <amd-module name="@scom/scom-staking/alert/index.tsx" />
+declare module "@scom/scom-staking/alert/index.tsx" {
     import { Module, ControlElement, Container } from '@ijstech/components';
     global {
         namespace JSX {
             interface IntrinsicElements {
-                ['i-scom-staking-result']: ControlElement;
+                ['i-scom-staking-alert']: ControlElement;
             }
         }
     }
@@ -15897,29 +15671,22 @@ declare module "@scom/scom-staking/common/result.tsx" {
         content?: any;
         txtHash?: string;
         obj?: any;
-        customRedirect?: any;
     }
-    export class Result extends Module {
+    export class Alert extends Module {
         private confirmModal;
         private mainContent;
         private _message;
-        onCustomClose: any;
         get message(): IMessage;
         set message(value: IMessage);
         constructor(parent?: Container, options?: any);
         init(): Promise<void>;
         closeModal(): void;
         showModal(): void;
-        onCloseRedirect(): void;
-        buildLink(): Promise<void>;
-        renderUI(): Promise<void>;
-        onErrMsgChanged(): Promise<any>;
+        private buildLink;
+        private renderUI;
+        private onErrMsgChanged;
         render(): any;
     }
-}
-/// <amd-module name="@scom/scom-staking/common/index.tsx" />
-declare module "@scom/scom-staking/common/index.tsx" {
-    export { Result } from "@scom/scom-staking/common/result.tsx";
 }
 /// <amd-module name="@scom/scom-staking/manage-stake/manage-stake.css.ts" />
 declare module "@scom/scom-staking/manage-stake/manage-stake.css.ts" {
@@ -15928,6 +15695,7 @@ declare module "@scom/scom-staking/manage-stake/manage-stake.css.ts" {
 /// <amd-module name="@scom/scom-staking/manage-stake/manage-stake.tsx" />
 declare module "@scom/scom-staking/manage-stake/manage-stake.tsx" {
     import { Container, ControlElement, Module } from '@ijstech/components';
+    import { BigNumber } from '@ijstech/eth-wallet';
     global {
         namespace JSX {
             interface IntrinsicElements {
@@ -15955,15 +15723,15 @@ declare module "@scom/scom-staking/manage-stake/manage-stake.tsx" {
         private btnStake;
         private btnUnstake;
         private btnMax;
-        private stakingResult;
+        private stakingAlert;
         private approvalModelAction;
         onRefresh: any;
         constructor(parent?: Container, options?: any);
         setData: (data: any) => void;
-        getBalance: () => string;
+        getBalance: () => BigNumber;
         needToBeApproval: () => boolean;
         get actionKey(): string;
-        private showResultMessage;
+        private showMessage;
         private onApproveToken;
         private onStake;
         private onUnstake;
@@ -15972,6 +15740,7 @@ declare module "@scom/scom-staking/manage-stake/manage-stake.tsx" {
         private renderStakingInfo;
         private onSetupPage;
         private updateEnableInput;
+        private callback;
         initApprovalModelAction(): Promise<void>;
         init(): void;
         render(): any;
@@ -15986,64 +15755,161 @@ declare module "@scom/scom-staking/index.css.ts" {
     export const stakingDappContainer: string;
     export const stakingComponent: string;
 }
-/// <amd-module name="@scom/scom-staking/commissions/index.css.ts" />
-declare module "@scom/scom-staking/commissions/index.css.ts" {
-    export const customStyle: string;
-    export const tableStyle: string;
-}
-/// <amd-module name="@scom/scom-staking/commissions/index.tsx" />
-declare module "@scom/scom-staking/commissions/index.tsx" {
-    import { Module, ControlElement } from '@ijstech/components';
-    import { IExtendedNetwork, ICommissionInfo, IEmbedData } from "@scom/scom-staking/global/index.ts";
-    export interface ISupportedNetworks {
-        chainId: number;
-    }
-    interface ScomStakingConfigElement extends ControlElement {
-        commissions?: ICommissionInfo;
-    }
-    global {
-        namespace JSX {
-            interface IntrinsicElements {
-                ['i-scom-staking-config']: ScomStakingConfigElement;
-            }
-        }
-    }
-    export default class StakingConfig extends Module {
-        private tableCommissions;
-        private modalAddCommission;
-        private networkPicker;
-        private inputWalletAddress;
-        private lbCommissionShare;
-        private btnAddWallet;
-        private pnlEmptyWallet;
-        private commissionInfoList;
-        private commissionsTableColumns;
-        private btnConfirm;
-        private lbErrMsg;
-        private _onCustomCommissionsChanged;
-        init(): Promise<void>;
-        get data(): IEmbedData;
-        set data(config: IEmbedData);
-        get onCustomCommissionsChanged(): (data: any) => Promise<void>;
-        set onCustomCommissionsChanged(value: (data: any) => Promise<void>);
-        onModalAddCommissionClosed(): void;
-        onAddCommissionClicked(): void;
-        onConfirmCommissionClicked(): Promise<void>;
-        validateModalFields(): boolean;
-        getSupportedChainIds(): {
-            chainId: number;
-        }[];
-        onNetworkSelected(network: IExtendedNetwork): void;
-        onInputWalletAddressChanged(): void;
-        private toggleVisible;
-        render(): any;
-    }
+/// <amd-module name="@scom/scom-staking/formSchema.json.ts" />
+declare module "@scom/scom-staking/formSchema.json.ts" {
+    import { LockTokenType } from "@scom/scom-staking/global/index.ts";
+    const _default_79: {
+        general: {
+            dataSchema: {
+                type: string;
+                properties: {
+                    chainId: {
+                        type: string;
+                        enum: number[];
+                        required: boolean;
+                    };
+                    customName: {
+                        type: string;
+                        label: string;
+                        required: boolean;
+                    };
+                    customDesc: {
+                        type: string;
+                        label: string;
+                    };
+                    customLogo: {
+                        type: string;
+                        title: string;
+                    };
+                    getTokenURL: {
+                        type: string;
+                        title: string;
+                    };
+                    showContractLink: {
+                        type: string;
+                    };
+                    stakings: {
+                        type: string;
+                        properties: {
+                            address: {
+                                type: string;
+                                required: boolean;
+                            };
+                            lockTokenType: {
+                                type: string;
+                                oneOf: {
+                                    title: string;
+                                    const: LockTokenType;
+                                }[];
+                                required: boolean;
+                            };
+                            rewards: {
+                                type: string;
+                                properties: {
+                                    address: {
+                                        type: string;
+                                        required: boolean;
+                                    };
+                                    isCommonStartDate: {
+                                        type: string;
+                                        title: string;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        theme: {
+            dataSchema: {
+                type: string;
+                properties: {
+                    dark: {
+                        type: string;
+                        properties: {
+                            backgroundColor: {
+                                type: string;
+                                format: string;
+                            };
+                            fontColor: {
+                                type: string;
+                                format: string;
+                            };
+                            textSecondary: {
+                                type: string;
+                                title: string;
+                                format: string;
+                            };
+                            inputBackgroundColor: {
+                                type: string;
+                                format: string;
+                            };
+                            inputFontColor: {
+                                type: string;
+                                format: string;
+                            };
+                            secondaryColor: {
+                                type: string;
+                                title: string;
+                                format: string;
+                            };
+                            secondaryFontColor: {
+                                type: string;
+                                title: string;
+                                format: string;
+                            };
+                        };
+                    };
+                    light: {
+                        type: string;
+                        properties: {
+                            backgroundColor: {
+                                type: string;
+                                format: string;
+                            };
+                            fontColor: {
+                                type: string;
+                                format: string;
+                            };
+                            textSecondary: {
+                                type: string;
+                                title: string;
+                                format: string;
+                            };
+                            inputBackgroundColor: {
+                                type: string;
+                                format: string;
+                            };
+                            inputFontColor: {
+                                type: string;
+                                format: string;
+                            };
+                            secondaryColor: {
+                                type: string;
+                                title: string;
+                                format: string;
+                            };
+                            secondaryFontColor: {
+                                type: string;
+                                title: string;
+                                format: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    export default _default_79;
 }
 /// <amd-module name="@scom/scom-staking" />
 declare module "@scom/scom-staking" {
-    import { Module, Container, ControlElement, IDataSchema } from '@ijstech/components';
+    import { Module, Container, ControlElement } from '@ijstech/components';
     import { ISingleStakingCampaign } from "@scom/scom-staking/global/index.ts";
-    import StakingConfig from "@scom/scom-staking/commissions/index.tsx";
+    import { IWalletPlugin } from '@scom/scom-wallet-modal';
+    import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
+    import { INetworkConfig } from '@scom/scom-network-picker';
     interface ScomStakingElement extends ControlElement {
         data?: ISingleStakingCampaign;
         lazyLoad?: boolean;
@@ -16059,39 +15925,26 @@ declare module "@scom/scom-staking" {
         private _data;
         tag: any;
         defaultEdit: boolean;
-        readonly onEdit: () => Promise<void>;
-        readonly onConfirm: () => Promise<void>;
-        readonly onDiscard: () => Promise<void>;
         private $eventBus;
         private loadingElm;
         private campaigns;
         private stakingComponent;
         private stakingElm;
         private noCampaignSection;
-        private stakingResult;
+        private stakingAlert;
         private manageStakeElm;
         private listAprTimer;
         private listActiveTimer;
         private tokenMap;
-        private configDApp;
         private dappContainer;
         private mdWallet;
-        private getPropertiesSchema;
-        private getThemeSchema;
+        private rpcWalletEvents;
+        private clientEvents;
         private _getActions;
         getConfigurators(): ({
             name: string;
             target: string;
-            getActions: () => {
-                name: string;
-                icon: string;
-                command: (builder: any, userInputData: any) => {
-                    execute: () => Promise<void>;
-                    undo: () => void;
-                    redo: () => void;
-                };
-                userInputDataSchema: IDataSchema;
-            }[];
+            getActions: (category?: string) => any[];
             getData: any;
             setData: (data: any) => Promise<void>;
             getTag: any;
@@ -16108,8 +15961,13 @@ declare module "@scom/scom-staking" {
                 data: string;
             };
             setLinkParams: (params: any) => Promise<void>;
-            bindOnChanged: (element: StakingConfig, callback: (data: any) => Promise<void>) => void;
-            getData: any;
+            bindOnChanged: (element: ScomCommissionFeeSetup, callback: (data: any) => Promise<void>) => void;
+            getData: () => {
+                fee: string;
+                then<TResult1 = ISingleStakingCampaign, TResult2 = never>(onfulfilled?: (value: ISingleStakingCampaign) => TResult1 | PromiseLike<TResult1>, onrejected?: (reason: any) => TResult2 | PromiseLike<TResult2>): Promise<TResult1 | TResult2>;
+                catch<TResult = never>(onrejected?: (reason: any) => TResult | PromiseLike<TResult>): Promise<ISingleStakingCampaign | TResult>;
+                [Symbol.toStringTag]: string;
+            };
             setData: any;
             getTag: any;
             setTag: any;
@@ -16122,17 +15980,25 @@ declare module "@scom/scom-staking" {
         private setTag;
         private updateStyle;
         private updateTheme;
+        get defaultChainId(): number;
+        set defaultChainId(value: number);
+        get wallets(): IWalletPlugin[];
+        set wallets(value: IWalletPlugin[]);
+        get networks(): INetworkConfig[];
+        set networks(value: INetworkConfig[]);
+        get showHeader(): boolean;
+        set showHeader(value: boolean);
         constructor(parent?: Container, options?: ControlElement);
+        onHide(): void;
         private registerEvent;
-        private onWalletConnect;
-        private onChainChange;
+        private onChainChanged;
         private isWalletValid;
-        private updateStaking;
-        private onSetupPage;
-        private showResultMessage;
+        private refreshUI;
+        private initializeWidgetConfig;
+        private initWallet;
+        private showMessage;
         private onClaim;
         private checkValidation;
-        private onDownload;
         private removeTimer;
         private getRewardToken;
         private getLPToken;

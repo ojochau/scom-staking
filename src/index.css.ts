@@ -6,16 +6,8 @@ const Theme = Styles.Theme.ThemeVars;
 const colorVar = {
   primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
   primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
-  darkBg: '#181E3E 0% 0% no-repeat padding-box',
   primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
 }
-
-Styles.fontFace({
-  fontFamily: "Apple SD Gothic Neo",
-  src: `url("${Assets.fullPath('fonts/FontsFree-Net-Apple-SD-Gothic-Neo-Bold.ttf')}") format("truetype")`,
-  fontWeight: 'bold',
-  fontStyle: 'normal'
-})
 
 Styles.fontFace({
   fontFamily: "Montserrat Regular",
@@ -50,34 +42,9 @@ Styles.fontFace({
 })
 
 Styles.fontFace({
-  fontFamily: "Raleway Regular",
-  src: `url("${Assets.fullPath('fonts/raleway/Raleway-Regular.ttf')}") format("truetype")`,
-  fontWeight: 'nomal',
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
   fontFamily: "Raleway Bold",
   src: `url("${Assets.fullPath('fonts/raleway/Raleway-Bold.ttf')}") format("truetype")`,
   fontWeight: 'bold',
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Raleway Light",
-  src: `url("${Assets.fullPath('fonts/raleway/Raleway-Light.ttf')}") format("truetype")`,
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Raleway Medium",
-  src: `url("${Assets.fullPath('fonts/raleway/Raleway-Medium.ttf')}") format("truetype")`,
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Raleway SemiBold",
-  src: `url("${Assets.fullPath('fonts/raleway/Raleway-SemiBold.ttf')}") format("truetype")`,
   fontStyle: 'normal'
 })
 
@@ -118,9 +85,6 @@ export const stakingComponent = Styles.style({
     '.i-loading-overlay': {
       background: Theme.background.main,
     },
-    '.overflow-inherit': {
-      overflow: 'inherit',
-    },
     '.btn-os': {
       background: colorVar.primaryButton,
       height: 'auto !important',
@@ -155,60 +119,13 @@ export const stakingComponent = Styles.style({
       background: colorVar.primaryDisabled,
       opacity: 1
     },
-    '.dark-bg, .dark-modal > div > div': {
-      background: colorVar.darkBg,
-      borderRadius: 5
-    },
-    '.btn-transparent, .btn-transparent:not(.disabled):focus, .btn-transparent:not(.disabled):hover': {
-      background: 'transparent',
-      boxShadow: 'none',
-      backgroundColor: 'transparent'
-    },
-    '.mr-0-5': {
-      marginRight: '.5rem'
-    },
-    '.ml-0-5': {
-      marginLeft: '.5rem'
-    },
-    '.mb-0-5': {
-      marginBottom: '.5rem'
-    },
     '.hidden': {
       display: 'none !important'
-    },
-    '.no-wrap': {
-      whiteSpace: 'nowrap'
-    },
-    '.flex-nowrap': {
-      flexWrap: 'nowrap',
-    },
-    '.py-1': {
-      paddingTop: '1rem',
-      paddingBottom: '1rem'
-    },
-    '.px-1': {
-      paddingLeft: '1rem',
-      paddingRight: '1rem'
-    },
-    '.align-middle': {
-      alignItems: 'center'
     },
     '.staking-layout': {
       width: '100%',
       marginInline: 'auto',
       overflow: 'hidden',
-    },
-    'i-link': {
-      display: 'flex',
-      $nest: {
-        '&:hover *': {
-          color: '#fff',
-          opacity: 0.9,
-        },
-      },
-    },
-    '.opacity-50': {
-      opacity: 0.5
     },
     '.cursor-default': {
       cursor: 'default',
@@ -325,47 +242,8 @@ export const stakingComponent = Styles.style({
               marginTop: '1rem',
             }
           }
-        },
-        '.slider-arrow': {
-          fill: '#f15e61',
         }
       },
-    },
-    '.ml-auto': {
-      marginLeft: 'auto',
-    },
-    '.mr-025': {
-      marginRight: '0.25rem',
-    },
-    '.input-disabled': {
-      opacity: 0.4,
-      cursor: 'default',
-      $nest: {
-        '*': {
-          cursor: 'default',
-        }
-      }
-    },
-    '#importFileErrModal': {
-      $nest: {
-        '.modal': {
-          borderRadius: 12,
-        },
-        '.i-modal_header': {
-          marginBottom: '1.5rem',
-          paddingBottom: '0.5rem',
-          borderBottom: `2px solid #F15E61`,
-          color: '#F15E61',
-          fontSize: '1.25rem',
-          fontWeight: 700,
-        },
-        '.i-modal_header > i-icon': {
-          fill: `#F15E61 !important`
-        },
-        '#importFileErr span': {
-          fontSize: '16px !important'
-        }
-      }
     },
     'i-modal .modal': {
       background: Theme.background.modal,
@@ -381,11 +259,6 @@ export const stakingComponent = Styles.style({
           marginTop: '2rem',
         },
       },
-    },
-    '.connect-wallet': {
-      display: 'block',
-      textAlign: 'center',
-      paddingTop: '1rem',
     }
   }
 })

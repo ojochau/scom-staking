@@ -11,7 +11,7 @@
   },
   "scripts": {
     "copy": "sh ./scripts/copy.sh",
-    "build": "rm -rf dist && npm run copy && npx @ijstech/compiler",
+    "build": "rm -rf dist && npx @ijstech/compiler",
     "test": "cd test && npm run test && cd .."
   },
   "dependencies": {
@@ -22,7 +22,8 @@
     "@scom/scom-network-list": "^0.1.0",
     "@scom/scom-token-list": "^0.1.1",
     "@scom/scom-network-picker": "^0.1.1",
-    "@scom/scom-wallet-modal": "^0.1.0"
+    "@scom/scom-wallet-modal": "^0.1.0",
+    "@scom/scom-commission-fee-setup": "^0.1.1"
   },
   "devDependencies": {
     "@ijstech/cli": "^0.1.28",
