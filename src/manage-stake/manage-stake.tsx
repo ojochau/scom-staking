@@ -1,7 +1,7 @@
 import { moment, Button, Input, Container, HStack, customElements, ControlElement, Module, Label, Styles } from '@ijstech/components';
-import { BigNumber, Wallet } from '@ijstech/eth-wallet';
-import { IERC20ApprovalAction, limitInputNumber } from '../global/index';
-import { LockTokenType, setStakingStatus, getLockedTokenObject, getLockedTokenSymbol, isRpcWalletConnected, getRpcWallet, getChainNativeToken, getChainId, isClientWalletConnected } from '../store/index';
+import { BigNumber } from '@ijstech/eth-wallet';
+import { IERC20ApprovalAction, LockTokenType, limitInputNumber } from '../global/index';
+import { setStakingStatus, getLockedTokenObject, getLockedTokenSymbol, isRpcWalletConnected, getRpcWallet, getChainNativeToken, getChainId, isClientWalletConnected } from '../store/index';
 import { ITokenObject, tokenStore } from '@scom/scom-token-list';
 import { Alert } from '../alert/index';
 import {
@@ -226,8 +226,8 @@ export class ManageStake extends Module {
   private updateEnableInput = async () => {
     if (this.stakingInfo?.mode !== 'Stake') return;
     const totalLocked = await getStakingTotalLocked(this.address);
-    const activeStartTime = this.stakingInfo ? this.stakingInfo.startOfEntryPeriod : 0;
-    const activeEndTime = this.stakingInfo ? this.stakingInfo.endOfEntryPeriod : 0;
+    const activeStartTime = this.stakingInfo.startOfEntryPeriod;
+    const activeEndTime = this.stakingInfo.endOfEntryPeriod;
     const lockedTokenDecimals = this.lockedTokenObject?.decimals || 18;
     const defaultDecimalsOffset = 18 - lockedTokenDecimals;
     const optionQty = new BigNumber(this.stakingInfo.maxTotalLock).minus(totalLocked).shiftedBy(defaultDecimalsOffset);

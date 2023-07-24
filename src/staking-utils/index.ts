@@ -488,8 +488,7 @@ const claimToken = async (contractAddress: string, callback?: any) => {
 }
 
 const lockToken = async (token: ITokenObject, amount: string, contractAddress: string, callback?: any) => {
-  if (!token) return;
-  if (!contractAddress) return;
+  if (!token || !contractAddress) return;
   try {
     let wallet = Wallet.getClientInstance();
     let decimals = typeof token.decimals === 'object' ? (token.decimals as BigNumber).toNumber() : token.decimals;

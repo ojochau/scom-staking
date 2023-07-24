@@ -1,34 +1,12 @@
 import { Erc20, INetwork, Wallet } from '@ijstech/eth-wallet';
-import {
-  EventId,
-  IExtendedNetwork,
-  SITE_ENV
-} from '../global/index';
+import { EventId } from '../global/index';
 
-import { ChainNativeTokenByChainId, ITokenObject, WETHByChainId } from '@scom/scom-token-list';
+import { ChainNativeTokenByChainId, ITokenObject } from '@scom/scom-token-list';
 import getNetworkList from '@scom/scom-network-list'
 
 export * from './data/index';
 
 import { application } from '@ijstech/components';
-
-export enum WalletPlugin {
-  MetaMask = 'metamask',
-  Coin98 = 'coin98',
-  TrustWallet = 'trustwallet',
-  BinanceChainWallet = 'binancechainwallet',
-  ONTOWallet = 'onto',
-  WalletConnect = 'walletconnect',
-  BitKeepWallet = 'bitkeepwallet',
-  FrontierWallet = 'frontierwallet',
-}
-
-export const nullAddress = "0x0000000000000000000000000000000000000000";
-export const INFINITE = "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
-
-export const getSupportedNetworks = () => {
-  return Object.values(state.networkMap);
-}
 
 const setInfuraId = (infuraId: string) => {
   state.infuraId = infuraId;
@@ -38,7 +16,7 @@ export const getInfuraId = () => {
   return state.infuraId;
 }
 
-const setNetworkList = (networkList: IExtendedNetwork[], infuraId?: string) => {
+const setNetworkList = (networkList: INetwork[], infuraId?: string) => {
   const wallet = Wallet.getClientInstance();
   state.networkMap = {};
   const defaultNetworkList = getNetworkList();
@@ -62,25 +40,8 @@ const setNetworkList = (networkList: IExtendedNetwork[], infuraId?: string) => {
   }
 }
 
-export const getNetworkInfo = (chainId: number) => {
-  return state.networkMap[chainId];
-}
-
-export const setCurrentChainId = (value: number) => {
-  state.currentChainId = value;
-}
-
-export const getCurrentChainId = (): number => {
-  return state.currentChainId;
-}
-
 export const getChainNativeToken = (chainId: number): ITokenObject => {
   return ChainNativeTokenByChainId[chainId];
-};
-
-export const getWETH = (chainId: number): ITokenObject => {
-  let wrappedToken = WETHByChainId[chainId];
-  return wrappedToken;
 };
 
 export const setDataFromConfig = (options: any) => {
@@ -92,12 +53,6 @@ export const setDataFromConfig = (options: any) => {
   }
   if (options.proxyAddresses) {
     setProxyAddresses(options.proxyAddresses)
-  }
-  if (options.ipfsGatewayUrl) {
-    setIPFSGatewayUrl(options.ipfsGatewayUrl);
-  }
-  if (options.apiGatewayUrls) {
-    setAPIGatewayUrls(options.apiGatewayUrls);
   }
   if (options.embedderCommissionFee) {
     setEmbedderCommissionFee(options.embedderCommissionFee);
@@ -112,14 +67,10 @@ export function getErc20(address: string) {
 export type ProxyAddresses = { [key: number]: string };
 
 export const state = {
-  siteEnv: SITE_ENV.TESTNET,
-  networkMap: {} as { [key: number]: IExtendedNetwork },
-  currentChainId: 0,
+  networkMap: {} as { [key: number]: INetwork },
   infuraId: '',
   stakingStatusMap: {} as { [key: string]: { value: boolean, text: string } },
   proxyAddresses: {} as ProxyAddresses,
-  ipfsGatewayUrl: '',
-  apiGatewayUrls: {} as Record<string, string>,
   embedderCommissionFee: '0',
   rpcWalletId: ''
 }
@@ -133,13 +84,6 @@ export const getStakingStatus = (key: string) => {
   return state.stakingStatusMap[key] || { value: false, text: 'Stake' };
 }
 
-export const getNetworkExplorerName = (chainId: number) => {
-  if (getNetworkInfo(chainId)) {
-    return getNetworkInfo(chainId).explorerName;
-  }
-  return 'Unknown';
-}
-
 export const setProxyAddresses = (data: ProxyAddresses) => {
   state.proxyAddresses = data;
 }
@@ -151,18 +95,6 @@ export const getProxyAddress = (chainId?: number) => {
     return proxyAddresses[_chainId];
   }
   return null;
-}
-
-export const setIPFSGatewayUrl = (url: string) => {
-  state.ipfsGatewayUrl = url;
-}
-
-export const getIPFSGatewayUrl = () => {
-  return state.ipfsGatewayUrl;
-}
-
-export const setAPIGatewayUrls = (urls: Record<string, string>) => {
-  state.apiGatewayUrls = urls;
 }
 
 const setEmbedderCommissionFee = (fee: string) => {

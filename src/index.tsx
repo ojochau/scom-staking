@@ -1,4 +1,4 @@
-import { moment, Module, Panel, Icon, Button, Label, VStack, HStack, Container, ControlElement, IEventBus, application, customModule, Input, customElements, IDataSchema, Styles } from '@ijstech/components';
+import { moment, Module, Panel, Icon, Button, Label, VStack, HStack, Container, ControlElement, IEventBus, application, customModule, Input, customElements, Styles } from '@ijstech/components';
 import { BigNumber, Constants, IEventBusRegistry, Wallet } from '@ijstech/eth-wallet';
 import Assets from './assets';
 import {
@@ -13,9 +13,7 @@ import {
 } from './global/index';
 import {
 	getChainId,
-	getNetworkInfo,
 	setDataFromConfig,
-	setCurrentChainId,
 	tokenSymbol,
 	getStakingStatus,
 	fallBackUrl,
@@ -25,7 +23,6 @@ import {
 	getTokenUrl,
 	maxHeight,
 	maxWidth,
-	getSingleStakingSchema,
 	getEmbedderCommissionFee,
 	initRpcWallet,
 	getRpcWallet,
@@ -53,6 +50,7 @@ import ScomDappContainer from '@scom/scom-dapp-container';
 import ScomWalletModal, { IWalletPlugin } from '@scom/scom-wallet-modal';
 import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
 import { INetworkConfig } from '@scom/scom-network-picker';
+import formSchema from './formSchema.json';
 
 const Theme = Styles.Theme.ThemeVars;
 
@@ -93,70 +91,7 @@ export default class ScomStaking extends Module {
 	private rpcWalletEvents: IEventBusRegistry[] = [];
 	private clientEvents: any[] = [];
 
-	private getPropertiesSchema() {
-		const propertiesSchema: any = getSingleStakingSchema();
-		return propertiesSchema;
-	}
-
-	private getThemeSchema() {
-		const _props = {
-			backgroundColor: {
-				type: 'string',
-				format: 'color'
-			},
-			fontColor: {
-				type: 'string',
-				format: 'color'
-			},
-			textSecondary: {
-				type: 'string',
-				title: 'Campaign Font Color',
-				format: 'color'
-			},
-			inputBackgroundColor: {
-				type: 'string',
-				format: 'color'
-			},
-			inputFontColor: {
-				type: 'string',
-				format: 'color'
-			},
-			// buttonBackgroundColor: {
-			// 	type: 'string',
-			// 	format: 'color'
-			// },
-			// buttonFontColor: {
-			// 	type: 'string',
-			// 	format: 'color'
-			// },
-			secondaryColor: {
-				type: 'string',
-				title: 'Timer Background Color',
-				format: 'color'
-			},
-			secondaryFontColor: {
-				type: 'string',
-				title: 'Timer Font Color',
-				format: 'color'
-			}
-		}
-		const themeSchema = {
-			type: 'object',
-			properties: {
-				'dark': {
-					type: 'object',
-					properties: _props
-				},
-				'light': {
-					type: 'object',
-					properties: _props
-				}
-			}
-		}
-		return themeSchema as IDataSchema;
-	}
-
-	private _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema, category?: string) {
+	private _getActions(category?: string) {
 		const actions = [
 			// {
 			// 	name: 'Commissions',
@@ -231,20 +166,18 @@ export default class ScomStaking extends Module {
 								if (userInputData?.getTokenURL !== undefined) this._data.getTokenURL = userInputData.getTokenURL;
 								if (userInputData?.showContractLink !== undefined) this._data.showContractLink = userInputData.showContractLink;
 								if (userInputData?.stakings !== undefined) this._data.stakings = userInputData.stakings;
-								setCurrentChainId(this._data.chainId);
 								this.refreshUI();
 								if (builder?.setData) builder.setData(this._data);
 							},
 							undo: async () => {
 								this._data = { ..._oldData };
-								setCurrentChainId(this._data.chainId);
 								this.refreshUI();
 								if (builder?.setData) builder.setData(this._data);
 							},
 							redo: () => { }
 						}
 					},
-					userInputDataSchema: propertiesSchema
+					userInputDataSchema: formSchema.general.dataSchema
 				}
 			);
 
@@ -272,7 +205,7 @@ export default class ScomStaking extends Module {
 							redo: () => { }
 						}
 					},
-					userInputDataSchema: themeSchema
+					userInputDataSchema: formSchema.theme.dataSchema
 				}
 			);
 		}
@@ -286,7 +219,7 @@ export default class ScomStaking extends Module {
 				name: 'Builder Configurator',
 				target: 'Builders',
 				getActions: (category?: string) => {
-					return this._getActions(this.getPropertiesSchema(), this.getThemeSchema(), category);
+					return this._getActions(category);
 				},
 				getData: this.getData.bind(this),
 				setData: async (data: any) => {
@@ -507,18 +440,28 @@ export default class ScomStaking extends Module {
 				await this.renderEmpty();
 				return;
 			}
+			await this.initWallet();
 			tokenStore.updateTokenMapData(getChainId());
 			const rpcWallet = getRpcWallet();
 			if (rpcWallet.address) {
 				tokenStore.updateAllTokenBalances(rpcWallet);
 			}
-			await Wallet.getClientInstance().init();
 			this.campaigns = await getAllCampaignsInfo({ [this._data.chainId]: this._data });
 			await this.renderCampaigns(hideLoading);
 			if (!hideLoading && this.loadingElm) {
 				this.loadingElm.visible = false;
 			}
 		})
+	}
+
+	private initWallet = async () => {
+		try {
+			await Wallet.getClientInstance().init();
+			const rpcWallet = getRpcWallet();
+			await rpcWallet.init();
+		} catch (err) {
+			console.log(err);
+		}
 	}
 
 	private showMessage = (status: 'warning' | 'success' | 'error', content?: string | Error) => {
@@ -607,7 +550,6 @@ export default class ScomStaking extends Module {
 		if (!lazyLoad) {
 			const data = this.getAttribute('data', true);
 			if (data) {
-				setCurrentChainId(data.chainId);
 				await this.setData(data);
 			} else {
 				this.renderEmpty();
@@ -1159,7 +1101,7 @@ export default class ScomStaking extends Module {
 						<i-panel id="stakingElm" class="wrapper" />
 					</i-panel>
 					<i-panel id="manageStakeElm" />
-					<i-scom-commission-fee-setup id="configDApp" visible={false} />
+					<i-scom-commission-fee-setup visible={false} />
 					<i-scom-wallet-modal id="mdWallet" wallets={[]} />
 				</i-panel>
 			</i-scom-dapp-container>

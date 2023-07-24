@@ -3,11 +3,9 @@ export * from './helper';
 export { parseContractError } from './error';
 
 export {
-  isTransactionConfirmed,
   registerSendTxEvents,
   approveERC20Max,
   getERC20Allowance,
-  getERC20Amount,
   TokenMapType
 } from './common';
 
