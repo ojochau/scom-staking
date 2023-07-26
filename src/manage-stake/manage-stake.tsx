@@ -3,7 +3,7 @@ import { BigNumber } from '@ijstech/eth-wallet';
 import { IERC20ApprovalAction, LockTokenType, limitInputNumber } from '../global/index';
 import { setStakingStatus, getLockedTokenObject, getLockedTokenSymbol, isRpcWalletConnected, getRpcWallet, getChainNativeToken, getChainId, isClientWalletConnected } from '../store/index';
 import { ITokenObject, tokenStore } from '@scom/scom-token-list';
-import { Alert } from '../alert/index';
+import ScomTxStatusModal from '@scom/scom-tx-status-modal';
 import {
   lockToken,
   withdrawToken,
@@ -52,7 +52,7 @@ export class ManageStake extends Module {
   private btnStake: Button;
   private btnUnstake: Button;
   private btnMax: Button;
-  private stakingAlert: Alert;
+  private txStatusModal: ScomTxStatusModal;
   private approvalModelAction: IERC20ApprovalAction;
   public onRefresh: any;
 
@@ -82,15 +82,15 @@ export class ManageStake extends Module {
   }
 
   private showMessage = (status: 'warning' | 'success' | 'error', content?: string | Error) => {
-    if (!this.stakingAlert) return;
+    if (!this.txStatusModal) return;
     let params: any = { status };
     if (status === 'success') {
       params.txtHash = content;
     } else {
       params.content = content;
     }
-    this.stakingAlert.message = { ...params };
-    this.stakingAlert.showModal();
+    this.txStatusModal.message = { ...params };
+    this.txStatusModal.showModal();
   }
 
   private onApproveToken = async () => {
@@ -366,8 +366,6 @@ export class ManageStake extends Module {
 
   init() {
     super.init();
-    this.stakingAlert = new Alert();
-    this.appendChild(this.stakingAlert);
   }
 
   render() {
@@ -445,6 +443,7 @@ export class ManageStake extends Module {
             />
           </i-hstack>
         </i-hstack>
+        <i-scom-tx-status-modal id="txStatusModal" />
       </i-panel>
     )
   }
