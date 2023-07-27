@@ -117,14 +117,3 @@ export interface Reward {
   isCommonStartDate?: boolean,
   vestingStartDate?: BigNumber //unix
 }
-
-export interface IEmbedData {
-  chainId?: number,
-  customName?: string,
-  customDesc?: string,
-  customLogo?: string,
-  getTokenURL?: string,
-  showContractLink?: boolean,
-  stakings?: ISingleStaking,
-  commissions?: ICommissionInfo[]
-}

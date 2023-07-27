@@ -11,12 +11,6 @@ declare module "@scom/scom-staking/assets.ts" {
 }
 /// <amd-module name="@scom/scom-staking/global/utils/helper.ts" />
 declare module "@scom/scom-staking/global/utils/helper.ts" {
-    export const explorerTxUrlsByChainId: {
-        [key: number]: string;
-    };
-    export const explorerAddressUrlsByChainId: {
-        [key: number]: string;
-    };
     export const DefaultDateFormat = "DD/MM/YYYY";
     export const formatDate: (date: any, customType?: string, showTimezone?: boolean) => string;
     export const formatNumber: (value: any, decimals?: number) => string;
@@ -24,12 +18,6 @@ declare module "@scom/scom-staking/global/utils/helper.ts" {
     export const isInvalidInput: (val: any) => boolean;
     export const limitInputNumber: (input: any, decimals?: number) => void;
     export const limitDecimals: (value: any, decimals: number) => any;
-    export const viewOnExplorerByTxHash: (chainId: number, txHash: string) => void;
-    export const viewOnExplorerByAddress: (chainId: number, address: string) => void;
-}
-/// <amd-module name="@scom/scom-staking/global/utils/error.ts" />
-declare module "@scom/scom-staking/global/utils/error.ts" {
-    export function parseContractError(oMessage: string, tokens: string[]): Promise<string>;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/OpenSwap.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/OpenSwap.json.ts" {
@@ -9735,21 +9723,10 @@ declare module "@scom/scom-staking/global/utils/interfaces.ts" {
         isCommonStartDate?: boolean;
         vestingStartDate?: BigNumber;
     }
-    export interface IEmbedData {
-        chainId?: number;
-        customName?: string;
-        customDesc?: string;
-        customLogo?: string;
-        getTokenURL?: string;
-        showContractLink?: boolean;
-        stakings?: ISingleStaking;
-        commissions?: ICommissionInfo[];
-    }
 }
 /// <amd-module name="@scom/scom-staking/global/utils/index.ts" />
 declare module "@scom/scom-staking/global/utils/index.ts" {
     export * from "@scom/scom-staking/global/utils/helper.ts";
-    export { parseContractError } from "@scom/scom-staking/global/utils/error.ts";
     export { registerSendTxEvents, approveERC20Max, getERC20Allowance, TokenMapType } from "@scom/scom-staking/global/utils/common.ts";
     export { ApprovalStatus, IERC20ApprovalEventOptions, IERC20ApprovalOptions, IERC20ApprovalAction, ERC20ApprovalModel } from "@scom/scom-staking/global/utils/approvalModel.ts";
     export * from "@scom/scom-staking/global/utils/interfaces.ts";
@@ -9774,13 +9751,12 @@ declare module "@scom/scom-staking/store/data/index.ts" {
 }
 /// <amd-module name="@scom/scom-staking/store/utils.ts" />
 declare module "@scom/scom-staking/store/utils.ts" {
-    import { Erc20, INetwork } from '@ijstech/eth-wallet';
+    import { INetwork } from '@ijstech/eth-wallet';
     import { ITokenObject } from '@scom/scom-token-list';
     export * from "@scom/scom-staking/store/data/index.ts";
     export const getInfuraId: () => string;
     export const getChainNativeToken: (chainId: number) => ITokenObject;
     export const setDataFromConfig: (options: any) => void;
-    export function getErc20(address: string): Erc20;
     export type ProxyAddresses = {
         [key: number]: string;
     };
@@ -9807,6 +9783,8 @@ declare module "@scom/scom-staking/store/utils.ts" {
     export const setProxyAddresses: (data: ProxyAddresses) => void;
     export const getProxyAddress: (chainId?: number) => string;
     export const getEmbedderCommissionFee: () => string;
+    export const getNetworkInfo: (chainId: number) => any;
+    export const viewOnExplorerByAddress: (chainId: number, address: string) => void;
     export function isClientWalletConnected(): boolean;
     export function isRpcWalletConnected(): boolean;
     export function getChainId(): number;
@@ -15651,43 +15629,6 @@ declare module "@scom/scom-staking/staking-utils/index.ts" {
     const getApprovalModelAction: (contractAddress: string, options: IERC20ApprovalEventOptions) => import("@scom/scom-staking/global/index.ts").IERC20ApprovalAction;
     export { getAllCampaignsInfo, getStakingTotalLocked, getLPObject, getLPBalance, getVaultObject, getVaultBalance, getERC20RewardCurrentAPR, getLPRewardCurrentAPR, getVaultRewardCurrentAPR, withdrawToken, claimToken, lockToken, getApprovalModelAction, };
 }
-/// <amd-module name="@scom/scom-staking/alert/index.css.ts" />
-declare module "@scom/scom-staking/alert/index.css.ts" {
-    const _default_78: string;
-    export default _default_78;
-}
-/// <amd-module name="@scom/scom-staking/alert/index.tsx" />
-declare module "@scom/scom-staking/alert/index.tsx" {
-    import { Module, ControlElement, Container } from '@ijstech/components';
-    global {
-        namespace JSX {
-            interface IntrinsicElements {
-                ['i-scom-staking-alert']: ControlElement;
-            }
-        }
-    }
-    export interface IMessage {
-        status: 'warning' | 'success' | 'error';
-        content?: any;
-        txtHash?: string;
-        obj?: any;
-    }
-    export class Alert extends Module {
-        private confirmModal;
-        private mainContent;
-        private _message;
-        get message(): IMessage;
-        set message(value: IMessage);
-        constructor(parent?: Container, options?: any);
-        init(): Promise<void>;
-        closeModal(): void;
-        showModal(): void;
-        private buildLink;
-        private renderUI;
-        private onErrMsgChanged;
-        render(): any;
-    }
-}
 /// <amd-module name="@scom/scom-staking/manage-stake/manage-stake.css.ts" />
 declare module "@scom/scom-staking/manage-stake/manage-stake.css.ts" {
     export const stakingManageStakeStyle: string;
@@ -15723,7 +15664,7 @@ declare module "@scom/scom-staking/manage-stake/manage-stake.tsx" {
         private btnStake;
         private btnUnstake;
         private btnMax;
-        private stakingAlert;
+        private txStatusModal;
         private approvalModelAction;
         onRefresh: any;
         constructor(parent?: Container, options?: any);
@@ -15758,7 +15699,7 @@ declare module "@scom/scom-staking/index.css.ts" {
 /// <amd-module name="@scom/scom-staking/formSchema.json.ts" />
 declare module "@scom/scom-staking/formSchema.json.ts" {
     import { LockTokenType } from "@scom/scom-staking/global/index.ts";
-    const _default_79: {
+    const _default_78: {
         general: {
             dataSchema: {
                 type: string;
@@ -15901,7 +15842,7 @@ declare module "@scom/scom-staking/formSchema.json.ts" {
             };
         };
     };
-    export default _default_79;
+    export default _default_78;
 }
 /// <amd-module name="@scom/scom-staking" />
 declare module "@scom/scom-staking" {
@@ -15928,10 +15869,9 @@ declare module "@scom/scom-staking" {
         private $eventBus;
         private loadingElm;
         private campaigns;
-        private stakingComponent;
         private stakingElm;
         private noCampaignSection;
-        private stakingAlert;
+        private txStatusModal;
         private manageStakeElm;
         private listAprTimer;
         private listActiveTimer;

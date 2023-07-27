@@ -7,7 +7,6 @@ import {
 	registerSendTxEvents,
 	TokenMapType,
 	EventId,
-	viewOnExplorerByAddress,
 	ISingleStakingCampaign,
 	LockTokenType
 } from './global/index';
@@ -24,6 +23,7 @@ import {
 	maxHeight,
 	maxWidth,
 	getEmbedderCommissionFee,
+	viewOnExplorerByAddress,
 	initRpcWallet,
 	getRpcWallet,
 	isRpcWalletConnected,
@@ -42,13 +42,13 @@ import {
 	claimToken,
 	getAllCampaignsInfo,
 } from './staking-utils/index';
-import { Alert } from './alert/index';
 import { ManageStake } from './manage-stake/index';
 import { Contracts } from './contracts/oswap-time-is-money-contract/index';
 import { stakingComponent, stakingDappContainer } from './index.css';
 import ScomDappContainer from '@scom/scom-dapp-container';
 import ScomWalletModal, { IWalletPlugin } from '@scom/scom-wallet-modal';
 import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
+import ScomTxStatusModal from '@scom/scom-tx-status-modal';
 import { INetworkConfig } from '@scom/scom-network-picker';
 import formSchema from './formSchema.json';
 
@@ -77,10 +77,9 @@ export default class ScomStaking extends Module {
 	private $eventBus: IEventBus;
 	private loadingElm: Panel;
 	private campaigns: any = [];
-	private stakingComponent: Panel;
 	private stakingElm: Panel;
 	private noCampaignSection: Panel;
-	private stakingAlert: Alert;
+	private txStatusModal: ScomTxStatusModal;
 	private manageStakeElm: Panel;
 	private listAprTimer: any = [];
 	private listActiveTimer: any = [];
@@ -465,15 +464,15 @@ export default class ScomStaking extends Module {
 	}
 
 	private showMessage = (status: 'warning' | 'success' | 'error', content?: string | Error) => {
-		if (!this.stakingAlert) return;
+		if (!this.txStatusModal) return;
 		let params: any = { status };
 		if (status === 'success') {
 			params.txtHash = content;
 		} else {
 			params.content = content;
 		}
-		this.stakingAlert.message = { ...params };
-		this.stakingAlert.showModal();
+		this.txStatusModal.message = { ...params };
+		this.txStatusModal.showModal();
 	}
 
 	private onClaim = async (btnClaim: Button, data: any) => {
@@ -544,8 +543,6 @@ export default class ScomStaking extends Module {
 	async init() {
 		this.isReadyCallbackQueued = true;
 		super.init();
-		this.stakingAlert = new Alert();
-		this.stakingComponent.appendChild(this.stakingAlert);
 		const lazyLoad = this.getAttribute('lazyLoad', true, false);
 		if (!lazyLoad) {
 			const data = this.getAttribute('data', true);
@@ -1084,7 +1081,7 @@ export default class ScomStaking extends Module {
 	render() {
 		return (
 			<i-scom-dapp-container id="dappContainer" class={stakingDappContainer}>
-				<i-panel id="stakingComponent" class={stakingComponent} minHeight={200}>
+				<i-panel class={stakingComponent} minHeight={200}>
 					<i-panel id="stakingLayout" class="staking-layout" width={maxWidth} height={maxHeight} margin={{ left: 'auto', right: 'auto' }}>
 						<i-vstack id="loadingElm" class="i-loading-overlay">
 							<i-vstack class="i-loading-spinner" horizontalAlignment="center" verticalAlignment="center">
@@ -1103,6 +1100,7 @@ export default class ScomStaking extends Module {
 					<i-panel id="manageStakeElm" />
 					<i-scom-commission-fee-setup visible={false} />
 					<i-scom-wallet-modal id="mdWallet" wallets={[]} />
+					<i-scom-tx-status-modal id="txStatusModal" />
 				</i-panel>
 			</i-scom-dapp-container>
 		)

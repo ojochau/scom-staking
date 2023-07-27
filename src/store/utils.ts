@@ -1,12 +1,10 @@
-import { Erc20, INetwork, Wallet } from '@ijstech/eth-wallet';
+import { INetwork, Wallet } from '@ijstech/eth-wallet';
 import { EventId } from '../global/index';
-
 import { ChainNativeTokenByChainId, ITokenObject } from '@scom/scom-token-list';
-import getNetworkList from '@scom/scom-network-list'
+import getNetworkList from '@scom/scom-network-list';
+import { application } from '@ijstech/components';
 
 export * from './data/index';
-
-import { application } from '@ijstech/components';
 
 const setInfuraId = (infuraId: string) => {
   state.infuraId = infuraId;
@@ -59,11 +57,6 @@ export const setDataFromConfig = (options: any) => {
   }
 }
 
-export function getErc20(address: string) {
-  const wallet = Wallet.getClientInstance();
-  return new Erc20(wallet, address);
-}
-
 export type ProxyAddresses = { [key: number]: string };
 
 export const state = {
@@ -103,6 +96,19 @@ const setEmbedderCommissionFee = (fee: string) => {
 
 export const getEmbedderCommissionFee = () => {
   return state.embedderCommissionFee;
+}
+
+export const getNetworkInfo = (chainId: number) => {
+  const networkMap = application.store["networkMap"];
+  return networkMap[chainId];
+}
+
+export const viewOnExplorerByAddress = (chainId: number, address: string) => {
+  let network = getNetworkInfo(chainId);
+  if (network && network.explorerAddressUrl) {
+    let url = `${network.explorerAddressUrl}${address}`;
+    window.open(url);
+  }
 }
 
 export function isClientWalletConnected() {
