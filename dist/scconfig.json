@@ -1,13 +1,13 @@
 {
     "name": "@scom/scom-staking",
     "type": "widget",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "dependencies": [
         "@ijstech/components",
         "@ijstech/eth-wallet",
-        "@ijstech/eth-contract",
         "@scom/scom-token-list",
         "@scom/scom-network-list",
+        "@ijstech/eth-contract",
         "@scom/scom-tx-status-modal",
         "@scom/scom-dapp-container",
         "@scom/scom-wallet-modal",
