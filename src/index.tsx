@@ -37,7 +37,7 @@ import {
 	getAllCampaignsInfo,
 } from './staking-utils/index';
 import ManageStake from './manage-stake/index';
-import { Contracts } from './contracts/oswap-time-is-money-contract/index';
+import { Contracts } from '@scom/oswap-time-is-money-contract';
 import { stakingComponent, stakingDappContainer } from './index.css';
 import ScomDappContainer from '@scom/scom-dapp-container';
 import ScomWalletModal, { IWalletPlugin } from '@scom/scom-wallet-modal';

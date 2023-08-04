@@ -1,8 +1,8 @@
 import { Wallet, BigNumber, Utils, Erc20, IWallet } from "@ijstech/eth-wallet";
-import { Contracts as TimeIsMoneyContracts } from "../contracts/oswap-time-is-money-contract/index";
-import { Contracts } from "../contracts/oswap-openswap-contract/index";
-import { Contracts as UtilsContracts } from "../contracts/oswap-chainlink-contract/index";
-import { Contracts as CrossChainContracts } from "../contracts/oswap-cross-chain-bridge-contract/index";
+import { Contracts as TimeIsMoneyContracts } from "@scom/oswap-time-is-money-contract";
+import { Contracts } from "@scom/oswap-openswap-contract";
+import { Contracts as UtilsContracts } from "@scom/oswap-chainlink-contract";
+import { Contracts as CrossChainContracts } from "@scom/oswap-cross-chain-bridge-contract";
 import {
   ISingleStakingCampaign,
   ISingleStaking,
@@ -43,9 +43,9 @@ export const getTokenPrice = async (wallet: IWallet, token: string) => { // in U
       let token0PriceFeedDecimals = await aggregator.decimals();
       let token0USDPrice = new BigNumber(token0LatestRoundData.answer).shiftedBy(-token0PriceFeedDecimals).toFixed();
       if (new BigNumber(token.toLowerCase()).lt(token0.toLowerCase())) {
-        tokenPrice = new BigNumber(reserves._reserve1).div(reserves._reserve0).times(token0USDPrice).toFixed()
+        tokenPrice = new BigNumber(reserves.reserve1).div(reserves.reserve0).times(token0USDPrice).toFixed()
       } else {
-        tokenPrice = new BigNumber(reserves._reserve0).div(reserves._reserve1).times(token0USDPrice).toFixed()
+        tokenPrice = new BigNumber(reserves.reserve0).div(reserves.reserve1).times(token0USDPrice).toFixed()
       }
     } else {
       let aggregator = new UtilsContracts.EACAggregatorProxy(wallet, token1PriceFeedAddress);
@@ -53,20 +53,20 @@ export const getTokenPrice = async (wallet: IWallet, token: string) => { // in U
       let token1PriceFeedDecimals = await aggregator.decimals();
       let token1USDPrice = new BigNumber(token1LatestRoundData.answer).shiftedBy(-token1PriceFeedDecimals).toFixed();
       if (new BigNumber(token.toLowerCase()).lt(token1.toLowerCase())) {
-        tokenPrice = new BigNumber(reserves._reserve1).div(reserves._reserve0).times(token1USDPrice).toFixed()
+        tokenPrice = new BigNumber(reserves.reserve1).div(reserves.reserve0).times(token1USDPrice).toFixed()
       } else {
-        tokenPrice = new BigNumber(reserves._reserve0).div(reserves._reserve1).times(token1USDPrice).toFixed()
+        tokenPrice = new BigNumber(reserves.reserve0).div(reserves.reserve1).times(token1USDPrice).toFixed()
       }
     }
   } else {
     if (token0.toLowerCase() == token.toLowerCase()) {//for other reference pair
       let token1Price = await getTokenPrice(wallet, token1);
       if (!token1Price) return null;
-      tokenPrice = new BigNumber(token1Price).times(reserves._reserve1).div(reserves._reserve0).toFixed()
+      tokenPrice = new BigNumber(token1Price).times(reserves.reserve1).div(reserves.reserve0).toFixed()
     } else {
       let token0Price = await getTokenPrice(wallet, token0);
       if (!token0Price) return null;
-      tokenPrice = new BigNumber(token0Price).times(reserves._reserve0).div(reserves._reserve1).toFixed()
+      tokenPrice = new BigNumber(token0Price).times(reserves.reserve0).div(reserves.reserve1).toFixed()
     }
   }
   return tokenPrice;
@@ -353,13 +353,13 @@ const getReservesByPair = async (wallet: IWallet, pairAddress: string, tokenInAd
   if (tokenInAddress && tokenOutAddress) {
     if (new BigNumber(tokenInAddress.toLowerCase()).lt(tokenOutAddress.toLowerCase())) {
       reserveObj = {
-        reserveA: reserves._reserve0,
-        reserveB: reserves._reserve1
+        reserveA: reserves.reserve0,
+        reserveB: reserves.reserve1
       };
     } else {
       reserveObj = {
-        reserveA: reserves._reserve1,
-        reserveB: reserves._reserve0
+        reserveA: reserves.reserve1,
+        reserveB: reserves.reserve0
       };
     }
   }

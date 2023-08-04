@@ -21,6 +21,12 @@
     "@scom/scom-wallet-modal": "*",
     "@scom/scom-token-list": "*"
   },
+  "packages": [
+    "@scom/oswap-openswap-contract",
+    "@scom/oswap-time-is-money-contract",
+    "@scom/oswap-chainlink-contract",
+    "@scom/oswap-cross-chain-bridge-contract"
+  ],
   "menus": [
     {
       "caption": "Module 1",
