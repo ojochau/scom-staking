@@ -1,0 +1,17 @@
+{
+    "name": "@scom/scom-staking",
+    "type": "widget",
+    "version": "0.1.6",
+    "dependencies": [
+        "@ijstech/components",
+        "@ijstech/eth-wallet",
+        "@scom/scom-token-list",
+        "@scom/scom-network-list",
+        "@ijstech/eth-contract",
+        "@scom/scom-tx-status-modal",
+        "@scom/scom-dapp-container",
+        "@scom/scom-wallet-modal",
+        "@scom/scom-commission-fee-setup",
+        "@scom/scom-network-picker"
+    ]
+}
