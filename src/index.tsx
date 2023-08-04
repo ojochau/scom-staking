@@ -11,10 +11,7 @@ import {
 	LockTokenType
 } from './global/index';
 import {
-	getChainId,
-	setDataFromConfig,
 	tokenSymbol,
-	getStakingStatus,
 	fallBackUrl,
 	getLockedTokenObject,
 	getLockedTokenSymbol,
@@ -22,11 +19,8 @@ import {
 	getTokenUrl,
 	maxHeight,
 	maxWidth,
-	getEmbedderCommissionFee,
 	viewOnExplorerByAddress,
-	initRpcWallet,
-	getRpcWallet,
-	isRpcWalletConnected,
+	State,
 	isClientWalletConnected
 } from './store/index';
 import { tokenStore, assets as tokenAssets, ITokenObject } from '@scom/scom-token-list';
@@ -42,7 +36,7 @@ import {
 	claimToken,
 	getAllCampaignsInfo,
 } from './staking-utils/index';
-import { ManageStake } from './manage-stake/index';
+import ManageStake from './manage-stake/index';
 import { Contracts } from './contracts/oswap-time-is-money-contract/index';
 import { stakingComponent, stakingDappContainer } from './index.css';
 import ScomDappContainer from '@scom/scom-dapp-container';
@@ -70,6 +64,7 @@ declare global {
 @customModule
 @customElements('i-scom-staking')
 export default class ScomStaking extends Module {
+	private state: State;
 	private _data: ISingleStakingCampaign;
 	tag: any = {};
 	defaultEdit: boolean = true;
@@ -125,7 +120,7 @@ export default class ScomStaking extends Module {
 			// 			const vstack = new VStack();
 			// 			const config = new ScomCommissionFeeSetup(null, {
 			//         commissions: self._data.commissions,
-			//         fee: getEmbedderCommissionFee(),
+			//         fee: this.state.embedderCommissionFee,
 			//         networks: self._data.networks
 			//       });
 			//       const button = new Button(null, {
@@ -165,6 +160,7 @@ export default class ScomStaking extends Module {
 								if (userInputData?.getTokenURL !== undefined) this._data.getTokenURL = userInputData.getTokenURL;
 								if (userInputData?.showContractLink !== undefined) this._data.showContractLink = userInputData.showContractLink;
 								if (userInputData?.stakings !== undefined) this._data.stakings = userInputData.stakings;
+								await this.resetRpcWallet();
 								this.refreshUI();
 								if (builder?.setData) builder.setData(this._data);
 							},
@@ -260,7 +256,7 @@ export default class ScomStaking extends Module {
 					}
 				},
 				getData: () => {
-					const fee = getEmbedderCommissionFee();
+					const fee = this.state.embedderCommissionFee;
 					return { ...this.getData(), fee }
 				},
 				setData: this.setData.bind(this),
@@ -274,14 +270,17 @@ export default class ScomStaking extends Module {
 		return this._data;
 	}
 
-	private async setData(value: any) {
-		this._data = value;
-		const rpcWalletId = initRpcWallet(this.defaultChainId);
-		const rpcWallet = getRpcWallet();
-		const event = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.Connected, async (connected: boolean) => {
+	private async resetRpcWallet() {
+		this.removeRpcWalletEvents();
+		const rpcWalletId = await this.state.initRpcWallet(this.defaultChainId);
+		const rpcWallet = this.rpcWallet;
+		const chainChangedEvent = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.ChainChanged, async (chainId: number) => {
+			this.onChainChanged();
+		});
+		const connectedEvent = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.Connected, async (connected: boolean) => {
 			await this.initializeWidgetConfig();
 		});
-		this.rpcWalletEvents.push(event);
+		this.rpcWalletEvents.push(chainChangedEvent, connectedEvent);
 
 		const data = {
 			defaultChainId: this.defaultChainId,
@@ -291,8 +290,12 @@ export default class ScomStaking extends Module {
 			rpcWalletId: rpcWallet.instanceId
 		}
 		if (this.dappContainer?.setData) this.dappContainer.setData(data);
-
 		// TODO - update proxy address
+	}
+
+	private async setData(value: any) {
+		this._data = value;
+		await this.resetRpcWallet();
 		this.initializeWidgetConfig();
 	}
 
@@ -377,20 +380,32 @@ export default class ScomStaking extends Module {
 		this._data.showHeader = value;
 	}
 
+	private get chainId() {
+		return this.state.getChainId();
+	}
+
+	private get rpcWallet() {
+		return this.state.getRpcWallet();
+	}
+
 	constructor(parent?: Container, options?: ControlElement) {
 		super(parent, options);
-		if (configData) setDataFromConfig(configData);
+		this.state = new State(configData);
 		this.$eventBus = application.EventBus;
 		this.registerEvent();
 	}
 
-	onHide() {
-		this.dappContainer.onHide();
-		const rpcWallet = getRpcWallet();
+	removeRpcWalletEvents() {
+		const rpcWallet = this.rpcWallet;
 		for (let event of this.rpcWalletEvents) {
 			rpcWallet.unregisterWalletEvent(event);
 		}
 		this.rpcWalletEvents = [];
+	}
+
+	onHide() {
+		this.dappContainer.onHide();
+		this.removeRpcWalletEvents();
 		for (let event of this.clientEvents) {
 			event.unregister();
 		}
@@ -398,7 +413,6 @@ export default class ScomStaking extends Module {
 	}
 
 	private registerEvent = () => {
-		this.clientEvents.push(this.$eventBus.register(this, EventId.chainChanged, this.onChainChanged));
 		this.clientEvents.push(this.$eventBus.register(this, EventId.EmitButtonStatus, this.updateButtonStatus));
 	}
 
@@ -440,12 +454,12 @@ export default class ScomStaking extends Module {
 				return;
 			}
 			await this.initWallet();
-			tokenStore.updateTokenMapData(getChainId());
-			const rpcWallet = getRpcWallet();
+			tokenStore.updateTokenMapData(this.chainId);
+			const rpcWallet = this.rpcWallet;
 			if (rpcWallet.address) {
 				tokenStore.updateAllTokenBalances(rpcWallet);
 			}
-			this.campaigns = await getAllCampaignsInfo({ [this._data.chainId]: this._data });
+			this.campaigns = await getAllCampaignsInfo(rpcWallet, { [this._data.chainId]: this._data });
 			await this.renderCampaigns(hideLoading);
 			if (!hideLoading && this.loadingElm) {
 				this.loadingElm.visible = false;
@@ -456,7 +470,7 @@ export default class ScomStaking extends Module {
 	private initWallet = async () => {
 		try {
 			await Wallet.getClientInstance().init();
-			const rpcWallet = getRpcWallet();
+			const rpcWallet = this.rpcWallet;
 			await rpcWallet.init();
 		} catch (err) {
 			console.log(err);
@@ -577,10 +591,9 @@ export default class ScomStaking extends Module {
 			}
 			return;
 		}
-		if (!isRpcWalletConnected()) {
-			const chainId = getChainId();
+		if (!this.state.isRpcWalletConnected()) {
 			const clientWallet = Wallet.getClientInstance();
-			await clientWallet.switchNetwork(chainId);
+			await clientWallet.switchNetwork(this.chainId);
 		}
 	}
 
@@ -589,7 +602,7 @@ export default class ScomStaking extends Module {
 			this.noCampaignSection = await Panel.create({ height: '100%' });
 		}
 		const isClientConnected = isClientWalletConnected();
-		const isRpcConnected = isRpcWalletConnected();
+		// const isRpcConnected = this.state.isRpcWalletConnected();
 		this.noCampaignSection.clearInnerHTML();
 		this.noCampaignSection.appendChild(
 			<i-panel class="no-campaign" height="100%" background={{ color: Theme.background.main }}>
@@ -628,7 +641,7 @@ export default class ScomStaking extends Module {
 			this.stakingElm.clearInnerHTML();
 		}
 		this.tokenMap = tokenStore.tokenMap;
-		const chainId = getChainId();
+		const chainId = this.state.getChainId();
 		await this.initEmptyUI();
 		this.noCampaignSection.visible = false;
 		if (this.campaigns && !this.campaigns.length) {
@@ -638,8 +651,8 @@ export default class ScomStaking extends Module {
 			this.removeTimer();
 			return;
 		}
-		const rpcWalletConnected = isRpcWalletConnected();
-
+		const rpcWalletConnected = this.state.isRpcWalletConnected();
+		const rpcWallet = this.rpcWallet;
 		let nodeItems: HTMLElement[] = [];
 		this.removeTimer();
 		const campaigns = [this.campaigns[0]];
@@ -656,11 +669,11 @@ export default class ScomStaking extends Module {
 				if (opt.tokenAddress) {
 					if (opt.lockTokenType == LockTokenType.LP_Token) {
 						lpTokenData = {
-							'object': await getLPObject(opt.tokenAddress)
+							'object': await getLPObject(rpcWallet, opt.tokenAddress)
 						}
 					} else if (opt.lockTokenType == LockTokenType.VAULT_Token) {
 						vaultTokenData = {
-							'object': await getVaultObject(opt.tokenAddress)
+							'object': await getVaultObject(rpcWallet, opt.tokenAddress)
 						}
 					}
 				}
@@ -739,16 +752,16 @@ export default class ScomStaking extends Module {
 			}
 
 			const setAvailableQty = async () => {
-				if (!isRpcWalletConnected()) return;
+				if (!this.state.isRpcWalletConnected()) return;
 				let i = 0;
 				for (const o of options) {
-					const _totalLocked = await getStakingTotalLocked(o.address);
+					const _totalLocked = await getStakingTotalLocked(rpcWallet, o.address);
 					totalLocked[o.address] = _totalLocked;
 					const optionQty = new BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
 					if (o.mode === 'Stake') {
 						const keyStake = `#btn-stake-${o.address}`;
 						const btnStake = this.querySelector(keyStake) as Button;
-						const isStaking = getStakingStatus(keyStake).value;
+						const isStaking = this.state.getStakingStatus(keyStake).value;
 						if (btnStake) {
 							let isValidInput = false;
 							const inputElm = this.querySelector(`#input-${o.address}`) as Input;
@@ -762,7 +775,7 @@ export default class ScomStaking extends Module {
 					} else {
 						const keyUnstake = `#btn-unstake-${o.address}`;
 						const btnUnstake = this.querySelector(keyUnstake) as Button;
-						const isUnstaking = getStakingStatus(keyUnstake).value;
+						const isUnstaking = this.state.getStakingStatus(keyUnstake).value;
 						if (btnUnstake) {
 							const manageStake = this.querySelector(`#manage-stake-${o.address}`) as ManageStake;
 							btnUnstake.enabled = !isUnstaking && o.mode !== 'Stake' && Number(o.stakeQty) != 0 && !manageStake?.needToBeApproval();
@@ -831,6 +844,7 @@ export default class ScomStaking extends Module {
 				const manageStake = new ManageStake();
 				manageStake.id = `manage-stake-${option.address}`;
 				manageStake.width = '100%';
+				manageStake.state = this.state;
 				manageStake.onRefresh = () => this.initializeWidgetConfig(true);
 				this.manageStakeElm.clearInnerHTML();
 				this.manageStakeElm.appendChild(manageStake);
@@ -957,16 +971,16 @@ export default class ScomStaking extends Module {
 									const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(option.lockTokenAddress)} : ${rewardOption.multiplier} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
 									const updateApr = async () => {
 										if (lockTokenType === LockTokenType.ERC20_Token) {
-											const apr: any = await getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, durationDays);
+											const apr: any = await getERC20RewardCurrentAPR(rpcWallet, rewardOption, lockedTokenObject, durationDays);
 											if (!isNaN(parseFloat(apr))) {
 												aprInfo[rewardOption.rewardTokenAddress] = apr;
 											}
 										} else if (lockTokenType === LockTokenType.LP_Token) {
 											if (rewardOption.referencePair) {
-												aprInfo[rewardOption.rewardTokenAddress] = await getLPRewardCurrentAPR(rewardOption, option.tokenInfo?.lpToken?.object, durationDays);
+												aprInfo[rewardOption.rewardTokenAddress] = await getLPRewardCurrentAPR(rpcWallet, rewardOption, option.tokenInfo?.lpToken?.object, durationDays);
 											}
 										} else {
-											aprInfo[rewardOption.rewardTokenAddress] = await getVaultRewardCurrentAPR(rewardOption, option.tokenInfo?.vaultToken?.object, durationDays);
+											aprInfo[rewardOption.rewardTokenAddress] = await getVaultRewardCurrentAPR(rpcWallet, rewardOption, option.tokenInfo?.vaultToken?.object, durationDays);
 										}
 										const aprValue = getAprValue(rewardOption);
 										lbApr.caption = `APR ${aprValue}`;
@@ -1098,7 +1112,6 @@ export default class ScomStaking extends Module {
 						<i-panel id="stakingElm" class="wrapper" />
 					</i-panel>
 					<i-panel id="manageStakeElm" />
-					<i-scom-commission-fee-setup visible={false} />
 					<i-scom-wallet-modal id="mdWallet" wallets={[]} />
 					<i-scom-tx-status-modal id="txStatusModal" />
 				</i-panel>

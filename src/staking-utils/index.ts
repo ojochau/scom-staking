@@ -4,20 +4,16 @@ import { Contracts } from "../contracts/oswap-openswap-contract/index";
 import { Contracts as UtilsContracts } from "../contracts/oswap-chainlink-contract/index";
 import { Contracts as CrossChainContracts } from "../contracts/oswap-cross-chain-bridge-contract/index";
 import {
-  ERC20ApprovalModel,
-  IERC20ApprovalEventOptions,
   ISingleStakingCampaign,
   ISingleStaking,
 } from "../global/index";
 import {
   USDPeggedTokenAddressMap,
-  getRpcWallet,
   getTokenDecimals
 } from "../store/index";
 import { tokenStore, ToUSDPriceFeedAddressesMap, WETHByChainId, tokenPriceAMMReference, ITokenObject } from '@scom/scom-token-list';
 
-export const getTokenPrice = async (token: string) => { // in USD value
-  let wallet = getRpcWallet();
+export const getTokenPrice = async (wallet: IWallet, token: string) => { // in USD value
   let chainId = wallet.chainId;
   let tokenPrice: string;
 
@@ -64,11 +60,11 @@ export const getTokenPrice = async (token: string) => { // in USD value
     }
   } else {
     if (token0.toLowerCase() == token.toLowerCase()) {//for other reference pair
-      let token1Price = await getTokenPrice(token1);
+      let token1Price = await getTokenPrice(wallet, token1);
       if (!token1Price) return null;
       tokenPrice = new BigNumber(token1Price).times(reserves._reserve1).div(reserves._reserve0).toFixed()
     } else {
-      let token0Price = await getTokenPrice(token0);
+      let token0Price = await getTokenPrice(wallet, token0);
       if (!token0Price) return null;
       tokenPrice = new BigNumber(token0Price).times(reserves._reserve0).div(reserves._reserve1).toFixed()
     }
@@ -76,9 +72,8 @@ export const getTokenPrice = async (token: string) => { // in USD value
   return tokenPrice;
 }
 
-const getDefaultStakingByAddress = async (option: ISingleStaking) => {
+const getDefaultStakingByAddress = async (wallet: IWallet, option: ISingleStaking) => {
   try {
-    let wallet = getRpcWallet();
     let currentAddress = wallet.address;
     let stakingAddress = option.address;
     let rewards = [option.rewards];
@@ -112,7 +107,7 @@ const getDefaultStakingByAddress = async (option: ISingleStaking) => {
       startOfEntryPeriod = (await timeIsMoney.startOfEntryPeriod()).toFixed();
     } catch (err) { }
     let tokenAddress = await timeIsMoney.token();
-    let stakingDecimals = 18 - getTokenDecimals(tokenAddress.toLocaleLowerCase());
+    let stakingDecimals = 18 - getTokenDecimals(tokenAddress.toLocaleLowerCase(), wallet.chainId);
     let endOfEntryPeriod = (await timeIsMoney.endOfEntryPeriod()).toFixed();
     let perAddressCapWei = await timeIsMoney.perAddressCap();
     let maxTotalLock = Utils.fromDecimals(maximumTotalLock).shiftedBy(stakingDecimals).toFixed();
@@ -230,8 +225,7 @@ const composeCampaignInfoList = async (stakingCampaignInfoList: ISingleStakingCa
   return campaigns;
 }
 
-const getAllCampaignsInfo = async (stakingInfo: { [key: number]: ISingleStakingCampaign }) => {
-  let wallet = getRpcWallet();
+const getAllCampaignsInfo = async (wallet: IWallet, stakingInfo: { [key: number]: ISingleStakingCampaign }) => {
   let chainId = wallet.chainId;
   let stakingCampaignInfoList = stakingInfo[chainId];
   if (!stakingCampaignInfoList) return [];
@@ -241,7 +235,7 @@ const getAllCampaignsInfo = async (stakingInfo: { [key: number]: ISingleStakingC
   let promises = allCampaignOptions.map(async (option: any, index: any) => {
     return new Promise<void>(async (resolve, reject) => {
       try {
-        let optionExtendedInfo = await getDefaultStakingByAddress(option);
+        let optionExtendedInfo = await getDefaultStakingByAddress(wallet, option);
         if (optionExtendedInfo) optionExtendedInfoMap[option.address] = optionExtendedInfo;
       }
       catch (error) { }
@@ -266,8 +260,7 @@ const getAllCampaignsInfo = async (stakingInfo: { [key: number]: ISingleStakingC
   });
 }
 
-const getStakingTotalLocked = async (stakingAddress: string) => {
-  let wallet = getRpcWallet();
+const getStakingTotalLocked = async (wallet: IWallet, stakingAddress: string) => {
   let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet, stakingAddress);
   let totalLockedWei = await timeIsMoney.totalLocked();
   let totalLocked = Utils.fromDecimals(totalLockedWei).toFixed();
@@ -279,9 +272,8 @@ const getWETH = (wallet: IWallet): ITokenObject => {
   return wrappedToken;
 };
 
-const getLPObject = async (pairAddress: string) => {
+const getLPObject = async (wallet: IWallet, pairAddress: string) => {
   try {
-    let wallet = getRpcWallet();
     const WETH = getWETH(wallet);
     let pair = new Contracts.OSWAP_Pair(wallet, pairAddress);
 
@@ -304,16 +296,14 @@ const getLPObject = async (pairAddress: string) => {
   }
 }
 
-const getLPBalance = async (pairAddress: string) => {
-  let wallet = getRpcWallet();
+const getLPBalance = async (wallet: IWallet, pairAddress: string) => {
   let pair = new Contracts.OSWAP_Pair(wallet, pairAddress);
   let balance = await pair.balanceOf(wallet.address);
   return Utils.fromDecimals(balance).toFixed();
 }
 
-const getVaultObject = async (vaultAddress: string) => {
+const getVaultObject = async (wallet: IWallet, vaultAddress: string) => {
   try {
-    let wallet = getRpcWallet();
     let vault = new CrossChainContracts.OSWAP_BridgeVault(wallet, vaultAddress);
     let symbol = await vault.symbol();
     let name = await vault.name();
@@ -332,29 +322,26 @@ const getVaultObject = async (vaultAddress: string) => {
   }
 }
 
-const getVaultBalance = async (vaultAddress: string) => {
-  let wallet = getRpcWallet();
+const getVaultBalance = async (wallet: IWallet, vaultAddress: string) => {
   let vault = new CrossChainContracts.OSWAP_BridgeVault(wallet, vaultAddress);
   let balance = await vault.balanceOf(wallet.address);
   return Utils.fromDecimals(balance).toFixed();
 }
 
-const getERC20RewardCurrentAPR = async (rewardOption: any, lockedToken: any, lockedDays: number) => {
-  let wallet = getRpcWallet();
+const getERC20RewardCurrentAPR = async (wallet: IWallet, rewardOption: any, lockedToken: any, lockedDays: number) => {
   let chainId = wallet.chainId;
   const usdPeggedTokenAddress = USDPeggedTokenAddressMap[chainId];
   if (!usdPeggedTokenAddress) return '';
 
   let APR = "";
-  let rewardPrice = await getTokenPrice(rewardOption.rewardTokenAddress);
-  let lockedTokenPrice = await getTokenPrice(lockedToken.address);
+  let rewardPrice = await getTokenPrice(wallet, rewardOption.rewardTokenAddress);
+  let lockedTokenPrice = await getTokenPrice(wallet, lockedToken.address);
   if (!rewardPrice || !lockedTokenPrice) return null;
   APR = new BigNumber(rewardOption.multiplier).times(new BigNumber(rewardPrice).times(365)).div(new BigNumber(lockedTokenPrice).times(lockedDays)).toFixed();
   return APR
 }
 
-const getReservesByPair = async (pairAddress: string, tokenInAddress?: string, tokenOutAddress?: string) => {
-  let wallet = getRpcWallet();
+const getReservesByPair = async (wallet: IWallet, pairAddress: string, tokenInAddress?: string, tokenOutAddress?: string) => {
   let reserveObj;
   let pair = new Contracts.OSWAP_Pair(wallet, pairAddress);
   let reserves = await pair.getReserves();
@@ -379,9 +366,8 @@ const getReservesByPair = async (pairAddress: string, tokenInAddress?: string, t
   return reserveObj;
 }
 
-const getLPRewardCurrentAPR = async (rewardOption: any, lpObject: any, lockedDays: number) => {
+const getLPRewardCurrentAPR = async (wallet: IWallet, rewardOption: any, lpObject: any, lockedDays: number) => {
   if (!lpObject) return '';
-  let wallet = getRpcWallet();
   const WETH = getWETH(wallet);
   const WETHAddress = WETH.address!;
   let chainId = wallet.chainId;
@@ -442,13 +428,12 @@ const getLPRewardCurrentAPR = async (rewardOption: any, lpObject: any, lockedDay
   return APR;
 }
 
-const getVaultRewardCurrentAPR = async (rewardOption: any, vaultObject: any, lockedDays: number) => {
+const getVaultRewardCurrentAPR = async (wallet: IWallet, rewardOption: any, vaultObject: any, lockedDays: number) => {
   let APR = '';
   try {
-    let rewardPrice = await getTokenPrice(rewardOption.rewardTokenAddress)
-    let assetTokenPrice = await getTokenPrice(vaultObject.assetToken.address);
+    let rewardPrice = await getTokenPrice(wallet, rewardOption.rewardTokenAddress)
+    let assetTokenPrice = await getTokenPrice(wallet, vaultObject.assetToken.address);
     if (!assetTokenPrice || !rewardPrice) return '';
-    let wallet = getRpcWallet();
     let vault = new CrossChainContracts.OSWAP_BridgeVault(wallet, vaultObject.address);
     let vaultTokenTotalSupply = await vault.totalSupply();
     let lpAssetBalance = await vault.lpAssetBalance();
@@ -503,16 +488,6 @@ const lockToken = async (token: ITokenObject, amount: string, contractAddress: s
   }
 }
 
-const getApprovalModelAction = (contractAddress: string, options: IERC20ApprovalEventOptions) => {
-  const approvalOptions = {
-    ...options,
-    spenderAddress: contractAddress
-  };
-  const approvalModel = new ERC20ApprovalModel(approvalOptions);
-  let approvalModelAction = approvalModel.getAction();
-  return approvalModelAction;
-}
-
 export {
   getAllCampaignsInfo,
   getStakingTotalLocked,
@@ -525,6 +500,5 @@ export {
   getVaultRewardCurrentAPR,
   withdrawToken,
   claimToken,
-  lockToken,
-  getApprovalModelAction,
+  lockToken
 }

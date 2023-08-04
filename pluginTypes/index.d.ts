@@ -1,6 +1,6 @@
-/// <reference path="@ijstech/eth-contract/index.d.ts" />
 /// <reference path="@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dapp-container/@ijstech/eth-wallet/index.d.ts" />
+/// <reference path="@ijstech/eth-contract/index.d.ts" />
 /// <amd-module name="@scom/scom-staking/assets.ts" />
 declare module "@scom/scom-staking/assets.ts" {
     function fullPath(path: string): string;
@@ -19,9 +19,221 @@ declare module "@scom/scom-staking/global/utils/helper.ts" {
     export const limitInputNumber: (input: any, decimals?: number) => void;
     export const limitDecimals: (value: any, decimals: number) => any;
 }
-/// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/OpenSwap.json.ts" />
-declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/OpenSwap.json.ts" {
+/// <amd-module name="@scom/scom-staking/global/utils/common.ts" />
+declare module "@scom/scom-staking/global/utils/common.ts" {
+    import { ISendTxEventsOptions } from "@ijstech/eth-wallet";
+    import { ITokenObject } from "@scom/scom-token-list";
+    export type TokenMapType = {
+        [token: string]: ITokenObject;
+    };
+    export const registerSendTxEvents: (sendTxEventHandlers: ISendTxEventsOptions) => void;
+}
+/// <amd-module name="@scom/scom-staking/global/utils/interfaces.ts" />
+declare module "@scom/scom-staking/global/utils/interfaces.ts" {
+    import { BigNumber, IClientSideProvider } from "@ijstech/eth-wallet";
+    export interface ICommissionInfo {
+        chainId: number;
+        walletAddress: string;
+        share: string;
+    }
+    export enum LockTokenType {
+        ERC20_Token = 0,
+        LP_Token = 1,
+        VAULT_Token = 2
+    }
+    export interface ISingleStakingCampaign {
+        chainId: number;
+        customName: string;
+        customDesc?: string;
+        customLogo?: string;
+        getTokenURL?: string;
+        showContractLink?: boolean;
+        stakings: ISingleStaking;
+        commissions?: ICommissionInfo[];
+        wallets: IWalletPlugin[];
+        networks: INetworkConfig[];
+        showHeader?: boolean;
+        defaultChainId?: number;
+    }
+    export interface ISingleStaking {
+        address: string;
+        customDesc?: string;
+        lockTokenType: LockTokenType;
+        rewards: ISingleReward;
+    }
+    export interface ISingleReward {
+        address: string;
+        isCommonStartDate?: boolean;
+    }
+    export interface IStakingCampaign {
+        chainId: number;
+        customName: string;
+        customDesc?: string;
+        customLogo?: string;
+        getTokenURL?: string;
+        campaignStart: BigNumber;
+        campaignEnd: BigNumber;
+        showContractLink?: boolean;
+        admin: string;
+        stakings: Staking[];
+    }
+    export interface IWalletPlugin {
+        name: string;
+        packageName?: string;
+        provider?: IClientSideProvider;
+    }
+    export interface INetworkConfig {
+        chainId: number;
+        chainName?: string;
+    }
+    export interface RewardNeeded {
+        value: BigNumber;
+        tokenAddress: string;
+    }
+    export interface Staking {
+        address?: string;
+        lockTokenAddress: string;
+        minLockTime: BigNumber;
+        perAddressCap: BigNumber;
+        maxTotalLock: BigNumber;
+        customDesc?: string;
+        lockTokenType: LockTokenType;
+        decimalsOffset?: number;
+        rewards: Reward[];
+    }
+    export interface Reward {
+        address?: string;
+        rewardTokenAddress: string;
+        multiplier: BigNumber;
+        rewardAmount?: BigNumber;
+        initialReward: BigNumber;
+        vestingPeriod: BigNumber;
+        claimDeadline: BigNumber;
+        admin: string;
+        isCommonStartDate?: boolean;
+        vestingStartDate?: BigNumber;
+    }
+}
+/// <amd-module name="@scom/scom-staking/global/utils/index.ts" />
+declare module "@scom/scom-staking/global/utils/index.ts" {
+    export * from "@scom/scom-staking/global/utils/helper.ts";
+    export { registerSendTxEvents, TokenMapType } from "@scom/scom-staking/global/utils/common.ts";
+    export * from "@scom/scom-staking/global/utils/interfaces.ts";
+}
+/// <amd-module name="@scom/scom-staking/global/index.ts" />
+declare module "@scom/scom-staking/global/index.ts" {
+    export const enum EventId {
+        Paid = "Paid",
+        EmitButtonStatus = "stakingEmitButtonStatus"
+    }
+    export * from "@scom/scom-staking/global/utils/index.ts";
+}
+/// <amd-module name="@scom/scom-staking/store/data/index.ts" />
+declare module "@scom/scom-staking/store/data/index.ts" {
+    const USDPeggedTokenAddressMap: {
+        [key: number]: string;
+    };
+    export { USDPeggedTokenAddressMap };
+}
+/// <amd-module name="@scom/scom-staking/store/utils.ts" />
+declare module "@scom/scom-staking/store/utils.ts" {
+    import { ERC20ApprovalModel, IERC20ApprovalEventOptions, INetwork } from '@ijstech/eth-wallet';
+    export * from "@scom/scom-staking/store/data/index.ts";
+    export type ProxyAddresses = {
+        [key: number]: string;
+    };
+    export class State {
+        networkMap: {
+            [key: number]: INetwork;
+        };
+        infuraId: string;
+        stakingStatusMap: {
+            [key: string]: {
+                value: boolean;
+                text: string;
+            };
+        };
+        proxyAddresses: ProxyAddresses;
+        embedderCommissionFee: string;
+        rpcWalletId: string;
+        approvalModel: ERC20ApprovalModel;
+        constructor(options: any);
+        initRpcWallet(defaultChainId: number): string;
+        private initData;
+        private setNetworkList;
+        getProxyAddress(chainId?: number): string;
+        setStakingStatus(key: string, value: boolean, text: string): void;
+        getStakingStatus(key: string): {
+            value: boolean;
+            text: string;
+        };
+        getRpcWallet(): import("@ijstech/eth-wallet").IRpcWallet;
+        isRpcWalletConnected(): boolean;
+        getChainId(): number;
+        setApprovalModelAction(options: IERC20ApprovalEventOptions): Promise<import("@ijstech/eth-wallet").IERC20ApprovalAction>;
+    }
+    export function isClientWalletConnected(): boolean;
+}
+/// <amd-module name="@scom/scom-staking/store/index.ts" />
+declare module "@scom/scom-staking/store/index.ts" {
+    import { ITokenObject } from '@scom/scom-token-list';
+    export const fallBackUrl: string;
+    export const getChainNativeToken: (chainId: number) => ITokenObject;
+    export const getNetworkInfo: (chainId: number) => any;
+    export const viewOnExplorerByAddress: (chainId: number, address: string) => void;
+    export const tokenSymbol: (address: string) => string;
+    export const getLockedTokenObject: (info: any, tokenInfo: any, tokenMap?: any) => any;
+    export const getLockedTokenSymbol: (info: any, token: any) => any;
+    export const getLockedTokenIconPaths: (info: any, tokenObject: any, chainId: number, tokenMap?: any) => string[];
+    export const getTokenDecimals: (address: string, chainId: number) => number;
+    export const baseUrl = "https://openswap.xyz/#";
+    export const getTokenUrl: string;
+    export const maxWidth = "690px";
+    export const maxHeight = 321;
+    export * from "@scom/scom-staking/store/utils.ts";
+}
+/// <amd-module name="@scom/scom-staking/data.json.ts" />
+declare module "@scom/scom-staking/data.json.ts" {
     const _default_1: {
+        infuraId: string;
+        networks: {
+            chainId: number;
+            explorerName: string;
+            explorerTxUrl: string;
+            explorerAddressUrl: string;
+        }[];
+        proxyAddresses: {
+            "97": string;
+            "43113": string;
+        };
+        embedderCommissionFee: string;
+        defaultBuilderData: {
+            defaultChainId: number;
+            chainId: number;
+            customName: string;
+            customDesc: string;
+            showContractLink: boolean;
+            stakings: {
+                address: string;
+                lockTokenType: number;
+                rewards: {
+                    address: string;
+                    isCommonStartDate: boolean;
+                };
+            };
+            networks: {
+                chainId: number;
+            }[];
+            wallets: {
+                name: string;
+            }[];
+        };
+    };
+    export default _default_1;
+}
+/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.json.ts" />
+declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.json.ts" {
+    const _default_2: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -63,7 +275,542 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/O
         })[];
         bytecode: string;
     };
-    export default _default_1;
+    export default _default_2;
+}
+/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.ts" />
+declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.ts" {
+    import { IWallet, Contract as _Contract, TransactionReceipt, BigNumber, Event, TransactionOptions } from "@ijstech/eth-contract";
+    export interface IDeployParams {
+        timeIsMoney: string;
+        token: string;
+        multiplier: number | BigNumber;
+        initialReward: number | BigNumber;
+        vestingPeriod: number | BigNumber;
+        claimDeadline: number | BigNumber;
+        admin: string;
+    }
+    export interface IPutFundParams {
+        from: string;
+        amount: number | BigNumber;
+    }
+    export class Rewards extends _Contract {
+        static _abi: any;
+        constructor(wallet: IWallet, address?: string);
+        deploy(params: IDeployParams, options?: TransactionOptions): Promise<string>;
+        parseAdminDrainEvent(receipt: TransactionReceipt): Rewards.AdminDrainEvent[];
+        decodeAdminDrainEvent(event: Event): Rewards.AdminDrainEvent;
+        parseClaimEvent(receipt: TransactionReceipt): Rewards.ClaimEvent[];
+        decodeClaimEvent(event: Event): Rewards.ClaimEvent;
+        admin: {
+            (options?: TransactionOptions): Promise<string>;
+        };
+        claim: {
+            (options?: TransactionOptions): Promise<TransactionReceipt>;
+            call: (options?: TransactionOptions) => Promise<void>;
+        };
+        claimDeadline: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        claimFor: {
+            (account: string, options?: TransactionOptions): Promise<TransactionReceipt>;
+            call: (account: string, options?: TransactionOptions) => Promise<void>;
+        };
+        claimSoFar: {
+            (param1: string, options?: TransactionOptions): Promise<BigNumber>;
+        };
+        initialReward: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        multiplier: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        putFund: {
+            (params: IPutFundParams, options?: TransactionOptions): Promise<TransactionReceipt>;
+            call: (params: IPutFundParams, options?: TransactionOptions) => Promise<void>;
+        };
+        reward: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        rewardForAccount: {
+            (account: string, options?: TransactionOptions): Promise<BigNumber>;
+        };
+        takeUnclaimed: {
+            (options?: TransactionOptions): Promise<TransactionReceipt>;
+            call: (options?: TransactionOptions) => Promise<void>;
+        };
+        timeIsMoney: {
+            (options?: TransactionOptions): Promise<string>;
+        };
+        token: {
+            (options?: TransactionOptions): Promise<string>;
+        };
+        unclaimed: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        unclaimedForAccount: {
+            (account: string, options?: TransactionOptions): Promise<BigNumber>;
+        };
+        vestingPeriod: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        private assign;
+    }
+    export module Rewards {
+        interface AdminDrainEvent {
+            amount: BigNumber;
+            _event: Event;
+        }
+        interface ClaimEvent {
+            account: string;
+            amount: BigNumber;
+            totalSoFar: BigNumber;
+            _event: Event;
+        }
+    }
+}
+/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.json.ts" />
+declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.json.ts" {
+    const _default_3: {
+        abi: ({
+            inputs: {
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            stateMutability: string;
+            type: string;
+            anonymous?: undefined;
+            name?: undefined;
+            outputs?: undefined;
+        } | {
+            anonymous: boolean;
+            inputs: {
+                indexed: boolean;
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            name: string;
+            type: string;
+            stateMutability?: undefined;
+            outputs?: undefined;
+        } | {
+            inputs: {
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            name: string;
+            outputs: {
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            stateMutability: string;
+            type: string;
+            anonymous?: undefined;
+        })[];
+        bytecode: string;
+    };
+    export default _default_3;
+}
+/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.ts" />
+declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.ts" {
+    import { IWallet, Contract as _Contract, TransactionReceipt, BigNumber, Event, TransactionOptions } from "@ijstech/eth-contract";
+    export interface IDeployParams {
+        timeIsMoney: string;
+        token: string;
+        multiplier: number | BigNumber;
+        initialReward: number | BigNumber;
+        vestingStartDate: number | BigNumber;
+        vestingPeriod: number | BigNumber;
+        claimDeadline: number | BigNumber;
+        admin: string;
+    }
+    export interface IPutFundParams {
+        from: string;
+        amount: number | BigNumber;
+    }
+    export class RewardsCommonStartDate extends _Contract {
+        static _abi: any;
+        constructor(wallet: IWallet, address?: string);
+        deploy(params: IDeployParams, options?: TransactionOptions): Promise<string>;
+        parseAdminDrainEvent(receipt: TransactionReceipt): RewardsCommonStartDate.AdminDrainEvent[];
+        decodeAdminDrainEvent(event: Event): RewardsCommonStartDate.AdminDrainEvent;
+        parseClaimEvent(receipt: TransactionReceipt): RewardsCommonStartDate.ClaimEvent[];
+        decodeClaimEvent(event: Event): RewardsCommonStartDate.ClaimEvent;
+        admin: {
+            (options?: TransactionOptions): Promise<string>;
+        };
+        claim: {
+            (options?: TransactionOptions): Promise<TransactionReceipt>;
+            call: (options?: TransactionOptions) => Promise<void>;
+        };
+        claimDeadline: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        claimFor: {
+            (account: string, options?: TransactionOptions): Promise<TransactionReceipt>;
+            call: (account: string, options?: TransactionOptions) => Promise<void>;
+        };
+        claimSoFar: {
+            (param1: string, options?: TransactionOptions): Promise<BigNumber>;
+        };
+        initialReward: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        multiplier: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        putFund: {
+            (params: IPutFundParams, options?: TransactionOptions): Promise<TransactionReceipt>;
+            call: (params: IPutFundParams, options?: TransactionOptions) => Promise<void>;
+        };
+        reward: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        rewardForAccount: {
+            (account: string, options?: TransactionOptions): Promise<BigNumber>;
+        };
+        takeUnclaimed: {
+            (options?: TransactionOptions): Promise<TransactionReceipt>;
+            call: (options?: TransactionOptions) => Promise<void>;
+        };
+        timeIsMoney: {
+            (options?: TransactionOptions): Promise<string>;
+        };
+        token: {
+            (options?: TransactionOptions): Promise<string>;
+        };
+        unclaimed: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        unclaimedForAccount: {
+            (account: string, options?: TransactionOptions): Promise<BigNumber>;
+        };
+        vestingPeriod: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        vestingStartDate: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        private assign;
+    }
+    export module RewardsCommonStartDate {
+        interface AdminDrainEvent {
+            amount: BigNumber;
+            _event: Event;
+        }
+        interface ClaimEvent {
+            account: string;
+            amount: BigNumber;
+            totalSoFar: BigNumber;
+            _event: Event;
+        }
+    }
+}
+/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.json.ts" />
+declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.json.ts" {
+    const _default_4: {
+        abi: ({
+            inputs: {
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            stateMutability: string;
+            type: string;
+            anonymous?: undefined;
+            name?: undefined;
+            outputs?: undefined;
+        } | {
+            anonymous: boolean;
+            inputs: {
+                indexed: boolean;
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            name: string;
+            type: string;
+            stateMutability?: undefined;
+            outputs?: undefined;
+        } | {
+            inputs: {
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            name: string;
+            outputs: {
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            stateMutability: string;
+            type: string;
+            anonymous?: undefined;
+        })[];
+        bytecode: string;
+    };
+    export default _default_4;
+}
+/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.ts" />
+declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.ts" {
+    import { IWallet, Contract as _Contract, TransactionReceipt, BigNumber, Event, TransactionOptions } from "@ijstech/eth-contract";
+    export interface IDeployParams {
+        token: string;
+        maximumTotalLock: number | BigNumber;
+        minimumLockTime: number | BigNumber;
+        startOfEntryPeriod: number | BigNumber;
+        endOfEntryPeriod: number | BigNumber;
+        perAddressCap: number | BigNumber;
+    }
+    export class TimeIsMoney extends _Contract {
+        static _abi: any;
+        constructor(wallet: IWallet, address?: string);
+        deploy(params: IDeployParams, options?: TransactionOptions): Promise<string>;
+        parseDepositEvent(receipt: TransactionReceipt): TimeIsMoney.DepositEvent[];
+        decodeDepositEvent(event: Event): TimeIsMoney.DepositEvent;
+        parseWithdrawalEvent(receipt: TransactionReceipt): TimeIsMoney.WithdrawalEvent[];
+        decodeWithdrawalEvent(event: Event): TimeIsMoney.WithdrawalEvent;
+        endOfEntryPeriod: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        getCredit: {
+            (account: string, options?: TransactionOptions): Promise<BigNumber>;
+        };
+        lock: {
+            (amount: number | BigNumber, options?: TransactionOptions): Promise<TransactionReceipt>;
+            call: (amount: number | BigNumber, options?: TransactionOptions) => Promise<void>;
+        };
+        lockAmount: {
+            (param1: string, options?: TransactionOptions): Promise<BigNumber>;
+        };
+        maximumTotalLock: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        minimumLockTime: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        perAddressCap: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        readyToWithdraw: {
+            (account: string, options?: TransactionOptions): Promise<boolean>;
+        };
+        releaseTime: {
+            (param1: string, options?: TransactionOptions): Promise<BigNumber>;
+        };
+        startOfEntryPeriod: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        token: {
+            (options?: TransactionOptions): Promise<string>;
+        };
+        totalLocked: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        withdraw: {
+            (allowWithdrawalBeforeRelease: boolean, options?: TransactionOptions): Promise<TransactionReceipt>;
+            call: (allowWithdrawalBeforeRelease: boolean, options?: TransactionOptions) => Promise<void>;
+        };
+        withdrawn: {
+            (param1: string, options?: TransactionOptions): Promise<boolean>;
+        };
+        private assign;
+    }
+    export module TimeIsMoney {
+        interface DepositEvent {
+            account: string;
+            amount: BigNumber;
+            _event: Event;
+        }
+        interface WithdrawalEvent {
+            account: string;
+            amount: BigNumber;
+            heldLongEnough: boolean;
+            _event: Event;
+        }
+    }
+}
+/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.json.ts" />
+declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.json.ts" {
+    const _default_5: {
+        abi: ({
+            inputs: {
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            stateMutability: string;
+            type: string;
+            anonymous?: undefined;
+            name?: undefined;
+            outputs?: undefined;
+        } | {
+            anonymous: boolean;
+            inputs: {
+                indexed: boolean;
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            name: string;
+            type: string;
+            stateMutability?: undefined;
+            outputs?: undefined;
+        } | {
+            inputs: {
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            name: string;
+            outputs: {
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            stateMutability: string;
+            type: string;
+            anonymous?: undefined;
+        })[];
+        bytecode: string;
+    };
+    export default _default_5;
+}
+/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.ts" />
+declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.ts" {
+    import { IWallet, Contract as _Contract, TransactionReceipt, BigNumber, Event, TransactionOptions } from "@ijstech/eth-contract";
+    export interface IDeployParams {
+        maximumTotalLock: number | BigNumber;
+        minimumLockTime: number | BigNumber;
+        startOfEntryPeriod: number | BigNumber;
+        endOfEntryPeriod: number | BigNumber;
+        perAddressCap: number | BigNumber;
+    }
+    export class TimeIsMoneyEther extends _Contract {
+        static _abi: any;
+        constructor(wallet: IWallet, address?: string);
+        deploy(params: IDeployParams, options?: TransactionOptions): Promise<string>;
+        parseDepositEvent(receipt: TransactionReceipt): TimeIsMoneyEther.DepositEvent[];
+        decodeDepositEvent(event: Event): TimeIsMoneyEther.DepositEvent;
+        parseWithdrawalEvent(receipt: TransactionReceipt): TimeIsMoneyEther.WithdrawalEvent[];
+        decodeWithdrawalEvent(event: Event): TimeIsMoneyEther.WithdrawalEvent;
+        endOfEntryPeriod: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        getCredit: {
+            (account: string, options?: TransactionOptions): Promise<BigNumber>;
+        };
+        lock: {
+            (options?: number | BigNumber | TransactionOptions): Promise<TransactionReceipt>;
+            call: (options?: number | BigNumber | TransactionOptions) => Promise<void>;
+        };
+        lockAmount: {
+            (param1: string, options?: TransactionOptions): Promise<BigNumber>;
+        };
+        maximumTotalLock: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        minimumLockTime: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        perAddressCap: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        readyToWithdraw: {
+            (account: string, options?: TransactionOptions): Promise<boolean>;
+        };
+        releaseTime: {
+            (param1: string, options?: TransactionOptions): Promise<BigNumber>;
+        };
+        startOfEntryPeriod: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        totalLocked: {
+            (options?: TransactionOptions): Promise<BigNumber>;
+        };
+        withdraw: {
+            (allowWithdrawalBeforeRelease: boolean, options?: TransactionOptions): Promise<TransactionReceipt>;
+            call: (allowWithdrawalBeforeRelease: boolean, options?: TransactionOptions) => Promise<void>;
+        };
+        withdrawn: {
+            (param1: string, options?: TransactionOptions): Promise<boolean>;
+        };
+        private assign;
+    }
+    export module TimeIsMoneyEther {
+        interface DepositEvent {
+            account: string;
+            amount: BigNumber;
+            _event: Event;
+        }
+        interface WithdrawalEvent {
+            account: string;
+            amount: BigNumber;
+            heldLongEnough: boolean;
+            _event: Event;
+        }
+    }
+}
+/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/index.ts" />
+declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/index.ts" {
+    export { Rewards } from "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.ts";
+    export { RewardsCommonStartDate } from "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.ts";
+    export { TimeIsMoney } from "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.ts";
+    export { TimeIsMoneyEther } from "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.ts";
+}
+/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/index.ts" />
+declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/index.ts" {
+    export * as Contracts from "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/index.ts";
+}
+/// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/OpenSwap.json.ts" />
+declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/OpenSwap.json.ts" {
+    const _default_6: {
+        abi: ({
+            inputs: {
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            stateMutability: string;
+            type: string;
+            anonymous?: undefined;
+            name?: undefined;
+            outputs?: undefined;
+        } | {
+            anonymous: boolean;
+            inputs: {
+                indexed: boolean;
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            name: string;
+            type: string;
+            stateMutability?: undefined;
+            outputs?: undefined;
+        } | {
+            inputs: {
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            name: string;
+            outputs: {
+                internalType: string;
+                name: string;
+                type: string;
+            }[];
+            stateMutability: string;
+            type: string;
+            anonymous?: undefined;
+        })[];
+        bytecode: string;
+    };
+    export default _default_6;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/OpenSwap.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/OpenSwap.ts" {
@@ -184,7 +931,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/O
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_ERC20.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_ERC20.json.ts" {
-    const _default_2: {
+    const _default_7: {
         abi: ({
             anonymous: boolean;
             inputs: {
@@ -215,7 +962,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/a
         })[];
         bytecode: string;
     };
-    export default _default_2;
+    export default _default_7;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_ERC20.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_ERC20.ts" {
@@ -326,7 +1073,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/a
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Factory.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Factory.json.ts" {
-    const _default_3: {
+    const _default_8: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -368,7 +1115,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/a
         })[];
         bytecode: string;
     };
-    export default _default_3;
+    export default _default_8;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Factory.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Factory.ts" {
@@ -512,7 +1259,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/a
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Pair.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Pair.json.ts" {
-    const _default_4: {
+    const _default_9: {
         abi: ({
             inputs: any[];
             stateMutability: string;
@@ -550,7 +1297,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/a
         })[];
         bytecode: string;
     };
-    export default _default_4;
+    export default _default_9;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Pair.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Pair.ts" {
@@ -817,7 +1564,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/a
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_PairCreator.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_PairCreator.json.ts" {
-    const _default_5: {
+    const _default_10: {
         abi: {
             inputs: {
                 internalType: string;
@@ -835,7 +1582,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/a
         }[];
         bytecode: string;
     };
-    export default _default_5;
+    export default _default_10;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_PairCreator.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_PairCreator.ts" {
@@ -854,7 +1601,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/a
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Router.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Router.json.ts" {
-    const _default_6: {
+    const _default_11: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -888,7 +1635,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/a
         })[];
         bytecode: string;
     };
-    export default _default_6;
+    export default _default_11;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Router.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Router.ts" {
@@ -1205,7 +1952,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/a
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_VotingExecutor1.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_VotingExecutor1.json.ts" {
-    const _default_7: {
+    const _default_12: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -1239,7 +1986,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/a
         })[];
         bytecode: string;
     };
-    export default _default_7;
+    export default _default_12;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_VotingExecutor1.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/amm/OSWAP_VotingExecutor1.ts" {
@@ -1264,7 +2011,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/a
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_FactoryBase.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_FactoryBase.json.ts" {
-    const _default_8: {
+    const _default_13: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -1306,7 +2053,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/c
         })[];
         bytecode: string;
     };
-    export default _default_8;
+    export default _default_13;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_FactoryBase.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_FactoryBase.ts" {
@@ -1402,7 +2149,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausableFactory.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausableFactory.json.ts" {
-    const _default_9: {
+    const _default_14: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -1451,7 +2198,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/c
         })[];
         bytecode: string;
     };
-    export default _default_9;
+    export default _default_14;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausableFactory.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausableFactory.ts" {
@@ -1509,7 +2256,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausablePair.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausablePair.json.ts" {
-    const _default_10: {
+    const _default_15: {
         abi: ({
             inputs: any[];
             stateMutability: string;
@@ -1539,7 +2286,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/c
         })[];
         bytecode: string;
     };
-    export default _default_10;
+    export default _default_15;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausablePair.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausablePair.ts" {
@@ -1564,7 +2311,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/c
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Administrator.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Administrator.json.ts" {
-    const _default_11: {
+    const _default_16: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -1606,7 +2353,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/g
         })[];
         bytecode: string;
     };
-    export default _default_11;
+    export default _default_16;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Administrator.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Administrator.ts" {
@@ -1838,7 +2585,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/g
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Governance.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Governance.json.ts" {
-    const _default_12: {
+    const _default_17: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -1880,7 +2627,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/g
         })[];
         bytecode: string;
     };
-    export default _default_12;
+    export default _default_17;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Governance.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Governance.ts" {
@@ -2221,7 +2968,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/g
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingContract.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingContract.json.ts" {
-    const _default_13: {
+    const _default_18: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -2249,7 +2996,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/g
         })[];
         bytecode: string;
     };
-    export default _default_13;
+    export default _default_18;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingContract.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingContract.ts" {
@@ -2376,7 +3123,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/g
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingExecutor.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingExecutor.json.ts" {
-    const _default_14: {
+    const _default_19: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -2410,7 +3157,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/g
         })[];
         bytecode: string;
     };
-    export default _default_14;
+    export default _default_19;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingExecutor.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingExecutor.ts" {
@@ -2439,7 +3186,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/g
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingRegistry.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingRegistry.json.ts" {
-    const _default_15: {
+    const _default_20: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -2473,7 +3220,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/g
         })[];
         bytecode: string;
     };
-    export default _default_15;
+    export default _default_20;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingRegistry.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingRegistry.ts" {
@@ -2505,7 +3252,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/g
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/libraries/ERC20.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/libraries/ERC20.json.ts" {
-    const _default_16: {
+    const _default_21: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -2547,7 +3294,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/l
         })[];
         bytecode: string;
     };
-    export default _default_16;
+    export default _default_21;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/libraries/ERC20.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/libraries/ERC20.ts" {
@@ -2651,7 +3398,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/l
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_CertiKSecurityOracle.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_CertiKSecurityOracle.json.ts" {
-    const _default_17: {
+    const _default_22: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -2679,7 +3426,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/o
         })[];
         bytecode: string;
     };
-    export default _default_17;
+    export default _default_22;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_CertiKSecurityOracle.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_CertiKSecurityOracle.ts" {
@@ -2699,7 +3446,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/o
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleFactory.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleFactory.json.ts" {
-    const _default_18: {
+    const _default_23: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -2741,7 +3488,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/o
         })[];
         bytecode: string;
     };
-    export default _default_18;
+    export default _default_23;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleFactory.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleFactory.ts" {
@@ -3052,7 +3799,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/o
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleLiquidityProvider.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleLiquidityProvider.json.ts" {
-    const _default_19: {
+    const _default_24: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -3086,7 +3833,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/o
         })[];
         bytecode: string;
     };
-    export default _default_19;
+    export default _default_24;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleLiquidityProvider.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleLiquidityProvider.ts" {
@@ -3206,7 +3953,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/o
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePair.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePair.json.ts" {
-    const _default_20: {
+    const _default_25: {
         abi: ({
             inputs: any[];
             stateMutability: string;
@@ -3244,7 +3991,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/o
         })[];
         bytecode: string;
     };
-    export default _default_20;
+    export default _default_25;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePair.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePair.ts" {
@@ -3649,7 +4396,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/o
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePairCreator.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePairCreator.json.ts" {
-    const _default_21: {
+    const _default_26: {
         abi: {
             inputs: {
                 internalType: string;
@@ -3667,7 +4414,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/o
         }[];
         bytecode: string;
     };
-    export default _default_21;
+    export default _default_26;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePairCreator.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePairCreator.ts" {
@@ -3686,7 +4433,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/o
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_VotingExecutor2.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_VotingExecutor2.json.ts" {
-    const _default_22: {
+    const _default_27: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -3720,7 +4467,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/o
         })[];
         bytecode: string;
     };
-    export default _default_22;
+    export default _default_27;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_VotingExecutor2.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_VotingExecutor2.ts" {
@@ -3745,7 +4492,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/o
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeFactory.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeFactory.json.ts" {
-    const _default_23: {
+    const _default_28: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -3787,7 +4534,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_23;
+    export default _default_28;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeFactory.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeFactory.ts" {
@@ -3984,7 +4731,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeLiquidityProvider.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeLiquidityProvider.json.ts" {
-    const _default_24: {
+    const _default_29: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -4018,7 +4765,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_24;
+    export default _default_29;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeLiquidityProvider.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeLiquidityProvider.ts" {
@@ -4158,7 +4905,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePair.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePair.json.ts" {
-    const _default_25: {
+    const _default_30: {
         abi: ({
             inputs: any[];
             stateMutability: string;
@@ -4196,7 +4943,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_25;
+    export default _default_30;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePair.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePair.ts" {
@@ -4547,7 +5294,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePairCreator.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePairCreator.json.ts" {
-    const _default_26: {
+    const _default_31: {
         abi: {
             inputs: {
                 internalType: string;
@@ -4565,7 +5312,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         }[];
         bytecode: string;
     };
-    export default _default_26;
+    export default _default_31;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePairCreator.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePairCreator.ts" {
@@ -4584,7 +5331,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_VotingExecutor3.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_VotingExecutor3.json.ts" {
-    const _default_27: {
+    const _default_32: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -4618,7 +5365,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_27;
+    export default _default_32;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_VotingExecutor3.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/range/OSWAP_VotingExecutor3.ts" {
@@ -4651,7 +5398,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_ConfigStore.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_ConfigStore.json.ts" {
-    const _default_28: {
+    const _default_33: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -4693,7 +5440,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_28;
+    export default _default_33;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_ConfigStore.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_ConfigStore.ts" {
@@ -4749,7 +5496,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcLiquidityProvider.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcLiquidityProvider.json.ts" {
-    const _default_29: {
+    const _default_34: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -4783,7 +5530,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_29;
+    export default _default_34;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcLiquidityProvider.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcLiquidityProvider.ts" {
@@ -4940,7 +5687,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairOracle.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairOracle.json.ts" {
-    const _default_30: {
+    const _default_35: {
         abi: ({
             inputs: any[];
             stateMutability: string;
@@ -4964,7 +5711,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_30;
+    export default _default_35;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairOracle.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairOracle.ts" {
@@ -5013,7 +5760,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedFactory.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedFactory.json.ts" {
-    const _default_31: {
+    const _default_36: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -5055,7 +5802,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_31;
+    export default _default_36;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedFactory.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedFactory.ts" {
@@ -5308,7 +6055,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider1.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider1.json.ts" {
-    const _default_32: {
+    const _default_37: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -5342,7 +6089,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_32;
+    export default _default_37;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider1.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider1.ts" {
@@ -5499,7 +6246,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider3.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider3.json.ts" {
-    const _default_33: {
+    const _default_38: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -5533,7 +6280,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_33;
+    export default _default_38;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider3.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider3.ts" {
@@ -5668,7 +6415,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider4.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider4.json.ts" {
-    const _default_34: {
+    const _default_39: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -5702,7 +6449,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_34;
+    export default _default_39;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider4.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider4.ts" {
@@ -5827,7 +6574,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair.json.ts" {
-    const _default_35: {
+    const _default_40: {
         abi: ({
             inputs: any[];
             stateMutability: string;
@@ -5865,7 +6612,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_35;
+    export default _default_40;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair.ts" {
@@ -6205,7 +6952,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairOracle.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairOracle.json.ts" {
-    const _default_36: {
+    const _default_41: {
         abi: ({
             inputs: any[];
             stateMutability: string;
@@ -6229,7 +6976,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_36;
+    export default _default_41;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairOracle.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairOracle.ts" {
@@ -6278,7 +7025,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_VotingExecutor4.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_VotingExecutor4.json.ts" {
-    const _default_37: {
+    const _default_42: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -6312,7 +7059,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_37;
+    export default _default_42;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_VotingExecutor4.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_VotingExecutor4.ts" {
@@ -6345,7 +7092,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter.json.ts" {
-    const _default_38: {
+    const _default_43: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -6379,7 +7126,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_38;
+    export default _default_43;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter.ts" {
@@ -6559,7 +7306,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouterRegistry.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouterRegistry.json.ts" {
-    const _default_39: {
+    const _default_44: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -6601,7 +7348,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_39;
+    export default _default_44;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouterRegistry.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouterRegistry.ts" {
@@ -6840,7 +7587,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_OracleRouter.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_OracleRouter.json.ts" {
-    const _default_40: {
+    const _default_45: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -6874,7 +7621,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_40;
+    export default _default_45;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_OracleRouter.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_OracleRouter.ts" {
@@ -7069,7 +7816,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPair.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPair.json.ts" {
-    const _default_41: {
+    const _default_46: {
         abi: ({
             inputs: any[];
             stateMutability: string;
@@ -7107,7 +7854,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_41;
+    export default _default_46;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPair.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPair.ts" {
@@ -7536,7 +8283,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairCreator.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairCreator.json.ts" {
-    const _default_42: {
+    const _default_47: {
         abi: {
             inputs: {
                 internalType: string;
@@ -7554,7 +8301,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         }[];
         bytecode: string;
     };
-    export default _default_42;
+    export default _default_47;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairCreator.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairCreator.ts" {
@@ -7573,7 +8320,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair1.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair1.json.ts" {
-    const _default_43: {
+    const _default_48: {
         abi: ({
             anonymous: boolean;
             inputs: {
@@ -7604,7 +8351,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_43;
+    export default _default_48;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair1.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair1.ts" {
@@ -8029,7 +8776,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair3.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair3.json.ts" {
-    const _default_44: {
+    const _default_49: {
         abi: ({
             anonymous: boolean;
             inputs: {
@@ -8060,7 +8807,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_44;
+    export default _default_49;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair3.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair3.ts" {
@@ -8498,7 +9245,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair4.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair4.json.ts" {
-    const _default_45: {
+    const _default_50: {
         abi: ({
             anonymous: boolean;
             inputs: {
@@ -8529,7 +9276,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_45;
+    export default _default_50;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair4.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair4.ts" {
@@ -9002,7 +9749,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator1.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator1.json.ts" {
-    const _default_46: {
+    const _default_51: {
         abi: {
             inputs: {
                 internalType: string;
@@ -9020,7 +9767,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         }[];
         bytecode: string;
     };
-    export default _default_46;
+    export default _default_51;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator1.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator1.ts" {
@@ -9039,7 +9786,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator4.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator4.json.ts" {
-    const _default_47: {
+    const _default_52: {
         abi: {
             inputs: {
                 internalType: string;
@@ -9057,7 +9804,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         }[];
         bytecode: string;
     };
-    export default _default_47;
+    export default _default_52;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator4.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator4.ts" {
@@ -9076,7 +9823,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter2.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter2.json.ts" {
-    const _default_48: {
+    const _default_53: {
         abi: ({
             inputs: {
                 internalType: string;
@@ -9110,7 +9857,7 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/r
         })[];
         bytecode: string;
     };
-    export default _default_48;
+    export default _default_53;
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter2.ts" />
 declare module "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter2.ts" {
@@ -9588,797 +10335,6 @@ declare module "@scom/scom-staking/contracts/oswap-openswap-contract/index.ts" {
     export * as Contracts from "@scom/scom-staking/contracts/oswap-openswap-contract/contracts/index.ts";
     export { deploy, deployCoreContracts, deployOracleContracts, deployRangeContracts, deployRestrictedContracts, deployHybridRouter, initHybridRouterRegistry, deployRestrictedPairOracle, IDeploymentResult, IDeploymentContracts, toDeploymentContracts } from "@scom/scom-staking/contracts/oswap-openswap-contract/deploy.ts";
     export { OpenSwap } from "@scom/scom-staking/contracts/oswap-openswap-contract/OpenSwap.ts";
-}
-/// <amd-module name="@scom/scom-staking/global/utils/common.ts" />
-declare module "@scom/scom-staking/global/utils/common.ts" {
-    import { BigNumber, ISendTxEventsOptions } from "@ijstech/eth-wallet";
-    import { ITokenObject } from "@scom/scom-token-list";
-    export type TokenMapType = {
-        [token: string]: ITokenObject;
-    };
-    export const registerSendTxEvents: (sendTxEventHandlers: ISendTxEventsOptions) => void;
-    export const approveERC20Max: (token: ITokenObject, spenderAddress: string, callback?: any, confirmationCallback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
-    export const getERC20Allowance: (token: ITokenObject, spenderAddress: string) => Promise<BigNumber>;
-}
-/// <amd-module name="@scom/scom-staking/global/utils/approvalModel.ts" />
-declare module "@scom/scom-staking/global/utils/approvalModel.ts" {
-    import { ITokenObject } from '@scom/scom-token-list';
-    export enum ApprovalStatus {
-        TO_BE_APPROVED = 0,
-        APPROVING = 1,
-        NONE = 2
-    }
-    export interface IERC20ApprovalEventOptions {
-        sender: any;
-        payAction: () => Promise<void>;
-        onToBeApproved: (token: ITokenObject) => Promise<void>;
-        onToBePaid: (token: ITokenObject) => Promise<void>;
-        onApproving: (token: ITokenObject, receipt?: string, data?: any) => Promise<void>;
-        onApproved: (token: ITokenObject, data?: any) => Promise<void>;
-        onPaying: (receipt?: string, data?: any) => Promise<void>;
-        onPaid: (data?: any) => Promise<void>;
-        onApprovingError: (token: ITokenObject, err: Error) => Promise<void>;
-        onPayingError: (err: Error) => Promise<void>;
-    }
-    export interface IERC20ApprovalOptions extends IERC20ApprovalEventOptions {
-        spenderAddress: string;
-    }
-    export interface IERC20ApprovalAction {
-        doApproveAction: (token: ITokenObject, inputAmount: string, data?: any) => Promise<void>;
-        doPayAction: (data?: any) => Promise<void>;
-        checkAllowance: (token: ITokenObject, inputAmount: string) => Promise<void>;
-    }
-    export class ERC20ApprovalModel {
-        private options;
-        constructor(options: IERC20ApprovalOptions);
-        set spenderAddress(value: string);
-        private checkAllowance;
-        private doApproveAction;
-        private doPayAction;
-        getAction: () => IERC20ApprovalAction;
-    }
-}
-/// <amd-module name="@scom/scom-staking/global/utils/interfaces.ts" />
-declare module "@scom/scom-staking/global/utils/interfaces.ts" {
-    import { BigNumber, IClientSideProvider } from "@ijstech/eth-wallet";
-    export interface ICommissionInfo {
-        chainId: number;
-        walletAddress: string;
-        share: string;
-    }
-    export enum LockTokenType {
-        ERC20_Token = 0,
-        LP_Token = 1,
-        VAULT_Token = 2
-    }
-    export interface ISingleStakingCampaign {
-        chainId: number;
-        customName: string;
-        customDesc?: string;
-        customLogo?: string;
-        getTokenURL?: string;
-        showContractLink?: boolean;
-        stakings: ISingleStaking;
-        commissions?: ICommissionInfo[];
-        wallets: IWalletPlugin[];
-        networks: INetworkConfig[];
-        showHeader?: boolean;
-        defaultChainId?: number;
-    }
-    export interface ISingleStaking {
-        address: string;
-        customDesc?: string;
-        lockTokenType: LockTokenType;
-        rewards: ISingleReward;
-    }
-    export interface ISingleReward {
-        address: string;
-        isCommonStartDate?: boolean;
-    }
-    export interface IStakingCampaign {
-        chainId: number;
-        customName: string;
-        customDesc?: string;
-        customLogo?: string;
-        getTokenURL?: string;
-        campaignStart: BigNumber;
-        campaignEnd: BigNumber;
-        showContractLink?: boolean;
-        admin: string;
-        stakings: Staking[];
-    }
-    export interface IWalletPlugin {
-        name: string;
-        packageName?: string;
-        provider?: IClientSideProvider;
-    }
-    export interface INetworkConfig {
-        chainId: number;
-        chainName?: string;
-    }
-    export interface RewardNeeded {
-        value: BigNumber;
-        tokenAddress: string;
-    }
-    export interface Staking {
-        address?: string;
-        lockTokenAddress: string;
-        minLockTime: BigNumber;
-        perAddressCap: BigNumber;
-        maxTotalLock: BigNumber;
-        customDesc?: string;
-        lockTokenType: LockTokenType;
-        decimalsOffset?: number;
-        rewards: Reward[];
-    }
-    export interface Reward {
-        address?: string;
-        rewardTokenAddress: string;
-        multiplier: BigNumber;
-        rewardAmount?: BigNumber;
-        initialReward: BigNumber;
-        vestingPeriod: BigNumber;
-        claimDeadline: BigNumber;
-        admin: string;
-        isCommonStartDate?: boolean;
-        vestingStartDate?: BigNumber;
-    }
-}
-/// <amd-module name="@scom/scom-staking/global/utils/index.ts" />
-declare module "@scom/scom-staking/global/utils/index.ts" {
-    export * from "@scom/scom-staking/global/utils/helper.ts";
-    export { registerSendTxEvents, approveERC20Max, getERC20Allowance, TokenMapType } from "@scom/scom-staking/global/utils/common.ts";
-    export { ApprovalStatus, IERC20ApprovalEventOptions, IERC20ApprovalOptions, IERC20ApprovalAction, ERC20ApprovalModel } from "@scom/scom-staking/global/utils/approvalModel.ts";
-    export * from "@scom/scom-staking/global/utils/interfaces.ts";
-}
-/// <amd-module name="@scom/scom-staking/global/index.ts" />
-declare module "@scom/scom-staking/global/index.ts" {
-    export const enum EventId {
-        IsWalletConnected = "isWalletConnected",
-        IsWalletDisconnected = "IsWalletDisconnected",
-        Paid = "Paid",
-        chainChanged = "chainChanged",
-        EmitButtonStatus = "stakingEmitButtonStatus"
-    }
-    export * from "@scom/scom-staking/global/utils/index.ts";
-}
-/// <amd-module name="@scom/scom-staking/store/data/index.ts" />
-declare module "@scom/scom-staking/store/data/index.ts" {
-    const USDPeggedTokenAddressMap: {
-        [key: number]: string;
-    };
-    export { USDPeggedTokenAddressMap };
-}
-/// <amd-module name="@scom/scom-staking/store/utils.ts" />
-declare module "@scom/scom-staking/store/utils.ts" {
-    import { INetwork } from '@ijstech/eth-wallet';
-    import { ITokenObject } from '@scom/scom-token-list';
-    export * from "@scom/scom-staking/store/data/index.ts";
-    export const getInfuraId: () => string;
-    export const getChainNativeToken: (chainId: number) => ITokenObject;
-    export const setDataFromConfig: (options: any) => void;
-    export type ProxyAddresses = {
-        [key: number]: string;
-    };
-    export const state: {
-        networkMap: {
-            [key: number]: INetwork;
-        };
-        infuraId: string;
-        stakingStatusMap: {
-            [key: string]: {
-                value: boolean;
-                text: string;
-            };
-        };
-        proxyAddresses: ProxyAddresses;
-        embedderCommissionFee: string;
-        rpcWalletId: string;
-    };
-    export const setStakingStatus: (key: string, value: boolean, text: string) => void;
-    export const getStakingStatus: (key: string) => {
-        value: boolean;
-        text: string;
-    };
-    export const setProxyAddresses: (data: ProxyAddresses) => void;
-    export const getProxyAddress: (chainId?: number) => string;
-    export const getEmbedderCommissionFee: () => string;
-    export const getNetworkInfo: (chainId: number) => any;
-    export const viewOnExplorerByAddress: (chainId: number, address: string) => void;
-    export function isClientWalletConnected(): boolean;
-    export function isRpcWalletConnected(): boolean;
-    export function getChainId(): number;
-    export function initRpcWallet(defaultChainId: number): string;
-    export function getRpcWallet(): import("@ijstech/eth-wallet").IRpcWallet;
-    export function getClientWallet(): import("@ijstech/eth-wallet").IClientWallet;
-}
-/// <amd-module name="@scom/scom-staking/store/index.ts" />
-declare module "@scom/scom-staking/store/index.ts" {
-    export const fallBackUrl: string;
-    export const tokenSymbol: (address: string) => string;
-    export const getLockedTokenObject: (info: any, tokenInfo: any, tokenMap?: any) => any;
-    export const getLockedTokenSymbol: (info: any, token: any) => any;
-    export const getLockedTokenIconPaths: (info: any, tokenObject: any, chainId: number, tokenMap?: any) => string[];
-    export const getTokenDecimals: (address: string) => number;
-    export const baseUrl = "https://openswap.xyz/#";
-    export const getTokenUrl: string;
-    export const maxWidth = "690px";
-    export const maxHeight = 321;
-    export * from "@scom/scom-staking/store/utils.ts";
-}
-/// <amd-module name="@scom/scom-staking/data.json.ts" />
-declare module "@scom/scom-staking/data.json.ts" {
-    const _default_49: {
-        infuraId: string;
-        networks: {
-            chainId: number;
-            explorerName: string;
-            explorerTxUrl: string;
-            explorerAddressUrl: string;
-        }[];
-        proxyAddresses: {
-            "97": string;
-            "43113": string;
-        };
-        embedderCommissionFee: string;
-        defaultBuilderData: {
-            defaultChainId: number;
-            chainId: number;
-            customName: string;
-            customDesc: string;
-            showContractLink: boolean;
-            stakings: {
-                address: string;
-                lockTokenType: number;
-                rewards: {
-                    address: string;
-                    isCommonStartDate: boolean;
-                };
-            };
-            networks: {
-                chainId: number;
-            }[];
-            wallets: {
-                name: string;
-            }[];
-        };
-    };
-    export default _default_49;
-}
-/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.json.ts" />
-declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.json.ts" {
-    const _default_50: {
-        abi: ({
-            inputs: {
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            stateMutability: string;
-            type: string;
-            anonymous?: undefined;
-            name?: undefined;
-            outputs?: undefined;
-        } | {
-            anonymous: boolean;
-            inputs: {
-                indexed: boolean;
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            name: string;
-            type: string;
-            stateMutability?: undefined;
-            outputs?: undefined;
-        } | {
-            inputs: {
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            name: string;
-            outputs: {
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            stateMutability: string;
-            type: string;
-            anonymous?: undefined;
-        })[];
-        bytecode: string;
-    };
-    export default _default_50;
-}
-/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.ts" />
-declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.ts" {
-    import { IWallet, Contract as _Contract, TransactionReceipt, BigNumber, Event, TransactionOptions } from "@ijstech/eth-contract";
-    export interface IDeployParams {
-        timeIsMoney: string;
-        token: string;
-        multiplier: number | BigNumber;
-        initialReward: number | BigNumber;
-        vestingPeriod: number | BigNumber;
-        claimDeadline: number | BigNumber;
-        admin: string;
-    }
-    export interface IPutFundParams {
-        from: string;
-        amount: number | BigNumber;
-    }
-    export class Rewards extends _Contract {
-        static _abi: any;
-        constructor(wallet: IWallet, address?: string);
-        deploy(params: IDeployParams, options?: TransactionOptions): Promise<string>;
-        parseAdminDrainEvent(receipt: TransactionReceipt): Rewards.AdminDrainEvent[];
-        decodeAdminDrainEvent(event: Event): Rewards.AdminDrainEvent;
-        parseClaimEvent(receipt: TransactionReceipt): Rewards.ClaimEvent[];
-        decodeClaimEvent(event: Event): Rewards.ClaimEvent;
-        admin: {
-            (options?: TransactionOptions): Promise<string>;
-        };
-        claim: {
-            (options?: TransactionOptions): Promise<TransactionReceipt>;
-            call: (options?: TransactionOptions) => Promise<void>;
-        };
-        claimDeadline: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        claimFor: {
-            (account: string, options?: TransactionOptions): Promise<TransactionReceipt>;
-            call: (account: string, options?: TransactionOptions) => Promise<void>;
-        };
-        claimSoFar: {
-            (param1: string, options?: TransactionOptions): Promise<BigNumber>;
-        };
-        initialReward: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        multiplier: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        putFund: {
-            (params: IPutFundParams, options?: TransactionOptions): Promise<TransactionReceipt>;
-            call: (params: IPutFundParams, options?: TransactionOptions) => Promise<void>;
-        };
-        reward: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        rewardForAccount: {
-            (account: string, options?: TransactionOptions): Promise<BigNumber>;
-        };
-        takeUnclaimed: {
-            (options?: TransactionOptions): Promise<TransactionReceipt>;
-            call: (options?: TransactionOptions) => Promise<void>;
-        };
-        timeIsMoney: {
-            (options?: TransactionOptions): Promise<string>;
-        };
-        token: {
-            (options?: TransactionOptions): Promise<string>;
-        };
-        unclaimed: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        unclaimedForAccount: {
-            (account: string, options?: TransactionOptions): Promise<BigNumber>;
-        };
-        vestingPeriod: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        private assign;
-    }
-    export module Rewards {
-        interface AdminDrainEvent {
-            amount: BigNumber;
-            _event: Event;
-        }
-        interface ClaimEvent {
-            account: string;
-            amount: BigNumber;
-            totalSoFar: BigNumber;
-            _event: Event;
-        }
-    }
-}
-/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.json.ts" />
-declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.json.ts" {
-    const _default_51: {
-        abi: ({
-            inputs: {
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            stateMutability: string;
-            type: string;
-            anonymous?: undefined;
-            name?: undefined;
-            outputs?: undefined;
-        } | {
-            anonymous: boolean;
-            inputs: {
-                indexed: boolean;
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            name: string;
-            type: string;
-            stateMutability?: undefined;
-            outputs?: undefined;
-        } | {
-            inputs: {
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            name: string;
-            outputs: {
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            stateMutability: string;
-            type: string;
-            anonymous?: undefined;
-        })[];
-        bytecode: string;
-    };
-    export default _default_51;
-}
-/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.ts" />
-declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.ts" {
-    import { IWallet, Contract as _Contract, TransactionReceipt, BigNumber, Event, TransactionOptions } from "@ijstech/eth-contract";
-    export interface IDeployParams {
-        timeIsMoney: string;
-        token: string;
-        multiplier: number | BigNumber;
-        initialReward: number | BigNumber;
-        vestingStartDate: number | BigNumber;
-        vestingPeriod: number | BigNumber;
-        claimDeadline: number | BigNumber;
-        admin: string;
-    }
-    export interface IPutFundParams {
-        from: string;
-        amount: number | BigNumber;
-    }
-    export class RewardsCommonStartDate extends _Contract {
-        static _abi: any;
-        constructor(wallet: IWallet, address?: string);
-        deploy(params: IDeployParams, options?: TransactionOptions): Promise<string>;
-        parseAdminDrainEvent(receipt: TransactionReceipt): RewardsCommonStartDate.AdminDrainEvent[];
-        decodeAdminDrainEvent(event: Event): RewardsCommonStartDate.AdminDrainEvent;
-        parseClaimEvent(receipt: TransactionReceipt): RewardsCommonStartDate.ClaimEvent[];
-        decodeClaimEvent(event: Event): RewardsCommonStartDate.ClaimEvent;
-        admin: {
-            (options?: TransactionOptions): Promise<string>;
-        };
-        claim: {
-            (options?: TransactionOptions): Promise<TransactionReceipt>;
-            call: (options?: TransactionOptions) => Promise<void>;
-        };
-        claimDeadline: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        claimFor: {
-            (account: string, options?: TransactionOptions): Promise<TransactionReceipt>;
-            call: (account: string, options?: TransactionOptions) => Promise<void>;
-        };
-        claimSoFar: {
-            (param1: string, options?: TransactionOptions): Promise<BigNumber>;
-        };
-        initialReward: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        multiplier: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        putFund: {
-            (params: IPutFundParams, options?: TransactionOptions): Promise<TransactionReceipt>;
-            call: (params: IPutFundParams, options?: TransactionOptions) => Promise<void>;
-        };
-        reward: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        rewardForAccount: {
-            (account: string, options?: TransactionOptions): Promise<BigNumber>;
-        };
-        takeUnclaimed: {
-            (options?: TransactionOptions): Promise<TransactionReceipt>;
-            call: (options?: TransactionOptions) => Promise<void>;
-        };
-        timeIsMoney: {
-            (options?: TransactionOptions): Promise<string>;
-        };
-        token: {
-            (options?: TransactionOptions): Promise<string>;
-        };
-        unclaimed: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        unclaimedForAccount: {
-            (account: string, options?: TransactionOptions): Promise<BigNumber>;
-        };
-        vestingPeriod: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        vestingStartDate: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        private assign;
-    }
-    export module RewardsCommonStartDate {
-        interface AdminDrainEvent {
-            amount: BigNumber;
-            _event: Event;
-        }
-        interface ClaimEvent {
-            account: string;
-            amount: BigNumber;
-            totalSoFar: BigNumber;
-            _event: Event;
-        }
-    }
-}
-/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.json.ts" />
-declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.json.ts" {
-    const _default_52: {
-        abi: ({
-            inputs: {
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            stateMutability: string;
-            type: string;
-            anonymous?: undefined;
-            name?: undefined;
-            outputs?: undefined;
-        } | {
-            anonymous: boolean;
-            inputs: {
-                indexed: boolean;
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            name: string;
-            type: string;
-            stateMutability?: undefined;
-            outputs?: undefined;
-        } | {
-            inputs: {
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            name: string;
-            outputs: {
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            stateMutability: string;
-            type: string;
-            anonymous?: undefined;
-        })[];
-        bytecode: string;
-    };
-    export default _default_52;
-}
-/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.ts" />
-declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.ts" {
-    import { IWallet, Contract as _Contract, TransactionReceipt, BigNumber, Event, TransactionOptions } from "@ijstech/eth-contract";
-    export interface IDeployParams {
-        token: string;
-        maximumTotalLock: number | BigNumber;
-        minimumLockTime: number | BigNumber;
-        startOfEntryPeriod: number | BigNumber;
-        endOfEntryPeriod: number | BigNumber;
-        perAddressCap: number | BigNumber;
-    }
-    export class TimeIsMoney extends _Contract {
-        static _abi: any;
-        constructor(wallet: IWallet, address?: string);
-        deploy(params: IDeployParams, options?: TransactionOptions): Promise<string>;
-        parseDepositEvent(receipt: TransactionReceipt): TimeIsMoney.DepositEvent[];
-        decodeDepositEvent(event: Event): TimeIsMoney.DepositEvent;
-        parseWithdrawalEvent(receipt: TransactionReceipt): TimeIsMoney.WithdrawalEvent[];
-        decodeWithdrawalEvent(event: Event): TimeIsMoney.WithdrawalEvent;
-        endOfEntryPeriod: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        getCredit: {
-            (account: string, options?: TransactionOptions): Promise<BigNumber>;
-        };
-        lock: {
-            (amount: number | BigNumber, options?: TransactionOptions): Promise<TransactionReceipt>;
-            call: (amount: number | BigNumber, options?: TransactionOptions) => Promise<void>;
-        };
-        lockAmount: {
-            (param1: string, options?: TransactionOptions): Promise<BigNumber>;
-        };
-        maximumTotalLock: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        minimumLockTime: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        perAddressCap: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        readyToWithdraw: {
-            (account: string, options?: TransactionOptions): Promise<boolean>;
-        };
-        releaseTime: {
-            (param1: string, options?: TransactionOptions): Promise<BigNumber>;
-        };
-        startOfEntryPeriod: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        token: {
-            (options?: TransactionOptions): Promise<string>;
-        };
-        totalLocked: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        withdraw: {
-            (allowWithdrawalBeforeRelease: boolean, options?: TransactionOptions): Promise<TransactionReceipt>;
-            call: (allowWithdrawalBeforeRelease: boolean, options?: TransactionOptions) => Promise<void>;
-        };
-        withdrawn: {
-            (param1: string, options?: TransactionOptions): Promise<boolean>;
-        };
-        private assign;
-    }
-    export module TimeIsMoney {
-        interface DepositEvent {
-            account: string;
-            amount: BigNumber;
-            _event: Event;
-        }
-        interface WithdrawalEvent {
-            account: string;
-            amount: BigNumber;
-            heldLongEnough: boolean;
-            _event: Event;
-        }
-    }
-}
-/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.json.ts" />
-declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.json.ts" {
-    const _default_53: {
-        abi: ({
-            inputs: {
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            stateMutability: string;
-            type: string;
-            anonymous?: undefined;
-            name?: undefined;
-            outputs?: undefined;
-        } | {
-            anonymous: boolean;
-            inputs: {
-                indexed: boolean;
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            name: string;
-            type: string;
-            stateMutability?: undefined;
-            outputs?: undefined;
-        } | {
-            inputs: {
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            name: string;
-            outputs: {
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            stateMutability: string;
-            type: string;
-            anonymous?: undefined;
-        })[];
-        bytecode: string;
-    };
-    export default _default_53;
-}
-/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.ts" />
-declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.ts" {
-    import { IWallet, Contract as _Contract, TransactionReceipt, BigNumber, Event, TransactionOptions } from "@ijstech/eth-contract";
-    export interface IDeployParams {
-        maximumTotalLock: number | BigNumber;
-        minimumLockTime: number | BigNumber;
-        startOfEntryPeriod: number | BigNumber;
-        endOfEntryPeriod: number | BigNumber;
-        perAddressCap: number | BigNumber;
-    }
-    export class TimeIsMoneyEther extends _Contract {
-        static _abi: any;
-        constructor(wallet: IWallet, address?: string);
-        deploy(params: IDeployParams, options?: TransactionOptions): Promise<string>;
-        parseDepositEvent(receipt: TransactionReceipt): TimeIsMoneyEther.DepositEvent[];
-        decodeDepositEvent(event: Event): TimeIsMoneyEther.DepositEvent;
-        parseWithdrawalEvent(receipt: TransactionReceipt): TimeIsMoneyEther.WithdrawalEvent[];
-        decodeWithdrawalEvent(event: Event): TimeIsMoneyEther.WithdrawalEvent;
-        endOfEntryPeriod: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        getCredit: {
-            (account: string, options?: TransactionOptions): Promise<BigNumber>;
-        };
-        lock: {
-            (options?: number | BigNumber | TransactionOptions): Promise<TransactionReceipt>;
-            call: (options?: number | BigNumber | TransactionOptions) => Promise<void>;
-        };
-        lockAmount: {
-            (param1: string, options?: TransactionOptions): Promise<BigNumber>;
-        };
-        maximumTotalLock: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        minimumLockTime: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        perAddressCap: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        readyToWithdraw: {
-            (account: string, options?: TransactionOptions): Promise<boolean>;
-        };
-        releaseTime: {
-            (param1: string, options?: TransactionOptions): Promise<BigNumber>;
-        };
-        startOfEntryPeriod: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        totalLocked: {
-            (options?: TransactionOptions): Promise<BigNumber>;
-        };
-        withdraw: {
-            (allowWithdrawalBeforeRelease: boolean, options?: TransactionOptions): Promise<TransactionReceipt>;
-            call: (allowWithdrawalBeforeRelease: boolean, options?: TransactionOptions) => Promise<void>;
-        };
-        withdrawn: {
-            (param1: string, options?: TransactionOptions): Promise<boolean>;
-        };
-        private assign;
-    }
-    export module TimeIsMoneyEther {
-        interface DepositEvent {
-            account: string;
-            amount: BigNumber;
-            _event: Event;
-        }
-        interface WithdrawalEvent {
-            account: string;
-            amount: BigNumber;
-            heldLongEnough: boolean;
-            _event: Event;
-        }
-    }
-}
-/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/index.ts" />
-declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/index.ts" {
-    export { Rewards } from "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/Rewards.ts";
-    export { RewardsCommonStartDate } from "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/RewardsCommonStartDate.ts";
-    export { TimeIsMoney } from "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoney.ts";
-    export { TimeIsMoneyEther } from "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/TimeIsMoneyEther.ts";
-}
-/// <amd-module name="@scom/scom-staking/contracts/oswap-time-is-money-contract/index.ts" />
-declare module "@scom/scom-staking/contracts/oswap-time-is-money-contract/index.ts" {
-    export * as Contracts from "@scom/scom-staking/contracts/oswap-time-is-money-contract/contracts/index.ts";
 }
 /// <amd-module name="@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/AggregatorProxy.json.ts" />
 declare module "@scom/scom-staking/contracts/oswap-chainlink-contract/contracts/AggregatorProxy.json.ts" {
@@ -15589,15 +15545,15 @@ declare module "@scom/scom-staking/contracts/oswap-cross-chain-bridge-contract/i
 }
 /// <amd-module name="@scom/scom-staking/staking-utils/index.ts" />
 declare module "@scom/scom-staking/staking-utils/index.ts" {
-    import { BigNumber } from "@ijstech/eth-wallet";
-    import { IERC20ApprovalEventOptions, ISingleStakingCampaign } from "@scom/scom-staking/global/index.ts";
+    import { BigNumber, IWallet } from "@ijstech/eth-wallet";
+    import { ISingleStakingCampaign } from "@scom/scom-staking/global/index.ts";
     import { ITokenObject } from '@scom/scom-token-list';
-    export const getTokenPrice: (token: string) => Promise<string>;
-    const getAllCampaignsInfo: (stakingInfo: {
+    export const getTokenPrice: (wallet: IWallet, token: string) => Promise<string>;
+    const getAllCampaignsInfo: (wallet: IWallet, stakingInfo: {
         [key: number]: ISingleStakingCampaign;
     }) => Promise<any[]>;
-    const getStakingTotalLocked: (stakingAddress: string) => Promise<string>;
-    const getLPObject: (pairAddress: string) => Promise<{
+    const getStakingTotalLocked: (wallet: IWallet, stakingAddress: string) => Promise<string>;
+    const getLPObject: (wallet: IWallet, pairAddress: string) => Promise<{
         address: string;
         decimals: string;
         name: string;
@@ -15605,8 +15561,8 @@ declare module "@scom/scom-staking/staking-utils/index.ts" {
         token0: string;
         token1: string;
     }>;
-    const getLPBalance: (pairAddress: string) => Promise<string>;
-    const getVaultObject: (vaultAddress: string) => Promise<{
+    const getLPBalance: (wallet: IWallet, pairAddress: string) => Promise<string>;
+    const getVaultObject: (wallet: IWallet, vaultAddress: string) => Promise<{
         address: string;
         decimals: BigNumber;
         name: string;
@@ -15619,24 +15575,24 @@ declare module "@scom/scom-staking/staking-utils/index.ts" {
         symbol?: undefined;
         assetToken?: undefined;
     }>;
-    const getVaultBalance: (vaultAddress: string) => Promise<string>;
-    const getERC20RewardCurrentAPR: (rewardOption: any, lockedToken: any, lockedDays: number) => Promise<string>;
-    const getLPRewardCurrentAPR: (rewardOption: any, lpObject: any, lockedDays: number) => Promise<string>;
-    const getVaultRewardCurrentAPR: (rewardOption: any, vaultObject: any, lockedDays: number) => Promise<string>;
+    const getVaultBalance: (wallet: IWallet, vaultAddress: string) => Promise<string>;
+    const getERC20RewardCurrentAPR: (wallet: IWallet, rewardOption: any, lockedToken: any, lockedDays: number) => Promise<string>;
+    const getLPRewardCurrentAPR: (wallet: IWallet, rewardOption: any, lpObject: any, lockedDays: number) => Promise<string>;
+    const getVaultRewardCurrentAPR: (wallet: IWallet, rewardOption: any, vaultObject: any, lockedDays: number) => Promise<string>;
     const withdrawToken: (contractAddress: string, callback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     const claimToken: (contractAddress: string, callback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     const lockToken: (token: ITokenObject, amount: string, contractAddress: string, callback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
-    const getApprovalModelAction: (contractAddress: string, options: IERC20ApprovalEventOptions) => import("@scom/scom-staking/global/index.ts").IERC20ApprovalAction;
-    export { getAllCampaignsInfo, getStakingTotalLocked, getLPObject, getLPBalance, getVaultObject, getVaultBalance, getERC20RewardCurrentAPR, getLPRewardCurrentAPR, getVaultRewardCurrentAPR, withdrawToken, claimToken, lockToken, getApprovalModelAction, };
+    export { getAllCampaignsInfo, getStakingTotalLocked, getLPObject, getLPBalance, getVaultObject, getVaultBalance, getERC20RewardCurrentAPR, getLPRewardCurrentAPR, getVaultRewardCurrentAPR, withdrawToken, claimToken, lockToken };
 }
-/// <amd-module name="@scom/scom-staking/manage-stake/manage-stake.css.ts" />
-declare module "@scom/scom-staking/manage-stake/manage-stake.css.ts" {
+/// <amd-module name="@scom/scom-staking/manage-stake/index.css.ts" />
+declare module "@scom/scom-staking/manage-stake/index.css.ts" {
     export const stakingManageStakeStyle: string;
 }
-/// <amd-module name="@scom/scom-staking/manage-stake/manage-stake.tsx" />
-declare module "@scom/scom-staking/manage-stake/manage-stake.tsx" {
+/// <amd-module name="@scom/scom-staking/manage-stake/index.tsx" />
+declare module "@scom/scom-staking/manage-stake/index.tsx" {
     import { Container, ControlElement, Module } from '@ijstech/components';
     import { BigNumber } from '@ijstech/eth-wallet';
+    import { State } from "@scom/scom-staking/store/index.ts";
     global {
         namespace JSX {
             interface IntrinsicElements {
@@ -15644,7 +15600,8 @@ declare module "@scom/scom-staking/manage-stake/manage-stake.tsx" {
             }
         }
     }
-    export class ManageStake extends Module {
+    export default class ManageStake extends Module {
+        private _state;
         private stakingInfo;
         private address;
         private lockedTokenObject;
@@ -15666,8 +15623,10 @@ declare module "@scom/scom-staking/manage-stake/manage-stake.tsx" {
         private btnMax;
         private txStatusModal;
         private approvalModelAction;
-        onRefresh: any;
-        constructor(parent?: Container, options?: any);
+        onRefresh: () => void;
+        constructor(parent?: Container, options?: ControlElement);
+        set state(value: State);
+        get state(): State;
         setData: (data: any) => void;
         getBalance: () => BigNumber;
         needToBeApproval: () => boolean;
@@ -15686,10 +15645,6 @@ declare module "@scom/scom-staking/manage-stake/manage-stake.tsx" {
         init(): void;
         render(): any;
     }
-}
-/// <amd-module name="@scom/scom-staking/manage-stake/index.tsx" />
-declare module "@scom/scom-staking/manage-stake/index.tsx" {
-    export { ManageStake } from "@scom/scom-staking/manage-stake/manage-stake.tsx";
 }
 /// <amd-module name="@scom/scom-staking/index.css.ts" />
 declare module "@scom/scom-staking/index.css.ts" {
@@ -15863,6 +15818,7 @@ declare module "@scom/scom-staking" {
         }
     }
     export default class ScomStaking extends Module {
+        private state;
         private _data;
         tag: any;
         defaultEdit: boolean;
@@ -15914,6 +15870,7 @@ declare module "@scom/scom-staking" {
             getActions?: undefined;
         })[];
         private getData;
+        private resetRpcWallet;
         private setData;
         private getTag;
         private updateTag;
@@ -15928,7 +15885,10 @@ declare module "@scom/scom-staking" {
         set networks(value: INetworkConfig[]);
         get showHeader(): boolean;
         set showHeader(value: boolean);
+        private get chainId();
+        private get rpcWallet();
         constructor(parent?: Container, options?: ControlElement);
+        removeRpcWalletEvents(): void;
         onHide(): void;
         private registerEvent;
         private onChainChanged;

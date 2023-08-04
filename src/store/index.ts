@@ -1,9 +1,26 @@
 import Assets from '../assets';
-import { tokenStore, assets as tokenAssets, DefaultTokens, WETHByChainId } from '@scom/scom-token-list';
-import { getChainId, getChainNativeToken } from './utils';
+import { tokenStore, assets as tokenAssets, DefaultTokens, WETHByChainId, ITokenObject, ChainNativeTokenByChainId } from '@scom/scom-token-list';
 import { LockTokenType } from '../global/index';
+import { application } from '@ijstech/components';
 
 export const fallBackUrl = Assets.fullPath('img/tokens/token-placeholder.svg');
+
+export const getChainNativeToken = (chainId: number): ITokenObject => {
+  return ChainNativeTokenByChainId[chainId];
+}
+
+export const getNetworkInfo = (chainId: number) => {
+  const networkMap = application.store['networkMap'];
+  return networkMap[chainId];
+}
+
+export const viewOnExplorerByAddress = (chainId: number, address: string) => {
+  let network = getNetworkInfo(chainId);
+  if (network && network.explorerAddressUrl) {
+    let url = `${network.explorerAddressUrl}${address}`;
+    window.open(url);
+  }
+}
 
 export const tokenSymbol = (address: string) => {
   if (!address) return '';
@@ -70,8 +87,7 @@ export const getLockedTokenIconPaths = (info: any, tokenObject: any, chainId: nu
   return [];
 }
 
-export const getTokenDecimals = (address: string) => {
-  let chainId = getChainId();
+export const getTokenDecimals = (address: string, chainId: number) => {
   const ChainNativeToken = getChainNativeToken(chainId);
   const tokenObject = (!address || address.toLowerCase() === WETHByChainId[chainId].address.toLowerCase()) ? ChainNativeToken : tokenStore.tokenMap[address.toLowerCase()];
   return tokenObject ? tokenObject.decimals : 18;
