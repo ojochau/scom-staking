@@ -172,7 +172,8 @@ export default class ScomStaking extends Module {
 							redo: () => { }
 						}
 					},
-					userInputDataSchema: formSchema.general.dataSchema
+					userInputDataSchema: formSchema.general.dataSchema,
+					customControls: formSchema.general.customControls
 				}
 			);
 

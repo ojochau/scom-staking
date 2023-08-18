@@ -341,6 +341,7 @@ declare module "@scom/scom-staking/index.css.ts" {
 }
 /// <amd-module name="@scom/scom-staking/formSchema.json.ts" />
 declare module "@scom/scom-staking/formSchema.json.ts" {
+    import ScomNetworkPicker from '@scom/scom-network-picker';
     import { LockTokenType } from "@scom/scom-staking/global/index.ts";
     const _default_2: {
         general: {
@@ -402,6 +403,13 @@ declare module "@scom/scom-staking/formSchema.json.ts" {
                             };
                         };
                     };
+                };
+            };
+            customControls: {
+                "#/properties/chainId": {
+                    render: () => ScomNetworkPicker;
+                    getData: (control: ScomNetworkPicker) => number;
+                    setData: (control: ScomNetworkPicker, value: number) => void;
                 };
             };
         };
