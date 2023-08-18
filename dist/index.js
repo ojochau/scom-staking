@@ -1586,9 +1586,10 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
         }
     });
 });
-define("@scom/scom-staking/formSchema.json.ts", ["require", "exports", "@scom/scom-staking/global/index.ts"], function (require, exports, index_9) {
+define("@scom/scom-staking/formSchema.json.ts", ["require", "exports", "@scom/scom-network-picker", "@scom/scom-staking/global/index.ts"], function (require, exports, scom_network_picker_1, index_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const chainIds = [1, 56, 137, 250, 97, 80001, 43113, 43114];
     const theme = {
         backgroundColor: {
             type: 'string',
@@ -1637,7 +1638,7 @@ define("@scom/scom-staking/formSchema.json.ts", ["require", "exports", "@scom/sc
                 properties: {
                     chainId: {
                         type: 'number',
-                        enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
+                        enum: chainIds,
                         required: true
                     },
                     customName: {
@@ -1695,6 +1696,24 @@ define("@scom/scom-staking/formSchema.json.ts", ["require", "exports", "@scom/sc
                                 }
                             }
                         }
+                    }
+                }
+            },
+            customControls: {
+                "#/properties/chainId": {
+                    render: () => {
+                        const networkPicker = new scom_network_picker_1.default(undefined, {
+                            type: 'combobox',
+                            networks: chainIds.map(v => { return { chainId: v }; })
+                        });
+                        return networkPicker;
+                    },
+                    getData: (control) => {
+                        var _a;
+                        return (_a = control.selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId;
+                    },
+                    setData: (control, value) => {
+                        control.setNetworkByChainId(value);
                     }
                 }
             }
@@ -1816,7 +1835,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             redo: () => { }
                         };
                     },
-                    userInputDataSchema: formSchema_json_1.default.general.dataSchema
+                    userInputDataSchema: formSchema_json_1.default.general.dataSchema,
+                    customControls: formSchema_json_1.default.general.customControls
                 });
                 actions.push({
                     name: 'Theme Settings',
