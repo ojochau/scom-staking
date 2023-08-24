@@ -1,5 +1,4 @@
 import { Styles } from '@ijstech/components';
-import Assets from './assets';
 import { maxWidth, maxHeight } from './store/index';
 const Theme = Styles.Theme.ThemeVars;
 
@@ -8,45 +7,6 @@ const colorVar = {
   primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
   primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
 }
-
-Styles.fontFace({
-  fontFamily: "Montserrat Regular",
-  src: `url("${Assets.fullPath('fonts/montserrat/Montserrat-Regular.ttf')}") format("truetype")`,
-  fontWeight: 'nomal',
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Montserrat Bold",
-  src: `url("${Assets.fullPath('fonts/montserrat/Montserrat-Bold.ttf')}") format("truetype")`,
-  fontWeight: 'bold',
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Montserrat Light",
-  src: `url("${Assets.fullPath('fonts/montserrat/Montserrat-Light.ttf')}") format("truetype")`,
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Montserrat Medium",
-  src: `url("${Assets.fullPath('fonts/montserrat/Montserrat-Medium.ttf')}") format("truetype")`,
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Montserrat SemiBold",
-  src: `url("${Assets.fullPath('fonts/montserrat/Montserrat-SemiBold.ttf')}") format("truetype")`,
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Raleway Bold",
-  src: `url("${Assets.fullPath('fonts/raleway/Raleway-Bold.ttf')}") format("truetype")`,
-  fontWeight: 'bold',
-  fontStyle: 'normal'
-})
 
 export const stakingDappContainer = Styles.style({
   $nest: {
@@ -73,9 +33,6 @@ export const stakingDappContainer = Styles.style({
 
 export const stakingComponent = Styles.style({
   $nest: {
-    'i-label': {
-      fontFamily: 'Montserrat Regular',
-    },
     'span': {
       letterSpacing: '0.15px',
     },
@@ -93,7 +50,6 @@ export const stakingComponent = Styles.style({
       transition: 'background .3s ease',
       fontSize: '1rem',
       fontWeight: 'bold',
-      fontFamily: 'Raleway Bold',
       $nest: {
         'i-icon.loading-icon': {
           marginInline: '0.25rem',
@@ -200,8 +156,7 @@ export const stakingComponent = Styles.style({
               paddingInline: 4,
               minWidth: 20,
               height: 20,
-              fontSize: 14,
-              fontFamily: 'Montserrat Regular',
+              fontSize: 14
             },
             '.timer-unit': {
               display: 'flex',

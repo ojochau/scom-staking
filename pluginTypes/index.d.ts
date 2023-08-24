@@ -339,8 +339,8 @@ declare module "@scom/scom-staking/index.css.ts" {
     export const stakingDappContainer: string;
     export const stakingComponent: string;
 }
-/// <amd-module name="@scom/scom-staking/formSchema.json.ts" />
-declare module "@scom/scom-staking/formSchema.json.ts" {
+/// <amd-module name="@scom/scom-staking/formSchema.ts" />
+declare module "@scom/scom-staking/formSchema.ts" {
     import ScomNetworkPicker from '@scom/scom-network-picker';
     import { LockTokenType } from "@scom/scom-staking/global/index.ts";
     const _default_2: {
