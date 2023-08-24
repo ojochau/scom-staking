@@ -70,9 +70,6 @@ export default class Module1 extends Module {
                     "networks": [
                         {
                             "chainId": 43113
-                        },
-                        {
-                            "chainId": 97
                         }
                     ],
                     "wallets": [

@@ -1329,7 +1329,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
     ], ManageStake);
     exports.default = ManageStake;
 });
-define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/components", "@scom/scom-staking/assets.ts", "@scom/scom-staking/store/index.ts"], function (require, exports, components_7, assets_2, index_8) {
+define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/components", "@scom/scom-staking/store/index.ts"], function (require, exports, components_7, index_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.stakingComponent = exports.stakingDappContainer = void 0;
@@ -1339,39 +1339,6 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
         primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
         primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
     };
-    components_7.Styles.fontFace({
-        fontFamily: "Montserrat Regular",
-        src: `url("${assets_2.default.fullPath('fonts/montserrat/Montserrat-Regular.ttf')}") format("truetype")`,
-        fontWeight: 'nomal',
-        fontStyle: 'normal'
-    });
-    components_7.Styles.fontFace({
-        fontFamily: "Montserrat Bold",
-        src: `url("${assets_2.default.fullPath('fonts/montserrat/Montserrat-Bold.ttf')}") format("truetype")`,
-        fontWeight: 'bold',
-        fontStyle: 'normal'
-    });
-    components_7.Styles.fontFace({
-        fontFamily: "Montserrat Light",
-        src: `url("${assets_2.default.fullPath('fonts/montserrat/Montserrat-Light.ttf')}") format("truetype")`,
-        fontStyle: 'normal'
-    });
-    components_7.Styles.fontFace({
-        fontFamily: "Montserrat Medium",
-        src: `url("${assets_2.default.fullPath('fonts/montserrat/Montserrat-Medium.ttf')}") format("truetype")`,
-        fontStyle: 'normal'
-    });
-    components_7.Styles.fontFace({
-        fontFamily: "Montserrat SemiBold",
-        src: `url("${assets_2.default.fullPath('fonts/montserrat/Montserrat-SemiBold.ttf')}") format("truetype")`,
-        fontStyle: 'normal'
-    });
-    components_7.Styles.fontFace({
-        fontFamily: "Raleway Bold",
-        src: `url("${assets_2.default.fullPath('fonts/raleway/Raleway-Bold.ttf')}") format("truetype")`,
-        fontWeight: 'bold',
-        fontStyle: 'normal'
-    });
     exports.stakingDappContainer = components_7.Styles.style({
         $nest: {
             'dapp-container-body': {
@@ -1396,9 +1363,6 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
     });
     exports.stakingComponent = components_7.Styles.style({
         $nest: {
-            'i-label': {
-                fontFamily: 'Montserrat Regular',
-            },
             'span': {
                 letterSpacing: '0.15px',
             },
@@ -1416,7 +1380,6 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
                 transition: 'background .3s ease',
                 fontSize: '1rem',
                 fontWeight: 'bold',
-                fontFamily: 'Raleway Bold',
                 $nest: {
                     'i-icon.loading-icon': {
                         marginInline: '0.25rem',
@@ -1523,8 +1486,7 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
                                 paddingInline: 4,
                                 minWidth: 20,
                                 height: 20,
-                                fontSize: 14,
-                                fontFamily: 'Montserrat Regular',
+                                fontSize: 14
                             },
                             '.timer-unit': {
                                 display: 'flex',
@@ -1586,7 +1548,7 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
         }
     });
 });
-define("@scom/scom-staking/formSchema.json.ts", ["require", "exports", "@scom/scom-network-picker", "@scom/scom-staking/global/index.ts"], function (require, exports, scom_network_picker_1, index_9) {
+define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-network-picker", "@scom/scom-staking/global/index.ts"], function (require, exports, scom_network_picker_1, index_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const chainIds = [1, 56, 137, 250, 97, 80001, 43113, 43114];
@@ -1735,7 +1697,7 @@ define("@scom/scom-staking/formSchema.json.ts", ["require", "exports", "@scom/sc
         }
     };
 });
-define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/data.json.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/manage-stake/index.tsx", "@scom/oswap-time-is-money-contract", "@scom/scom-staking/index.css.ts", "@scom/scom-staking/formSchema.json.ts"], function (require, exports, components_8, eth_wallet_6, assets_3, index_10, index_11, scom_token_list_4, data_json_1, index_12, index_13, oswap_time_is_money_contract_2, index_css_2, formSchema_json_1) {
+define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/data.json.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/manage-stake/index.tsx", "@scom/oswap-time-is-money-contract", "@scom/scom-staking/index.css.ts", "@scom/scom-staking/formSchema.ts"], function (require, exports, components_8, eth_wallet_6, assets_2, index_10, index_11, scom_token_list_4, data_json_1, index_12, index_13, oswap_time_is_money_contract_2, index_css_2, formSchema_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_8.Styles.Theme.ThemeVars;
@@ -1835,8 +1797,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             redo: () => { }
                         };
                     },
-                    userInputDataSchema: formSchema_json_1.default.general.dataSchema,
-                    customControls: formSchema_json_1.default.general.customControls
+                    userInputDataSchema: formSchema_1.default.general.dataSchema,
+                    customControls: formSchema_1.default.general.customControls
                 });
                 actions.push({
                     name: 'Theme Settings',
@@ -1869,7 +1831,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             redo: () => { }
                         };
                     },
-                    userInputDataSchema: formSchema_json_1.default.theme.dataSchema
+                    userInputDataSchema: formSchema_1.default.theme.dataSchema
                 });
             }
             return actions;
@@ -2219,7 +2181,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 this.noCampaignSection.clearInnerHTML();
                 this.noCampaignSection.appendChild(this.$render("i-panel", { class: "no-campaign", height: "100%", background: { color: Theme.background.main } },
                     this.$render("i-vstack", { gap: 10, verticalAlignment: "center" },
-                        this.$render("i-image", { url: assets_3.default.fullPath('img/staking/TrollTrooper.svg') }),
+                        this.$render("i-image", { url: assets_2.default.fullPath('img/staking/TrollTrooper.svg') }),
                         this.$render("i-label", { caption: isClientConnected ? 'No Campaigns' : 'Please connect with your wallet!' }))));
                 this.noCampaignSection.visible = true;
             };
@@ -2443,7 +2405,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         let aprInfo = {};
                         const claimStakedRow = await components_8.HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
                         claimStakedRow.appendChild(this.$render("i-label", { caption: "You Staked", font: { size: '16px' } }));
-                        claimStakedRow.appendChild(this.$render("i-label", { caption: `${(0, index_10.formatNumber)(new eth_wallet_6.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`, font: { size: '16px', name: 'Montserrat Regular' } }));
+                        claimStakedRow.appendChild(this.$render("i-label", { caption: `${(0, index_10.formatNumber)(new eth_wallet_6.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`, font: { size: '16px' } }));
                         const rowRewards = await components_8.VStack.create({ gap: 8, verticalAlignment: 'center' });
                         for (let idx = 0; idx < rewardsData.length; idx++) {
                             const reward = rewardsData[idx];
@@ -2461,7 +2423,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             const rewardSymbol = rewardToken.symbol || '';
                             rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
                                 this.$render("i-label", { caption: `${rewardSymbol} Locked`, font: { size: '16px', color: Theme.text.primary } }),
-                                this.$render("i-label", { caption: `${(0, index_10.formatNumber)(new eth_wallet_6.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '16px', name: 'Montserrat Regular' } })));
+                                this.$render("i-label", { caption: `${(0, index_10.formatNumber)(new eth_wallet_6.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '16px' } })));
                             // rowRewards.appendChild(
                             // 	<i-hstack horizontalAlignment="space-between">
                             // 		<i-label caption={`${rewardSymbol} Vesting Start`} font={{ size: '16px', color: colorText }} />
@@ -2486,7 +2448,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             }
                             rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
                                 this.$render("i-label", { caption: `${rewardSymbol} Claimable`, font: { size: '16px' } }),
-                                this.$render("i-label", { caption: rewardClaimable, font: { size: '16px', name: 'Montserrat Regular' } }),
+                                this.$render("i-label", { caption: rewardClaimable, font: { size: '16px' } }),
                                 startClaimingText ? this.$render("i-label", { caption: startClaimingText, font: { size: '16px' } }) : []));
                             const btnClaim = await components_8.Button.create({
                                 // rightIcon: { spin: true, fill: Theme.colors.primary.contrastText, visible: false },
@@ -2525,11 +2487,11 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                                             return this.$render("i-image", { position: "absolute", width: 28, height: 28, bottom: 0, left: (idxImg * 20) + 35, url: scom_token_list_4.assets.fullPath(v), fallbackUrl: index_11.fallBackUrl });
                                         })),
                                     this.$render("i-vstack", { gap: 2, overflow: { x: 'hidden' }, verticalAlignment: "center" },
-                                        this.$render("i-label", { visible: !!campaign.customName, caption: campaign.customName, font: { size: '20px', name: 'Montserrat Bold', color: Theme.text.secondary, bold: true }, class: "text-overflow" }),
-                                        this.$render("i-label", { visible: !!campaign.customDesc, caption: campaign.customDesc, font: { size: '16px', name: 'Montserrat Regular' }, opacity: 0.5, class: "text-overflow" }))),
+                                        this.$render("i-label", { visible: !!campaign.customName, caption: campaign.customName, font: { size: '20px', color: Theme.text.secondary, bold: true }, class: "text-overflow" }),
+                                        this.$render("i-label", { visible: !!campaign.customDesc, caption: campaign.customDesc, font: { size: '16px' }, opacity: 0.5, class: "text-overflow" }))),
                                 await Promise.all(rewardOptions.map(async (rewardOption, idx) => {
-                                    const lbApr = await components_8.Label.create({ font: { size: '32px', name: 'Montserrat Medium', color: Theme.text.secondary } });
-                                    const lbRate = await components_8.Label.create({ font: { size: '16px', name: 'Montserrat Regular' }, opacity: 0.5 });
+                                    const lbApr = await components_8.Label.create({ font: { size: '32px', color: Theme.text.secondary } });
+                                    const lbRate = await components_8.Label.create({ font: { size: '16px' }, opacity: 0.5 });
                                     lbApr.classList.add('text-overflow');
                                     const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
                                     const rewardTokenDecimals = rewardToken.decimals || 18;
@@ -2569,13 +2531,13 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             this.$render("i-hstack", { width: "100%", verticalAlignment: "center" },
                                 this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
                                     this.$render("i-label", { caption: "Start Date", font: { size: '14px' }, opacity: 0.5 }),
-                                    this.$render("i-label", { caption: (0, index_10.formatDate)(option.startOfEntryPeriod, 'DD MMM, YYYY'), font: { size: '16px', name: 'Montserrat Regular' } })),
+                                    this.$render("i-label", { caption: (0, index_10.formatDate)(option.startOfEntryPeriod, 'DD MMM, YYYY'), font: { size: '16px' } })),
                                 activeTimerRows[optionIdx],
                                 this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
                                     this.$render("i-label", { caption: "Stake Duration", font: { size: '14px' }, opacity: 0.5 }),
                                     this.$render("i-hstack", { gap: 4, verticalAlignment: "center" }, options.map((_option, _optionIdx) => {
                                         const isCurrentIdx = optionIdx === _optionIdx;
-                                        return this.$render("i-button", { caption: durationDays < 1 ? '< 1 Day' : `${durationDays} Days`, class: `btn-os ${isCurrentIdx ? 'cursor-default' : ''}`, border: { radius: 12, width: 1, style: 'solid', color: isCurrentIdx ? 'transparent' : '#8994A3' }, font: { size: '12px', name: 'Montserrat Regular', color: isCurrentIdx ? Theme.colors.secondary.contrastText : '#8994A3' }, padding: { top: 2.5, bottom: 2.5, left: 8, right: 8 }, background: { color: isCurrentIdx ? `${Theme.colors.secondary.main} !important` : 'transparent' }, onClick: () => onChangeStake(_optionIdx) });
+                                        return this.$render("i-button", { caption: durationDays < 1 ? '< 1 Day' : `${durationDays} Days`, class: `btn-os ${isCurrentIdx ? 'cursor-default' : ''}`, border: { radius: 12, width: 1, style: 'solid', color: isCurrentIdx ? 'transparent' : '#8994A3' }, font: { size: '12px', color: isCurrentIdx ? Theme.colors.secondary.contrastText : '#8994A3' }, padding: { top: 2.5, bottom: 2.5, left: 8, right: 8 }, background: { color: isCurrentIdx ? `${Theme.colors.secondary.main} !important` : 'transparent' }, onClick: () => onChangeStake(_optionIdx) });
                                     }))),
                                 this.$render("i-vstack", { gap: 4, width: "25%", margin: { left: 'auto' }, verticalAlignment: "center", horizontalAlignment: "end" },
                                     this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => this.getLPToken(campaign, lockedTokenSymbol, chainId) },
@@ -2642,7 +2604,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     this.$render("i-panel", { id: "stakingLayout", class: "staking-layout", width: index_11.maxWidth, height: index_11.maxHeight, margin: { left: 'auto', right: 'auto' } },
                         this.$render("i-vstack", { id: "loadingElm", class: "i-loading-overlay" },
                             this.$render("i-vstack", { class: "i-loading-spinner", horizontalAlignment: "center", verticalAlignment: "center" },
-                                this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_3.default.fullPath('img/loading.svg'), width: 36, height: 36 } }),
+                                this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_2.default.fullPath('img/loading.svg'), width: 36, height: 36 } }),
                                 this.$render("i-label", { caption: "Loading...", font: { color: '#FD4A4C', size: '1.5em' }, class: "i-loading-spinner_text" }))),
                         this.$render("i-panel", { id: "stakingElm", class: "wrapper" })),
                     this.$render("i-panel", { id: "manageStakeElm" }),

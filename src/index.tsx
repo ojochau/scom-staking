@@ -44,7 +44,7 @@ import ScomWalletModal, { IWalletPlugin } from '@scom/scom-wallet-modal';
 import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
 import ScomTxStatusModal from '@scom/scom-tx-status-modal';
 import { INetworkConfig } from '@scom/scom-network-picker';
-import formSchema from './formSchema.json';
+import formSchema from './formSchema';
 
 const Theme = Styles.Theme.ThemeVars;
 
@@ -862,7 +862,7 @@ export default class ScomStaking extends Module {
 
 				const claimStakedRow = await HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
 				claimStakedRow.appendChild(<i-label caption="You Staked" font={{ size: '16px' }} />);
-				claimStakedRow.appendChild(<i-label caption={`${formatNumber(new BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`} font={{ size: '16px', name: 'Montserrat Regular' }} />);
+				claimStakedRow.appendChild(<i-label caption={`${formatNumber(new BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`} font={{ size: '16px' }} />);
 
 				const rowRewards = await VStack.create({ gap: 8, verticalAlignment: 'center' });
 				for (let idx = 0; idx < rewardsData.length; idx++) {
@@ -881,7 +881,7 @@ export default class ScomStaking extends Module {
 					rowRewards.appendChild(
 						<i-hstack horizontalAlignment="space-between">
 							<i-label caption={`${rewardSymbol} Locked`} font={{ size: '16px', color: Theme.text.primary }} />
-							<i-label caption={`${formatNumber(new BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`} font={{ size: '16px', name: 'Montserrat Regular' }} />
+							<i-label caption={`${formatNumber(new BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`} font={{ size: '16px' }} />
 						</i-hstack>
 					);
 					// rowRewards.appendChild(
@@ -909,7 +909,7 @@ export default class ScomStaking extends Module {
 					rowRewards.appendChild(
 						<i-hstack horizontalAlignment="space-between">
 							<i-label caption={`${rewardSymbol} Claimable`} font={{ size: '16px' }} />
-							<i-label caption={rewardClaimable} font={{ size: '16px', name: 'Montserrat Regular' }} />
+							<i-label caption={rewardClaimable} font={{ size: '16px' }} />
 							{startClaimingText ? <i-label caption={startClaimingText} font={{ size: '16px' }} /> : []}
 						</i-hstack>
 					);
@@ -955,14 +955,14 @@ export default class ScomStaking extends Module {
 									}
 								</i-hstack>
 								<i-vstack gap={2} overflow={{ x: 'hidden' }} verticalAlignment="center">
-									<i-label visible={!!campaign.customName} caption={campaign.customName} font={{ size: '20px', name: 'Montserrat Bold', color: Theme.text.secondary, bold: true }} class="text-overflow" />
-									<i-label visible={!!campaign.customDesc} caption={campaign.customDesc} font={{ size: '16px', name: 'Montserrat Regular' }} opacity={0.5} class="text-overflow" />
+									<i-label visible={!!campaign.customName} caption={campaign.customName} font={{ size: '20px', color: Theme.text.secondary, bold: true }} class="text-overflow" />
+									<i-label visible={!!campaign.customDesc} caption={campaign.customDesc} font={{ size: '16px' }} opacity={0.5} class="text-overflow" />
 								</i-vstack>
 							</i-hstack>
 							{
 								await Promise.all(rewardOptions.map(async (rewardOption: any, idx: number) => {
-									const lbApr = await Label.create({ font: { size: '32px', name: 'Montserrat Medium', color: Theme.text.secondary } });
-									const lbRate = await Label.create({ font: { size: '16px', name: 'Montserrat Regular' }, opacity: 0.5 });
+									const lbApr = await Label.create({ font: { size: '32px', color: Theme.text.secondary } });
+									const lbRate = await Label.create({ font: { size: '16px' }, opacity: 0.5 });
 									lbApr.classList.add('text-overflow');
 									const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
 									const rewardTokenDecimals = rewardToken.decimals || 18;
@@ -1002,7 +1002,7 @@ export default class ScomStaking extends Module {
 						<i-hstack width="100%" verticalAlignment="center">
 							<i-vstack gap={2} width="25%" verticalAlignment="center">
 								<i-label caption="Start Date" font={{ size: '14px' }} opacity={0.5} />
-								<i-label caption={formatDate(option.startOfEntryPeriod, 'DD MMM, YYYY')} font={{ size: '16px', name: 'Montserrat Regular' }} />
+								<i-label caption={formatDate(option.startOfEntryPeriod, 'DD MMM, YYYY')} font={{ size: '16px' }} />
 							</i-vstack>
 							{activeTimerRows[optionIdx]}
 							<i-vstack gap={2} width="25%" verticalAlignment="center">
@@ -1015,7 +1015,7 @@ export default class ScomStaking extends Module {
 												caption={durationDays < 1 ? '< 1 Day' : `${durationDays} Days`}
 												class={`btn-os ${isCurrentIdx ? 'cursor-default' : ''}`}
 												border={{ radius: 12, width: 1, style: 'solid', color: isCurrentIdx ? 'transparent' : '#8994A3' }}
-												font={{ size: '12px', name: 'Montserrat Regular', color: isCurrentIdx ? Theme.colors.secondary.contrastText : '#8994A3' }}
+												font={{ size: '12px', color: isCurrentIdx ? Theme.colors.secondary.contrastText : '#8994A3' }}
 												padding={{ top: 2.5, bottom: 2.5, left: 8, right: 8 }}
 												background={{ color: isCurrentIdx ? `${Theme.colors.secondary.main} !important` : 'transparent' }}
 												onClick={() => onChangeStake(_optionIdx)}

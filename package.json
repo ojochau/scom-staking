@@ -10,7 +10,6 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "copy": "sh ./scripts/copy.sh",
     "build": "rm -rf dist && npx @ijstech/compiler",
     "test": "cd test && npm run test && cd .."
   },
