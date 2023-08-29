@@ -344,152 +344,168 @@ declare module "@scom/scom-staking/formSchema.ts" {
     import ScomNetworkPicker from '@scom/scom-network-picker';
     import { LockTokenType } from "@scom/scom-staking/global/index.ts";
     const _default_2: {
-        general: {
-            dataSchema: {
-                type: string;
-                properties: {
-                    chainId: {
-                        type: string;
-                        enum: number[];
-                        required: boolean;
-                    };
-                    customName: {
-                        type: string;
-                        label: string;
-                        required: boolean;
-                    };
-                    customDesc: {
-                        type: string;
-                        label: string;
-                    };
-                    customLogo: {
-                        type: string;
-                        title: string;
-                    };
-                    getTokenURL: {
-                        type: string;
-                        title: string;
-                    };
-                    showContractLink: {
-                        type: string;
-                    };
-                    stakings: {
-                        type: string;
-                        properties: {
-                            address: {
-                                type: string;
-                                required: boolean;
-                            };
-                            lockTokenType: {
-                                type: string;
-                                oneOf: {
+        dataSchema: {
+            type: string;
+            properties: {
+                chainId: {
+                    type: string;
+                    enum: number[];
+                    required: boolean;
+                };
+                customName: {
+                    type: string;
+                    label: string;
+                    required: boolean;
+                };
+                customDesc: {
+                    type: string;
+                    label: string;
+                };
+                customLogo: {
+                    type: string;
+                    title: string;
+                };
+                getTokenURL: {
+                    type: string;
+                    title: string;
+                };
+                showContractLink: {
+                    type: string;
+                };
+                stakings: {
+                    type: string;
+                    properties: {
+                        address: {
+                            type: string;
+                            required: boolean;
+                        };
+                        lockTokenType: {
+                            type: string;
+                            oneOf: {
+                                title: string;
+                                const: LockTokenType;
+                            }[];
+                            required: boolean;
+                        };
+                        rewards: {
+                            type: string;
+                            properties: {
+                                address: {
+                                    type: string;
+                                    required: boolean;
+                                };
+                                isCommonStartDate: {
+                                    type: string;
                                     title: string;
-                                    const: LockTokenType;
-                                }[];
-                                required: boolean;
-                            };
-                            rewards: {
-                                type: string;
-                                properties: {
-                                    address: {
-                                        type: string;
-                                        required: boolean;
-                                    };
-                                    isCommonStartDate: {
-                                        type: string;
-                                        title: string;
-                                    };
                                 };
                             };
                         };
                     };
                 };
-            };
-            customControls: {
-                "#/properties/chainId": {
-                    render: () => ScomNetworkPicker;
-                    getData: (control: ScomNetworkPicker) => number;
-                    setData: (control: ScomNetworkPicker, value: number) => void;
+                dark: {
+                    type: string;
+                    properties: {
+                        backgroundColor: {
+                            type: string;
+                            format: string;
+                        };
+                        fontColor: {
+                            type: string;
+                            format: string;
+                        };
+                        textSecondary: {
+                            type: string;
+                            title: string;
+                            format: string;
+                        };
+                        inputBackgroundColor: {
+                            type: string;
+                            format: string;
+                        };
+                        inputFontColor: {
+                            type: string;
+                            format: string;
+                        };
+                        secondaryColor: {
+                            type: string;
+                            title: string;
+                            format: string;
+                        };
+                        secondaryFontColor: {
+                            type: string;
+                            title: string;
+                            format: string;
+                        };
+                    };
+                };
+                light: {
+                    type: string;
+                    properties: {
+                        backgroundColor: {
+                            type: string;
+                            format: string;
+                        };
+                        fontColor: {
+                            type: string;
+                            format: string;
+                        };
+                        textSecondary: {
+                            type: string;
+                            title: string;
+                            format: string;
+                        };
+                        inputBackgroundColor: {
+                            type: string;
+                            format: string;
+                        };
+                        inputFontColor: {
+                            type: string;
+                            format: string;
+                        };
+                        secondaryColor: {
+                            type: string;
+                            title: string;
+                            format: string;
+                        };
+                        secondaryFontColor: {
+                            type: string;
+                            title: string;
+                            format: string;
+                        };
+                    };
                 };
             };
         };
-        theme: {
-            dataSchema: {
+        uiSchema: {
+            type: string;
+            elements: ({
                 type: string;
-                properties: {
-                    dark: {
+                label: string;
+                elements: {
+                    type: string;
+                    elements: {
                         type: string;
-                        properties: {
-                            backgroundColor: {
-                                type: string;
-                                format: string;
-                            };
-                            fontColor: {
-                                type: string;
-                                format: string;
-                            };
-                            textSecondary: {
-                                type: string;
-                                title: string;
-                                format: string;
-                            };
-                            inputBackgroundColor: {
-                                type: string;
-                                format: string;
-                            };
-                            inputFontColor: {
-                                type: string;
-                                format: string;
-                            };
-                            secondaryColor: {
-                                type: string;
-                                title: string;
-                                format: string;
-                            };
-                            secondaryFontColor: {
-                                type: string;
-                                title: string;
-                                format: string;
-                            };
-                        };
-                    };
-                    light: {
+                        scope: string;
+                    }[];
+                }[];
+            } | {
+                type: string;
+                label: string;
+                elements: {
+                    type: string;
+                    elements: {
                         type: string;
-                        properties: {
-                            backgroundColor: {
-                                type: string;
-                                format: string;
-                            };
-                            fontColor: {
-                                type: string;
-                                format: string;
-                            };
-                            textSecondary: {
-                                type: string;
-                                title: string;
-                                format: string;
-                            };
-                            inputBackgroundColor: {
-                                type: string;
-                                format: string;
-                            };
-                            inputFontColor: {
-                                type: string;
-                                format: string;
-                            };
-                            secondaryColor: {
-                                type: string;
-                                title: string;
-                                format: string;
-                            };
-                            secondaryFontColor: {
-                                type: string;
-                                title: string;
-                                format: string;
-                            };
-                        };
-                    };
-                };
+                        label: string;
+                        scope: string;
+                    }[];
+                }[];
+            })[];
+        };
+        customControls: {
+            "#/properties/chainId": {
+                render: () => ScomNetworkPicker;
+                getData: (control: ScomNetworkPicker) => number;
+                setData: (control: ScomNetworkPicker, value: number) => void;
             };
         };
     };

@@ -18,6 +18,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 define("@scom/scom-staking/assets.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -1553,145 +1564,198 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
     Object.defineProperty(exports, "__esModule", { value: true });
     const chainIds = [1, 56, 137, 250, 97, 80001, 43113, 43114];
     const theme = {
-        backgroundColor: {
-            type: 'string',
-            format: 'color'
-        },
-        fontColor: {
-            type: 'string',
-            format: 'color'
-        },
-        textSecondary: {
-            type: 'string',
-            title: 'Campaign Font Color',
-            format: 'color'
-        },
-        inputBackgroundColor: {
-            type: 'string',
-            format: 'color'
-        },
-        inputFontColor: {
-            type: 'string',
-            format: 'color'
-        },
-        // buttonBackgroundColor: {
-        // 	type: 'string',
-        // 	format: 'color'
-        // },
-        // buttonFontColor: {
-        // 	type: 'string',
-        // 	format: 'color'
-        // },
-        secondaryColor: {
-            type: 'string',
-            title: 'Timer Background Color',
-            format: 'color'
-        },
-        secondaryFontColor: {
-            type: 'string',
-            title: 'Timer Font Color',
-            format: 'color'
+        type: 'object',
+        properties: {
+            backgroundColor: {
+                type: 'string',
+                format: 'color'
+            },
+            fontColor: {
+                type: 'string',
+                format: 'color'
+            },
+            textSecondary: {
+                type: 'string',
+                title: 'Campaign Font Color',
+                format: 'color'
+            },
+            inputBackgroundColor: {
+                type: 'string',
+                format: 'color'
+            },
+            inputFontColor: {
+                type: 'string',
+                format: 'color'
+            },
+            // buttonBackgroundColor: {
+            // 	type: 'string',
+            // 	format: 'color'
+            // },
+            // buttonFontColor: {
+            // 	type: 'string',
+            // 	format: 'color'
+            // },
+            secondaryColor: {
+                type: 'string',
+                title: 'Timer Background Color',
+                format: 'color'
+            },
+            secondaryFontColor: {
+                type: 'string',
+                title: 'Timer Font Color',
+                format: 'color'
+            }
         }
     };
     exports.default = {
-        general: {
-            dataSchema: {
-                type: 'object',
-                properties: {
-                    chainId: {
-                        type: 'number',
-                        enum: chainIds,
-                        required: true
-                    },
-                    customName: {
-                        type: 'string',
-                        label: 'Campaign Name',
-                        required: true
-                    },
-                    customDesc: {
-                        type: 'string',
-                        label: 'Campaign Description'
-                    },
-                    customLogo: {
-                        type: 'string',
-                        title: 'Campaign Logo'
-                    },
-                    getTokenURL: {
-                        type: 'string',
-                        title: 'Token Trade URL'
-                    },
-                    showContractLink: {
-                        type: 'boolean'
-                    },
-                    stakings: {
-                        type: 'object',
-                        properties: {
-                            address: {
-                                type: 'string',
-                                required: true
-                            },
-                            // customDesc: {
-                            //   type: 'string',
-                            //   title: 'Staking Description',
-                            //   readOnly
-                            // },
-                            lockTokenType: {
-                                type: 'number',
-                                oneOf: [
-                                    { title: 'ERC20_Token', const: index_9.LockTokenType.ERC20_Token },
-                                    { title: 'LP_Token', const: index_9.LockTokenType.LP_Token },
-                                    { title: 'VAULT_Token', const: index_9.LockTokenType.VAULT_Token },
-                                ],
-                                required: true
-                            },
-                            rewards: {
-                                type: 'object',
-                                properties: {
-                                    address: {
-                                        type: 'string',
-                                        required: true
-                                    },
-                                    isCommonStartDate: {
-                                        type: 'boolean',
-                                        title: 'Common Start Date'
-                                    }
+        dataSchema: {
+            type: 'object',
+            properties: {
+                chainId: {
+                    type: 'number',
+                    enum: chainIds,
+                    required: true
+                },
+                customName: {
+                    type: 'string',
+                    label: 'Campaign Name',
+                    required: true
+                },
+                customDesc: {
+                    type: 'string',
+                    label: 'Campaign Description'
+                },
+                customLogo: {
+                    type: 'string',
+                    title: 'Campaign Logo'
+                },
+                getTokenURL: {
+                    type: 'string',
+                    title: 'Token Trade URL'
+                },
+                showContractLink: {
+                    type: 'boolean'
+                },
+                stakings: {
+                    type: 'object',
+                    properties: {
+                        address: {
+                            type: 'string',
+                            required: true
+                        },
+                        // customDesc: {
+                        //   type: 'string',
+                        //   title: 'Staking Description',
+                        //   readOnly
+                        // },
+                        lockTokenType: {
+                            type: 'number',
+                            oneOf: [
+                                { title: 'ERC20_Token', const: index_9.LockTokenType.ERC20_Token },
+                                { title: 'LP_Token', const: index_9.LockTokenType.LP_Token },
+                                { title: 'VAULT_Token', const: index_9.LockTokenType.VAULT_Token },
+                            ],
+                            required: true
+                        },
+                        rewards: {
+                            type: 'object',
+                            properties: {
+                                address: {
+                                    type: 'string',
+                                    required: true
+                                },
+                                isCommonStartDate: {
+                                    type: 'boolean',
+                                    title: 'Common Start Date'
                                 }
                             }
                         }
                     }
-                }
-            },
-            customControls: {
-                "#/properties/chainId": {
-                    render: () => {
-                        const networkPicker = new scom_network_picker_1.default(undefined, {
-                            type: 'combobox',
-                            networks: chainIds.map(v => { return { chainId: v }; })
-                        });
-                        return networkPicker;
-                    },
-                    getData: (control) => {
-                        var _a;
-                        return (_a = control.selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId;
-                    },
-                    setData: (control, value) => {
-                        control.setNetworkByChainId(value);
-                    }
-                }
+                },
+                dark: theme,
+                light: theme
             }
         },
-        theme: {
-            dataSchema: {
-                type: 'object',
-                properties: {
-                    "dark": {
-                        type: 'object',
-                        properties: theme
-                    },
-                    "light": {
-                        type: 'object',
-                        properties: theme
-                    }
+        uiSchema: {
+            type: 'Categorization',
+            elements: [
+                {
+                    type: 'Category',
+                    label: 'General',
+                    elements: [
+                        {
+                            type: 'VerticalLayout',
+                            elements: [
+                                {
+                                    type: 'Control',
+                                    scope: '#/properties/chainId'
+                                },
+                                {
+                                    type: 'Control',
+                                    scope: '#/properties/customName'
+                                },
+                                {
+                                    type: 'Control',
+                                    scope: '#/properties/customDesc'
+                                },
+                                {
+                                    type: 'Control',
+                                    scope: '#/properties/customLogo'
+                                },
+                                {
+                                    type: 'Control',
+                                    scope: '#/properties/getTokenURL'
+                                },
+                                {
+                                    type: 'Control',
+                                    scope: '#/properties/showContractLink'
+                                },
+                                {
+                                    type: 'Control',
+                                    scope: '#/properties/stakings'
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    type: 'Category',
+                    label: 'Theme',
+                    elements: [
+                        {
+                            type: 'VerticalLayout',
+                            elements: [
+                                {
+                                    type: 'Control',
+                                    label: 'Dark',
+                                    scope: '#/properties/dark'
+                                },
+                                {
+                                    type: 'Control',
+                                    label: 'Light',
+                                    scope: '#/properties/light'
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        customControls: {
+            "#/properties/chainId": {
+                render: () => {
+                    const networkPicker = new scom_network_picker_1.default(undefined, {
+                        type: 'combobox',
+                        networks: chainIds.map(v => { return { chainId: v }; })
+                    });
+                    return networkPicker;
+                },
+                getData: (control) => {
+                    var _a;
+                    return (_a = control.selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId;
+                },
+                setData: (control, value) => {
+                    control.setNetworkByChainId(value);
                 }
             }
         }
@@ -1756,70 +1820,61 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             ];
             if (category && category !== 'offers') {
                 actions.push({
-                    name: 'Settings',
-                    icon: 'cog',
+                    name: 'Edit',
+                    icon: 'edit',
                     command: (builder, userInputData) => {
-                        let _oldData = {
+                        let oldData = {
                             chainId: 0,
                             customName: '',
                             stakings: undefined,
                             wallets: [],
                             networks: []
                         };
+                        let oldTag = {};
                         return {
                             execute: async () => {
-                                _oldData = Object.assign({}, this._data);
-                                if ((userInputData === null || userInputData === void 0 ? void 0 : userInputData.chainId) !== undefined)
-                                    this._data.chainId = userInputData.chainId;
-                                if ((userInputData === null || userInputData === void 0 ? void 0 : userInputData.customName) !== undefined)
-                                    this._data.customName = userInputData.customName;
-                                if ((userInputData === null || userInputData === void 0 ? void 0 : userInputData.customDesc) !== undefined)
-                                    this._data.customDesc = userInputData.customDesc;
-                                if ((userInputData === null || userInputData === void 0 ? void 0 : userInputData.customLogo) !== undefined)
-                                    this._data.customLogo = userInputData.customLogo;
-                                if ((userInputData === null || userInputData === void 0 ? void 0 : userInputData.getTokenURL) !== undefined)
-                                    this._data.getTokenURL = userInputData.getTokenURL;
-                                if ((userInputData === null || userInputData === void 0 ? void 0 : userInputData.showContractLink) !== undefined)
-                                    this._data.showContractLink = userInputData.showContractLink;
-                                if ((userInputData === null || userInputData === void 0 ? void 0 : userInputData.stakings) !== undefined)
-                                    this._data.stakings = userInputData.stakings;
+                                oldData = JSON.parse(JSON.stringify(this._data));
+                                const { chainId, customName, customDesc, customLogo, getTokenURL, showContractLink, stakings } = userInputData, themeSettings = __rest(userInputData, ["chainId", "customName", "customDesc", "customLogo", "getTokenURL", "showContractLink", "stakings"]);
+                                const generalSettings = {
+                                    chainId,
+                                    customName,
+                                    customDesc,
+                                    customLogo,
+                                    getTokenURL,
+                                    showContractLink,
+                                    stakings
+                                };
+                                if (generalSettings.chainId !== undefined)
+                                    this._data.chainId = generalSettings.chainId;
+                                if (generalSettings.customName !== undefined)
+                                    this._data.customName = generalSettings.customName;
+                                if (generalSettings.customDesc !== undefined)
+                                    this._data.customDesc = generalSettings.customDesc;
+                                if (generalSettings.customLogo !== undefined)
+                                    this._data.customLogo = generalSettings.customLogo;
+                                if (generalSettings.getTokenURL !== undefined)
+                                    this._data.getTokenURL = generalSettings.getTokenURL;
+                                if (generalSettings.showContractLink !== undefined)
+                                    this._data.showContractLink = generalSettings.showContractLink;
+                                if (generalSettings.stakings !== undefined)
+                                    this._data.stakings = generalSettings.stakings;
                                 await this.resetRpcWallet();
                                 this.refreshUI();
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
                                     builder.setData(this._data);
+                                oldTag = JSON.parse(JSON.stringify(this.tag));
+                                if (builder)
+                                    builder.setTag(themeSettings);
+                                else
+                                    this.setTag(themeSettings);
+                                if (this.dappContainer)
+                                    this.dappContainer.setTag(themeSettings);
                             },
                             undo: async () => {
-                                this._data = Object.assign({}, _oldData);
+                                this._data = JSON.parse(JSON.stringify(oldData));
                                 this.refreshUI();
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
                                     builder.setData(this._data);
-                            },
-                            redo: () => { }
-                        };
-                    },
-                    userInputDataSchema: formSchema_1.default.general.dataSchema,
-                    customControls: formSchema_1.default.general.customControls
-                });
-                actions.push({
-                    name: 'Theme Settings',
-                    icon: 'palette',
-                    command: (builder, userInputData) => {
-                        let oldTag = {};
-                        return {
-                            execute: async () => {
-                                if (!userInputData)
-                                    return;
-                                oldTag = JSON.parse(JSON.stringify(this.tag));
-                                if (builder)
-                                    builder.setTag(userInputData);
-                                else
-                                    this.setTag(userInputData);
-                                if (this.dappContainer)
-                                    this.dappContainer.setTag(userInputData);
-                            },
-                            undo: () => {
-                                if (!userInputData)
-                                    return;
                                 this.tag = JSON.parse(JSON.stringify(oldTag));
                                 if (builder)
                                     builder.setTag(this.tag);
@@ -1831,7 +1886,9 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             redo: () => { }
                         };
                     },
-                    userInputDataSchema: formSchema_1.default.theme.dataSchema
+                    userInputDataSchema: formSchema_1.default.dataSchema,
+                    userInputUISchema: formSchema_1.default.uiSchema,
+                    customControls: formSchema_1.default.customControls
                 });
             }
             return actions;

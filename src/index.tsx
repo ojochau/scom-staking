@@ -140,59 +140,61 @@ export default class ScomStaking extends Module {
 		if (category && category !== 'offers') {
 			actions.push(
 				{
-					name: 'Settings',
-					icon: 'cog',
+					name: 'Edit',
+					icon: 'edit',
 					command: (builder: any, userInputData: any) => {
-						let _oldData: ISingleStakingCampaign = {
+						let oldData: ISingleStakingCampaign = {
 							chainId: 0,
 							customName: '',
 							stakings: undefined,
 							wallets: [],
 							networks: []
 						};
-						return {
-							execute: async () => {
-								_oldData = { ...this._data };
-								if (userInputData?.chainId !== undefined) this._data.chainId = userInputData.chainId;
-								if (userInputData?.customName !== undefined) this._data.customName = userInputData.customName;
-								if (userInputData?.customDesc !== undefined) this._data.customDesc = userInputData.customDesc;
-								if (userInputData?.customLogo !== undefined) this._data.customLogo = userInputData.customLogo;
-								if (userInputData?.getTokenURL !== undefined) this._data.getTokenURL = userInputData.getTokenURL;
-								if (userInputData?.showContractLink !== undefined) this._data.showContractLink = userInputData.showContractLink;
-								if (userInputData?.stakings !== undefined) this._data.stakings = userInputData.stakings;
-								await this.resetRpcWallet();
-								this.refreshUI();
-								if (builder?.setData) builder.setData(this._data);
-							},
-							undo: async () => {
-								this._data = { ..._oldData };
-								this.refreshUI();
-								if (builder?.setData) builder.setData(this._data);
-							},
-							redo: () => { }
-						}
-					},
-					userInputDataSchema: formSchema.general.dataSchema,
-					customControls: formSchema.general.customControls
-				}
-			);
-
-			actions.push(
-				{
-					name: 'Theme Settings',
-					icon: 'palette',
-					command: (builder: any, userInputData: any) => {
 						let oldTag = {};
 						return {
 							execute: async () => {
-								if (!userInputData) return;
+								oldData = JSON.parse(JSON.stringify(this._data));
+								const {
+									chainId,
+									customName,
+									customDesc,
+									customLogo,
+									getTokenURL,
+									showContractLink,
+									stakings,
+									...themeSettings
+								} = userInputData;
+
+								const generalSettings = {
+									chainId,
+									customName,
+									customDesc,
+									customLogo,
+									getTokenURL,
+									showContractLink,
+									stakings
+								};
+								if (generalSettings.chainId !== undefined) this._data.chainId = generalSettings.chainId;
+								if (generalSettings.customName !== undefined) this._data.customName = generalSettings.customName;
+								if (generalSettings.customDesc !== undefined) this._data.customDesc = generalSettings.customDesc;
+								if (generalSettings.customLogo !== undefined) this._data.customLogo = generalSettings.customLogo;
+								if (generalSettings.getTokenURL !== undefined) this._data.getTokenURL = generalSettings.getTokenURL;
+								if (generalSettings.showContractLink !== undefined) this._data.showContractLink = generalSettings.showContractLink;
+								if (generalSettings.stakings !== undefined) this._data.stakings = generalSettings.stakings;
+								await this.resetRpcWallet();
+								this.refreshUI();
+								if (builder?.setData) builder.setData(this._data);
+
 								oldTag = JSON.parse(JSON.stringify(this.tag));
-								if (builder) builder.setTag(userInputData);
-								else this.setTag(userInputData);
-								if (this.dappContainer) this.dappContainer.setTag(userInputData);
+								if (builder) builder.setTag(themeSettings);
+								else this.setTag(themeSettings);
+								if (this.dappContainer) this.dappContainer.setTag(themeSettings);
 							},
-							undo: () => {
-								if (!userInputData) return;
+							undo: async () => {
+								this._data = JSON.parse(JSON.stringify(oldData));
+								this.refreshUI();
+								if (builder?.setData) builder.setData(this._data);
+
 								this.tag = JSON.parse(JSON.stringify(oldTag));
 								if (builder) builder.setTag(this.tag);
 								else this.setTag(this.tag);
@@ -201,7 +203,9 @@ export default class ScomStaking extends Module {
 							redo: () => { }
 						}
 					},
-					userInputDataSchema: formSchema.theme.dataSchema
+					userInputDataSchema: formSchema.dataSchema,
+					userInputUISchema: formSchema.uiSchema,
+					customControls: formSchema.customControls
 				}
 			);
 		}
