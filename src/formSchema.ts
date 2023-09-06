@@ -57,16 +57,16 @@ export default {
                 enum: chainIds,
                 required: true
             },
-            customName: {
+            name: {
                 type: 'string',
                 label: 'Campaign Name',
                 required: true
             },
-            customDesc: {
+            desc: {
                 type: 'string',
                 label: 'Campaign Description'
             },
-            customLogo: {
+            logo: {
                 type: 'string',
                 title: 'Campaign Logo'
             },
@@ -84,11 +84,6 @@ export default {
                         type: 'string',
                         required: true
                     },
-                    // customDesc: {
-                    //   type: 'string',
-                    //   title: 'Staking Description',
-                    //   readOnly
-                    // },
                     lockTokenType: {
                         type: 'number',
                         oneOf: [
@@ -133,15 +128,15 @@ export default {
                             },
                             {
                                 type: 'Control',
-                                scope: '#/properties/customName'
+                                scope: '#/properties/name'
                             },
                             {
                                 type: 'Control',
-                                scope: '#/properties/customDesc'
+                                scope: '#/properties/desc'
                             },
                             {
                                 type: 'Control',
-                                scope: '#/properties/customLogo'
+                                scope: '#/properties/logo'
                             },
                             {
                                 type: 'Control',

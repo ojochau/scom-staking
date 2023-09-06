@@ -19,7 +19,7 @@ export class State {
     this.initData(options);
   }
 
-  initRpcWallet(defaultChainId: number) {
+  initRpcWallet(chainId: number) {
     if (this.rpcWalletId) {
       return this.rpcWalletId;
     }
@@ -27,7 +27,7 @@ export class State {
     const networkList: INetwork[] = Object.values(application.store?.networkMap || []);
     const instanceId = clientWallet.initRpcWallet({
       networks: networkList,
-      defaultChainId,
+      defaultChainId: chainId,
       infuraId: application.store?.infuraId,
       multicalls: application.store?.multicalls
     });

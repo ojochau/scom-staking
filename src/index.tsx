@@ -145,7 +145,7 @@ export default class ScomStaking extends Module {
 					command: (builder: any, userInputData: any) => {
 						let oldData: ISingleStakingCampaign = {
 							chainId: 0,
-							customName: '',
+							name: '',
 							stakings: undefined,
 							wallets: [],
 							networks: []
@@ -156,9 +156,9 @@ export default class ScomStaking extends Module {
 								oldData = JSON.parse(JSON.stringify(this._data));
 								const {
 									chainId,
-									customName,
-									customDesc,
-									customLogo,
+									name,
+									desc,
+									logo,
 									getTokenURL,
 									showContractLink,
 									stakings,
@@ -167,17 +167,17 @@ export default class ScomStaking extends Module {
 
 								const generalSettings = {
 									chainId,
-									customName,
-									customDesc,
-									customLogo,
+									name,
+									desc,
+									logo,
 									getTokenURL,
 									showContractLink,
 									stakings
 								};
 								if (generalSettings.chainId !== undefined) this._data.chainId = generalSettings.chainId;
-								if (generalSettings.customName !== undefined) this._data.customName = generalSettings.customName;
-								if (generalSettings.customDesc !== undefined) this._data.customDesc = generalSettings.customDesc;
-								if (generalSettings.customLogo !== undefined) this._data.customLogo = generalSettings.customLogo;
+								if (generalSettings.name !== undefined) this._data.name = generalSettings.name;
+								if (generalSettings.desc !== undefined) this._data.desc = generalSettings.desc;
+								if (generalSettings.logo !== undefined) this._data.logo = generalSettings.logo;
 								if (generalSettings.getTokenURL !== undefined) this._data.getTokenURL = generalSettings.getTokenURL;
 								if (generalSettings.showContractLink !== undefined) this._data.showContractLink = generalSettings.showContractLink;
 								if (generalSettings.stakings !== undefined) this._data.stakings = generalSettings.stakings;
@@ -277,18 +277,18 @@ export default class ScomStaking extends Module {
 
 	private async resetRpcWallet() {
 		this.removeRpcWalletEvents();
-		const rpcWalletId = await this.state.initRpcWallet(this.defaultChainId);
+		const rpcWalletId = await this.state.initRpcWallet(this.chainId);
 		const rpcWallet = this.rpcWallet;
 		const chainChangedEvent = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.ChainChanged, async (chainId: number) => {
 			this.onChainChanged();
 		});
 		const connectedEvent = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.Connected, async (connected: boolean) => {
-			await this.initializeWidgetConfig();
+			this.initializeWidgetConfig();
 		});
 		this.rpcWalletEvents.push(chainChangedEvent, connectedEvent);
 
 		const data = {
-			defaultChainId: this.defaultChainId,
+			defaultChainId: this.chainId,
 			wallets: this.wallets,
 			networks: this.networks,
 			showHeader: this.showHeader,
@@ -329,9 +329,9 @@ export default class ScomStaking extends Module {
 		if (this.dappContainer)
 			this.dappContainer.setTag(this.tag);
 		this.updateTheme();
-		if (this.stakingElm) {
-			this.renderCampaigns();
-		}
+		// if (this.stakingElm) {
+		// 	this.renderCampaigns();
+		// }
 	}
 
 	private updateStyle(name: string, value: any) {
@@ -351,14 +351,6 @@ export default class ScomStaking extends Module {
 		this.updateStyle('--colors-secondary-contrast_text', this.tag[themeVar]?.secondaryFontColor);
 		this.updateStyle('--input-font_color', this.tag[themeVar]?.inputFontColor);
 		this.updateStyle('--input-background', this.tag[themeVar]?.inputBackgroundColor);
-	}
-
-	get defaultChainId() {
-		return this._data.defaultChainId;
-	}
-
-	set defaultChainId(value: number) {
-		this._data.defaultChainId = value;
 	}
 
 	get wallets() {
@@ -386,7 +378,7 @@ export default class ScomStaking extends Module {
 	}
 
 	private get chainId() {
-		return this.state.getChainId();
+		return this._data.chainId;
 	}
 
 	private get rpcWallet() {
@@ -449,7 +441,7 @@ export default class ScomStaking extends Module {
 		this.initializeWidgetConfig();
 	}
 
-	private initializeWidgetConfig = async (hideLoading?: boolean) => {
+	private initializeWidgetConfig = (hideLoading?: boolean) => {
 		setTimeout(async () => {
 			if (!hideLoading && this.loadingElm) {
 				this.loadingElm.visible = true;
@@ -462,7 +454,7 @@ export default class ScomStaking extends Module {
 			tokenStore.updateTokenMapData(this.chainId);
 			const rpcWallet = this.rpcWallet;
 			if (rpcWallet.address) {
-				tokenStore.updateAllTokenBalances(rpcWallet);
+				await tokenStore.updateAllTokenBalances(rpcWallet);
 			}
 			this.campaigns = await getAllCampaignsInfo(rpcWallet, { [this._data.chainId]: this._data });
 			await this.renderCampaigns(hideLoading);
@@ -507,7 +499,7 @@ export default class ScomStaking extends Module {
 		};
 
 		const confirmationCallBack = async (receipt: any) => {
-			await this.initializeWidgetConfig(true);
+			this.initializeWidgetConfig(true);
 			if (!btnClaim) return;
 			btnClaim.rightIcon.visible = false;
 			btnClaim.enabled = true;
@@ -523,8 +515,8 @@ export default class ScomStaking extends Module {
 
 	private checkValidation = () => {
 		if (!this._data) return false;
-		const { chainId, customName, stakings } = this._data;
-		if (!chainId || !customName || !stakings) return false;
+		const { chainId, name, stakings } = this._data;
+		if (!chainId || !name || !stakings) return false;
 		const { address, rewards, lockTokenType } = stakings;
 		if (!address || !rewards || !rewards.address || lockTokenType === undefined) return false;
 		// const { chainId, customName, campaignStart, campaignEnd, admin, stakings } = this._data;
@@ -843,7 +835,7 @@ export default class ScomStaking extends Module {
 			}
 
 			setTimer();
-			this.listActiveTimer.push(setInterval(setTimer, 2000));
+			// this.listActiveTimer.push(setInterval(setTimer, 2000));
 
 			const stakingsElm = await Promise.all(options.map(async (option: any, optionIdx: number) => {
 				const manageStake = new ManageStake();
@@ -959,8 +951,8 @@ export default class ScomStaking extends Module {
 									}
 								</i-hstack>
 								<i-vstack gap={2} overflow={{ x: 'hidden' }} verticalAlignment="center">
-									<i-label visible={!!campaign.customName} caption={campaign.customName} font={{ size: '20px', color: Theme.text.secondary, bold: true }} class="text-overflow" />
-									<i-label visible={!!campaign.customDesc} caption={campaign.customDesc} font={{ size: '16px' }} opacity={0.5} class="text-overflow" />
+									<i-label visible={!!campaign.name} caption={campaign.name} font={{ size: '20px', color: Theme.text.secondary, bold: true }} class="text-overflow" />
+									<i-label visible={!!campaign.desc} caption={campaign.desc} font={{ size: '16px' }} opacity={0.5} class="text-overflow" />
 								</i-vstack>
 							</i-hstack>
 							{

@@ -204,8 +204,8 @@ const composeCampaignInfoList = async (stakingCampaignInfoList: ISingleStakingCa
 
     let campaignObj: any = {
       ...stakingCampaignInfo,
-      campaignName: stakingCampaignInfo.customName,
-      campaignDesc: stakingCampaignInfo.customDesc,
+      campaignName: stakingCampaignInfo.name,
+      campaignDesc: stakingCampaignInfo.desc,
       getTokenURL: stakingCampaignInfo.getTokenURL,
       options: durationOptionsWithExtendedInfo,
     }

@@ -14,9 +14,9 @@ export enum LockTokenType {
 
 export interface ISingleStakingCampaign {
   chainId: number,
-  customName: string,
-  customDesc?: string,
-  customLogo?: string,
+  name: string,
+  desc?: string,
+  logo?: string,
   getTokenURL?: string,
   // campaignStart: number, // new campaign
   // campaignEnd: number, // new campaign
@@ -26,8 +26,7 @@ export interface ISingleStakingCampaign {
   commissions?: ICommissionInfo[],
   wallets: IWalletPlugin[],
   networks: INetworkConfig[],
-  showHeader?: boolean,
-  defaultChainId?: number
+  showHeader?: boolean
 }
 
 export interface ISingleStaking {
@@ -39,7 +38,7 @@ export interface ISingleStaking {
   // maxTotalLock: number, // new campaign
 
   //custom
-  customDesc?: string,
+  desc?: string,
   lockTokenType: LockTokenType,
   rewards: ISingleReward
 }
@@ -60,9 +59,9 @@ export interface ISingleReward {
 export interface IStakingCampaign {
   //custom
   chainId: number,
-  customName: string,
-  customDesc?: string,
-  customLogo?: string,
+  name: string,
+  desc?: string,
+  logo?: string,
   getTokenURL?: string,
   campaignStart: BigNumber, //unix
   campaignEnd: BigNumber, //unix
@@ -96,7 +95,7 @@ export interface Staking {
   maxTotalLock: BigNumber,
 
   //custom
-  customDesc?: string,
+  desc?: string,
   lockTokenType: LockTokenType,
   decimalsOffset?: number,
   // totalRewardAmount?: RewardNeeded[], // total reward needed

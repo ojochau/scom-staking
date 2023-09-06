@@ -54,8 +54,8 @@ export default class Module1 extends Module {
             <i-hstack id="mainStack" margin={{ top: '1rem', left: '1rem' }} gap="2rem">
                 <i-scom-staking data={{
                     "chainId": 43113,
-                    "customName": "Scom-Staking",
-                    "customDesc": "Earn USDT.e",
+                    "name": "Scom-Staking",
+                    "desc": "Earn USDT.e",
                     "showContractLink": true,
                     "stakings":
                     {
@@ -76,8 +76,7 @@ export default class Module1 extends Module {
                         {
                             "name": "metamask"
                         }
-                    ],
-                    defaultChainId: 43113
+                    ]
                 }} />
             </i-hstack>
         </i-panel>

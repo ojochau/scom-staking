@@ -43,9 +43,9 @@ declare module "@scom/scom-staking/global/utils/interfaces.ts" {
     }
     export interface ISingleStakingCampaign {
         chainId: number;
-        customName: string;
-        customDesc?: string;
-        customLogo?: string;
+        name: string;
+        desc?: string;
+        logo?: string;
         getTokenURL?: string;
         showContractLink?: boolean;
         stakings: ISingleStaking;
@@ -53,11 +53,10 @@ declare module "@scom/scom-staking/global/utils/interfaces.ts" {
         wallets: IWalletPlugin[];
         networks: INetworkConfig[];
         showHeader?: boolean;
-        defaultChainId?: number;
     }
     export interface ISingleStaking {
         address: string;
-        customDesc?: string;
+        desc?: string;
         lockTokenType: LockTokenType;
         rewards: ISingleReward;
     }
@@ -67,9 +66,9 @@ declare module "@scom/scom-staking/global/utils/interfaces.ts" {
     }
     export interface IStakingCampaign {
         chainId: number;
-        customName: string;
-        customDesc?: string;
-        customLogo?: string;
+        name: string;
+        desc?: string;
+        logo?: string;
         getTokenURL?: string;
         campaignStart: BigNumber;
         campaignEnd: BigNumber;
@@ -96,7 +95,7 @@ declare module "@scom/scom-staking/global/utils/interfaces.ts" {
         minLockTime: BigNumber;
         perAddressCap: BigNumber;
         maxTotalLock: BigNumber;
-        customDesc?: string;
+        desc?: string;
         lockTokenType: LockTokenType;
         decimalsOffset?: number;
         rewards: Reward[];
@@ -158,7 +157,7 @@ declare module "@scom/scom-staking/store/utils.ts" {
         rpcWalletId: string;
         approvalModel: ERC20ApprovalModel;
         constructor(options: any);
-        initRpcWallet(defaultChainId: number): string;
+        initRpcWallet(chainId: number): string;
         private initData;
         private setNetworkList;
         getProxyAddress(chainId?: number): string;
@@ -195,23 +194,10 @@ declare module "@scom/scom-staking/store/index.ts" {
 /// <amd-module name="@scom/scom-staking/data.json.ts" />
 declare module "@scom/scom-staking/data.json.ts" {
     const _default_1: {
-        infuraId: string;
-        networks: {
-            chainId: number;
-            explorerName: string;
-            explorerTxUrl: string;
-            explorerAddressUrl: string;
-        }[];
-        proxyAddresses: {
-            "97": string;
-            "43113": string;
-        };
-        embedderCommissionFee: string;
         defaultBuilderData: {
-            defaultChainId: number;
             chainId: number;
-            customName: string;
-            customDesc: string;
+            name: string;
+            desc: string;
             showContractLink: boolean;
             stakings: {
                 address: string;
@@ -352,16 +338,16 @@ declare module "@scom/scom-staking/formSchema.ts" {
                     enum: number[];
                     required: boolean;
                 };
-                customName: {
+                name: {
                     type: string;
                     label: string;
                     required: boolean;
                 };
-                customDesc: {
+                desc: {
                     type: string;
                     label: string;
                 };
-                customLogo: {
+                logo: {
                     type: string;
                     title: string;
                 };
@@ -589,8 +575,6 @@ declare module "@scom/scom-staking" {
         private setTag;
         private updateStyle;
         private updateTheme;
-        get defaultChainId(): number;
-        set defaultChainId(value: number);
         get wallets(): IWalletPlugin[];
         set wallets(value: IWalletPlugin[]);
         get networks(): INetworkConfig[];
