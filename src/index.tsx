@@ -35,6 +35,7 @@ import {
 	getVaultRewardCurrentAPR,
 	claimToken,
 	getAllCampaignsInfo,
+	getProxySelectors,
 } from './staking-utils/index';
 import ManageStake from './manage-stake/index';
 import { Contracts } from '@scom/oswap-time-is-money-contract';
@@ -44,7 +45,7 @@ import ScomWalletModal, { IWalletPlugin } from '@scom/scom-wallet-modal';
 import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
 import ScomTxStatusModal from '@scom/scom-tx-status-modal';
 import { INetworkConfig } from '@scom/scom-network-picker';
-import formSchema from './formSchema';
+import formSchema, { getProjectOwnerSchema } from './formSchema';
 
 const Theme = Styles.Theme.ThemeVars;
 
@@ -212,9 +213,39 @@ export default class ScomStaking extends Module {
 		return actions;
 	}
 
+	private getProjectOwnerActions() {
+		const formSchema = getProjectOwnerSchema();
+		const actions: any[] = [
+		{
+			name: 'Settings',
+			userInputDataSchema: formSchema.dataSchema,
+			userInputUISchema: formSchema.uiSchema
+		}
+		];
+		return actions;
+	}
+
 	getConfigurators() {
 		let self = this;
 		return [
+			{
+				name: 'Project Owner Configurator',
+			  	target: 'Project Owners',
+				getProxySelectors: async (chainId: number) => {
+					const address = this.campaigns[0]?.options?.[0]?.address;
+					const selectors = await getProxySelectors(this.state, chainId, address);
+					return selectors;
+				},
+				getActions: () => {
+					return this.getProjectOwnerActions();
+				},
+				getData: this.getData.bind(this),
+				setData: async (data: any) => {
+					await this.setData(data);
+				},
+				getTag: this.getTag.bind(this),
+				setTag: this.setTag.bind(this)
+			},
 			{
 				name: 'Builder Configurator',
 				target: 'Builders',

@@ -9,7 +9,8 @@ import {
 } from "../global/index";
 import {
   USDPeggedTokenAddressMap,
-  getTokenDecimals
+  getTokenDecimals,
+  State
 } from "../store/index";
 import { tokenStore, ToUSDPriceFeedAddressesMap, WETHByChainId, tokenPriceAMMReference, ITokenObject } from '@scom/scom-token-list';
 
@@ -488,6 +489,22 @@ const lockToken = async (token: ITokenObject, amount: string, contractAddress: s
   }
 }
 
+const getProxySelectors = async (state: State, chainId: number, contractAddress: string): Promise<string[]> => {
+  const wallet = state.getRpcWallet();
+  await wallet.init();
+  if (wallet.chainId != chainId) await wallet.switchNetwork(chainId);
+  const timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet, contractAddress);
+  const permittedProxyFunctions: (keyof TimeIsMoneyContracts.TimeIsMoney)[] = [
+    "lock",
+    "withdraw"
+  ];
+  const selectors = permittedProxyFunctions
+    .map(e => e + "(" + timeIsMoney._abi.filter(f => f.name == e)[0].inputs.map(f => f.type).join(',') + ")")
+    .map(e => wallet.soliditySha3(e).substring(0, 10))
+    .map(e => timeIsMoney.address.toLowerCase() + e.replace("0x", ""));
+  return selectors;
+}
+
 export {
   getAllCampaignsInfo,
   getStakingTotalLocked,
@@ -500,5 +517,6 @@ export {
   getVaultRewardCurrentAPR,
   withdrawToken,
   claimToken,
-  lockToken
+  lockToken,
+  getProxySelectors
 }

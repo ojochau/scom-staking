@@ -440,7 +440,7 @@ define("@scom/scom-staking/data.json.ts", ["require", "exports"], function (requ
 define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/oswap-time-is-money-contract", "@scom/oswap-openswap-contract", "@scom/oswap-chainlink-contract", "@scom/oswap-cross-chain-bridge-contract", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list"], function (require, exports, eth_wallet_4, oswap_time_is_money_contract_1, oswap_openswap_contract_1, oswap_chainlink_contract_1, oswap_cross_chain_bridge_contract_1, index_4, scom_token_list_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.lockToken = exports.claimToken = exports.withdrawToken = exports.getVaultRewardCurrentAPR = exports.getLPRewardCurrentAPR = exports.getERC20RewardCurrentAPR = exports.getVaultBalance = exports.getVaultObject = exports.getLPBalance = exports.getLPObject = exports.getStakingTotalLocked = exports.getAllCampaignsInfo = exports.getTokenPrice = void 0;
+    exports.getProxySelectors = exports.lockToken = exports.claimToken = exports.withdrawToken = exports.getVaultRewardCurrentAPR = exports.getLPRewardCurrentAPR = exports.getERC20RewardCurrentAPR = exports.getVaultBalance = exports.getVaultObject = exports.getLPBalance = exports.getLPObject = exports.getStakingTotalLocked = exports.getAllCampaignsInfo = exports.getTokenPrice = void 0;
     const getTokenPrice = async (wallet, token) => {
         let chainId = wallet.chainId;
         let tokenPrice;
@@ -898,6 +898,23 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
         }
     };
     exports.lockToken = lockToken;
+    const getProxySelectors = async (state, chainId, contractAddress) => {
+        const wallet = state.getRpcWallet();
+        await wallet.init();
+        if (wallet.chainId != chainId)
+            await wallet.switchNetwork(chainId);
+        const timeIsMoney = new oswap_time_is_money_contract_1.Contracts.TimeIsMoney(wallet, contractAddress);
+        const permittedProxyFunctions = [
+            "lock",
+            "withdraw"
+        ];
+        const selectors = permittedProxyFunctions
+            .map(e => e + "(" + timeIsMoney._abi.filter(f => f.name == e)[0].inputs.map(f => f.type).join(',') + ")")
+            .map(e => wallet.soliditySha3(e).substring(0, 10))
+            .map(e => timeIsMoney.address.toLowerCase() + e.replace("0x", ""));
+        return selectors;
+    };
+    exports.getProxySelectors = getProxySelectors;
 });
 define("@scom/scom-staking/manage-stake/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_5) {
     "use strict";
@@ -1538,6 +1555,7 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
 define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-network-picker", "@scom/scom-staking/global/index.ts"], function (require, exports, scom_network_picker_1, index_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.getProjectOwnerSchema = void 0;
     const chainIds = [1, 56, 137, 250, 97, 80001, 43113, 43114];
     const theme = {
         type: 'object',
@@ -1731,6 +1749,130 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
             }
         }
     };
+    function getProjectOwnerSchema() {
+        return {
+            dataSchema: {
+                type: 'object',
+                properties: {
+                    name: {
+                        type: 'string',
+                        label: 'Campaign Name',
+                        required: true
+                    },
+                    desc: {
+                        type: 'string',
+                        label: 'Campaign Description'
+                    },
+                    logo: {
+                        type: 'string',
+                        title: 'Campaign Logo'
+                    },
+                    getTokenURL: {
+                        type: 'string',
+                        title: 'Token Trade URL'
+                    },
+                    showContractLink: {
+                        type: 'boolean'
+                    },
+                    stakings: {
+                        type: 'object',
+                        properties: {
+                            address: {
+                                type: 'string',
+                                required: true
+                            },
+                            lockTokenType: {
+                                type: 'number',
+                                oneOf: [
+                                    { title: 'ERC20_Token', const: index_9.LockTokenType.ERC20_Token },
+                                    { title: 'LP_Token', const: index_9.LockTokenType.LP_Token },
+                                    { title: 'VAULT_Token', const: index_9.LockTokenType.VAULT_Token },
+                                ],
+                                required: true
+                            },
+                            rewards: {
+                                type: 'object',
+                                properties: {
+                                    address: {
+                                        type: 'string',
+                                        required: true
+                                    },
+                                    isCommonStartDate: {
+                                        type: 'boolean',
+                                        title: 'Common Start Date'
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    dark: theme,
+                    light: theme
+                }
+            },
+            uiSchema: {
+                type: 'Categorization',
+                elements: [
+                    {
+                        type: 'Category',
+                        label: 'General',
+                        elements: [
+                            {
+                                type: 'VerticalLayout',
+                                elements: [
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/name'
+                                    },
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/desc'
+                                    },
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/logo'
+                                    },
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/getTokenURL'
+                                    },
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/showContractLink'
+                                    },
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/stakings'
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        type: 'Category',
+                        label: 'Theme',
+                        elements: [
+                            {
+                                type: 'VerticalLayout',
+                                elements: [
+                                    {
+                                        type: 'Control',
+                                        label: 'Dark',
+                                        scope: '#/properties/dark'
+                                    },
+                                    {
+                                        type: 'Control',
+                                        label: 'Light',
+                                        scope: '#/properties/light'
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+    }
+    exports.getProjectOwnerSchema = getProjectOwnerSchema;
 });
 define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/data.json.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/manage-stake/index.tsx", "@scom/oswap-time-is-money-contract", "@scom/scom-staking/index.css.ts", "@scom/scom-staking/formSchema.ts"], function (require, exports, components_8, eth_wallet_6, assets_2, index_10, index_11, scom_token_list_4, data_json_1, index_12, index_13, oswap_time_is_money_contract_2, index_css_2, formSchema_1) {
     "use strict";
@@ -1864,9 +2006,39 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             }
             return actions;
         }
+        getProjectOwnerActions() {
+            const formSchema = (0, formSchema_1.getProjectOwnerSchema)();
+            const actions = [
+                {
+                    name: 'Settings',
+                    userInputDataSchema: formSchema.dataSchema,
+                    userInputUISchema: formSchema.uiSchema
+                }
+            ];
+            return actions;
+        }
         getConfigurators() {
             let self = this;
             return [
+                {
+                    name: 'Project Owner Configurator',
+                    target: 'Project Owners',
+                    getProxySelectors: async (chainId) => {
+                        var _a, _b, _c;
+                        const address = (_c = (_b = (_a = this.campaigns[0]) === null || _a === void 0 ? void 0 : _a.options) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.address;
+                        const selectors = await (0, index_12.getProxySelectors)(this.state, chainId, address);
+                        return selectors;
+                    },
+                    getActions: () => {
+                        return this.getProjectOwnerActions();
+                    },
+                    getData: this.getData.bind(this),
+                    setData: async (data) => {
+                        await this.setData(data);
+                    },
+                    getTag: this.getTag.bind(this),
+                    setTag: this.setTag.bind(this)
+                },
                 {
                     name: 'Builder Configurator',
                     target: 'Builders',
