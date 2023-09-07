@@ -195,3 +195,127 @@ export default {
         }
     }
 }
+
+export function getProjectOwnerSchema() {
+    return {
+        dataSchema: {
+            type: 'object',
+            properties: {
+                name: {
+                    type: 'string',
+                    label: 'Campaign Name',
+                    required: true
+                },
+                desc: {
+                    type: 'string',
+                    label: 'Campaign Description'
+                },
+                logo: {
+                    type: 'string',
+                    title: 'Campaign Logo'
+                },
+                getTokenURL: {
+                    type: 'string',
+                    title: 'Token Trade URL'
+                },
+                showContractLink: {
+                    type: 'boolean'
+                },
+                stakings: {
+                    type: 'object',
+                    properties: {
+                        address: {
+                            type: 'string',
+                            required: true
+                        },
+                        lockTokenType: {
+                            type: 'number',
+                            oneOf: [
+                                { title: 'ERC20_Token', const: LockTokenType.ERC20_Token },
+                                { title: 'LP_Token', const: LockTokenType.LP_Token },
+                                { title: 'VAULT_Token', const: LockTokenType.VAULT_Token },
+                            ],
+                            required: true
+                        },
+                        rewards: {
+                            type: 'object',
+                            properties: {
+                                address: {
+                                    type: 'string',
+                                    required: true
+                                },
+                                isCommonStartDate: {
+                                    type: 'boolean',
+                                    title: 'Common Start Date'
+                                }
+                            }
+                        }
+                    }
+                },
+                dark: theme,
+                light: theme
+            }
+        },
+        uiSchema: {
+            type: 'Categorization',
+            elements: [
+                {
+                    type: 'Category',
+                    label: 'General',
+                    elements: [
+                        {
+                            type: 'VerticalLayout',
+                            elements: [
+                                {
+                                    type: 'Control',
+                                    scope: '#/properties/name'
+                                },
+                                {
+                                    type: 'Control',
+                                    scope: '#/properties/desc'
+                                },
+                                {
+                                    type: 'Control',
+                                    scope: '#/properties/logo'
+                                },
+                                {
+                                    type: 'Control',
+                                    scope: '#/properties/getTokenURL'
+                                },
+                                {
+                                    type: 'Control',
+                                    scope: '#/properties/showContractLink'
+                                },
+                                {
+                                    type: 'Control',
+                                    scope: '#/properties/stakings'
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    type: 'Category',
+                    label: 'Theme',
+                    elements: [
+                        {
+                            type: 'VerticalLayout',
+                            elements: [
+                                {
+                                    type: 'Control',
+                                    label: 'Dark',
+                                    scope: '#/properties/dark'
+                                },
+                                {
+                                    type: 'Control',
+                                    label: 'Light',
+                                    scope: '#/properties/light'
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

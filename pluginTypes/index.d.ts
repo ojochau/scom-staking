@@ -221,6 +221,7 @@ declare module "@scom/scom-staking/data.json.ts" {
 declare module "@scom/scom-staking/staking-utils/index.ts" {
     import { BigNumber, IWallet } from "@ijstech/eth-wallet";
     import { ISingleStakingCampaign } from "@scom/scom-staking/global/index.ts";
+    import { State } from "@scom/scom-staking/store/index.ts";
     import { ITokenObject } from '@scom/scom-token-list';
     export const getTokenPrice: (wallet: IWallet, token: string) => Promise<string>;
     const getAllCampaignsInfo: (wallet: IWallet, stakingInfo: {
@@ -256,7 +257,8 @@ declare module "@scom/scom-staking/staking-utils/index.ts" {
     const withdrawToken: (contractAddress: string, callback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     const claimToken: (contractAddress: string, callback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     const lockToken: (token: ITokenObject, amount: string, contractAddress: string, callback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
-    export { getAllCampaignsInfo, getStakingTotalLocked, getLPObject, getLPBalance, getVaultObject, getVaultBalance, getERC20RewardCurrentAPR, getLPRewardCurrentAPR, getVaultRewardCurrentAPR, withdrawToken, claimToken, lockToken };
+    const getProxySelectors: (state: State, chainId: number, contractAddress: string) => Promise<string[]>;
+    export { getAllCampaignsInfo, getStakingTotalLocked, getLPObject, getLPBalance, getVaultObject, getVaultBalance, getERC20RewardCurrentAPR, getLPRewardCurrentAPR, getVaultRewardCurrentAPR, withdrawToken, claimToken, lockToken, getProxySelectors };
 }
 /// <amd-module name="@scom/scom-staking/manage-stake/index.css.ts" />
 declare module "@scom/scom-staking/manage-stake/index.css.ts" {
@@ -496,6 +498,160 @@ declare module "@scom/scom-staking/formSchema.ts" {
         };
     };
     export default _default_2;
+    export function getProjectOwnerSchema(): {
+        dataSchema: {
+            type: string;
+            properties: {
+                name: {
+                    type: string;
+                    label: string;
+                    required: boolean;
+                };
+                desc: {
+                    type: string;
+                    label: string;
+                };
+                logo: {
+                    type: string;
+                    title: string;
+                };
+                getTokenURL: {
+                    type: string;
+                    title: string;
+                };
+                showContractLink: {
+                    type: string;
+                };
+                stakings: {
+                    type: string;
+                    properties: {
+                        address: {
+                            type: string;
+                            required: boolean;
+                        };
+                        lockTokenType: {
+                            type: string;
+                            oneOf: {
+                                title: string;
+                                const: LockTokenType;
+                            }[];
+                            required: boolean;
+                        };
+                        rewards: {
+                            type: string;
+                            properties: {
+                                address: {
+                                    type: string;
+                                    required: boolean;
+                                };
+                                isCommonStartDate: {
+                                    type: string;
+                                    title: string;
+                                };
+                            };
+                        };
+                    };
+                };
+                dark: {
+                    type: string;
+                    properties: {
+                        backgroundColor: {
+                            type: string;
+                            format: string;
+                        };
+                        fontColor: {
+                            type: string;
+                            format: string;
+                        };
+                        textSecondary: {
+                            type: string;
+                            title: string;
+                            format: string;
+                        };
+                        inputBackgroundColor: {
+                            type: string;
+                            format: string;
+                        };
+                        inputFontColor: {
+                            type: string;
+                            format: string;
+                        };
+                        secondaryColor: {
+                            type: string;
+                            title: string;
+                            format: string;
+                        };
+                        secondaryFontColor: {
+                            type: string;
+                            title: string;
+                            format: string;
+                        };
+                    };
+                };
+                light: {
+                    type: string;
+                    properties: {
+                        backgroundColor: {
+                            type: string;
+                            format: string;
+                        };
+                        fontColor: {
+                            type: string;
+                            format: string;
+                        };
+                        textSecondary: {
+                            type: string;
+                            title: string;
+                            format: string;
+                        };
+                        inputBackgroundColor: {
+                            type: string;
+                            format: string;
+                        };
+                        inputFontColor: {
+                            type: string;
+                            format: string;
+                        };
+                        secondaryColor: {
+                            type: string;
+                            title: string;
+                            format: string;
+                        };
+                        secondaryFontColor: {
+                            type: string;
+                            title: string;
+                            format: string;
+                        };
+                    };
+                };
+            };
+        };
+        uiSchema: {
+            type: string;
+            elements: ({
+                type: string;
+                label: string;
+                elements: {
+                    type: string;
+                    elements: {
+                        type: string;
+                        scope: string;
+                    }[];
+                }[];
+            } | {
+                type: string;
+                label: string;
+                elements: {
+                    type: string;
+                    elements: {
+                        type: string;
+                        label: string;
+                        scope: string;
+                    }[];
+                }[];
+            })[];
+        };
+    };
 }
 /// <amd-module name="@scom/scom-staking" />
 declare module "@scom/scom-staking" {
@@ -535,7 +691,21 @@ declare module "@scom/scom-staking" {
         private rpcWalletEvents;
         private clientEvents;
         private _getActions;
+        private getProjectOwnerActions;
         getConfigurators(): ({
+            name: string;
+            target: string;
+            getProxySelectors: (chainId: number) => Promise<string[]>;
+            getActions: () => any[];
+            getData: any;
+            setData: (data: any) => Promise<void>;
+            getTag: any;
+            setTag: any;
+            elementName?: undefined;
+            getLinkParams?: undefined;
+            setLinkParams?: undefined;
+            bindOnChanged?: undefined;
+        } | {
             name: string;
             target: string;
             getActions: (category?: string) => any[];
@@ -543,6 +713,7 @@ declare module "@scom/scom-staking" {
             setData: (data: any) => Promise<void>;
             getTag: any;
             setTag: any;
+            getProxySelectors?: undefined;
             elementName?: undefined;
             getLinkParams?: undefined;
             setLinkParams?: undefined;
@@ -565,6 +736,7 @@ declare module "@scom/scom-staking" {
             setData: any;
             getTag: any;
             setTag: any;
+            getProxySelectors?: undefined;
             getActions?: undefined;
         })[];
         private getData;
