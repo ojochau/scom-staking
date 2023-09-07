@@ -27,7 +27,8 @@
     "@scom/oswap-openswap-contract": "^0.1.0",
     "@scom/oswap-time-is-money-contract": "^0.1.0",
     "@scom/oswap-chainlink-contract": "^0.1.0",
-    "@scom/oswap-cross-chain-bridge-contract": "^0.1.0"
+    "@scom/oswap-cross-chain-bridge-contract": "^0.1.0",
+    "@scom/scom-token-input": "^0.1.1"
   },
   "devDependencies": {
     "@ijstech/cli": "^0.1.28",

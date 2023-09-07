@@ -1,4 +1,4 @@
-import { moment, Module, Panel, Icon, Button, Label, VStack, HStack, Container, ControlElement, IEventBus, application, customModule, Input, customElements, Styles } from '@ijstech/components';
+import { moment, Module, Panel, Icon, Button, Label, VStack, HStack, Container, ControlElement, IEventBus, application, customModule, Input, customElements, Styles, Control } from '@ijstech/components';
 import { BigNumber, Constants, IEventBusRegistry, Wallet } from '@ijstech/eth-wallet';
 import Assets from './assets';
 import {
@@ -46,6 +46,7 @@ import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
 import ScomTxStatusModal from '@scom/scom-tx-status-modal';
 import { INetworkConfig } from '@scom/scom-network-picker';
 import formSchema, { getProjectOwnerSchema } from './formSchema';
+import ScomStakingFlowInitialSetup from './flow/initialSetup';
 
 const Theme = Styles.Theme.ThemeVars;
 
@@ -1145,5 +1146,32 @@ export default class ScomStaking extends Module {
 				</i-panel>
 			</i-scom-dapp-container>
 		)
+	}
+
+	async handleFlowStage(target: Control, stage: string, options: any) {
+		let widget;
+		if (stage === 'initialSetup') {
+			widget = new ScomStakingFlowInitialSetup();
+			target.appendChild(widget);
+			await widget.ready();
+			let properties = options.properties;
+			let tokenRequirements = options.tokenRequirements;
+			await widget.setData({ ...properties, tokenRequirements });
+		}
+		else {
+			widget = this;
+			target.appendChild(widget);
+			await this.ready();
+			let properties = options.properties;
+			let tag = options.tag;
+			await this.setData(properties);
+			if (tag) {
+				await this.setTag(tag);
+			}
+		}
+
+		return {
+			widget: widget
+		}
 	}
 }

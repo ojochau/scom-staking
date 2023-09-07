@@ -1,5 +1,7 @@
 /// <reference path="@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dapp-container/@ijstech/eth-wallet/index.d.ts" />
+/// <reference path="@scom/scom-token-input/@ijstech/eth-wallet/index.d.ts" />
+/// <reference path="@scom/scom-token-input/@scom/scom-token-modal/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@ijstech/eth-contract/index.d.ts" />
 /// <amd-module name="@scom/scom-staking/assets.ts" />
 declare module "@scom/scom-staking/assets.ts" {
@@ -653,9 +655,35 @@ declare module "@scom/scom-staking/formSchema.ts" {
         };
     };
 }
+/// <amd-module name="@scom/scom-staking/flow/initialSetup.tsx" />
+declare module "@scom/scom-staking/flow/initialSetup.tsx" {
+    import { Module, ControlElement, Container } from '@ijstech/components';
+    interface ScomStakingFlowInitialSetupElement extends ControlElement {
+        data?: any;
+    }
+    global {
+        namespace JSX {
+            interface IntrinsicElements {
+                ['i-scom-staking-flow-initial-setup']: ScomStakingFlowInitialSetupElement;
+            }
+        }
+    }
+    export default class ScomStakingFlowInitialSetup extends Module {
+        private state;
+        private _data;
+        private tokenInput;
+        constructor(parent?: Container, options?: ControlElement);
+        private get rpcWallet();
+        private resetRpcWallet;
+        setData(value: any): Promise<void>;
+        private initWallet;
+        private initializeWidgetConfig;
+        render(): any;
+    }
+}
 /// <amd-module name="@scom/scom-staking" />
 declare module "@scom/scom-staking" {
-    import { Module, Container, ControlElement } from '@ijstech/components';
+    import { Module, Container, ControlElement, Control } from '@ijstech/components';
     import { ISingleStakingCampaign } from "@scom/scom-staking/global/index.ts";
     import { IWalletPlugin } from '@scom/scom-wallet-modal';
     import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
@@ -777,5 +805,8 @@ declare module "@scom/scom-staking" {
         private renderEmpty;
         private renderCampaigns;
         render(): any;
+        handleFlowStage(target: Control, stage: string, options: any): Promise<{
+            widget: any;
+        }>;
     }
 }
