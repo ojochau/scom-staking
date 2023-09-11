@@ -672,12 +672,14 @@ declare module "@scom/scom-staking/flow/initialSetup.tsx" {
         private state;
         private _data;
         private tokenInput;
+        private $eventBus;
         constructor(parent?: Container, options?: ControlElement);
         private get rpcWallet();
         private resetRpcWallet;
         setData(value: any): Promise<void>;
         private initWallet;
         private initializeWidgetConfig;
+        private handleClickNext;
         render(): any;
     }
 }

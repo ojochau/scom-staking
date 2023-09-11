@@ -1157,7 +1157,8 @@ export default class ScomStaking extends Module {
 			await widget.ready();
 			let properties = options.properties;
 			let tokenRequirements = options.tokenRequirements;
-			await widget.setData({ ...properties, tokenRequirements });
+			let invokerId = options.invokerId;
+			await widget.setData({ ...properties, tokenRequirements, invokerId });
 		}
 		else {
 			widget = this;
