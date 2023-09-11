@@ -22,9 +22,9 @@ export const viewOnExplorerByAddress = (chainId: number, address: string) => {
   }
 }
 
-export const tokenSymbol = (address: string) => {
+export const tokenSymbol = (chainId: number, address: string) => {
   if (!address) return '';
-  const tokenMap = tokenStore.tokenMap;
+  const tokenMap = tokenStore.getTokenMapByChainId(chainId);
   let tokenObject = tokenMap[address.toLowerCase()];
   if (!tokenObject) {
     tokenObject = tokenMap[address];
@@ -33,12 +33,9 @@ export const tokenSymbol = (address: string) => {
 }
 
 // staking common
-export const getLockedTokenObject = (info: any, tokenInfo: any, tokenMap?: any) => {
+export const getLockedTokenObject = (info: any, tokenInfo: any, tokenMap: any) => {
   if (info) {
     if (info.lockTokenType == LockTokenType.ERC20_Token) {
-      if (!tokenMap) {
-        tokenMap = tokenStore.tokenMap;
-      }
       return tokenMap[tokenInfo.tokenAddress];
     }
     if (info.lockTokenType == LockTokenType.LP_Token && tokenInfo.lpToken) {
@@ -69,7 +66,7 @@ export const getLockedTokenSymbol = (info: any, token: any) => {
 export const getLockedTokenIconPaths = (info: any, tokenObject: any, chainId: number, tokenMap?: any) => {
   if (info && tokenObject) {
     if (!tokenMap) {
-      tokenMap = tokenStore.tokenMap;
+      tokenMap = tokenStore.getTokenMapByChainId(chainId);
     }
     if (info.lockTokenType == LockTokenType.ERC20_Token) {
       return [tokenAssets.getTokenIconPath(tokenObject, chainId)];
@@ -89,7 +86,8 @@ export const getLockedTokenIconPaths = (info: any, tokenObject: any, chainId: nu
 
 export const getTokenDecimals = (address: string, chainId: number) => {
   const ChainNativeToken = getChainNativeToken(chainId);
-  const tokenObject = (!address || address.toLowerCase() === WETHByChainId[chainId].address.toLowerCase()) ? ChainNativeToken : tokenStore.tokenMap[address.toLowerCase()];
+  const tokenMap = tokenStore.getTokenMapByChainId(chainId);
+  const tokenObject = (!address || address.toLowerCase() === WETHByChainId[chainId].address.toLowerCase()) ? ChainNativeToken : tokenMap[address.toLowerCase()];
   return tokenObject ? tokenObject.decimals : 18;
 }
 

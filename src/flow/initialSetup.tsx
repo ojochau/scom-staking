@@ -65,7 +65,8 @@ export default class ScomStakingFlowInitialSetup extends Module {
         // let tokenAddress = campaignInfo.tokenAddress?.toLowerCase()
         let tokenAddress = this._data.tokenRequirements[0].tokenOut.address?.toLowerCase();
         this.tokenInput.rpcWalletId = rpcWallet.instanceId;
-        const token = tokenStore.tokenMap[tokenAddress];
+        const tokenMap = tokenStore.getTokenMapByChainId(this._data.chainId);
+        const token = tokenMap[tokenAddress];
         this.tokenInput.tokenDataListProp = [token];
         this.tokenInput.token = token
 	}

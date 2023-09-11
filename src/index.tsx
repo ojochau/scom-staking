@@ -669,7 +669,7 @@ export default class ScomStaking extends Module {
 		if (!hideLoading) {
 			this.stakingElm.clearInnerHTML();
 		}
-		this.tokenMap = tokenStore.tokenMap;
+		this.tokenMap = tokenStore.getTokenMapByChainId(this.chainId);
 		const chainId = this.state.getChainId();
 		await this.initEmptyUI();
 		this.noCampaignSection.visible = false;
@@ -996,8 +996,9 @@ export default class ScomStaking extends Module {
 									const rewardTokenDecimals = rewardToken.decimals || 18;
 									const decimalsOffset = 18 - rewardTokenDecimals;
 									const lockTokenType = option.lockTokenType;
+									
 									// const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
-									const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(option.lockTokenAddress)} : ${rewardOption.multiplier} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
+									const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(this.chainId, option.lockTokenAddress)} : ${rewardOption.multiplier} ${tokenSymbol(this.chainId, rewardOption.rewardTokenAddress)}`;
 									const updateApr = async () => {
 										if (lockTokenType === LockTokenType.ERC20_Token) {
 											const apr: any = await getERC20RewardCurrentAPR(rpcWallet, rewardOption, lockedTokenObject, durationDays);

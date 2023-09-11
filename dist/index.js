@@ -327,10 +327,10 @@ define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-s
         }
     };
     exports.viewOnExplorerByAddress = viewOnExplorerByAddress;
-    const tokenSymbol = (address) => {
+    const tokenSymbol = (chainId, address) => {
         if (!address)
             return '';
-        const tokenMap = scom_token_list_1.tokenStore.tokenMap;
+        const tokenMap = scom_token_list_1.tokenStore.getTokenMapByChainId(chainId);
         let tokenObject = tokenMap[address.toLowerCase()];
         if (!tokenObject) {
             tokenObject = tokenMap[address];
@@ -342,9 +342,6 @@ define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-s
     const getLockedTokenObject = (info, tokenInfo, tokenMap) => {
         if (info) {
             if (info.lockTokenType == index_3.LockTokenType.ERC20_Token) {
-                if (!tokenMap) {
-                    tokenMap = scom_token_list_1.tokenStore.tokenMap;
-                }
                 return tokenMap[tokenInfo.tokenAddress];
             }
             if (info.lockTokenType == index_3.LockTokenType.LP_Token && tokenInfo.lpToken) {
@@ -376,7 +373,7 @@ define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-s
         var _a;
         if (info && tokenObject) {
             if (!tokenMap) {
-                tokenMap = scom_token_list_1.tokenStore.tokenMap;
+                tokenMap = scom_token_list_1.tokenStore.getTokenMapByChainId(chainId);
             }
             if (info.lockTokenType == index_3.LockTokenType.ERC20_Token) {
                 return [scom_token_list_1.assets.getTokenIconPath(tokenObject, chainId)];
@@ -396,7 +393,8 @@ define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-s
     exports.getLockedTokenIconPaths = getLockedTokenIconPaths;
     const getTokenDecimals = (address, chainId) => {
         const ChainNativeToken = (0, exports.getChainNativeToken)(chainId);
-        const tokenObject = (!address || address.toLowerCase() === scom_token_list_1.WETHByChainId[chainId].address.toLowerCase()) ? ChainNativeToken : scom_token_list_1.tokenStore.tokenMap[address.toLowerCase()];
+        const tokenMap = scom_token_list_1.tokenStore.getTokenMapByChainId(chainId);
+        const tokenObject = (!address || address.toLowerCase() === scom_token_list_1.WETHByChainId[chainId].address.toLowerCase()) ? ChainNativeToken : tokenMap[address.toLowerCase()];
         return tokenObject ? tokenObject.decimals : 18;
     };
     exports.getTokenDecimals = getTokenDecimals;
@@ -513,12 +511,48 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
             let hasRewardAddress = rewards.length && rewards[0].address;
             let timeIsMoney = new oswap_time_is_money_contract_1.Contracts.TimeIsMoney(wallet, stakingAddress);
             let mode = '';
-            let minimumLockTime = await timeIsMoney.minimumLockTime();
-            let maximumTotalLock = await timeIsMoney.maximumTotalLock();
-            let totalLockedWei = await timeIsMoney.totalLocked();
-            let totalCreditWei = await timeIsMoney.getCredit(currentAddress);
-            let lockAmountWei = await timeIsMoney.lockAmount(currentAddress);
-            let withdrawn = await timeIsMoney.withdrawn(currentAddress);
+            // let minimumLockTime = await timeIsMoney.minimumLockTime();
+            // let maximumTotalLock = await timeIsMoney.maximumTotalLock();
+            // let totalLockedWei = await timeIsMoney.totalLocked();
+            // let totalCreditWei = await timeIsMoney.getCredit(currentAddress);
+            // let lockAmountWei = await timeIsMoney.lockAmount(currentAddress);
+            // let withdrawn = await timeIsMoney.withdrawn(currentAddress);
+            const minimumLockTimeFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'minimumLockTime', []);
+            const maximumTotalLockFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'maximumTotalLock', []);
+            const totalLockedFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'totalLocked', []);
+            const totalCreditFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'getCredit', [currentAddress]);
+            const lockAmountFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'lockAmount', [currentAddress]);
+            const withdrawnFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'withdrawn', [currentAddress]);
+            const tokenFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'token', []);
+            const endOfEntryPeriodFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'endOfEntryPeriod', []);
+            const perAddressCapFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'perAddressCap', []);
+            const funcCallDataArr = [
+                minimumLockTimeFuncCallData,
+                maximumTotalLockFuncCallData,
+                totalLockedFuncCallData,
+                totalCreditFuncCallData,
+                lockAmountFuncCallData,
+                withdrawnFuncCallData,
+                tokenFuncCallData,
+                endOfEntryPeriodFuncCallData,
+                perAddressCapFuncCallData
+            ];
+            const result = await wallet.multiCall(funcCallDataArr.map((callData) => {
+                return {
+                    to: stakingAddress,
+                    data: callData
+                };
+            }));
+            const multiCallResults = result.results;
+            const minimumLockTime = new eth_wallet_4.BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'minimumLockTime', multiCallResults[0])[0]);
+            const maximumTotalLock = new eth_wallet_4.BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'maximumTotalLock', multiCallResults[1])[0]);
+            const totalLockedWei = new eth_wallet_4.BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'totalLocked', multiCallResults[2])[0]);
+            const totalCreditWei = new eth_wallet_4.BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'getCredit', multiCallResults[3])[0]);
+            const lockAmountWei = new eth_wallet_4.BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'lockAmount', multiCallResults[4])[0]);
+            const withdrawn = wallet.decodeAbiEncodedParameters(timeIsMoney, 'withdrawn', multiCallResults[5])[0];
+            const tokenAddress = wallet.decodeAbiEncodedParameters(timeIsMoney, 'token', multiCallResults[6])[0];
+            const endOfEntryPeriod = new eth_wallet_4.BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'endOfEntryPeriod', multiCallResults[7])[0]).toFixed();
+            const perAddressCapWei = new eth_wallet_4.BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'perAddressCap', multiCallResults[8])[0]);
             let totalCredit = eth_wallet_4.Utils.fromDecimals(totalCreditWei).toFixed();
             let lockAmount = eth_wallet_4.Utils.fromDecimals(lockAmountWei).toFixed();
             let stakeQty = withdrawn ? '0' : lockAmount;
@@ -536,13 +570,13 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
                 startOfEntryPeriod = (await timeIsMoney.startOfEntryPeriod()).toFixed();
             }
             catch (err) { }
-            let tokenAddress = await timeIsMoney.token();
+            // let tokenAddress = await timeIsMoney.token();
+            // let endOfEntryPeriod = (await timeIsMoney.endOfEntryPeriod()).toFixed();
+            // let perAddressCapWei = await timeIsMoney.perAddressCap();
             let stakingDecimals = 18 - (0, index_4.getTokenDecimals)(tokenAddress.toLocaleLowerCase(), wallet.chainId);
-            let endOfEntryPeriod = (await timeIsMoney.endOfEntryPeriod()).toFixed();
-            let perAddressCapWei = await timeIsMoney.perAddressCap();
+            let perAddressCap = eth_wallet_4.Utils.fromDecimals(perAddressCapWei).shiftedBy(stakingDecimals).toFixed();
             let maxTotalLock = eth_wallet_4.Utils.fromDecimals(maximumTotalLock).shiftedBy(stakingDecimals).toFixed();
             let totalLocked = eth_wallet_4.Utils.fromDecimals(totalLockedWei).toFixed();
-            let perAddressCap = eth_wallet_4.Utils.fromDecimals(perAddressCapWei).shiftedBy(stakingDecimals).toFixed();
             let obj = {
                 mode,
                 minLockTime: minimumLockTime.toNumber(),
@@ -572,18 +606,52 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
                                 let unclaimedWei = await rewardsContract.unclaimed();
                                 claimable = eth_wallet_4.Utils.fromDecimals(unclaimedWei).toFixed();
                             }
-                            admin = await rewardsContract.admin();
-                            rewardTokenAddress = await rewardsContract.token();
+                            const adminFuncCallData = wallet.encodeFunctionCall(rewardsContract, 'admin', []);
+                            const tokenFuncCallData = wallet.encodeFunctionCall(rewardsContract, 'token', []);
+                            const multiplierFuncCallData = wallet.encodeFunctionCall(rewardsContract, 'multiplier', []);
+                            const initialRewardFuncCallData = wallet.encodeFunctionCall(rewardsContract, 'initialReward', []);
+                            const vestingPeriodFuncCallData = wallet.encodeFunctionCall(rewardsContract, 'vestingPeriod', []);
+                            const claimDeadlineFuncCallData = wallet.encodeFunctionCall(rewardsContract, 'claimDeadline', []);
+                            let callDataArr = [
+                                adminFuncCallData,
+                                tokenFuncCallData,
+                                multiplierFuncCallData,
+                                initialRewardFuncCallData,
+                                vestingPeriodFuncCallData,
+                                claimDeadlineFuncCallData
+                            ];
+                            if (reward.isCommonStartDate) {
+                                const vestingStartDateFuncCallData = wallet.encodeFunctionCall(rewardsContract, 'vestingStartDate', []);
+                                callDataArr.push(vestingStartDateFuncCallData);
+                            }
+                            const result = await wallet.multiCall(callDataArr.map((callData) => {
+                                return {
+                                    to: reward.address,
+                                    data: callData
+                                };
+                            }));
+                            const multiCallResults = result.results;
+                            admin = wallet.decodeAbiEncodedParameters(rewardsContract, 'admin', multiCallResults[0])[0];
+                            rewardTokenAddress = wallet.decodeAbiEncodedParameters(rewardsContract, 'token', multiCallResults[1])[0];
+                            let multiplierWei = new eth_wallet_4.BigNumber(wallet.decodeAbiEncodedParameters(rewardsContract, 'multiplier', multiCallResults[2])[0]);
+                            initialReward = new eth_wallet_4.BigNumber(wallet.decodeAbiEncodedParameters(rewardsContract, 'initialReward', multiCallResults[3])[0]).toFixed();
+                            vestingPeriod = new eth_wallet_4.BigNumber(wallet.decodeAbiEncodedParameters(rewardsContract, 'vestingPeriod', multiCallResults[4])[0]).toNumber();
+                            claimDeadline = new eth_wallet_4.BigNumber(wallet.decodeAbiEncodedParameters(rewardsContract, 'claimDeadline', multiCallResults[5])[0]).toNumber();
+                            if (reward.isCommonStartDate) {
+                                vestingStartDate = new eth_wallet_4.BigNumber(wallet.decodeAbiEncodedParameters(rewardsContract, 'vestingStartDate', multiCallResults[6])[0]).toNumber();
+                            }
+                            // admin = await rewardsContract.admin();
+                            // rewardTokenAddress = await rewardsContract.token();
+                            // let multiplierWei = await rewardsContract.multiplier();
+                            // initialReward = Utils.fromDecimals(await rewardsContract.initialReward(), rewardTokenDecimals).toFixed();
+                            // vestingPeriod = (await rewardsContract.vestingPeriod()).toNumber();
+                            // claimDeadline = (await rewardsContract.claimDeadline()).toNumber();
+                            // if (reward.isCommonStartDate) {
+                            //   vestingStartDate = (await rewardsContract.vestingStartDate()).toNumber();
+                            // }
                             let rewardToken = new eth_wallet_4.Erc20(wallet, rewardTokenAddress);
                             let rewardTokenDecimals = await rewardToken.decimals;
-                            let multiplierWei = await rewardsContract.multiplier();
                             multiplier = eth_wallet_4.Utils.fromDecimals(multiplierWei, rewardTokenDecimals).toFixed();
-                            initialReward = eth_wallet_4.Utils.fromDecimals(await rewardsContract.initialReward(), rewardTokenDecimals).toFixed();
-                            vestingPeriod = (await rewardsContract.vestingPeriod()).toNumber();
-                            claimDeadline = (await rewardsContract.claimDeadline()).toNumber();
-                            if (reward.isCommonStartDate) {
-                                vestingStartDate = (await rewardsContract.vestingStartDate()).toNumber();
-                            }
                             let rewardAmount = new eth_wallet_4.BigNumber(multiplier).multipliedBy(maxTotalLock).toFixed();
                             rewardsData.push(Object.assign(Object.assign({}, reward), { claimable,
                                 rewardTokenAddress,
@@ -708,7 +776,7 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
             let symbol = await vault.symbol();
             let name = await vault.name();
             let decimals = await vault.decimals();
-            let tokenMap = scom_token_list_2.tokenStore.tokenMap;
+            let tokenMap = scom_token_list_2.tokenStore.getTokenMapByChainId(wallet.chainId);
             let assetToken = tokenMap[vaultAddress.toLowerCase()];
             return {
                 address: vaultAddress.toLowerCase(),
@@ -1089,11 +1157,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                 // Stake
                 if (tokenAddress && mode === 'Stake') {
                     if (lockTokenType == index_5.LockTokenType.ERC20_Token) {
-                        const rpcWallet = this.state.getRpcWallet();
-                        if (rpcWallet.address) {
-                            await scom_token_list_3.tokenStore.updateAllTokenBalances(rpcWallet);
-                        }
-                        let balances = scom_token_list_3.tokenStore.tokenBalances;
+                        let balances = scom_token_list_3.tokenStore.getTokenBalancesByChainId(this.state.getChainId());
                         this.tokenBalances = Object.keys(balances).reduce((accumulator, key) => {
                             accumulator[key.toLowerCase()] = balances[key];
                             return accumulator;
@@ -1124,7 +1188,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                     this.renderStakingInfo(null);
                     return;
                 }
-                this.tokenMap = scom_token_list_3.tokenStore.tokenMap;
+                this.tokenMap = scom_token_list_3.tokenStore.getTokenMapByChainId(this.state.getChainId());
                 if (this.state.isRpcWalletConnected()) {
                     await this.initApprovalModelAction();
                 }
@@ -1900,7 +1964,8 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
                 // let tokenAddress = campaignInfo.tokenAddress?.toLowerCase()
                 let tokenAddress = (_a = this._data.tokenRequirements[0].tokenOut.address) === null || _a === void 0 ? void 0 : _a.toLowerCase();
                 this.tokenInput.rpcWalletId = rpcWallet.instanceId;
-                const token = scom_token_list_4.tokenStore.tokenMap[tokenAddress];
+                const tokenMap = scom_token_list_4.tokenStore.getTokenMapByChainId(this._data.chainId);
+                const token = tokenMap[tokenAddress];
                 this.tokenInput.tokenDataListProp = [token];
                 this.tokenInput.token = token;
             };
@@ -2451,7 +2516,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 if (!hideLoading) {
                     this.stakingElm.clearInnerHTML();
                 }
-                this.tokenMap = scom_token_list_5.tokenStore.tokenMap;
+                this.tokenMap = scom_token_list_5.tokenStore.getTokenMapByChainId(this.chainId);
                 const chainId = this.state.getChainId();
                 await this.initEmptyUI();
                 this.noCampaignSection.visible = false;
@@ -2750,7 +2815,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                                     const decimalsOffset = 18 - rewardTokenDecimals;
                                     const lockTokenType = option.lockTokenType;
                                     // const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
-                                    const rateDesc = `1 ${lockTokenType === index_11.LockTokenType.LP_Token ? 'LP' : (0, index_12.tokenSymbol)(option.lockTokenAddress)} : ${rewardOption.multiplier} ${(0, index_12.tokenSymbol)(rewardOption.rewardTokenAddress)}`;
+                                    const rateDesc = `1 ${lockTokenType === index_11.LockTokenType.LP_Token ? 'LP' : (0, index_12.tokenSymbol)(this.chainId, option.lockTokenAddress)} : ${rewardOption.multiplier} ${(0, index_12.tokenSymbol)(this.chainId, rewardOption.rewardTokenAddress)}`;
                                     const updateApr = async () => {
                                         var _a, _b, _c, _d;
                                         if (lockTokenType === index_11.LockTokenType.ERC20_Token) {

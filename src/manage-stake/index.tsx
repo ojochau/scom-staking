@@ -192,11 +192,7 @@ export default class ManageStake extends Module {
     // Stake
     if (tokenAddress && mode === 'Stake') {
       if (lockTokenType == LockTokenType.ERC20_Token) {
-        const rpcWallet = this.state.getRpcWallet();
-        if (rpcWallet.address) {
-          await tokenStore.updateAllTokenBalances(rpcWallet);
-        }
-        let balances = tokenStore.tokenBalances;
+        let balances = tokenStore.getTokenBalancesByChainId(this.state.getChainId());
         this.tokenBalances = Object.keys(balances).reduce((accumulator: any, key) => {
           accumulator[key.toLowerCase()] = balances[key];
           return accumulator;
@@ -226,7 +222,7 @@ export default class ManageStake extends Module {
       this.renderStakingInfo(null);
       return;
     }
-    this.tokenMap = tokenStore.tokenMap;
+    this.tokenMap = tokenStore.getTokenMapByChainId(this.state.getChainId());
     if (this.state.isRpcWalletConnected()) {
       await this.initApprovalModelAction();
     }

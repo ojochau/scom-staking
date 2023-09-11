@@ -182,8 +182,8 @@ declare module "@scom/scom-staking/store/index.ts" {
     export const getChainNativeToken: (chainId: number) => ITokenObject;
     export const getNetworkInfo: (chainId: number) => any;
     export const viewOnExplorerByAddress: (chainId: number, address: string) => void;
-    export const tokenSymbol: (address: string) => string;
-    export const getLockedTokenObject: (info: any, tokenInfo: any, tokenMap?: any) => any;
+    export const tokenSymbol: (chainId: number, address: string) => string;
+    export const getLockedTokenObject: (info: any, tokenInfo: any, tokenMap: any) => any;
     export const getLockedTokenSymbol: (info: any, token: any) => any;
     export const getLockedTokenIconPaths: (info: any, tokenObject: any, chainId: number, tokenMap?: any) => string[];
     export const getTokenDecimals: (address: string, chainId: number) => number;
