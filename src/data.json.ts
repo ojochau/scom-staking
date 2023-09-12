@@ -4,7 +4,7 @@ export default {
     "name": "Staking",
     "desc": "Earn OSWAP",
     "showContractLink": true,
-    "stakings": {
+    "staking": {
       "address": "0x03C22D12eb6E5ea3a06F46Fc0e1857438BB7DCae",
       "lockTokenType": 0,
       "rewards": {

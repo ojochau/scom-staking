@@ -1,6 +1,6 @@
 import { moment, Button, Input, Container, HStack, customElements, ControlElement, Module, Label, Styles } from '@ijstech/components';
 import { BigNumber, IERC20ApprovalAction } from '@ijstech/eth-wallet';
-import { LockTokenType, TokenMapType, limitInputNumber } from '../global/index';
+import { IExtendOptionInfo, LockTokenType, TokenMapType, limitInputNumber } from '../global/index';
 import { getLockedTokenObject, getLockedTokenSymbol, getChainNativeToken, isClientWalletConnected, State } from '../store/index';
 import { ITokenObject, tokenStore } from '@scom/scom-token-list';
 import ScomTxStatusModal from '@scom/scom-tx-status-modal';
@@ -33,7 +33,7 @@ declare global {
 @customElements('staking-manage-stake')
 export default class ManageStake extends Module {
   private _state: State;
-  private stakingInfo: any = {};
+  private stakingInfo: IExtendOptionInfo;
   private address: string;
   private lockedTokenObject = {} as ITokenObject;
   private maxQty = 0;
@@ -47,10 +47,10 @@ export default class ManageStake extends Module {
   private tokenMap: TokenMapType = {};
   private lbToken: Label;
   private wrapperInputAmount: HStack;
-  private inputAmount: Input;
+  public inputAmount: Input;
+  public btnStake: Button;
+  public btnUnstake: Button;
   private btnApprove: Button;
-  private btnStake: Button;
-  private btnUnstake: Button;
   private btnMax: Button;
   private txStatusModal: ScomTxStatusModal;
   private approvalModelAction: IERC20ApprovalAction;
@@ -68,7 +68,7 @@ export default class ManageStake extends Module {
     return this._state;
   }
 
-  setData = (data: any) => {
+  setData = (data: IExtendOptionInfo) => {
     this.address = data.address;
     this.stakingInfo = data;
     this.onSetupPage();
@@ -132,7 +132,7 @@ export default class ManageStake extends Module {
       this.approvalModelAction.checkAllowance(this.lockedTokenObject, this.inputAmount.value);
   };
 
-  private renderStakingInfo = async (info: any) => {
+  private renderStakingInfo = async (info: IExtendOptionInfo) => {
     if (!info || !Object.keys(info).length) {
       this.btnApprove.visible = false;
       if (!this.state.isRpcWalletConnected()) {
@@ -143,7 +143,6 @@ export default class ManageStake extends Module {
     };
     this.btnStake.id = `btn-stake-${this.address}`;
     this.btnUnstake.id = `btn-unstake-${this.address}`;
-    this.inputAmount.id = `input-${this.address}`;
     let lpTokenData: any = {};
     let vaultTokenData: any = {};
     const rpcWallet = this.state.getRpcWallet();
@@ -204,6 +203,7 @@ export default class ManageStake extends Module {
         this.balance = new BigNumber(vaultTokenData.balance || 0).shiftedBy(defaultDecimalsOffset).toFixed();
       }
       this.btnMax.visible = true;
+      if (!this.lbToken.isConnected) await this.lbToken.ready();
       this.lbToken.caption = symbol;
     }
     await this.updateEnableInput();
@@ -269,7 +269,7 @@ export default class ManageStake extends Module {
           this.btnApprove.visible = false;
         }
         this.btnStake.enabled = false;
-        this.btnUnstake.enabled = false;
+        this.btnUnstake.enabled = this.stakingInfo.mode !== 'Stake' && new BigNumber(this.stakeQty).gt(0);
       },
       onToBePaid: async (token: ITokenObject) => {
         this.btnApprove.visible = false;
