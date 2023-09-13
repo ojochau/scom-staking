@@ -158,7 +158,12 @@ define("@scom/scom-staking/global/utils/common.ts", ["require", "exports", "@ijs
 define("@scom/scom-staking/global/utils/interfaces.ts", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.LockTokenType = void 0;
+    exports.LockTokenType = exports.CurrentMode = void 0;
+    var CurrentMode;
+    (function (CurrentMode) {
+        CurrentMode[CurrentMode["STAKE"] = 0] = "STAKE";
+        CurrentMode[CurrentMode["UNLOCK"] = 1] = "UNLOCK";
+    })(CurrentMode = exports.CurrentMode || (exports.CurrentMode = {}));
     var LockTokenType;
     (function (LockTokenType) {
         LockTokenType[LockTokenType["ERC20_Token"] = 0] = "ERC20_Token";
@@ -178,6 +183,7 @@ define("@scom/scom-staking/global/utils/index.ts", ["require", "exports", "@scom
 define("@scom/scom-staking/global/index.ts", ["require", "exports", "@scom/scom-staking/global/utils/index.ts"], function (require, exports, index_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    ///<amd-module name='@scom/scom-staking/global/index.ts'/> 
     __exportStar(index_1, exports);
 });
 define("@scom/scom-staking/store/data/index.ts", ["require", "exports"], function (require, exports) {
@@ -272,12 +278,11 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
             }
             return null;
         }
-        setStakingStatus(key, value, text) {
-            this.stakingStatusMap[key] = { value, text };
-            components_3.application.EventBus.dispatch("stakingEmitButtonStatus" /* EventId.EmitButtonStatus */, { key, value, text });
+        setStakingStatus(key, value) {
+            this.stakingStatusMap[key] = value;
         }
         getStakingStatus(key) {
-            return this.stakingStatusMap[key] || { value: false, text: 'Stake' };
+            return this.stakingStatusMap[key];
         }
         getRpcWallet() {
             return this.rpcWalletId ? eth_wallet_3.Wallet.getRpcWalletInstance(this.rpcWalletId) : null;
@@ -986,11 +991,6 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_6.Styles.Theme.ThemeVars;
-    var CurrentMode;
-    (function (CurrentMode) {
-        CurrentMode[CurrentMode["STAKE"] = 0] = "STAKE";
-        CurrentMode[CurrentMode["UNLOCK"] = 1] = "UNLOCK";
-    })(CurrentMode || (CurrentMode = {}));
     ;
     let ManageStake = class ManageStake extends components_6.Module {
         constructor(parent, options) {
@@ -1002,7 +1002,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
             this.perAddressCap = '0';
             this.stakeQty = '0';
             this.tokenSymbol = '';
-            this.currentMode = CurrentMode.STAKE;
+            this.currentMode = index_5.CurrentMode.STAKE;
             this.tokenBalances = {};
             this.tokenMap = {};
             this.setData = (data) => {
@@ -1034,25 +1034,25 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                 this.approvalModelAction.doApproveAction(this.lockedTokenObject, this.inputAmount.value);
             };
             this.onStake = async () => {
-                this.currentMode = CurrentMode.STAKE;
+                this.currentMode = index_5.CurrentMode.STAKE;
                 this.approvalModelAction.doPayAction();
             };
             this.onUnstake = () => {
-                this.currentMode = CurrentMode.UNLOCK;
+                this.currentMode = index_5.CurrentMode.UNLOCK;
                 this.approvalModelAction.doPayAction();
             };
             this.onInputAmount = () => {
                 var _a;
                 if (this.inputAmount.enabled === false)
                     return;
-                this.currentMode = CurrentMode.STAKE;
+                this.currentMode = index_5.CurrentMode.STAKE;
                 (0, index_5.limitInputNumber)(this.inputAmount, ((_a = this.lockedTokenObject) === null || _a === void 0 ? void 0 : _a.decimals) || 18);
                 if (this.state.isRpcWalletConnected())
                     this.approvalModelAction.checkAllowance(this.lockedTokenObject, this.inputAmount.value);
             };
             this.setMaxBalance = () => {
                 var _a;
-                this.currentMode = CurrentMode.STAKE;
+                this.currentMode = index_5.CurrentMode.STAKE;
                 this.inputAmount.value = eth_wallet_5.BigNumber.min(this.availableQty, this.balance, this.perAddressCap).toFixed();
                 (0, index_5.limitInputNumber)(this.inputAmount, ((_a = this.lockedTokenObject) === null || _a === void 0 ? void 0 : _a.decimals) || 18);
                 if (this.state.isRpcWalletConnected())
@@ -1105,7 +1105,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                 this.availableQty = new eth_wallet_5.BigNumber(this.maxQty).minus(totalLocked).toFixed();
                 this.btnApprove.visible = false;
                 // Unstake
-                if (CurrentMode[mode.toUpperCase()] !== CurrentMode.STAKE) {
+                if (index_5.CurrentMode[mode.toUpperCase()] !== index_5.CurrentMode.STAKE) {
                     if (this.state.isRpcWalletConnected()) {
                         this.approvalModelAction.checkAllowance(this.lockedTokenObject, this.stakeQty);
                     }
@@ -1187,18 +1187,12 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
         get state() {
             return this._state;
         }
-        get actionKey() {
-            if (this.currentMode === CurrentMode.STAKE) {
-                return `#btn-stake-${this.address}`;
-            }
-            return `#btn-unstake-${this.address}`;
-        }
         async initApprovalModelAction() {
             this.approvalModelAction = await this.state.setApprovalModelAction({
                 sender: this,
                 payAction: async () => {
-                    this.showMessage('warning', `${this.currentMode === CurrentMode.STAKE ? 'Stake' : 'Unlock'} ${this.tokenSymbol}`);
-                    if (this.currentMode === CurrentMode.STAKE) {
+                    this.showMessage('warning', `${this.currentMode === index_5.CurrentMode.STAKE ? 'Stake' : 'Unlock'} ${this.tokenSymbol}`);
+                    if (this.currentMode === index_5.CurrentMode.STAKE) {
                         (0, index_7.lockToken)(this.lockedTokenObject, this.inputAmount.value, this.address, this.callback);
                     }
                     else {
@@ -1221,7 +1215,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                     var _a;
                     this.btnApprove.visible = false;
                     const isClosed = (0, components_6.moment)(((_a = this.stakingInfo) === null || _a === void 0 ? void 0 : _a.endOfEntryPeriod) || 0).diff((0, components_6.moment)()) <= 0;
-                    if (this.currentMode === CurrentMode.STAKE) {
+                    if (this.currentMode === index_5.CurrentMode.STAKE) {
                         const amount = new eth_wallet_5.BigNumber(this.inputAmount.value);
                         if (amount.gt(this.balance)) {
                             this.btnStake.caption = 'Insufficient Balance';
@@ -1271,31 +1265,30 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                         this.showMessage('success', receipt);
                         this.inputAmount.enabled = false;
                         this.btnMax.enabled = false;
-                        if (this.currentMode === CurrentMode.STAKE) {
+                        if (this.currentMode === index_5.CurrentMode.STAKE) {
                             this.btnStake.caption = 'Staking';
                             this.btnStake.rightIcon.visible = true;
-                            this.state.setStakingStatus(this.actionKey, true, 'Staking');
+                            this.state.setStakingStatus(this.currentMode, true);
                             this.btnUnstake.enabled = false;
                         }
                         else {
                             this.btnUnstake.caption = 'Unstaking';
                             this.btnUnstake.rightIcon.visible = true;
-                            this.state.setStakingStatus(this.actionKey, true, 'Unstaking');
+                            this.state.setStakingStatus(this.currentMode, true);
                             this.btnStake.enabled = false;
                         }
                     }
                 },
                 onPaid: async () => {
-                    const caption = this.currentMode === CurrentMode.STAKE ? 'Unstake' : 'Stake';
                     if (this.onRefresh) {
                         const rpcWallet = this.state.getRpcWallet();
                         if (rpcWallet.address) {
                             await scom_token_list_3.tokenStore.updateAllTokenBalances(rpcWallet);
                         }
                         await this.onRefresh();
-                        this.state.setStakingStatus(this.actionKey, false, caption);
+                        this.state.setStakingStatus(this.currentMode, false);
                     }
-                    if (this.currentMode === CurrentMode.STAKE) {
+                    if (this.currentMode === index_5.CurrentMode.STAKE) {
                         this.btnStake.caption = 'Stake';
                         this.btnStake.rightIcon.visible = false;
                     }
@@ -1310,8 +1303,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                 },
                 onPayingError: async (err) => {
                     await this.updateEnableInput();
-                    const caption = this.currentMode === CurrentMode.STAKE ? 'Stake' : 'Unstake';
-                    if (this.currentMode === CurrentMode.STAKE) {
+                    if (this.currentMode === index_5.CurrentMode.STAKE) {
                         this.btnStake.caption = 'Stake';
                         this.btnStake.rightIcon.visible = false;
                     }
@@ -1320,7 +1312,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                         this.btnUnstake.rightIcon.visible = false;
                     }
                     this.showMessage('error', err);
-                    this.state.setStakingStatus(this.actionKey, false, caption);
+                    this.state.setStakingStatus(this.currentMode, false);
                 }
             });
             this.state.approvalModel.spenderAddress = this.address;
@@ -2217,10 +2209,6 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             this.listAprTimer = [];
             this.tokenMap = {};
             this.rpcWalletEvents = [];
-            this.clientEvents = [];
-            this.registerEvent = () => {
-                this.clientEvents.push(this.$eventBus.register(this, "stakingEmitButtonStatus" /* EventId.EmitButtonStatus */, this.updateButtonStatus));
-            };
             this.onChainChanged = async () => {
                 if (await this.isWalletValid()) {
                     this.initializeWidgetConfig();
@@ -2353,17 +2341,6 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     window.open(index_12.getTokenUrl ? index_12.getTokenUrl : `https:openswap.xyz/#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
                 }
             };
-            this.updateButtonStatus = async (data) => {
-                var _a;
-                if (data) {
-                    const { value, key, text } = data;
-                    const elm = (_a = this.stakingElm) === null || _a === void 0 ? void 0 : _a.querySelector(key);
-                    if (elm) {
-                        elm.rightIcon.visible = value;
-                        elm.caption = text;
-                    }
-                }
-            };
             this.connectWallet = async () => {
                 if (!(0, index_12.isClientWalletConnected)()) {
                     if (this.mdWallet) {
@@ -2491,7 +2468,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     const optionQty = new eth_wallet_7.BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
                     if (o.mode === 'Stake') {
                         const btnStake = this.manageStake.btnStake;
-                        const isStaking = this.state.getStakingStatus(this.manageStake.actionKey).value;
+                        const isStaking = this.state.getStakingStatus(index_11.CurrentMode.STAKE);
                         if (btnStake) {
                             let isValidInput = false;
                             const inputElm = this.manageStake.inputAmount;
@@ -2504,7 +2481,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     }
                     else {
                         const btnUnstake = this.manageStake.btnUnstake;
-                        const isUnstaking = this.state.getStakingStatus(this.manageStake.actionKey).value;
+                        const isUnstaking = this.state.getStakingStatus(index_11.CurrentMode.UNLOCK);
                         if (btnUnstake) {
                             btnUnstake.enabled = !isUnstaking && o.mode !== 'Stake' && Number(o.stakeQty) != 0 && !this.manageStake.needToBeApproval();
                         }
@@ -2722,8 +2699,6 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 this.stakingElm.append(this.noCampaignSection, containerSection);
             };
             this.state = new index_12.State(data_json_1.default);
-            this.$eventBus = components_9.application.EventBus;
-            this.registerEvent();
         }
         removeRpcWalletEvents() {
             const rpcWallet = this.rpcWallet;
@@ -2735,10 +2710,6 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
         onHide() {
             this.dappContainer.onHide();
             this.removeRpcWalletEvents();
-            for (let event of this.clientEvents) {
-                event.unregister();
-            }
-            this.clientEvents = [];
         }
         async init() {
             this.isReadyCallbackQueued = true;

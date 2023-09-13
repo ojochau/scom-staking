@@ -6,6 +6,11 @@ export interface ICommissionInfo {
   share: string;
 }
 
+export enum CurrentMode {
+  STAKE,
+  UNLOCK
+}
+
 export enum LockTokenType {
   ERC20_Token,
   LP_Token,

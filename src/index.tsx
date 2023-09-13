@@ -1,4 +1,4 @@
-import { moment, Module, Panel, Icon, Button, Label, VStack, HStack, Container, ControlElement, IEventBus, application, customModule, Input, customElements, Styles, Control } from '@ijstech/components';
+import { moment, Module, Panel, Icon, Button, Label, VStack, HStack, Container, ControlElement, application, customModule, customElements, Styles, Control } from '@ijstech/components';
 import { BigNumber, Constants, IEventBusRegistry, Wallet } from '@ijstech/eth-wallet';
 import Assets from './assets';
 import {
@@ -6,10 +6,10 @@ import {
 	formatDate,
 	registerSendTxEvents,
 	TokenMapType,
-	EventId,
 	ISingleStakingCampaign,
 	LockTokenType,
-	ICampaignDetail
+	ICampaignDetail,
+	CurrentMode
 } from './global/index';
 import {
 	tokenSymbol,
@@ -72,7 +72,6 @@ export default class ScomStaking extends Module {
 	tag: any = {};
 	defaultEdit: boolean = true;
 
-	private $eventBus: IEventBus;
 	private loadingElm: Panel;
 	private campaign: ICampaignDetail;
 	private stakingElm: Panel;
@@ -86,7 +85,6 @@ export default class ScomStaking extends Module {
 	private mdWallet: ScomWalletModal;
 
 	private rpcWalletEvents: IEventBusRegistry[] = [];
-	private clientEvents: any[] = [];
 
 	private _getActions(category?: string) {
 		const actions = [];
@@ -371,8 +369,6 @@ export default class ScomStaking extends Module {
 	constructor(parent?: Container, options?: ControlElement) {
 		super(parent, options);
 		this.state = new State(configData);
-		this.$eventBus = application.EventBus;
-		this.registerEvent();
 	}
 
 	removeRpcWalletEvents() {
@@ -386,14 +382,6 @@ export default class ScomStaking extends Module {
 	onHide() {
 		this.dappContainer.onHide();
 		this.removeRpcWalletEvents();
-		for (let event of this.clientEvents) {
-			event.unregister();
-		}
-		this.clientEvents = [];
-	}
-
-	private registerEvent = () => {
-		this.clientEvents.push(this.$eventBus.register(this, EventId.EmitButtonStatus, this.updateButtonStatus));
 	}
 
 	private onChainChanged = async () => {
@@ -545,17 +533,6 @@ export default class ScomStaking extends Module {
 		}
 		this.isReadyCallbackQueued = false;
 		this.executeReadyCallback();
-	}
-
-	private updateButtonStatus = async (data: { key: string, value: boolean, text: string }) => {
-		if (data) {
-			const { value, key, text } = data;
-			const elm = this.stakingElm?.querySelector(key) as Button;
-			if (elm) {
-				elm.rightIcon.visible = value;
-				elm.caption = text;
-			}
-		}
 	}
 
 	private connectWallet = async () => {
@@ -711,7 +688,7 @@ export default class ScomStaking extends Module {
 			const optionQty = new BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
 			if (o.mode === 'Stake') {
 				const btnStake = this.manageStake.btnStake;
-				const isStaking = this.state.getStakingStatus(this.manageStake.actionKey).value;
+				const isStaking = this.state.getStakingStatus(CurrentMode.STAKE);
 				if (btnStake) {
 					let isValidInput = false;
 					const inputElm = this.manageStake.inputAmount;
@@ -723,7 +700,7 @@ export default class ScomStaking extends Module {
 				}
 			} else {
 				const btnUnstake = this.manageStake.btnUnstake;
-				const isUnstaking = this.state.getStakingStatus(this.manageStake.actionKey).value;
+				const isUnstaking = this.state.getStakingStatus(CurrentMode.UNLOCK);
 				if (btnUnstake) {
 					btnUnstake.enabled = !isUnstaking && o.mode !== 'Stake' && Number(o.stakeQty) != 0 && !this.manageStake.needToBeApproval();
 				}
