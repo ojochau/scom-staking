@@ -77,7 +77,7 @@ export default {
             showContractLink: {
                 type: 'boolean'
             },
-            stakings: {
+            staking: {
                 type: 'object',
                 properties: {
                     address: {
@@ -148,7 +148,7 @@ export default {
                             },
                             {
                                 type: 'Control',
-                                scope: '#/properties/stakings'
+                                scope: '#/properties/staking'
                             }
                         ]
                     }
@@ -221,7 +221,7 @@ export function getProjectOwnerSchema() {
                 showContractLink: {
                     type: 'boolean'
                 },
-                stakings: {
+                staking: {
                     type: 'object',
                     properties: {
                         address: {

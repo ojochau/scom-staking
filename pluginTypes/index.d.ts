@@ -50,7 +50,7 @@ declare module "@scom/scom-staking/global/utils/interfaces.ts" {
         logo?: string;
         getTokenURL?: string;
         showContractLink?: boolean;
-        stakings: ISingleStaking;
+        staking: ISingleStaking;
         commissions?: ICommissionInfo[];
         wallets: IWalletPlugin[];
         networks: INetworkConfig[];
@@ -66,6 +66,70 @@ declare module "@scom/scom-staking/global/utils/interfaces.ts" {
         address: string;
         isCommonStartDate?: boolean;
     }
+    export interface IWalletPlugin {
+        name: string;
+        packageName?: string;
+        provider?: IClientSideProvider;
+    }
+    export interface INetworkConfig {
+        chainId: number;
+        chainName?: string;
+    }
+    export interface IOptionInfo {
+        mode: string;
+        minLockTime: number;
+        maxTotalLock: string;
+        totalLocked: string;
+        stakeQty: string;
+        startOfEntryPeriod: number;
+        endOfEntryPeriod: number;
+        perAddressCap: string;
+        lockTokenAddress: string;
+        tokenAddress: string;
+        rewardsData?: IRewardInfo[];
+    }
+    export interface IExtendOptionInfo extends IOptionInfo, ISingleStaking {
+        tokenInfo?: {
+            tokenAddress: string;
+            lpToken: {
+                object: {
+                    address: string;
+                    decimals: string;
+                    name: string;
+                    symbol: string;
+                    token0: string;
+                    token1: string;
+                };
+            };
+            vaultToken: {
+                object: {
+                    address: string;
+                    decimals: string;
+                    name: string;
+                    symbol: string;
+                    token0: string;
+                    token1: string;
+                };
+            };
+        };
+    }
+    export interface ICampaignDetail extends ISingleStakingCampaign {
+        option: IExtendOptionInfo;
+        tokenAddress?: string;
+    }
+    export interface IRewardInfo extends ISingleReward {
+        claimable: string;
+        rewardTokenAddress: string;
+        multiplier: string;
+        initialReward: string;
+        admin: string;
+        vestingPeriod: number;
+        vestingStartDate: number;
+        rewardAmount: string;
+        index: number;
+        vestedReward?: number | string;
+        claimStartTime?: number;
+    }
     export interface IStakingCampaign {
         chainId: number;
         name: string;
@@ -77,15 +141,6 @@ declare module "@scom/scom-staking/global/utils/interfaces.ts" {
         showContractLink?: boolean;
         admin: string;
         stakings: Staking[];
-    }
-    export interface IWalletPlugin {
-        name: string;
-        packageName?: string;
-        provider?: IClientSideProvider;
-    }
-    export interface INetworkConfig {
-        chainId: number;
-        chainName?: string;
     }
     export interface RewardNeeded {
         value: BigNumber;
@@ -201,7 +256,7 @@ declare module "@scom/scom-staking/data.json.ts" {
             name: string;
             desc: string;
             showContractLink: boolean;
-            stakings: {
+            staking: {
                 address: string;
                 lockTokenType: number;
                 rewards: {
@@ -222,13 +277,29 @@ declare module "@scom/scom-staking/data.json.ts" {
 /// <amd-module name="@scom/scom-staking/staking-utils/index.ts" />
 declare module "@scom/scom-staking/staking-utils/index.ts" {
     import { BigNumber, IWallet } from "@ijstech/eth-wallet";
-    import { ISingleStakingCampaign } from "@scom/scom-staking/global/index.ts";
+    import { ISingleStakingCampaign, ISingleStaking, IExtendOptionInfo } from "@scom/scom-staking/global/index.ts";
     import { State } from "@scom/scom-staking/store/index.ts";
     import { ITokenObject } from '@scom/scom-token-list';
     export const getTokenPrice: (wallet: IWallet, token: string) => Promise<string>;
-    const getAllCampaignsInfo: (wallet: IWallet, stakingInfo: {
+    const getCampaignInfo: (wallet: IWallet, stakingInfo: {
         [key: number]: ISingleStakingCampaign;
-    }) => Promise<any[]>;
+    }) => Promise<{
+        campaignStart: number;
+        campaignEnd: number;
+        tokenAddress: string;
+        option: IExtendOptionInfo;
+        chainId: number;
+        name: string;
+        desc?: string;
+        logo?: string;
+        getTokenURL?: string;
+        showContractLink?: boolean;
+        staking: ISingleStaking;
+        commissions?: import("@scom/scom-staking/global/index.ts").ICommissionInfo[];
+        wallets: import("@scom/scom-staking/global/index.ts").IWalletPlugin[];
+        networks: import("@scom/scom-staking/global/index.ts").INetworkConfig[];
+        showHeader?: boolean;
+    }>;
     const getStakingTotalLocked: (wallet: IWallet, stakingAddress: string) => Promise<string>;
     const getLPObject: (wallet: IWallet, pairAddress: string) => Promise<{
         address: string;
@@ -260,7 +331,7 @@ declare module "@scom/scom-staking/staking-utils/index.ts" {
     const claimToken: (contractAddress: string, callback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     const lockToken: (token: ITokenObject, amount: string, contractAddress: string, callback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     const getProxySelectors: (state: State, chainId: number, contractAddress: string) => Promise<string[]>;
-    export { getAllCampaignsInfo, getStakingTotalLocked, getLPObject, getLPBalance, getVaultObject, getVaultBalance, getERC20RewardCurrentAPR, getLPRewardCurrentAPR, getVaultRewardCurrentAPR, withdrawToken, claimToken, lockToken, getProxySelectors };
+    export { getCampaignInfo, getStakingTotalLocked, getLPObject, getLPBalance, getVaultObject, getVaultBalance, getERC20RewardCurrentAPR, getLPRewardCurrentAPR, getVaultRewardCurrentAPR, withdrawToken, claimToken, lockToken, getProxySelectors };
 }
 /// <amd-module name="@scom/scom-staking/manage-stake/index.css.ts" />
 declare module "@scom/scom-staking/manage-stake/index.css.ts" {
@@ -268,8 +339,9 @@ declare module "@scom/scom-staking/manage-stake/index.css.ts" {
 }
 /// <amd-module name="@scom/scom-staking/manage-stake/index.tsx" />
 declare module "@scom/scom-staking/manage-stake/index.tsx" {
-    import { Container, ControlElement, Module } from '@ijstech/components';
+    import { Button, Input, Container, ControlElement, Module } from '@ijstech/components';
     import { BigNumber } from '@ijstech/eth-wallet';
+    import { IExtendOptionInfo } from "@scom/scom-staking/global/index.ts";
     import { State } from "@scom/scom-staking/store/index.ts";
     global {
         namespace JSX {
@@ -294,10 +366,10 @@ declare module "@scom/scom-staking/manage-stake/index.tsx" {
         private tokenMap;
         private lbToken;
         private wrapperInputAmount;
-        private inputAmount;
+        inputAmount: Input;
+        btnStake: Button;
+        btnUnstake: Button;
         private btnApprove;
-        private btnStake;
-        private btnUnstake;
         private btnMax;
         private txStatusModal;
         private approvalModelAction;
@@ -305,7 +377,7 @@ declare module "@scom/scom-staking/manage-stake/index.tsx" {
         constructor(parent?: Container, options?: ControlElement);
         set state(value: State);
         get state(): State;
-        setData: (data: any) => void;
+        setData: (data: IExtendOptionInfo) => void;
         getBalance: () => BigNumber;
         needToBeApproval: () => boolean;
         get actionKey(): string;
@@ -362,7 +434,7 @@ declare module "@scom/scom-staking/formSchema.ts" {
                 showContractLink: {
                     type: string;
                 };
-                stakings: {
+                staking: {
                     type: string;
                     properties: {
                         address: {
@@ -524,7 +596,7 @@ declare module "@scom/scom-staking/formSchema.ts" {
                 showContractLink: {
                     type: string;
                 };
-                stakings: {
+                staking: {
                     type: string;
                     properties: {
                         address: {
@@ -618,13 +690,13 @@ declare module "@scom/scom-staking" {
         defaultEdit: boolean;
         private $eventBus;
         private loadingElm;
-        private campaigns;
+        private campaign;
         private stakingElm;
         private noCampaignSection;
         private txStatusModal;
-        private manageStakeElm;
+        private manageStake;
         private listAprTimer;
-        private listActiveTimer;
+        private activeTimer;
         private tokenMap;
         private dappContainer;
         private mdWallet;
@@ -715,7 +787,7 @@ declare module "@scom/scom-staking" {
         private connectWallet;
         private initEmptyUI;
         private renderEmpty;
-        private renderCampaigns;
+        private renderCampaign;
         render(): any;
         handleFlowStage(target: Control, stage: string, options: any): Promise<{
             widget: any;

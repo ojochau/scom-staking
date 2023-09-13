@@ -9,7 +9,6 @@ import {
     application
  } from '@ijstech/components';
 import { tokenStore } from '@scom/scom-token-list';
-import { getAllCampaignsInfo } from '../staking-utils/index';
 import { State } from '../store/index';
 import ScomTokenInput from '@scom/scom-token-input';
 import { BigNumber } from '@ijstech/eth-wallet';
