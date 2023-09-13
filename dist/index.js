@@ -1858,7 +1858,7 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                     },
                     {
                         type: 'Control',
-                        scope: '#/properties/stakings'
+                        scope: '#/properties/staking'
                     }
                 ]
             }
@@ -1929,13 +1929,20 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
             await this.resetRpcWallet();
             await this.initializeWidgetConfig();
         }
+        init() {
+            super.init();
+            this.tokenInput.style.setProperty('--input-background', '#232B5A');
+            this.tokenInput.style.setProperty('--input-font_color', '#fff');
+        }
         render() {
             return (this.$render("i-vstack", { gap: '1rem', padding: { top: 10, bottom: 10, left: 20, right: 20 } },
                 this.$render("i-label", { caption: 'Get Ready to Stake', font: { size: '1.5rem' } }),
                 this.$render("i-vstack", { gap: '1rem' },
                     this.$render("i-label", { caption: 'How many tokens are you planning to stake?' }),
-                    this.$render("i-scom-token-input", { id: "tokenInput", placeholder: '0.0', value: '-', tokenReadOnly: true, isBalanceShown: false, isBtnMaxShown: false, border: { radius: '1rem' }, font: { size: '1.25rem' }, background: { color: Theme.input.background } }),
-                    this.$render("i-button", { id: "btnNext", caption: "Next", padding: { top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }, font: { color: Theme.colors.primary.contrastText }, onClick: this.handleClickNext }))));
+                    this.$render("i-hstack", { verticalAlignment: 'center', width: '50%' },
+                        this.$render("i-scom-token-input", { id: "tokenInput", placeholder: '0.0', value: '-', tokenReadOnly: true, isBalanceShown: false, isBtnMaxShown: false, border: { radius: '1rem' }, font: { size: '1.25rem' }, background: { color: Theme.input.background } })),
+                    this.$render("i-hstack", { horizontalAlignment: 'end' },
+                        this.$render("i-button", { id: "btnNext", caption: "Next", padding: { top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }, font: { color: Theme.colors.primary.contrastText }, onClick: this.handleClickNext })))));
         }
     };
     ScomStakingFlowInitialSetup = __decorate([

@@ -661,6 +661,7 @@ declare module "@scom/scom-staking/flow/initialSetup.tsx" {
         private initWallet;
         private initializeWidgetConfig;
         private handleClickNext;
+        init(): void;
         render(): any;
     }
 }

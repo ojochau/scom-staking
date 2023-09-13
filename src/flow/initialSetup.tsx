@@ -93,30 +93,39 @@ export default class ScomStakingFlowInitialSetup extends Module {
             executionProperties: this.executionProperties
         });
     }
+    init() {
+        super.init();
+        this.tokenInput.style.setProperty('--input-background', '#232B5A');
+        this.tokenInput.style.setProperty('--input-font_color', '#fff');
+    }
     render() {
         return (
             <i-vstack gap='1rem' padding={{ top: 10, bottom: 10, left: 20, right: 20 }}>
                 <i-label caption='Get Ready to Stake' font={{ size: '1.5rem' }}></i-label>
                 <i-vstack gap='1rem'>
                     <i-label caption='How many tokens are you planning to stake?'></i-label>
-                    <i-scom-token-input
-                        id="tokenInput"
-                        placeholder='0.0'
-                        value='-'
-                        tokenReadOnly={true}
-                        isBalanceShown={false}
-                        isBtnMaxShown={false}
-                        border={{ radius: '1rem' }}
-                        font={{ size: '1.25rem' }}
-                        background={{ color: Theme.input.background }}
-                    ></i-scom-token-input>
-                    <i-button
-                        id="btnNext"
-                        caption="Next"
-                        padding={{ top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }}
-                        font={{color: Theme.colors.primary.contrastText}}
-                        onClick={this.handleClickNext}
-                    ></i-button>
+                    <i-hstack verticalAlignment='center' width='50%'>
+                        <i-scom-token-input
+                            id="tokenInput"
+                            placeholder='0.0'
+                            value='-'
+                            tokenReadOnly={true}
+                            isBalanceShown={false}
+                            isBtnMaxShown={false}
+                            border={{ radius: '1rem' }}
+                            font={{ size: '1.25rem' }}
+                            background={{ color: Theme.input.background }}
+                        ></i-scom-token-input>
+                    </i-hstack>
+                    <i-hstack horizontalAlignment='end'>
+                        <i-button
+                            id="btnNext"
+                            caption="Next"
+                            padding={{ top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }}
+                            font={{color: Theme.colors.primary.contrastText}}
+                            onClick={this.handleClickNext}
+                        ></i-button>
+                    </i-hstack>
                 </i-vstack>
             </i-vstack>
         )
