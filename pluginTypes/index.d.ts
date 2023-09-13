@@ -626,104 +626,14 @@ declare module "@scom/scom-staking/formSchema.ts" {
                         };
                     };
                 };
-                dark: {
-                    type: string;
-                    properties: {
-                        backgroundColor: {
-                            type: string;
-                            format: string;
-                        };
-                        fontColor: {
-                            type: string;
-                            format: string;
-                        };
-                        textSecondary: {
-                            type: string;
-                            title: string;
-                            format: string;
-                        };
-                        inputBackgroundColor: {
-                            type: string;
-                            format: string;
-                        };
-                        inputFontColor: {
-                            type: string;
-                            format: string;
-                        };
-                        secondaryColor: {
-                            type: string;
-                            title: string;
-                            format: string;
-                        };
-                        secondaryFontColor: {
-                            type: string;
-                            title: string;
-                            format: string;
-                        };
-                    };
-                };
-                light: {
-                    type: string;
-                    properties: {
-                        backgroundColor: {
-                            type: string;
-                            format: string;
-                        };
-                        fontColor: {
-                            type: string;
-                            format: string;
-                        };
-                        textSecondary: {
-                            type: string;
-                            title: string;
-                            format: string;
-                        };
-                        inputBackgroundColor: {
-                            type: string;
-                            format: string;
-                        };
-                        inputFontColor: {
-                            type: string;
-                            format: string;
-                        };
-                        secondaryColor: {
-                            type: string;
-                            title: string;
-                            format: string;
-                        };
-                        secondaryFontColor: {
-                            type: string;
-                            title: string;
-                            format: string;
-                        };
-                    };
-                };
             };
         };
         uiSchema: {
             type: string;
-            elements: ({
+            elements: {
                 type: string;
-                label: string;
-                elements: {
-                    type: string;
-                    elements: {
-                        type: string;
-                        scope: string;
-                    }[];
-                }[];
-            } | {
-                type: string;
-                label: string;
-                elements: {
-                    type: string;
-                    elements: {
-                        type: string;
-                        label: string;
-                        scope: string;
-                    }[];
-                }[];
-            })[];
+                scope: string;
+            }[];
         };
     };
 }

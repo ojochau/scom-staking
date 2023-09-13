@@ -251,69 +251,35 @@ export function getProjectOwnerSchema() {
                             }
                         }
                     }
-                },
-                dark: theme,
-                light: theme
+                }
             }
         },
         uiSchema: {
-            type: 'Categorization',
+            type: 'VerticalLayout',
             elements: [
                 {
-                    type: 'Category',
-                    label: 'General',
-                    elements: [
-                        {
-                            type: 'VerticalLayout',
-                            elements: [
-                                {
-                                    type: 'Control',
-                                    scope: '#/properties/name'
-                                },
-                                {
-                                    type: 'Control',
-                                    scope: '#/properties/desc'
-                                },
-                                {
-                                    type: 'Control',
-                                    scope: '#/properties/logo'
-                                },
-                                {
-                                    type: 'Control',
-                                    scope: '#/properties/getTokenURL'
-                                },
-                                {
-                                    type: 'Control',
-                                    scope: '#/properties/showContractLink'
-                                },
-                                {
-                                    type: 'Control',
-                                    scope: '#/properties/staking'
-                                }
-                            ]
-                        }
-                    ]
+                    type: 'Control',
+                    scope: '#/properties/name'
                 },
                 {
-                    type: 'Category',
-                    label: 'Theme',
-                    elements: [
-                        {
-                            type: 'VerticalLayout',
-                            elements: [
-                                {
-                                    type: 'Control',
-                                    label: 'Dark',
-                                    scope: '#/properties/dark'
-                                },
-                                {
-                                    type: 'Control',
-                                    label: 'Light',
-                                    scope: '#/properties/light'
-                                }
-                            ]
-                        }
-                    ]
+                    type: 'Control',
+                    scope: '#/properties/desc'
+                },
+                {
+                    type: 'Control',
+                    scope: '#/properties/logo'
+                },
+                {
+                    type: 'Control',
+                    scope: '#/properties/getTokenURL'
+                },
+                {
+                    type: 'Control',
+                    scope: '#/properties/showContractLink'
+                },
+                {
+                    type: 'Control',
+                    scope: '#/properties/stakings'
                 }
             ]
         }
