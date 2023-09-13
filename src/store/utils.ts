@@ -1,14 +1,14 @@
 import { ERC20ApprovalModel, IERC20ApprovalEventOptions, INetwork, Wallet } from '@ijstech/eth-wallet';
-import { EventId } from '../global/index';
 import getNetworkList from '@scom/scom-network-list';
 import { application } from '@ijstech/components';
+import { CurrentMode } from '../global/index';
 
 export * from './data/index';
 export type ProxyAddresses = { [key: number]: string };
 export class State {
   networkMap: { [key: number]: INetwork } = {};
   infuraId: string = '';
-  stakingStatusMap: { [key: string]: { value: boolean, text: string } } = {};
+  stakingStatusMap: { [key: string]: boolean } = {};
   proxyAddresses: ProxyAddresses = {};
   embedderCommissionFee: string = '0';
   rpcWalletId: string = '';
@@ -87,13 +87,12 @@ export class State {
     return null;
   }
 
-  setStakingStatus(key: string, value: boolean, text: string) {
-    this.stakingStatusMap[key] = { value, text };
-    application.EventBus.dispatch(EventId.EmitButtonStatus, { key, value, text });
+  setStakingStatus(key: CurrentMode, value: boolean) {
+    this.stakingStatusMap[key] = value;
   }
 
-  getStakingStatus(key: string) {
-    return this.stakingStatusMap[key] || { value: false, text: 'Stake' };
+  getStakingStatus(key: CurrentMode) {
+    return this.stakingStatusMap[key];
   }
 
   getRpcWallet() {

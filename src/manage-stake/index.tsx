@@ -1,6 +1,6 @@
 import { moment, Button, Input, Container, HStack, customElements, ControlElement, Module, Label, Styles } from '@ijstech/components';
 import { BigNumber, IERC20ApprovalAction } from '@ijstech/eth-wallet';
-import { IExtendOptionInfo, LockTokenType, TokenMapType, limitInputNumber } from '../global/index';
+import { CurrentMode, IExtendOptionInfo, LockTokenType, TokenMapType, limitInputNumber } from '../global/index';
 import { getLockedTokenObject, getLockedTokenSymbol, getChainNativeToken, isClientWalletConnected, State } from '../store/index';
 import { ITokenObject, tokenStore } from '@scom/scom-token-list';
 import ScomTxStatusModal from '@scom/scom-tx-status-modal';
@@ -16,11 +16,6 @@ import {
 import { stakingManageStakeStyle } from './index.css';
 
 const Theme = Styles.Theme.ThemeVars;
-
-enum CurrentMode {
-  STAKE,
-  UNLOCK
-}
 
 declare global {
   namespace JSX {
@@ -85,13 +80,6 @@ export default class ManageStake extends Module {
 
   needToBeApproval = () => {
     return this.btnApprove && this.btnApprove.visible;
-  }
-
-  get actionKey() {
-    if (this.currentMode === CurrentMode.STAKE) {
-      return `#btn-stake-${this.address}`;
-    }
-    return `#btn-unstake-${this.address}`;
   }
 
   private showMessage = (status: 'warning' | 'success' | 'error', content?: string | Error) => {
@@ -330,25 +318,24 @@ export default class ManageStake extends Module {
           if (this.currentMode === CurrentMode.STAKE) {
             this.btnStake.caption = 'Staking';
             this.btnStake.rightIcon.visible = true;
-            this.state.setStakingStatus(this.actionKey, true, 'Staking');
+            this.state.setStakingStatus(this.currentMode, true);
             this.btnUnstake.enabled = false;
           } else {
             this.btnUnstake.caption = 'Unstaking';
             this.btnUnstake.rightIcon.visible = true;
-            this.state.setStakingStatus(this.actionKey, true, 'Unstaking');
+            this.state.setStakingStatus(this.currentMode, true);
             this.btnStake.enabled = false;
           }
         }
       },
       onPaid: async () => {
-        const caption = this.currentMode === CurrentMode.STAKE ? 'Unstake' : 'Stake';
         if (this.onRefresh) {
           const rpcWallet = this.state.getRpcWallet();
           if (rpcWallet.address) {
             await tokenStore.updateAllTokenBalances(rpcWallet);
           }
           await this.onRefresh();
-          this.state.setStakingStatus(this.actionKey, false, caption);
+          this.state.setStakingStatus(this.currentMode, false);
         }
         if (this.currentMode === CurrentMode.STAKE) {
           this.btnStake.caption = 'Stake';
@@ -364,7 +351,6 @@ export default class ManageStake extends Module {
       },
       onPayingError: async (err: Error) => {
         await this.updateEnableInput();
-        const caption = this.currentMode === CurrentMode.STAKE ? 'Stake' : 'Unstake';
         if (this.currentMode === CurrentMode.STAKE) {
           this.btnStake.caption = 'Stake';
           this.btnStake.rightIcon.visible = false;
@@ -373,7 +359,7 @@ export default class ManageStake extends Module {
           this.btnUnstake.rightIcon.visible = false;
         }
         this.showMessage('error', err);
-        this.state.setStakingStatus(this.actionKey, false, caption);
+        this.state.setStakingStatus(this.currentMode, false);
       }
     });
     this.state.approvalModel.spenderAddress = this.address;

@@ -38,6 +38,10 @@ declare module "@scom/scom-staking/global/utils/interfaces.ts" {
         walletAddress: string;
         share: string;
     }
+    export enum CurrentMode {
+        STAKE = 0,
+        UNLOCK = 1
+    }
     export enum LockTokenType {
         ERC20_Token = 0,
         LP_Token = 1,
@@ -179,10 +183,6 @@ declare module "@scom/scom-staking/global/utils/index.ts" {
 }
 /// <amd-module name="@scom/scom-staking/global/index.ts" />
 declare module "@scom/scom-staking/global/index.ts" {
-    export const enum EventId {
-        Paid = "Paid",
-        EmitButtonStatus = "stakingEmitButtonStatus"
-    }
     export * from "@scom/scom-staking/global/utils/index.ts";
 }
 /// <amd-module name="@scom/scom-staking/store/data/index.ts" />
@@ -195,6 +195,7 @@ declare module "@scom/scom-staking/store/data/index.ts" {
 /// <amd-module name="@scom/scom-staking/store/utils.ts" />
 declare module "@scom/scom-staking/store/utils.ts" {
     import { ERC20ApprovalModel, IERC20ApprovalEventOptions, INetwork } from '@ijstech/eth-wallet';
+    import { CurrentMode } from "@scom/scom-staking/global/index.ts";
     export * from "@scom/scom-staking/store/data/index.ts";
     export type ProxyAddresses = {
         [key: number]: string;
@@ -205,10 +206,7 @@ declare module "@scom/scom-staking/store/utils.ts" {
         };
         infuraId: string;
         stakingStatusMap: {
-            [key: string]: {
-                value: boolean;
-                text: string;
-            };
+            [key: string]: boolean;
         };
         proxyAddresses: ProxyAddresses;
         embedderCommissionFee: string;
@@ -219,11 +217,8 @@ declare module "@scom/scom-staking/store/utils.ts" {
         private initData;
         private setNetworkList;
         getProxyAddress(chainId?: number): string;
-        setStakingStatus(key: string, value: boolean, text: string): void;
-        getStakingStatus(key: string): {
-            value: boolean;
-            text: string;
-        };
+        setStakingStatus(key: CurrentMode, value: boolean): void;
+        getStakingStatus(key: CurrentMode): boolean;
         getRpcWallet(): import("@ijstech/eth-wallet").IRpcWallet;
         isRpcWalletConnected(): boolean;
         getChainId(): number;
@@ -383,7 +378,6 @@ declare module "@scom/scom-staking/manage-stake/index.tsx" {
         setInputValue: (value: string) => void;
         getBalance: () => BigNumber;
         needToBeApproval: () => boolean;
-        get actionKey(): string;
         private showMessage;
         private onApproveToken;
         private onStake;
@@ -693,7 +687,6 @@ declare module "@scom/scom-staking" {
         private _data;
         tag: any;
         defaultEdit: boolean;
-        private $eventBus;
         private loadingElm;
         private campaign;
         private stakingElm;
@@ -706,7 +699,6 @@ declare module "@scom/scom-staking" {
         private dappContainer;
         private mdWallet;
         private rpcWalletEvents;
-        private clientEvents;
         private _getActions;
         private getProjectOwnerActions;
         getConfigurators(): ({
@@ -775,7 +767,6 @@ declare module "@scom/scom-staking" {
         constructor(parent?: Container, options?: ControlElement);
         removeRpcWalletEvents(): void;
         onHide(): void;
-        private registerEvent;
         private onChainChanged;
         private isWalletValid;
         private refreshUI;
@@ -788,7 +779,6 @@ declare module "@scom/scom-staking" {
         private getRewardToken;
         private getLPToken;
         init(): Promise<void>;
-        private updateButtonStatus;
         private connectWallet;
         private initEmptyUI;
         private renderEmpty;

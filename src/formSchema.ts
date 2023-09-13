@@ -279,7 +279,7 @@ export function getProjectOwnerSchema() {
                 },
                 {
                     type: 'Control',
-                    scope: '#/properties/stakings'
+                    scope: '#/properties/staking'
                 }
             ]
         }
