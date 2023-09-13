@@ -1898,7 +1898,8 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
                 this.tokenInput.token = token;
                 await scom_token_list_4.tokenStore.updateTokenBalances(rpcWallet, [token]);
             };
-            this.handleClickNext = async () => {
+            this.handleClickStart = async () => {
+                this.tokenInput.readOnly = true;
                 let eventName = `${this.invokerId}:nextStep`;
                 const tokenBalances = await scom_token_list_4.tokenStore.getTokenBalancesByChainId(this.executionProperties.chainId);
                 const balance = tokenBalances[this.tokenInput.token.address.toLowerCase()];
@@ -1906,6 +1907,7 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
                 this.executionProperties.stakeInputValue = this.tokenInput.value;
                 const isBalanceSufficient = new eth_wallet_6.BigNumber(balance).gte(this.tokenInput.value);
                 this.$eventBus.dispatch(eventName, {
+                    isInitialSetup: true,
                     amount: this.tokenInput.value,
                     tokenAcquisition: !isBalanceSufficient,
                     tokenRequirements: this.tokenRequirements,
@@ -1942,7 +1944,7 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
                     this.$render("i-hstack", { verticalAlignment: 'center', width: '50%' },
                         this.$render("i-scom-token-input", { id: "tokenInput", placeholder: '0.0', value: '-', tokenReadOnly: true, isBalanceShown: false, isBtnMaxShown: false, border: { radius: '1rem' }, font: { size: '1.25rem' }, background: { color: Theme.input.background } })),
                     this.$render("i-hstack", { horizontalAlignment: 'end' },
-                        this.$render("i-button", { id: "btnNext", caption: "Next", padding: { top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }, font: { color: Theme.colors.primary.contrastText }, onClick: this.handleClickNext })))));
+                        this.$render("i-button", { id: "btnStart", caption: "Start", padding: { top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }, font: { color: Theme.colors.primary.contrastText }, onClick: this.handleClickStart })))));
         }
     };
     ScomStakingFlowInitialSetup = __decorate([

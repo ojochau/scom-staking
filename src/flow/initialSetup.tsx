@@ -79,14 +79,16 @@ export default class ScomStakingFlowInitialSetup extends Module {
         this.tokenInput.token = token
         await tokenStore.updateTokenBalances(rpcWallet, [token]);
 	}
-    private handleClickNext = async () => {
+    private handleClickStart = async () => {
+        this.tokenInput.readOnly = true;
         let eventName = `${this.invokerId}:nextStep`;
         const tokenBalances = await tokenStore.getTokenBalancesByChainId(this.executionProperties.chainId);
         const balance = tokenBalances[this.tokenInput.token.address.toLowerCase()];
         this.tokenRequirements[0].tokenOut.amount = this.tokenInput.value;
         this.executionProperties.stakeInputValue = this.tokenInput.value;
         const isBalanceSufficient = new BigNumber(balance).gte(this.tokenInput.value);
-        this.$eventBus.dispatch(eventName, { 
+        this.$eventBus.dispatch(eventName, {
+            isInitialSetup: true, 
             amount: this.tokenInput.value,
             tokenAcquisition: !isBalanceSufficient,
             tokenRequirements: this.tokenRequirements,
@@ -119,11 +121,11 @@ export default class ScomStakingFlowInitialSetup extends Module {
                     </i-hstack>
                     <i-hstack horizontalAlignment='end'>
                         <i-button
-                            id="btnNext"
-                            caption="Next"
+                            id="btnStart"
+                            caption="Start"
                             padding={{ top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }}
-                            font={{color: Theme.colors.primary.contrastText}}
-                            onClick={this.handleClickNext}
+                            font={{color: Theme.colors.primary.contrastText }}
+                            onClick={this.handleClickStart}
                         ></i-button>
                     </i-hstack>
                 </i-vstack>
