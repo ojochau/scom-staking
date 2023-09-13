@@ -414,7 +414,7 @@ define("@scom/scom-staking/data.json.ts", ["require", "exports"], function (requ
             "name": "Staking",
             "desc": "Earn OSWAP",
             "showContractLink": true,
-            "stakings": {
+            "staking": {
                 "address": "0x03C22D12eb6E5ea3a06F46Fc0e1857438BB7DCae",
                 "lockTokenType": 0,
                 "rewards": {
@@ -438,7 +438,7 @@ define("@scom/scom-staking/data.json.ts", ["require", "exports"], function (requ
 define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/oswap-time-is-money-contract", "@scom/oswap-openswap-contract", "@scom/oswap-chainlink-contract", "@scom/oswap-cross-chain-bridge-contract", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list"], function (require, exports, eth_wallet_4, oswap_time_is_money_contract_1, oswap_openswap_contract_1, oswap_chainlink_contract_1, oswap_cross_chain_bridge_contract_1, index_4, scom_token_list_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getProxySelectors = exports.lockToken = exports.claimToken = exports.withdrawToken = exports.getVaultRewardCurrentAPR = exports.getLPRewardCurrentAPR = exports.getERC20RewardCurrentAPR = exports.getVaultBalance = exports.getVaultObject = exports.getLPBalance = exports.getLPObject = exports.getStakingTotalLocked = exports.getAllCampaignsInfo = exports.getTokenPrice = void 0;
+    exports.getProxySelectors = exports.lockToken = exports.claimToken = exports.withdrawToken = exports.getVaultRewardCurrentAPR = exports.getLPRewardCurrentAPR = exports.getERC20RewardCurrentAPR = exports.getVaultBalance = exports.getVaultObject = exports.getLPBalance = exports.getLPObject = exports.getStakingTotalLocked = exports.getCampaignInfo = exports.getTokenPrice = void 0;
     const getTokenPrice = async (wallet, token) => {
         let chainId = wallet.chainId;
         let tokenPrice;
@@ -679,57 +679,23 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
             return null;
         }
     };
-    const composeCampaignInfoList = async (stakingCampaignInfoList, addDurationOption) => {
+    const getCampaignInfo = async (wallet, stakingInfo) => {
         var _a;
-        let campaigns = [];
-        const _stakingCampaignInfoList = [stakingCampaignInfoList];
-        for (let i = 0; i < _stakingCampaignInfoList.length; i++) {
-            let stakingCampaignInfo = _stakingCampaignInfoList[i];
-            let durationOptionsWithExtendedInfo = [];
-            let durationOptions = [stakingCampaignInfo.stakings];
-            for (let j = 0; j < durationOptions.length; j++) {
-                let durationOption = durationOptions[j];
-                addDurationOption(durationOptionsWithExtendedInfo, durationOption);
-            }
-            let campaignObj = Object.assign(Object.assign({}, stakingCampaignInfo), { campaignName: stakingCampaignInfo.name, campaignDesc: stakingCampaignInfo.desc, getTokenURL: stakingCampaignInfo.getTokenURL, options: durationOptionsWithExtendedInfo });
-            if (durationOptionsWithExtendedInfo.length > 0) {
-                const extendedInfo = durationOptionsWithExtendedInfo[0];
-                const admin = extendedInfo.rewards && extendedInfo.rewards[0] ? extendedInfo.rewards[0].admin : '';
-                campaignObj = Object.assign(Object.assign({}, campaignObj), { admin, campaignStart: extendedInfo.startOfEntryPeriod / 1000, campaignEnd: extendedInfo.endOfEntryPeriod / 1000, tokenAddress: (_a = extendedInfo.tokenAddress) === null || _a === void 0 ? void 0 : _a.toLowerCase() });
-            }
-            campaigns.push(campaignObj);
-        }
-        return campaigns;
-    };
-    const getAllCampaignsInfo = async (wallet, stakingInfo) => {
         let chainId = wallet.chainId;
-        let stakingCampaignInfoList = stakingInfo[chainId];
-        if (!stakingCampaignInfoList)
-            return [];
-        let optionExtendedInfoMap = {};
-        let allCampaignOptions = [stakingCampaignInfoList.stakings];
-        let promises = allCampaignOptions.map(async (option, index) => {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    let optionExtendedInfo = await getDefaultStakingByAddress(wallet, option);
-                    if (optionExtendedInfo)
-                        optionExtendedInfoMap[option.address] = optionExtendedInfo;
-                }
-                catch (error) { }
-                resolve();
-            });
-        });
-        await Promise.all(promises);
-        let campaigns = await composeCampaignInfoList(stakingCampaignInfoList, (options, defaultOption) => {
-            if (defaultOption.address && optionExtendedInfoMap[defaultOption.address]) {
-                options.push(Object.assign(Object.assign({}, defaultOption), optionExtendedInfoMap[defaultOption.address]));
-            }
-        });
-        return campaigns.map(campaign => {
-            return Object.assign(Object.assign({}, campaign), { stakings: campaign.options });
-        });
+        let stakingCampaignInfo = stakingInfo[chainId];
+        if (!stakingCampaignInfo)
+            return null;
+        let staking = Object.assign({}, stakingCampaignInfo.staking);
+        let optionExtendedInfo;
+        try {
+            optionExtendedInfo = await getDefaultStakingByAddress(wallet, staking);
+        }
+        catch (error) { }
+        let stakingExtendInfo = Object.assign(Object.assign({}, staking), optionExtendedInfo);
+        // const admin = stakingExtendInfo.rewards && stakingExtendInfo.rewards[0] ? stakingExtendInfo.rewards[0].admin : '';
+        return Object.assign(Object.assign({}, stakingCampaignInfo), { campaignStart: stakingExtendInfo.startOfEntryPeriod / 1000, campaignEnd: stakingExtendInfo.endOfEntryPeriod / 1000, tokenAddress: (_a = stakingExtendInfo.tokenAddress) === null || _a === void 0 ? void 0 : _a.toLowerCase(), option: stakingExtendInfo });
     };
-    exports.getAllCampaignsInfo = getAllCampaignsInfo;
+    exports.getCampaignInfo = getCampaignInfo;
     const getStakingTotalLocked = async (wallet, stakingAddress) => {
         let timeIsMoney = new oswap_time_is_money_contract_1.Contracts.TimeIsMoney(wallet, stakingAddress);
         let totalLockedWei = await timeIsMoney.totalLocked();
@@ -977,7 +943,7 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
             "withdraw"
         ];
         const selectors = permittedProxyFunctions
-            .map(e => e + "(" + timeIsMoney._abi.filter(f => f.name == e)[0].inputs.map(f => f.type).join(',') + ")")
+            .map((e) => e + "(" + timeIsMoney._abi.filter(f => f.name == e)[0].inputs.map(f => f.type).join(',') + ")")
             .map(e => wallet.soliditySha3(e).substring(0, 10))
             .map(e => timeIsMoney.address.toLowerCase() + e.replace("0x", ""));
         return selectors;
@@ -1029,7 +995,6 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
     let ManageStake = class ManageStake extends components_6.Module {
         constructor(parent, options) {
             super(parent, options);
-            this.stakingInfo = {};
             this.lockedTokenObject = {};
             this.maxQty = 0;
             this.availableQty = '0';
@@ -1106,7 +1071,6 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                 ;
                 this.btnStake.id = `btn-stake-${this.address}`;
                 this.btnUnstake.id = `btn-unstake-${this.address}`;
-                this.inputAmount.id = `input-${this.address}`;
                 let lpTokenData = {};
                 let vaultTokenData = {};
                 const rpcWallet = this.state.getRpcWallet();
@@ -1171,6 +1135,8 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                         this.balance = new eth_wallet_5.BigNumber(vaultTokenData.balance || 0).shiftedBy(defaultDecimalsOffset).toFixed();
                     }
                     this.btnMax.visible = true;
+                    if (!this.lbToken.isConnected)
+                        await this.lbToken.ready();
                     this.lbToken.caption = symbol;
                 }
                 await this.updateEnableInput();
@@ -1249,7 +1215,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                         this.btnApprove.visible = false;
                     }
                     this.btnStake.enabled = false;
-                    this.btnUnstake.enabled = false;
+                    this.btnUnstake.enabled = this.stakingInfo.mode !== 'Stake' && new eth_wallet_5.BigNumber(this.stakeQty).gt(0);
                 },
                 onToBePaid: async (token) => {
                     var _a;
@@ -1694,7 +1660,7 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                 showContractLink: {
                     type: 'boolean'
                 },
-                stakings: {
+                staking: {
                     type: 'object',
                     properties: {
                         address: {
@@ -1765,7 +1731,7 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                                 },
                                 {
                                     type: 'Control',
-                                    scope: '#/properties/stakings'
+                                    scope: '#/properties/staking'
                                 }
                             ]
                         }
@@ -1838,7 +1804,7 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                     showContractLink: {
                         type: 'boolean'
                     },
-                    stakings: {
+                    staking: {
                         type: 'object',
                         properties: {
                             address: {
@@ -1905,7 +1871,7 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                                     },
                                     {
                                         type: 'Control',
-                                        scope: '#/properties/stakings'
+                                        scope: '#/properties/staking'
                                     }
                                 ]
                             }
@@ -2016,57 +1982,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
     const Theme = components_9.Styles.Theme.ThemeVars;
     let ScomStaking = class ScomStaking extends components_9.Module {
         _getActions(category) {
-            const actions = [
-            // {
-            // 	name: 'Commissions',
-            // 	icon: 'dollar-sign',
-            // 	command: (builder: any, userInputData: any) => {
-            // 		let _oldData: IBuybackCampaign = {
-            // 			chainId: 0,
-            // 			projectName: '',
-            // 			offerIndex: 0,
-            // 			tokenIn: '',
-            // 			tokenOut: '',
-            // 			wallets: [],
-            // 			networks: []
-            // 		}
-            // 		return {
-            // 			execute: async () => {
-            // 				_oldData = { ...this._data };
-            // 				if (userInputData.commissions) this._data.commissions = userInputData.commissions;
-            // 				this.refreshUI();
-            // 				if (builder?.setData) builder.setData(this._data);
-            // 			},
-            // 			undo: () => {
-            // 				this._data = { ..._oldData };
-            // 				this.refreshUI();
-            // 				if (builder?.setData) builder.setData(this._data);
-            // 			},
-            // 			redo: () => { }
-            // 		}
-            // 	},
-            // 	customUI: {
-            // 		render: (data?: any, onConfirm?: (result: boolean, data: any) => void) => {
-            // 			const vstack = new VStack();
-            // 			const config = new ScomCommissionFeeSetup(null, {
-            //         commissions: self._data.commissions,
-            //         fee: this.state.embedderCommissionFee,
-            //         networks: self._data.networks
-            //       });
-            //       const button = new Button(null, {
-            //         caption: 'Confirm',
-            //       });
-            //       vstack.append(config);
-            //       vstack.append(button);
-            //       button.onClick = async () => {
-            //         const commissions = config.commissions;
-            //         if (onConfirm) onConfirm(true, {commissions});
-            //       }
-            //       return vstack;
-            // 		}
-            // 	}
-            // },
-            ];
+            const actions = [];
             if (category && category !== 'offers') {
                 actions.push({
                     name: 'Edit',
@@ -2075,7 +1991,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         let oldData = {
                             chainId: 0,
                             name: '',
-                            stakings: undefined,
+                            staking: undefined,
                             wallets: [],
                             networks: []
                         };
@@ -2083,7 +1999,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         return {
                             execute: async () => {
                                 oldData = JSON.parse(JSON.stringify(this._data));
-                                const { chainId, name, desc, logo, getTokenURL, showContractLink, stakings } = userInputData, themeSettings = __rest(userInputData, ["chainId", "name", "desc", "logo", "getTokenURL", "showContractLink", "stakings"]);
+                                const { chainId, name, desc, logo, getTokenURL, showContractLink, staking } = userInputData, themeSettings = __rest(userInputData, ["chainId", "name", "desc", "logo", "getTokenURL", "showContractLink", "staking"]);
                                 const generalSettings = {
                                     chainId,
                                     name,
@@ -2091,7 +2007,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                                     logo,
                                     getTokenURL,
                                     showContractLink,
-                                    stakings
+                                    staking
                                 };
                                 if (generalSettings.chainId !== undefined)
                                     this._data.chainId = generalSettings.chainId;
@@ -2105,8 +2021,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                                     this._data.getTokenURL = generalSettings.getTokenURL;
                                 if (generalSettings.showContractLink !== undefined)
                                     this._data.showContractLink = generalSettings.showContractLink;
-                                if (generalSettings.stakings !== undefined)
-                                    this._data.stakings = generalSettings.stakings;
+                                if (generalSettings.staking !== undefined)
+                                    this._data.staking = generalSettings.staking;
                                 await this.resetRpcWallet();
                                 this.refreshUI();
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
@@ -2161,7 +2077,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     target: 'Project Owners',
                     getProxySelectors: async (chainId) => {
                         var _a, _b, _c;
-                        const address = (_c = (_b = (_a = this.campaigns[0]) === null || _a === void 0 ? void 0 : _a.options) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.address;
+                        const address = (_c = (_b = (_a = this.campaign) === null || _a === void 0 ? void 0 : _a.option) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.address;
                         const selectors = await (0, index_13.getProxySelectors)(this.state, chainId, address);
                         return selectors;
                     },
@@ -2280,7 +2196,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 this.dappContainer.setTag(this.tag);
             this.updateTheme();
             // if (this.stakingElm) {
-            // 	this.renderCampaigns();
+            // 	this.renderCampaign();
             // }
         }
         updateStyle(name, value) {
@@ -2332,9 +2248,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             super(parent, options);
             this.tag = {};
             this.defaultEdit = true;
-            this.campaigns = [];
             this.listAprTimer = [];
-            this.listActiveTimer = [];
             this.tokenMap = {};
             this.rpcWalletEvents = [];
             this.clientEvents = [];
@@ -2352,7 +2266,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     try {
                         const wallet = eth_wallet_7.Wallet.getClientInstance();
                         const infoList = this._data[wallet.chainId];
-                        const stakingAddress = infoList && ((_a = infoList[0].stakings[0]) === null || _a === void 0 ? void 0 : _a.address);
+                        const stakingAddress = infoList && ((_a = infoList[0].staking) === null || _a === void 0 ? void 0 : _a.address);
                         if (stakingAddress) {
                             const timeIsMoney = new oswap_time_is_money_contract_2.Contracts.TimeIsMoney(wallet, stakingAddress);
                             await timeIsMoney.getCredit(wallet.address);
@@ -2383,8 +2297,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     if (rpcWallet.address) {
                         await scom_token_list_5.tokenStore.updateAllTokenBalances(rpcWallet);
                     }
-                    this.campaigns = await (0, index_13.getAllCampaignsInfo)(rpcWallet, { [this._data.chainId]: this._data });
-                    await this.renderCampaigns(hideLoading);
+                    this.campaign = await (0, index_13.getCampaignInfo)(rpcWallet, { [this._data.chainId]: this._data });
+                    await this.renderCampaign(hideLoading);
                     if (!hideLoading && this.loadingElm) {
                         this.loadingElm.visible = false;
                     }
@@ -2441,15 +2355,15 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             this.checkValidation = () => {
                 if (!this._data)
                     return false;
-                const { chainId, name, stakings } = this._data;
-                if (!chainId || !name || !stakings)
+                const { chainId, name, staking } = this._data;
+                if (!chainId || !name || !staking)
                     return false;
-                const { address, rewards, lockTokenType } = stakings;
+                const { address, rewards, lockTokenType } = staking;
                 if (!address || !rewards || !rewards.address || lockTokenType === undefined)
                     return false;
-                // const { chainId, customName, campaignStart, campaignEnd, admin, stakings } = this._data;
-                // if (!chainId || !customName || !campaignStart?.gt(0) || !campaignEnd?.gt(0) || !admin || !stakings) return false;
-                // const { lockTokenAddress, minLockTime, perAddressCap, maxTotalLock, rewards } = stakings[0];
+                // const { chainId, customName, campaignStart, campaignEnd, admin, staking } = this._data;
+                // if (!chainId || !customName || !campaignStart?.gt(0) || !campaignEnd?.gt(0) || !admin || !staking) return false;
+                // const { lockTokenAddress, minLockTime, perAddressCap, maxTotalLock, rewards } = staking;
                 // if (!lockTokenAddress || !minLockTime?.gt(0) || !perAddressCap?.gt(0) || !maxTotalLock?.gt(0) || !rewards) return false;
                 // const { rewardTokenAddress, multiplier, initialReward, vestingPeriod, claimDeadline } = rewards[0];
                 // if (!rewardTokenAddress || !multiplier?.gt(0) || initialReward?.isNaN() || !vestingPeriod?.gt(0) || !claimDeadline) return false;
@@ -2460,10 +2374,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     clearInterval(timer);
                 }
                 this.listAprTimer = [];
-                for (const timer of this.listActiveTimer) {
-                    clearInterval(timer);
-                }
-                this.listActiveTimer = [];
+                clearInterval(this.activeTimer);
             };
             this.getRewardToken = (tokenAddress) => {
                 return this.tokenMap[tokenAddress] || this.tokenMap[tokenAddress === null || tokenAddress === void 0 ? void 0 : tokenAddress.toLocaleLowerCase()] || {};
@@ -2525,7 +2436,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     this.loadingElm.visible = false;
                 }
             };
-            this.renderCampaigns = async (hideLoading) => {
+            this.renderCampaign = async (hideLoading) => {
                 if (!hideLoading) {
                     this.stakingElm.clearInnerHTML();
                 }
@@ -2533,7 +2444,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 const chainId = this.state.getChainId();
                 await this.initEmptyUI();
                 this.noCampaignSection.visible = false;
-                if (this.campaigns && !this.campaigns.length) {
+                if (!this.campaign) {
                     this.stakingElm.clearInnerHTML();
                     this.stakingElm.appendChild(this.noCampaignSection);
                     this.noCampaignSection.visible = true;
@@ -2542,356 +2453,307 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 }
                 const rpcWalletConnected = this.state.isRpcWalletConnected();
                 const rpcWallet = this.rpcWallet;
-                let nodeItems = [];
                 this.removeTimer();
-                const campaigns = [this.campaigns[0]];
-                for (let idx = 0; idx < campaigns.length; idx++) {
-                    const campaign = this.campaigns[idx];
-                    const containerSection = await components_9.Panel.create();
-                    containerSection.id = `campaign-${idx}`;
-                    containerSection.classList.add('container');
-                    const options = campaign.options;
-                    for (let optIdx = 0; optIdx < options.length; optIdx++) {
-                        const opt = options[optIdx];
-                        let lpTokenData = {};
-                        let vaultTokenData = {};
-                        if (opt.tokenAddress) {
-                            if (opt.lockTokenType == index_11.LockTokenType.LP_Token) {
-                                lpTokenData = {
-                                    'object': await (0, index_13.getLPObject)(rpcWallet, opt.tokenAddress)
-                                };
-                            }
-                            else if (opt.lockTokenType == index_11.LockTokenType.VAULT_Token) {
-                                vaultTokenData = {
-                                    'object': await (0, index_13.getVaultObject)(rpcWallet, opt.tokenAddress)
-                                };
-                            }
-                        }
-                        const tokenInfo = {
-                            tokenAddress: campaign.tokenAddress,
-                            lpToken: lpTokenData,
-                            vaultToken: vaultTokenData
+                const campaign = this.campaign;
+                const containerSection = await components_9.Panel.create();
+                containerSection.classList.add('container');
+                let opt = Object.assign({}, campaign.option);
+                let lpTokenData = {};
+                let vaultTokenData = {};
+                if (opt.tokenAddress) {
+                    if (opt.lockTokenType == index_11.LockTokenType.LP_Token) {
+                        lpTokenData = {
+                            'object': await (0, index_13.getLPObject)(rpcWallet, opt.tokenAddress)
                         };
-                        options[optIdx] = Object.assign(Object.assign({}, options[optIdx]), { tokenInfo });
                     }
-                    const stakingInfo = options ? options[0] : null;
-                    const lockedTokenObject = (0, index_12.getLockedTokenObject)(stakingInfo, stakingInfo.tokenInfo, this.tokenMap);
-                    const lockedTokenSymbol = (0, index_12.getLockedTokenSymbol)(stakingInfo, lockedTokenObject);
-                    const lockedTokenIconPaths = (0, index_12.getLockedTokenIconPaths)(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
-                    const lockedTokenDecimals = (lockedTokenObject === null || lockedTokenObject === void 0 ? void 0 : lockedTokenObject.decimals) || 18;
-                    const defaultDecimalsOffset = 18 - lockedTokenDecimals;
-                    const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
-                    const activeEndTime = stakingInfo ? stakingInfo.endOfEntryPeriod : 0;
-                    let isStarted = (0, components_9.moment)(activeStartTime).diff((0, components_9.moment)()) <= 0;
-                    let isClosed = (0, components_9.moment)(activeEndTime).diff((0, components_9.moment)()) <= 0;
-                    let totalLocked = {};
-                    const stakingElms = [];
-                    const optionTimer = { background: { color: Theme.colors.secondary.main }, font: { color: Theme.colors.secondary.contrastText } };
-                    const activeTimerRows = [];
-                    const activeTimerElms = [];
-                    const endHours = [];
-                    const endDays = [];
-                    const endMins = [];
-                    const stickerSections = [];
-                    const stickerLabels = [];
-                    const stickerIcons = [];
-                    for (let i = 0; i < options.length; i++) {
-                        stakingElms[i] = await components_9.VStack.create({ visible: i === 0 });
-                        activeTimerRows[i] = await components_9.VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
-                        activeTimerElms[i] = await components_9.VStack.create();
-                        activeTimerRows[i].appendChild(this.$render("i-label", { caption: "End Date", font: { size: '14px' }, opacity: 0.5 }));
-                        activeTimerRows[i].appendChild(activeTimerElms[i]);
-                        endHours[i] = await components_9.Label.create(optionTimer);
-                        endDays[i] = await components_9.Label.create(optionTimer);
-                        endMins[i] = await components_9.Label.create(optionTimer);
-                        endHours[i].classList.add('timer-value');
-                        endDays[i].classList.add('timer-value');
-                        endMins[i].classList.add('timer-value');
-                        activeTimerElms[i].appendChild(this.$render("i-hstack", { gap: 4, class: "custom-timer" },
-                            endDays[i],
-                            this.$render("i-label", { caption: "D", class: "timer-unit" }),
-                            endHours[i],
-                            this.$render("i-label", { caption: "H", class: "timer-unit" }),
-                            endMins[i],
-                            this.$render("i-label", { caption: "M", class: "timer-unit" })));
-                        // Sticker
-                        stickerSections[i] = await components_9.Panel.create({ visible: false });
-                        stickerLabels[i] = await components_9.Label.create();
-                        stickerIcons[i] = await components_9.Icon.create({ fill: '#fff' });
-                        stickerSections[i].classList.add('sticker');
-                        stickerSections[i].appendChild(this.$render("i-vstack", { class: "sticker-text" },
-                            stickerIcons[i],
-                            stickerLabels[i]));
-                    }
-                    const onChangeStake = (index) => {
-                        stakingElms.forEach((elm) => {
-                            elm.visible = false;
-                        });
-                        stakingElms[index].visible = true;
-                    };
-                    const setAvailableQty = async () => {
-                        if (!this.state.isRpcWalletConnected())
-                            return;
-                        let i = 0;
-                        for (const o of options) {
-                            const _totalLocked = await (0, index_13.getStakingTotalLocked)(rpcWallet, o.address);
-                            totalLocked[o.address] = _totalLocked;
-                            const optionQty = new eth_wallet_7.BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
-                            if (o.mode === 'Stake') {
-                                const keyStake = `#btn-stake-${o.address}`;
-                                const btnStake = this.querySelector(keyStake);
-                                const isStaking = this.state.getStakingStatus(keyStake).value;
-                                if (btnStake) {
-                                    let isValidInput = false;
-                                    const inputElm = this.querySelector(`#input-${o.address}`);
-                                    if (inputElm) {
-                                        const manageStake = this.querySelector(`#manage-stake-${o.address}`);
-                                        const inputVal = new eth_wallet_7.BigNumber(inputElm.value || 0);
-                                        isValidInput = inputVal.gt(0) && inputVal.lte(manageStake.getBalance()) && !(manageStake === null || manageStake === void 0 ? void 0 : manageStake.needToBeApproval());
-                                    }
-                                    btnStake.enabled = !isStaking && isValidInput && (isStarted && !(optionQty.lte(0) || isClosed));
-                                }
-                            }
-                            else {
-                                const keyUnstake = `#btn-unstake-${o.address}`;
-                                const btnUnstake = this.querySelector(keyUnstake);
-                                const isUnstaking = this.state.getStakingStatus(keyUnstake).value;
-                                if (btnUnstake) {
-                                    const manageStake = this.querySelector(`#manage-stake-${o.address}`);
-                                    btnUnstake.enabled = !isUnstaking && o.mode !== 'Stake' && Number(o.stakeQty) != 0 && !(manageStake === null || manageStake === void 0 ? void 0 : manageStake.needToBeApproval());
-                                }
-                            }
-                            if (isClosed) {
-                                if (stickerLabels[i].caption !== 'Closed') {
-                                    stickerSections[i].classList.add('closed');
-                                    stickerSections[i].classList.remove('sold-out');
-                                    stickerLabels[i].caption = 'Closed';
-                                    stickerIcons[i].name = 'check-square';
-                                }
-                            }
-                            else if (optionQty.lte(0)) {
-                                if (stickerLabels[i].caption !== 'Sold Out') {
-                                    stickerLabels[i].caption = 'Sold Out';
-                                    stickerIcons[i].name = 'star';
-                                    stickerSections[i].classList.add('sold-out');
-                                }
-                            }
-                            else {
-                                if (stickerLabels[i].caption !== 'Active') {
-                                    stickerLabels[i].caption = 'Active';
-                                    stickerIcons[i].name = 'star';
-                                }
-                            }
-                            if (!stickerSections[i].visible) {
-                                stickerSections[i].visible = true;
-                            }
-                            i++;
-                        }
-                        ;
-                    };
-                    const setEndRemainingTime = () => {
-                        isStarted = (0, components_9.moment)(activeStartTime).diff((0, components_9.moment)()) <= 0;
-                        isClosed = (0, components_9.moment)(activeEndTime).diff((0, components_9.moment)()) <= 0;
-                        for (let i = 0; i < options.length; i++) {
-                            activeTimerRows[i].visible = isStarted && !isClosed;
-                        }
-                        if (activeEndTime == 0) {
-                            for (let i = 0; i < options.length; i++) {
-                                endDays[i].caption = endHours[i].caption = endMins[i].caption = '0';
-                            }
-                            if (this.listActiveTimer[idx]) {
-                                clearInterval(this.listActiveTimer[idx]);
-                            }
-                        }
-                        else {
-                            const days = (0, components_9.moment)(activeEndTime).diff((0, components_9.moment)(), 'days');
-                            const hours = (0, components_9.moment)(activeEndTime).diff((0, components_9.moment)(), 'hours') - days * 24;
-                            const mins = (0, components_9.moment)(activeEndTime).diff((0, components_9.moment)(), 'minutes') - days * 24 * 60 - hours * 60;
-                            for (let i = 0; i < options.length; i++) {
-                                endDays[i].caption = `${days}`;
-                                endHours[i].caption = `${hours}`;
-                                endMins[i].caption = `${mins}`;
-                            }
-                        }
-                    };
-                    const setTimer = () => {
-                        setEndRemainingTime();
-                        setAvailableQty();
-                    };
-                    setTimer();
-                    // this.listActiveTimer.push(setInterval(setTimer, 2000));
-                    const stakingsElm = await Promise.all(options.map(async (option, optionIdx) => {
-                        const manageStake = new index_14.default();
-                        manageStake.id = `manage-stake-${option.address}`;
-                        manageStake.width = '100%';
-                        manageStake.state = this.state;
-                        manageStake.onRefresh = () => this.initializeWidgetConfig(true);
-                        this.manageStakeElm.clearInnerHTML();
-                        this.manageStakeElm.appendChild(manageStake);
-                        manageStake.setData(Object.assign(Object.assign({}, campaign), option));
-                        const isClaim = option.mode === 'Claim';
-                        const rewardsData = option.rewardsData[0] ? [option.rewardsData[0]] : [];
-                        const rewardOptions = !isClaim ? rewardsData : [];
-                        let aprInfo = {};
-                        const claimStakedRow = await components_9.HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
-                        claimStakedRow.appendChild(this.$render("i-label", { caption: "You Staked", font: { size: '16px' } }));
-                        claimStakedRow.appendChild(this.$render("i-label", { caption: `${(0, index_11.formatNumber)(new eth_wallet_7.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`, font: { size: '16px' } }));
-                        const rowRewards = await components_9.VStack.create({ gap: 8, verticalAlignment: 'center' });
-                        for (let idx = 0; idx < rewardsData.length; idx++) {
-                            const reward = rewardsData[idx];
-                            const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
-                            const rewardTokenDecimals = rewardToken.decimals || 18;
-                            let decimalsOffset = 18 - rewardTokenDecimals;
-                            let rewardLockedDecimalsOffset = decimalsOffset;
-                            if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
-                                rewardLockedDecimalsOffset = decimalsOffset * 2;
-                            }
-                            else if (lockedTokenDecimals !== 18 && rewardTokenDecimals === 18) {
-                                rewardLockedDecimalsOffset = rewardTokenDecimals - lockedTokenDecimals;
-                                decimalsOffset = 18 - lockedTokenDecimals;
-                            }
-                            const rewardSymbol = rewardToken.symbol || '';
-                            rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
-                                this.$render("i-label", { caption: `${rewardSymbol} Locked`, font: { size: '16px', color: Theme.text.primary } }),
-                                this.$render("i-label", { caption: `${(0, index_11.formatNumber)(new eth_wallet_7.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '16px' } })));
-                            // rowRewards.appendChild(
-                            // 	<i-hstack horizontalAlignment="space-between">
-                            // 		<i-label caption={`${rewardSymbol} Vesting Start`} font={{ size: '16px', color: colorText }} />
-                            // 		<i-label caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
-                            // 	</i-hstack>
-                            // );
-                            // rowRewards.appendChild(
-                            // 	<i-hstack horizontalAlignment="space-between">
-                            // 		<i-label caption={`${rewardSymbol} Vesting End`} font={{ size: '16px', color: colorText }} />
-                            // 		<i-label caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
-                            // 	</i-hstack>
-                            // );
-                            const passClaimStartTime = !(reward.claimStartTime && (0, components_9.moment)().diff(components_9.moment.unix(reward.claimStartTime)) < 0);
-                            let rewardClaimable = `0 ${rewardSymbol}`;
-                            if (passClaimStartTime && isClaim) {
-                                rewardClaimable = `${(0, index_11.formatNumber)(new eth_wallet_7.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
-                            }
-                            let startClaimingText = '';
-                            if (!(!reward.claimStartTime || passClaimStartTime) && isClaim) {
-                                const claimStart = components_9.moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
-                                startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
-                            }
-                            rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
-                                this.$render("i-label", { caption: `${rewardSymbol} Claimable`, font: { size: '16px' } }),
-                                this.$render("i-label", { caption: rewardClaimable, font: { size: '16px' } }),
-                                startClaimingText ? this.$render("i-label", { caption: startClaimingText, font: { size: '16px' } }) : []));
-                            const btnClaim = await components_9.Button.create({
-                                // rightIcon: { spin: true, fill: Theme.colors.primary.contrastText, visible: false },
-                                rightIcon: { spin: true, fill: '#fff', visible: false },
-                                caption: rpcWalletConnected ? `Claim ${rewardSymbol}` : 'Switch Network',
-                                // background: { color: `${Theme.colors.primary.main} !important` },
-                                // font: { color: Theme.colors.primary.contrastText },
-                                enabled: !rpcWalletConnected || (rpcWalletConnected && !(!passClaimStartTime || new eth_wallet_7.BigNumber(reward.claimable).isZero()) && isClaim),
-                                margin: { left: 'auto', right: 'auto', bottom: 10 }
-                            });
-                            btnClaim.id = `btnClaim-${idx}-${option.address}`;
-                            btnClaim.classList.add('btn-os', 'btn-stake');
-                            btnClaim.onClick = () => rpcWalletConnected ? this.onClaim(btnClaim, { reward, rewardSymbol }) : this.connectWallet();
-                            rowRewards.appendChild(btnClaim);
-                        }
-                        ;
-                        const getAprValue = (rewardOption) => {
-                            if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
-                                const apr = new eth_wallet_7.BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, eth_wallet_7.BigNumber.ROUND_DOWN);
-                                return `${apr}%`;
-                            }
-                            return '';
+                    else if (opt.lockTokenType == index_11.LockTokenType.VAULT_Token) {
+                        vaultTokenData = {
+                            'object': await (0, index_13.getVaultObject)(rpcWallet, opt.tokenAddress)
                         };
-                        const durationDays = option.minLockTime / (60 * 60 * 24);
-                        const _lockedTokenObject = (0, index_12.getLockedTokenObject)(option, option.tokenInfo, this.tokenMap);
-                        const _lockedTokenIconPaths = (0, index_12.getLockedTokenIconPaths)(option, _lockedTokenObject, chainId, this.tokenMap);
-                        const pathsLength = _lockedTokenIconPaths.length;
-                        const rewardToken = (rewardsData === null || rewardsData === void 0 ? void 0 : rewardsData.length) ? this.getRewardToken(rewardsData[0].rewardTokenAddress) : null;
-                        stakingElms[optionIdx].appendChild(this.$render("i-vstack", { gap: 15, width: index_12.maxWidth, height: "100%", padding: { top: 10, bottom: 10, left: 20, right: 20 }, position: "relative" },
-                            stickerSections[optionIdx],
-                            this.$render("i-hstack", { gap: 10, width: "100%", verticalAlignment: "center" },
-                                this.$render("i-hstack", { gap: 10, width: "50%" },
-                                    this.$render("i-hstack", { width: pathsLength === 1 ? 63.5 : 80, position: "relative", verticalAlignment: "center" },
-                                        this.$render("i-image", { width: 60, height: 60, url: scom_token_list_5.assets.tokenPath(rewardToken, chainId), fallbackUrl: index_12.fallBackUrl }),
-                                        _lockedTokenIconPaths.map((v, idxImg) => {
-                                            return this.$render("i-image", { position: "absolute", width: 28, height: 28, bottom: 0, left: (idxImg * 20) + 35, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_12.fallBackUrl });
-                                        })),
-                                    this.$render("i-vstack", { gap: 2, overflow: { x: 'hidden' }, verticalAlignment: "center" },
-                                        this.$render("i-label", { visible: !!campaign.name, caption: campaign.name, font: { size: '20px', color: Theme.text.secondary, bold: true }, class: "text-overflow" }),
-                                        this.$render("i-label", { visible: !!campaign.desc, caption: campaign.desc, font: { size: '16px' }, opacity: 0.5, class: "text-overflow" }))),
-                                await Promise.all(rewardOptions.map(async (rewardOption, idx) => {
-                                    const lbApr = await components_9.Label.create({ font: { size: '32px', color: Theme.text.secondary } });
-                                    const lbRate = await components_9.Label.create({ font: { size: '16px' }, opacity: 0.5 });
-                                    lbApr.classList.add('text-overflow');
-                                    const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
-                                    const rewardTokenDecimals = rewardToken.decimals || 18;
-                                    const decimalsOffset = 18 - rewardTokenDecimals;
-                                    const lockTokenType = option.lockTokenType;
-                                    // const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
-                                    const rateDesc = `1 ${lockTokenType === index_11.LockTokenType.LP_Token ? 'LP' : (0, index_12.tokenSymbol)(this.chainId, option.lockTokenAddress)} : ${rewardOption.multiplier} ${(0, index_12.tokenSymbol)(this.chainId, rewardOption.rewardTokenAddress)}`;
-                                    const updateApr = async () => {
-                                        var _a, _b, _c, _d;
-                                        if (lockTokenType === index_11.LockTokenType.ERC20_Token) {
-                                            const apr = await (0, index_13.getERC20RewardCurrentAPR)(rpcWallet, rewardOption, lockedTokenObject, durationDays);
-                                            if (!isNaN(parseFloat(apr))) {
-                                                aprInfo[rewardOption.rewardTokenAddress] = apr;
-                                            }
-                                        }
-                                        else if (lockTokenType === index_11.LockTokenType.LP_Token) {
-                                            if (rewardOption.referencePair) {
-                                                aprInfo[rewardOption.rewardTokenAddress] = await (0, index_13.getLPRewardCurrentAPR)(rpcWallet, rewardOption, (_b = (_a = option.tokenInfo) === null || _a === void 0 ? void 0 : _a.lpToken) === null || _b === void 0 ? void 0 : _b.object, durationDays);
-                                            }
-                                        }
-                                        else {
-                                            aprInfo[rewardOption.rewardTokenAddress] = await (0, index_13.getVaultRewardCurrentAPR)(rpcWallet, rewardOption, (_d = (_c = option.tokenInfo) === null || _c === void 0 ? void 0 : _c.vaultToken) === null || _d === void 0 ? void 0 : _d.object, durationDays);
-                                        }
-                                        const aprValue = getAprValue(rewardOption);
-                                        lbApr.caption = `APR ${aprValue}`;
-                                        lbRate.caption = rateDesc;
-                                    };
-                                    updateApr();
-                                    this.listAprTimer.push(setInterval(updateApr, 10000));
-                                    const aprValue = getAprValue(rewardOption);
-                                    lbApr.caption = `APR ${aprValue}`;
-                                    lbRate.caption = rateDesc;
-                                    return this.$render("i-vstack", { verticalAlignment: "center" },
-                                        lbApr,
-                                        lbRate);
-                                }))),
-                            this.$render("i-hstack", { width: "100%", verticalAlignment: "center" },
-                                this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
-                                    this.$render("i-label", { caption: "Start Date", font: { size: '14px' }, opacity: 0.5 }),
-                                    this.$render("i-label", { caption: (0, index_11.formatDate)(option.startOfEntryPeriod, 'DD MMM, YYYY'), font: { size: '16px' } })),
-                                activeTimerRows[optionIdx],
-                                this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
-                                    this.$render("i-label", { caption: "Stake Duration", font: { size: '14px' }, opacity: 0.5 }),
-                                    this.$render("i-hstack", { gap: 4, verticalAlignment: "center" }, options.map((_option, _optionIdx) => {
-                                        const isCurrentIdx = optionIdx === _optionIdx;
-                                        return this.$render("i-button", { caption: durationDays < 1 ? '< 1 Day' : `${durationDays} Days`, class: `btn-os ${isCurrentIdx ? 'cursor-default' : ''}`, border: { radius: 12, width: 1, style: 'solid', color: isCurrentIdx ? 'transparent' : '#8994A3' }, font: { size: '12px', color: isCurrentIdx ? Theme.colors.secondary.contrastText : '#8994A3' }, padding: { top: 2.5, bottom: 2.5, left: 8, right: 8 }, background: { color: isCurrentIdx ? `${Theme.colors.secondary.main} !important` : 'transparent' }, onClick: () => onChangeStake(_optionIdx) });
-                                    }))),
-                                this.$render("i-vstack", { gap: 4, width: "25%", margin: { left: 'auto' }, verticalAlignment: "center", horizontalAlignment: "end" },
-                                    this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => this.getLPToken(campaign, lockedTokenSymbol, chainId) },
-                                        this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: Theme.text.primary }),
-                                        this.$render("i-label", { caption: `Get ${lockedTokenSymbol}`, font: { size: '13.6px' } }),
-                                        lockedTokenIconPaths.map((v) => {
-                                            return this.$render("i-image", { display: "flex", width: 15, height: 15, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_12.fallBackUrl });
-                                        })),
-                                    campaign.showContractLink ?
-                                        this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => (0, index_12.viewOnExplorerByAddress)(chainId, option.address) },
-                                            this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: Theme.text.primary, class: "inline-block" }),
-                                            this.$render("i-label", { caption: "View Contract", font: { size: '13.6px' } })) : [])),
-                            this.$render("i-vstack", { gap: 8 },
-                                claimStakedRow,
-                                this.$render("i-vstack", { verticalAlignment: "center", horizontalAlignment: "center" }, manageStake),
-                                rowRewards)));
-                        return stakingElms[optionIdx];
-                    }));
-                    nodeItems.push(containerSection);
-                    containerSection.appendChild(this.$render("i-hstack", { background: { color: Theme.background.main }, width: "100%", height: index_12.maxHeight, border: { width: 1, style: 'solid', color: '#7979794a' } }, stakingsElm));
+                    }
+                }
+                const tokenInfo = {
+                    tokenAddress: campaign.tokenAddress,
+                    lpToken: lpTokenData,
+                    vaultToken: vaultTokenData
+                };
+                opt = Object.assign(Object.assign({}, opt), { tokenInfo });
+                const stakingInfo = opt;
+                const lockedTokenObject = (0, index_12.getLockedTokenObject)(stakingInfo, stakingInfo.tokenInfo, this.tokenMap);
+                const lockedTokenSymbol = (0, index_12.getLockedTokenSymbol)(stakingInfo, lockedTokenObject);
+                const lockedTokenIconPaths = (0, index_12.getLockedTokenIconPaths)(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
+                const lockedTokenDecimals = (lockedTokenObject === null || lockedTokenObject === void 0 ? void 0 : lockedTokenObject.decimals) || 18;
+                const defaultDecimalsOffset = 18 - lockedTokenDecimals;
+                const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
+                const activeEndTime = stakingInfo ? stakingInfo.endOfEntryPeriod : 0;
+                let isStarted = (0, components_9.moment)(activeStartTime).diff((0, components_9.moment)()) <= 0;
+                let isClosed = (0, components_9.moment)(activeEndTime).diff((0, components_9.moment)()) <= 0;
+                let totalLocked = {};
+                const optionTimer = { background: { color: Theme.colors.secondary.main }, font: { color: Theme.colors.secondary.contrastText } };
+                const stakingElm = await components_9.VStack.create();
+                const activeTimerRow = await components_9.VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
+                const activeTimerElm = await components_9.VStack.create();
+                activeTimerRow.appendChild(this.$render("i-label", { caption: "End Date", font: { size: '14px' }, opacity: 0.5 }));
+                activeTimerRow.appendChild(activeTimerElm);
+                const endHour = await components_9.Label.create(optionTimer);
+                const endDay = await components_9.Label.create(optionTimer);
+                const endMin = await components_9.Label.create(optionTimer);
+                endHour.classList.add('timer-value');
+                endDay.classList.add('timer-value');
+                endMin.classList.add('timer-value');
+                activeTimerElm.appendChild(this.$render("i-hstack", { gap: 4, class: "custom-timer" },
+                    endDay,
+                    this.$render("i-label", { caption: "D", class: "timer-unit" }),
+                    endHour,
+                    this.$render("i-label", { caption: "H", class: "timer-unit" }),
+                    endMin,
+                    this.$render("i-label", { caption: "M", class: "timer-unit" })));
+                // Sticker
+                const stickerSection = await components_9.Panel.create({ visible: false });
+                const stickerLabel = await components_9.Label.create();
+                const stickerIcon = await components_9.Icon.create({ fill: '#fff' });
+                stickerSection.classList.add('sticker');
+                stickerSection.appendChild(this.$render("i-vstack", { class: "sticker-text" },
+                    stickerIcon,
+                    stickerLabel));
+                const setAvailableQty = async () => {
+                    if (!this.state.isRpcWalletConnected() || !this.manageStake)
+                        return;
+                    const o = opt;
+                    const _totalLocked = await (0, index_13.getStakingTotalLocked)(rpcWallet, o.address);
+                    totalLocked[o.address] = _totalLocked;
+                    const optionQty = new eth_wallet_7.BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
+                    if (o.mode === 'Stake') {
+                        const btnStake = this.manageStake.btnStake;
+                        const isStaking = this.state.getStakingStatus(this.manageStake.actionKey).value;
+                        if (btnStake) {
+                            let isValidInput = false;
+                            const inputElm = this.manageStake.inputAmount;
+                            if (inputElm) {
+                                const inputVal = new eth_wallet_7.BigNumber(inputElm.value || 0);
+                                isValidInput = inputVal.gt(0) && inputVal.lte(this.manageStake.getBalance()) && !this.manageStake.needToBeApproval();
+                            }
+                            btnStake.enabled = !isStaking && isValidInput && (isStarted && !(optionQty.lte(0) || isClosed));
+                        }
+                    }
+                    else {
+                        const btnUnstake = this.manageStake.btnUnstake;
+                        const isUnstaking = this.state.getStakingStatus(this.manageStake.actionKey).value;
+                        if (btnUnstake) {
+                            btnUnstake.enabled = !isUnstaking && o.mode !== 'Stake' && Number(o.stakeQty) != 0 && !this.manageStake.needToBeApproval();
+                        }
+                    }
+                    if (isClosed) {
+                        if (stickerLabel.caption !== 'Closed') {
+                            stickerSection.classList.add('closed');
+                            stickerSection.classList.remove('sold-out');
+                            stickerLabel.caption = 'Closed';
+                            stickerIcon.name = 'check-square';
+                        }
+                    }
+                    else if (optionQty.lte(0)) {
+                        if (stickerLabel.caption !== 'Sold Out') {
+                            stickerLabel.caption = 'Sold Out';
+                            stickerIcon.name = 'star';
+                            stickerSection.classList.add('sold-out');
+                        }
+                    }
+                    else {
+                        if (stickerLabel.caption !== 'Active') {
+                            stickerLabel.caption = 'Active';
+                            stickerIcon.name = 'star';
+                        }
+                    }
+                    if (!stickerSection.visible) {
+                        stickerSection.visible = true;
+                    }
+                };
+                const setEndRemainingTime = () => {
+                    isStarted = (0, components_9.moment)(activeStartTime).diff((0, components_9.moment)()) <= 0;
+                    isClosed = (0, components_9.moment)(activeEndTime).diff((0, components_9.moment)()) <= 0;
+                    activeTimerRow.visible = isStarted && !isClosed;
+                    if (activeEndTime == 0) {
+                        endDay.caption = endHour.caption = endMin.caption = '0';
+                        if (this.activeTimer) {
+                            clearInterval(this.activeTimer);
+                        }
+                    }
+                    else {
+                        const days = (0, components_9.moment)(activeEndTime).diff((0, components_9.moment)(), 'days');
+                        const hours = (0, components_9.moment)(activeEndTime).diff((0, components_9.moment)(), 'hours') - days * 24;
+                        const mins = (0, components_9.moment)(activeEndTime).diff((0, components_9.moment)(), 'minutes') - days * 24 * 60 - hours * 60;
+                        endDay.caption = `${days}`;
+                        endHour.caption = `${hours}`;
+                        endMin.caption = `${mins}`;
+                    }
+                };
+                const setTimer = () => {
+                    setEndRemainingTime();
+                    setAvailableQty();
+                };
+                setTimer();
+                const option = Object.assign({}, opt);
+                this.manageStake = new index_14.default(undefined, {
+                    width: '100%',
+                });
+                this.manageStake.state = this.state;
+                this.manageStake.onRefresh = () => this.initializeWidgetConfig(true);
+                this.manageStake.setData(Object.assign(Object.assign({}, campaign), option));
+                const isClaim = option.mode === 'Claim';
+                const rewardsData = option.rewardsData[0] ? [option.rewardsData[0]] : [];
+                const rewardOptions = !isClaim ? rewardsData : [];
+                let aprInfo = {};
+                const claimStakedRow = await components_9.HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
+                claimStakedRow.appendChild(this.$render("i-label", { caption: "You Staked", font: { size: '16px' } }));
+                claimStakedRow.appendChild(this.$render("i-label", { caption: `${(0, index_11.formatNumber)(new eth_wallet_7.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`, font: { size: '16px' } }));
+                const rowRewards = await components_9.VStack.create({ gap: 8, verticalAlignment: 'center' });
+                for (let idx = 0; idx < rewardsData.length; idx++) {
+                    const reward = rewardsData[idx];
+                    const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
+                    const rewardTokenDecimals = rewardToken.decimals || 18;
+                    let decimalsOffset = 18 - rewardTokenDecimals;
+                    let rewardLockedDecimalsOffset = decimalsOffset;
+                    if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
+                        rewardLockedDecimalsOffset = decimalsOffset * 2;
+                    }
+                    else if (lockedTokenDecimals !== 18 && rewardTokenDecimals === 18) {
+                        rewardLockedDecimalsOffset = rewardTokenDecimals - lockedTokenDecimals;
+                        decimalsOffset = 18 - lockedTokenDecimals;
+                    }
+                    const rewardSymbol = rewardToken.symbol || '';
+                    rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
+                        this.$render("i-label", { caption: `${rewardSymbol} Locked`, font: { size: '16px', color: Theme.text.primary } }),
+                        this.$render("i-label", { caption: `${(0, index_11.formatNumber)(new eth_wallet_7.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '16px' } })));
+                    // rowRewards.appendChild(
+                    // 	<i-hstack horizontalAlignment="space-between">
+                    // 		<i-label caption={`${rewardSymbol} Vesting Start`} font={{ size: '16px', color: colorText }} />
+                    // 		<i-label caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
+                    // 	</i-hstack>
+                    // );
+                    // rowRewards.appendChild(
+                    // 	<i-hstack horizontalAlignment="space-between">
+                    // 		<i-label caption={`${rewardSymbol} Vesting End`} font={{ size: '16px', color: colorText }} />
+                    // 		<i-label caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
+                    // 	</i-hstack>
+                    // );
+                    const passClaimStartTime = !(reward.claimStartTime && (0, components_9.moment)().diff(components_9.moment.unix(reward.claimStartTime)) < 0);
+                    let rewardClaimable = `0 ${rewardSymbol}`;
+                    if (passClaimStartTime && isClaim) {
+                        rewardClaimable = `${(0, index_11.formatNumber)(new eth_wallet_7.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
+                    }
+                    let startClaimingText = '';
+                    if (!(!reward.claimStartTime || passClaimStartTime) && isClaim) {
+                        const claimStart = components_9.moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
+                        startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
+                    }
+                    rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
+                        this.$render("i-label", { caption: `${rewardSymbol} Claimable`, font: { size: '16px' } }),
+                        this.$render("i-label", { caption: rewardClaimable, font: { size: '16px' } }),
+                        startClaimingText ? this.$render("i-label", { caption: startClaimingText, font: { size: '16px' } }) : []));
+                    const btnClaim = await components_9.Button.create({
+                        // rightIcon: { spin: true, fill: Theme.colors.primary.contrastText, visible: false },
+                        rightIcon: { spin: true, fill: '#fff', visible: false },
+                        caption: rpcWalletConnected ? `Claim ${rewardSymbol}` : 'Switch Network',
+                        // background: { color: `${Theme.colors.primary.main} !important` },
+                        // font: { color: Theme.colors.primary.contrastText },
+                        enabled: !rpcWalletConnected || (rpcWalletConnected && !(!passClaimStartTime || new eth_wallet_7.BigNumber(reward.claimable).isZero()) && isClaim),
+                        margin: { left: 'auto', right: 'auto', bottom: 10 }
+                    });
+                    btnClaim.classList.add('btn-os', 'btn-stake');
+                    btnClaim.onClick = () => rpcWalletConnected ? this.onClaim(btnClaim, { reward, rewardSymbol }) : this.connectWallet();
+                    rowRewards.appendChild(btnClaim);
                 }
                 ;
+                const getAprValue = (rewardOption) => {
+                    if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
+                        const apr = new eth_wallet_7.BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, eth_wallet_7.BigNumber.ROUND_DOWN);
+                        return `${apr}%`;
+                    }
+                    return '';
+                };
+                const durationDays = option.minLockTime / (60 * 60 * 24);
+                const _lockedTokenObject = (0, index_12.getLockedTokenObject)(option, option.tokenInfo, this.tokenMap);
+                const _lockedTokenIconPaths = (0, index_12.getLockedTokenIconPaths)(option, _lockedTokenObject, chainId, this.tokenMap);
+                const pathsLength = _lockedTokenIconPaths.length;
+                const rewardToken = (rewardsData === null || rewardsData === void 0 ? void 0 : rewardsData.length) ? this.getRewardToken(rewardsData[0].rewardTokenAddress) : null;
+                stakingElm.appendChild(this.$render("i-vstack", { gap: 15, width: index_12.maxWidth, height: "100%", padding: { top: 10, bottom: 10, left: 20, right: 20 }, position: "relative" },
+                    stickerSection,
+                    this.$render("i-hstack", { gap: 10, width: "100%", verticalAlignment: "center" },
+                        this.$render("i-hstack", { gap: 10, width: "50%" },
+                            this.$render("i-hstack", { width: pathsLength === 1 ? 63.5 : 80, position: "relative", verticalAlignment: "center" },
+                                this.$render("i-image", { width: 60, height: 60, url: scom_token_list_5.assets.tokenPath(rewardToken, chainId), fallbackUrl: index_12.fallBackUrl }),
+                                _lockedTokenIconPaths.map((v, idxImg) => {
+                                    return this.$render("i-image", { position: "absolute", width: 28, height: 28, bottom: 0, left: (idxImg * 20) + 35, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_12.fallBackUrl });
+                                })),
+                            this.$render("i-vstack", { gap: 2, overflow: { x: 'hidden' }, verticalAlignment: "center" },
+                                this.$render("i-label", { visible: !!campaign.name, caption: campaign.name, font: { size: '20px', color: Theme.text.secondary, bold: true }, class: "text-overflow" }),
+                                this.$render("i-label", { visible: !!campaign.desc, caption: campaign.desc, font: { size: '16px' }, opacity: 0.5, class: "text-overflow" }))),
+                        await Promise.all(rewardOptions.map(async (rewardOption, idx) => {
+                            const lbApr = await components_9.Label.create({ font: { size: '32px', color: Theme.text.secondary } });
+                            const lbRate = await components_9.Label.create({ font: { size: '16px' }, opacity: 0.5 });
+                            lbApr.classList.add('text-overflow');
+                            const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
+                            const rewardTokenDecimals = rewardToken.decimals || 18;
+                            const decimalsOffset = 18 - rewardTokenDecimals;
+                            const lockTokenType = option.lockTokenType;
+                            // const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
+                            const rateDesc = `1 ${lockTokenType === index_11.LockTokenType.LP_Token ? 'LP' : (0, index_12.tokenSymbol)(this.chainId, option.lockTokenAddress)} : ${rewardOption.multiplier} ${(0, index_12.tokenSymbol)(this.chainId, rewardOption.rewardTokenAddress)}`;
+                            const updateApr = async () => {
+                                var _a, _b, _c, _d;
+                                if (lockTokenType === index_11.LockTokenType.ERC20_Token) {
+                                    const apr = await (0, index_13.getERC20RewardCurrentAPR)(rpcWallet, rewardOption, lockedTokenObject, durationDays);
+                                    if (!isNaN(parseFloat(apr))) {
+                                        aprInfo[rewardOption.rewardTokenAddress] = apr;
+                                    }
+                                }
+                                else if (lockTokenType === index_11.LockTokenType.LP_Token) {
+                                    if (rewardOption.referencePair) {
+                                        aprInfo[rewardOption.rewardTokenAddress] = await (0, index_13.getLPRewardCurrentAPR)(rpcWallet, rewardOption, (_b = (_a = option.tokenInfo) === null || _a === void 0 ? void 0 : _a.lpToken) === null || _b === void 0 ? void 0 : _b.object, durationDays);
+                                    }
+                                }
+                                else {
+                                    aprInfo[rewardOption.rewardTokenAddress] = await (0, index_13.getVaultRewardCurrentAPR)(rpcWallet, rewardOption, (_d = (_c = option.tokenInfo) === null || _c === void 0 ? void 0 : _c.vaultToken) === null || _d === void 0 ? void 0 : _d.object, durationDays);
+                                }
+                                const aprValue = getAprValue(rewardOption);
+                                lbApr.caption = `APR ${aprValue}`;
+                                lbRate.caption = rateDesc;
+                            };
+                            updateApr();
+                            this.listAprTimer.push(setInterval(updateApr, 10000));
+                            const aprValue = getAprValue(rewardOption);
+                            lbApr.caption = `APR ${aprValue}`;
+                            lbRate.caption = rateDesc;
+                            return this.$render("i-vstack", { verticalAlignment: "center" },
+                                lbApr,
+                                lbRate);
+                        }))),
+                    this.$render("i-hstack", { width: "100%", verticalAlignment: "center" },
+                        this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
+                            this.$render("i-label", { caption: "Start Date", font: { size: '14px' }, opacity: 0.5 }),
+                            this.$render("i-label", { caption: (0, index_11.formatDate)(option.startOfEntryPeriod, 'DD MMM, YYYY'), font: { size: '16px' } })),
+                        activeTimerRow,
+                        this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
+                            this.$render("i-label", { caption: "Stake Duration", font: { size: '14px' }, opacity: 0.5 }),
+                            this.$render("i-hstack", { gap: 4, verticalAlignment: "center" },
+                                this.$render("i-button", { caption: durationDays < 1 ? '< 1 Day' : `${durationDays} Days`, class: "btn-os cursor-default", border: { radius: 12, width: 1, style: 'solid', color: 'transparent' }, font: { size: '12px', color: Theme.colors.secondary.contrastText }, padding: { top: 2.5, bottom: 2.5, left: 8, right: 8 }, background: { color: `${Theme.colors.secondary.main} !important` } }))),
+                        this.$render("i-vstack", { gap: 4, width: "25%", margin: { left: 'auto' }, verticalAlignment: "center", horizontalAlignment: "end" },
+                            this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => this.getLPToken(campaign, lockedTokenSymbol, chainId) },
+                                this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: Theme.text.primary }),
+                                this.$render("i-label", { caption: `Get ${lockedTokenSymbol}`, font: { size: '13.6px' } }),
+                                lockedTokenIconPaths.map((v) => {
+                                    return this.$render("i-image", { display: "flex", width: 15, height: 15, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_12.fallBackUrl });
+                                })),
+                            campaign.showContractLink ?
+                                this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => (0, index_12.viewOnExplorerByAddress)(chainId, option.address) },
+                                    this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: Theme.text.primary, class: "inline-block" }),
+                                    this.$render("i-label", { caption: "View Contract", font: { size: '13.6px' } })) : [])),
+                    this.$render("i-vstack", { gap: 8 },
+                        claimStakedRow,
+                        this.$render("i-vstack", { verticalAlignment: "center", horizontalAlignment: "center" }, this.manageStake),
+                        rowRewards)));
+                containerSection.appendChild(this.$render("i-hstack", { background: { color: Theme.background.main }, width: "100%", height: index_12.maxHeight, border: { width: 1, style: 'solid', color: '#7979794a' } }, stakingElm));
                 this.stakingElm.clearInnerHTML();
-                this.stakingElm.append(this.noCampaignSection, ...nodeItems);
+                this.stakingElm.append(this.noCampaignSection, containerSection);
             };
             this.state = new index_12.State(data_json_1.default);
             this.$eventBus = components_9.application.EventBus;
@@ -2937,7 +2799,6 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                                 this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_2.default.fullPath('img/loading.svg'), width: 36, height: 36 } }),
                                 this.$render("i-label", { caption: "Loading...", font: { color: '#FD4A4C', size: '1.5em' }, class: "i-loading-spinner_text" }))),
                         this.$render("i-panel", { id: "stakingElm", class: "wrapper" })),
-                    this.$render("i-panel", { id: "manageStakeElm" }),
                     this.$render("i-scom-wallet-modal", { id: "mdWallet", wallets: [] }),
                     this.$render("i-scom-tx-status-modal", { id: "txStatusModal" }))));
         }

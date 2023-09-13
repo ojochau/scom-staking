@@ -22,7 +22,7 @@ export interface ISingleStakingCampaign {
   // campaignEnd: number, // new campaign
   showContractLink?: boolean,
   // admin: string, // new campaign
-  stakings: ISingleStaking,
+  staking: ISingleStaking,
   commissions?: ICommissionInfo[],
   wallets: IWalletPlugin[],
   networks: INetworkConfig[],
@@ -56,6 +56,78 @@ export interface ISingleReward {
   // vestingStartDate?: number, // new campaign
 }
 
+export interface IWalletPlugin {
+  name: string;
+  packageName?: string;
+  provider?: IClientSideProvider;
+}
+
+export interface INetworkConfig {
+  chainId: number;
+  chainName?: string;
+}
+
+export interface IOptionInfo {
+  mode: string;
+  minLockTime: number;
+  maxTotalLock: string;
+  totalLocked: string;
+  stakeQty: string;
+  startOfEntryPeriod: number;
+  endOfEntryPeriod: number;
+  perAddressCap: string;
+  lockTokenAddress: string;
+  tokenAddress: string;
+  rewardsData?: IRewardInfo[];
+}
+
+export interface IExtendOptionInfo extends IOptionInfo, ISingleStaking {
+  tokenInfo?: {
+    tokenAddress: string;
+    lpToken: {
+      object: {
+        address: string;
+        decimals: string;
+        name: string;
+        symbol: string;
+        token0: string;
+        token1: string;
+      }
+    };
+    vaultToken: {
+      object: {
+        address: string;
+        decimals: string;
+        name: string;
+        symbol: string;
+        token0: string;
+        token1: string;
+      }
+    };
+  }
+}
+
+export interface ICampaignDetail extends ISingleStakingCampaign {
+  option: IExtendOptionInfo;
+  tokenAddress?: string;
+}
+
+export interface IRewardInfo extends ISingleReward {
+  claimable: string;
+  rewardTokenAddress: string;
+  multiplier: string;
+  initialReward: string;
+  admin: string;
+  vestingPeriod: number;
+  vestingStartDate: number;
+  rewardAmount: string;
+  index: number;
+
+  vestedReward?: number | string;
+  claimStartTime?: number;
+}
+
+// Multiple Stakings
 export interface IStakingCampaign {
   //custom
   chainId: number,
@@ -68,17 +140,6 @@ export interface IStakingCampaign {
   showContractLink?: boolean,
   admin: string, // can only withdraw remaining fund after claimDeadline.
   stakings: Staking[]
-}
-
-export interface IWalletPlugin {
-  name: string;
-  packageName?: string;
-  provider?: IClientSideProvider;
-}
-
-export interface INetworkConfig {
-  chainId: number;
-  chainName?: string;
 }
 
 export interface RewardNeeded {

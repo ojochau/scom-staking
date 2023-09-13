@@ -6,6 +6,10 @@ import { Contracts as CrossChainContracts } from "@scom/oswap-cross-chain-bridge
 import {
   ISingleStakingCampaign,
   ISingleStaking,
+  IOptionInfo,
+  IExtendOptionInfo,
+  ICampaignDetail,
+  IRewardInfo,
 } from "../global/index";
 import {
   USDPeggedTokenAddressMap,
@@ -125,7 +129,7 @@ const getDefaultStakingByAddress = async (wallet: IWallet, option: ISingleStakin
     const tokenAddress = wallet.decodeAbiEncodedParameters(timeIsMoney, 'token', multiCallResults[6])[0];
     const endOfEntryPeriod = new BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'endOfEntryPeriod', multiCallResults[7])[0]).toFixed();
     const perAddressCapWei = new BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'perAddressCap', multiCallResults[8])[0]);
-    
+
     let totalCredit = Utils.fromDecimals(totalCreditWei).toFixed();
     let lockAmount = Utils.fromDecimals(lockAmountWei).toFixed();
     let stakeQty = withdrawn ? '0' : lockAmount;
@@ -166,7 +170,7 @@ const getDefaultStakingByAddress = async (wallet: IWallet, option: ISingleStakin
     };
 
     if (hasRewardAddress) {
-      let rewardsData: any[] = [];
+      let rewardsData: IRewardInfo[] = [];
       let promises = rewards.map(async (reward, index) => {
         return new Promise<void>(async (resolve, reject) => {
           let rewardsContract, admin, multiplier, initialReward, rewardTokenAddress, vestingPeriod, vestingStartDate, claimDeadline;
@@ -264,74 +268,28 @@ const getDefaultStakingByAddress = async (wallet: IWallet, option: ISingleStakin
   }
 }
 
-const composeCampaignInfoList = async (stakingCampaignInfoList: ISingleStakingCampaign, addDurationOption: (options: any[], defaultOption: ISingleStaking) => void) => {
-  let campaigns: any[] = [];
-  const _stakingCampaignInfoList = [stakingCampaignInfoList];
-  for (let i = 0; i < _stakingCampaignInfoList.length; i++) {
-    let stakingCampaignInfo = _stakingCampaignInfoList[i];
-    let durationOptionsWithExtendedInfo: any[] = [];
-    let durationOptions = [stakingCampaignInfo.stakings];
-    for (let j = 0; j < durationOptions.length; j++) {
-      let durationOption = durationOptions[j];
-      addDurationOption(durationOptionsWithExtendedInfo, durationOption);
-    }
-
-    let campaignObj: any = {
-      ...stakingCampaignInfo,
-      campaignName: stakingCampaignInfo.name,
-      campaignDesc: stakingCampaignInfo.desc,
-      getTokenURL: stakingCampaignInfo.getTokenURL,
-      options: durationOptionsWithExtendedInfo,
-    }
-    if (durationOptionsWithExtendedInfo.length > 0) {
-      const extendedInfo = durationOptionsWithExtendedInfo[0];
-      const admin = extendedInfo.rewards && extendedInfo.rewards[0] ? extendedInfo.rewards[0].admin : '';
-      campaignObj = {
-        ...campaignObj,
-        admin,
-        campaignStart: extendedInfo.startOfEntryPeriod / 1000,
-        campaignEnd: extendedInfo.endOfEntryPeriod / 1000,
-        tokenAddress: extendedInfo.tokenAddress?.toLowerCase()
-      }
-    }
-    campaigns.push(campaignObj);
-  }
-  return campaigns;
-}
-
-const getAllCampaignsInfo = async (wallet: IWallet, stakingInfo: { [key: number]: ISingleStakingCampaign }) => {
+const getCampaignInfo = async (wallet: IWallet, stakingInfo: { [key: number]: ISingleStakingCampaign }) => {
   let chainId = wallet.chainId;
-  let stakingCampaignInfoList = stakingInfo[chainId];
-  if (!stakingCampaignInfoList) return [];
+  let stakingCampaignInfo = stakingInfo[chainId];
+  if (!stakingCampaignInfo) return null;
 
-  let optionExtendedInfoMap: any = {};
-  let allCampaignOptions = [stakingCampaignInfoList.stakings];
-  let promises = allCampaignOptions.map(async (option: any, index: any) => {
-    return new Promise<void>(async (resolve, reject) => {
-      try {
-        let optionExtendedInfo = await getDefaultStakingByAddress(wallet, option);
-        if (optionExtendedInfo) optionExtendedInfoMap[option.address] = optionExtendedInfo;
-      }
-      catch (error) { }
-      resolve();
-    })
-  });
-  await Promise.all(promises);
+  let staking = { ...stakingCampaignInfo.staking };
+  let optionExtendedInfo: IOptionInfo;
+  try {
+    optionExtendedInfo = await getDefaultStakingByAddress(wallet, staking);
+  }
+  catch (error) { }
+  let stakingExtendInfo: IExtendOptionInfo = { ...staking, ...optionExtendedInfo };
 
-  let campaigns: any[] = await composeCampaignInfoList(stakingCampaignInfoList, (options: any[], defaultOption: ISingleStaking) => {
-    if (defaultOption.address && optionExtendedInfoMap[defaultOption.address]) {
-      options.push({
-        ...defaultOption,
-        ...optionExtendedInfoMap[defaultOption.address]
-      })
-    }
-  })
-  return campaigns.map(campaign => {
-    return {
-      ...campaign,
-      stakings: campaign.options,
-    }
-  });
+  // const admin = stakingExtendInfo.rewards && stakingExtendInfo.rewards[0] ? stakingExtendInfo.rewards[0].admin : '';
+  return {
+    // admin,
+    ...stakingCampaignInfo,
+    campaignStart: stakingExtendInfo.startOfEntryPeriod / 1000,
+    campaignEnd: stakingExtendInfo.endOfEntryPeriod / 1000,
+    tokenAddress: stakingExtendInfo.tokenAddress?.toLowerCase(),
+    option: stakingExtendInfo
+  }
 }
 
 const getStakingTotalLocked = async (wallet: IWallet, stakingAddress: string) => {
@@ -572,14 +530,14 @@ const getProxySelectors = async (state: State, chainId: number, contractAddress:
     "withdraw"
   ];
   const selectors = permittedProxyFunctions
-    .map(e => e + "(" + timeIsMoney._abi.filter(f => f.name == e)[0].inputs.map(f => f.type).join(',') + ")")
+    .map((e: any) => e + "(" + timeIsMoney._abi.filter(f => f.name == e)[0].inputs.map(f => f.type).join(',') + ")")
     .map(e => wallet.soliditySha3(e).substring(0, 10))
     .map(e => timeIsMoney.address.toLowerCase() + e.replace("0x", ""));
   return selectors;
 }
 
 export {
-  getAllCampaignsInfo,
+  getCampaignInfo,
   getStakingTotalLocked,
   getLPObject,
   getLPBalance,

@@ -57,7 +57,7 @@ export default class Module1 extends Module {
                     "name": "Scom-Staking",
                     "desc": "Earn USDT.e",
                     "showContractLink": true,
-                    "stakings":
+                    "staking":
                     {
                         "address": "0x0314297AdfE7012b9c6Cc0FDaB0c0a7C6E89285A",
                         "lockTokenType": 0,

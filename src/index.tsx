@@ -8,7 +8,8 @@ import {
 	TokenMapType,
 	EventId,
 	ISingleStakingCampaign,
-	LockTokenType
+	LockTokenType,
+	ICampaignDetail
 } from './global/index';
 import {
 	tokenSymbol,
@@ -34,7 +35,7 @@ import {
 	getLPRewardCurrentAPR,
 	getVaultRewardCurrentAPR,
 	claimToken,
-	getAllCampaignsInfo,
+	getCampaignInfo,
 	getProxySelectors,
 } from './staking-utils/index';
 import ManageStake from './manage-stake/index';
@@ -73,13 +74,13 @@ export default class ScomStaking extends Module {
 
 	private $eventBus: IEventBus;
 	private loadingElm: Panel;
-	private campaigns: any = [];
+	private campaign: ICampaignDetail;
 	private stakingElm: Panel;
 	private noCampaignSection: Panel;
 	private txStatusModal: ScomTxStatusModal;
-	private manageStakeElm: Panel;
+	private manageStake: ManageStake;
 	private listAprTimer: any = [];
-	private listActiveTimer: any = [];
+	private activeTimer: any;
 	private tokenMap: TokenMapType = {};
 	private dappContainer: ScomDappContainer;
 	private mdWallet: ScomWalletModal;
@@ -88,57 +89,7 @@ export default class ScomStaking extends Module {
 	private clientEvents: any[] = [];
 
 	private _getActions(category?: string) {
-		const actions = [
-			// {
-			// 	name: 'Commissions',
-			// 	icon: 'dollar-sign',
-			// 	command: (builder: any, userInputData: any) => {
-			// 		let _oldData: IBuybackCampaign = {
-			// 			chainId: 0,
-			// 			projectName: '',
-			// 			offerIndex: 0,
-			// 			tokenIn: '',
-			// 			tokenOut: '',
-			// 			wallets: [],
-			// 			networks: []
-			// 		}
-			// 		return {
-			// 			execute: async () => {
-			// 				_oldData = { ...this._data };
-			// 				if (userInputData.commissions) this._data.commissions = userInputData.commissions;
-			// 				this.refreshUI();
-			// 				if (builder?.setData) builder.setData(this._data);
-			// 			},
-			// 			undo: () => {
-			// 				this._data = { ..._oldData };
-			// 				this.refreshUI();
-			// 				if (builder?.setData) builder.setData(this._data);
-			// 			},
-			// 			redo: () => { }
-			// 		}
-			// 	},
-			// 	customUI: {
-			// 		render: (data?: any, onConfirm?: (result: boolean, data: any) => void) => {
-			// 			const vstack = new VStack();
-			// 			const config = new ScomCommissionFeeSetup(null, {
-			//         commissions: self._data.commissions,
-			//         fee: this.state.embedderCommissionFee,
-			//         networks: self._data.networks
-			//       });
-			//       const button = new Button(null, {
-			//         caption: 'Confirm',
-			//       });
-			//       vstack.append(config);
-			//       vstack.append(button);
-			//       button.onClick = async () => {
-			//         const commissions = config.commissions;
-			//         if (onConfirm) onConfirm(true, {commissions});
-			//       }
-			//       return vstack;
-			// 		}
-			// 	}
-			// },
-		];
+		const actions = [];
 		if (category && category !== 'offers') {
 			actions.push(
 				{
@@ -148,7 +99,7 @@ export default class ScomStaking extends Module {
 						let oldData: ISingleStakingCampaign = {
 							chainId: 0,
 							name: '',
-							stakings: undefined,
+							staking: undefined,
 							wallets: [],
 							networks: []
 						};
@@ -163,7 +114,7 @@ export default class ScomStaking extends Module {
 									logo,
 									getTokenURL,
 									showContractLink,
-									stakings,
+									staking,
 									...themeSettings
 								} = userInputData;
 
@@ -174,7 +125,7 @@ export default class ScomStaking extends Module {
 									logo,
 									getTokenURL,
 									showContractLink,
-									stakings
+									staking
 								};
 								if (generalSettings.chainId !== undefined) this._data.chainId = generalSettings.chainId;
 								if (generalSettings.name !== undefined) this._data.name = generalSettings.name;
@@ -182,7 +133,7 @@ export default class ScomStaking extends Module {
 								if (generalSettings.logo !== undefined) this._data.logo = generalSettings.logo;
 								if (generalSettings.getTokenURL !== undefined) this._data.getTokenURL = generalSettings.getTokenURL;
 								if (generalSettings.showContractLink !== undefined) this._data.showContractLink = generalSettings.showContractLink;
-								if (generalSettings.stakings !== undefined) this._data.stakings = generalSettings.stakings;
+								if (generalSettings.staking !== undefined) this._data.staking = generalSettings.staking;
 								await this.resetRpcWallet();
 								this.refreshUI();
 								if (builder?.setData) builder.setData(this._data);
@@ -217,11 +168,11 @@ export default class ScomStaking extends Module {
 	private getProjectOwnerActions() {
 		const formSchema = getProjectOwnerSchema();
 		const actions: any[] = [
-		{
-			name: 'Settings',
-			userInputDataSchema: formSchema.dataSchema,
-			userInputUISchema: formSchema.uiSchema
-		}
+			{
+				name: 'Settings',
+				userInputDataSchema: formSchema.dataSchema,
+				userInputUISchema: formSchema.uiSchema
+			}
 		];
 		return actions;
 	}
@@ -231,9 +182,9 @@ export default class ScomStaking extends Module {
 		return [
 			{
 				name: 'Project Owner Configurator',
-			  	target: 'Project Owners',
+				target: 'Project Owners',
 				getProxySelectors: async (chainId: number) => {
-					const address = this.campaigns[0]?.options?.[0]?.address;
+					const address = this.campaign?.option?.[0]?.address;
 					const selectors = await getProxySelectors(this.state, chainId, address);
 					return selectors;
 				},
@@ -362,7 +313,7 @@ export default class ScomStaking extends Module {
 			this.dappContainer.setTag(this.tag);
 		this.updateTheme();
 		// if (this.stakingElm) {
-		// 	this.renderCampaigns();
+		// 	this.renderCampaign();
 		// }
 	}
 
@@ -456,7 +407,7 @@ export default class ScomStaking extends Module {
 			try {
 				const wallet = Wallet.getClientInstance();
 				const infoList = this._data[wallet.chainId];
-				const stakingAddress = infoList && infoList[0].stakings[0]?.address;
+				const stakingAddress = infoList && infoList[0].staking?.address;
 				if (stakingAddress) {
 					const timeIsMoney = new Contracts.TimeIsMoney(wallet, stakingAddress);
 					await timeIsMoney.getCredit(wallet.address);
@@ -488,8 +439,8 @@ export default class ScomStaking extends Module {
 			if (rpcWallet.address) {
 				await tokenStore.updateAllTokenBalances(rpcWallet);
 			}
-			this.campaigns = await getAllCampaignsInfo(rpcWallet, { [this._data.chainId]: this._data });
-			await this.renderCampaigns(hideLoading);
+			this.campaign = await getCampaignInfo(rpcWallet, { [this._data.chainId]: this._data });
+			await this.renderCampaign(hideLoading);
 			if (!hideLoading && this.loadingElm) {
 				this.loadingElm.visible = false;
 			}
@@ -547,13 +498,13 @@ export default class ScomStaking extends Module {
 
 	private checkValidation = () => {
 		if (!this._data) return false;
-		const { chainId, name, stakings } = this._data;
-		if (!chainId || !name || !stakings) return false;
-		const { address, rewards, lockTokenType } = stakings;
+		const { chainId, name, staking } = this._data;
+		if (!chainId || !name || !staking) return false;
+		const { address, rewards, lockTokenType } = staking;
 		if (!address || !rewards || !rewards.address || lockTokenType === undefined) return false;
-		// const { chainId, customName, campaignStart, campaignEnd, admin, stakings } = this._data;
-		// if (!chainId || !customName || !campaignStart?.gt(0) || !campaignEnd?.gt(0) || !admin || !stakings) return false;
-		// const { lockTokenAddress, minLockTime, perAddressCap, maxTotalLock, rewards } = stakings[0];
+		// const { chainId, customName, campaignStart, campaignEnd, admin, staking } = this._data;
+		// if (!chainId || !customName || !campaignStart?.gt(0) || !campaignEnd?.gt(0) || !admin || !staking) return false;
+		// const { lockTokenAddress, minLockTime, perAddressCap, maxTotalLock, rewards } = staking;
 		// if (!lockTokenAddress || !minLockTime?.gt(0) || !perAddressCap?.gt(0) || !maxTotalLock?.gt(0) || !rewards) return false;
 		// const { rewardTokenAddress, multiplier, initialReward, vestingPeriod, claimDeadline } = rewards[0];
 		// if (!rewardTokenAddress || !multiplier?.gt(0) || initialReward?.isNaN() || !vestingPeriod?.gt(0) || !claimDeadline) return false;
@@ -565,10 +516,7 @@ export default class ScomStaking extends Module {
 			clearInterval(timer);
 		}
 		this.listAprTimer = [];
-		for (const timer of this.listActiveTimer) {
-			clearInterval(timer);
-		}
-		this.listActiveTimer = [];
+		clearInterval(this.activeTimer);
 	}
 
 	private getRewardToken = (tokenAddress: string) => {
@@ -599,7 +547,7 @@ export default class ScomStaking extends Module {
 		this.executeReadyCallback();
 	}
 
-	private updateButtonStatus = async (data: any) => {
+	private updateButtonStatus = async (data: { key: string, value: boolean, text: string }) => {
 		if (data) {
 			const { value, key, text } = data;
 			const elm = this.stakingElm?.querySelector(key) as Button;
@@ -665,7 +613,7 @@ export default class ScomStaking extends Module {
 		}
 	}
 
-	private renderCampaigns = async (hideLoading?: boolean) => {
+	private renderCampaign = async (hideLoading?: boolean) => {
 		if (!hideLoading) {
 			this.stakingElm.clearInnerHTML();
 		}
@@ -673,7 +621,7 @@ export default class ScomStaking extends Module {
 		const chainId = this.state.getChainId();
 		await this.initEmptyUI();
 		this.noCampaignSection.visible = false;
-		if (this.campaigns && !this.campaigns.length) {
+		if (!this.campaign) {
 			this.stakingElm.clearInnerHTML();
 			this.stakingElm.appendChild(this.noCampaignSection);
 			this.noCampaignSection.visible = true;
@@ -682,406 +630,357 @@ export default class ScomStaking extends Module {
 		}
 		const rpcWalletConnected = this.state.isRpcWalletConnected();
 		const rpcWallet = this.rpcWallet;
-		let nodeItems: HTMLElement[] = [];
 		this.removeTimer();
-		const campaigns = [this.campaigns[0]];
-		for (let idx = 0; idx < campaigns.length; idx++) {
-			const campaign = this.campaigns[idx];
-			const containerSection = await Panel.create();
-			containerSection.id = `campaign-${idx}`;
-			containerSection.classList.add('container');
-			const options = campaign.options;
-			for (let optIdx = 0; optIdx < options.length; optIdx++) {
-				const opt = options[optIdx];
-				let lpTokenData: any = {};
-				let vaultTokenData: any = {};
-				if (opt.tokenAddress) {
-					if (opt.lockTokenType == LockTokenType.LP_Token) {
-						lpTokenData = {
-							'object': await getLPObject(rpcWallet, opt.tokenAddress)
-						}
-					} else if (opt.lockTokenType == LockTokenType.VAULT_Token) {
-						vaultTokenData = {
-							'object': await getVaultObject(rpcWallet, opt.tokenAddress)
-						}
-					}
+		const campaign = this.campaign;
+		const containerSection = await Panel.create();
+		containerSection.classList.add('container');
+		let opt = { ...campaign.option };
+		let lpTokenData: any = {};
+		let vaultTokenData: any = {};
+		if (opt.tokenAddress) {
+			if (opt.lockTokenType == LockTokenType.LP_Token) {
+				lpTokenData = {
+					'object': await getLPObject(rpcWallet, opt.tokenAddress)
 				}
-				const tokenInfo = {
-					tokenAddress: campaign.tokenAddress,
-					lpToken: lpTokenData,
-					vaultToken: vaultTokenData
-				}
-				options[optIdx] = {
-					...options[optIdx],
-					tokenInfo
+			} else if (opt.lockTokenType == LockTokenType.VAULT_Token) {
+				vaultTokenData = {
+					'object': await getVaultObject(rpcWallet, opt.tokenAddress)
 				}
 			}
-			const stakingInfo = options ? options[0] : null;
-			const lockedTokenObject = getLockedTokenObject(stakingInfo, stakingInfo.tokenInfo, this.tokenMap);
-			const lockedTokenSymbol = getLockedTokenSymbol(stakingInfo, lockedTokenObject);
-			const lockedTokenIconPaths = getLockedTokenIconPaths(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
-			const lockedTokenDecimals = lockedTokenObject?.decimals || 18;
-			const defaultDecimalsOffset = 18 - lockedTokenDecimals;
-			const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
-			const activeEndTime = stakingInfo ? stakingInfo.endOfEntryPeriod : 0;
-			let isStarted = moment(activeStartTime).diff(moment()) <= 0;
-			let isClosed = moment(activeEndTime).diff(moment()) <= 0;
-			let totalLocked: any = {};
-			const stakingElms: VStack[] = [];
-			const optionTimer = { background: { color: Theme.colors.secondary.main }, font: { color: Theme.colors.secondary.contrastText } };
-			const activeTimerRows: VStack[] = [];
-			const activeTimerElms: VStack[] = [];
-			const endHours: Label[] = [];
-			const endDays: Label[] = [];
-			const endMins: Label[] = [];
-			const stickerSections: Panel[] = [];
-			const stickerLabels: Label[] = [];
-			const stickerIcons: Icon[] = [];
-			for (let i = 0; i < options.length; i++) {
-				stakingElms[i] = await VStack.create({ visible: i === 0 });
-				activeTimerRows[i] = await VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
-				activeTimerElms[i] = await VStack.create();
-				activeTimerRows[i].appendChild(<i-label caption="End Date" font={{ size: '14px' }} opacity={0.5} />);
-				activeTimerRows[i].appendChild(activeTimerElms[i]);
-				endHours[i] = await Label.create(optionTimer);
-				endDays[i] = await Label.create(optionTimer);
-				endMins[i] = await Label.create(optionTimer);
-				endHours[i].classList.add('timer-value');
-				endDays[i].classList.add('timer-value');
-				endMins[i].classList.add('timer-value');
-				activeTimerElms[i].appendChild(
-					<i-hstack gap={4} class="custom-timer">
-						{endDays[i]}
-						<i-label caption="D" class="timer-unit" />
-						{endHours[i]}
-						<i-label caption="H" class="timer-unit" />
-						{endMins[i]}
-						<i-label caption="M" class="timer-unit" />
-					</i-hstack>
-				);
+		}
+		const tokenInfo = {
+			tokenAddress: campaign.tokenAddress,
+			lpToken: lpTokenData,
+			vaultToken: vaultTokenData
+		}
+		opt = {
+			...opt,
+			tokenInfo
+		}
+		const stakingInfo = opt;
+		const lockedTokenObject = getLockedTokenObject(stakingInfo, stakingInfo.tokenInfo, this.tokenMap);
+		const lockedTokenSymbol = getLockedTokenSymbol(stakingInfo, lockedTokenObject);
+		const lockedTokenIconPaths = getLockedTokenIconPaths(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
+		const lockedTokenDecimals = lockedTokenObject?.decimals || 18;
+		const defaultDecimalsOffset = 18 - lockedTokenDecimals;
+		const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
+		const activeEndTime = stakingInfo ? stakingInfo.endOfEntryPeriod : 0;
+		let isStarted = moment(activeStartTime).diff(moment()) <= 0;
+		let isClosed = moment(activeEndTime).diff(moment()) <= 0;
+		let totalLocked: any = {};
+		const optionTimer = { background: { color: Theme.colors.secondary.main }, font: { color: Theme.colors.secondary.contrastText } };
+		const stakingElm = await VStack.create();
+		const activeTimerRow = await VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
+		const activeTimerElm = await VStack.create();
+		activeTimerRow.appendChild(<i-label caption="End Date" font={{ size: '14px' }} opacity={0.5} />);
+		activeTimerRow.appendChild(activeTimerElm);
+		const endHour = await Label.create(optionTimer);
+		const endDay = await Label.create(optionTimer);
+		const endMin = await Label.create(optionTimer);
+		endHour.classList.add('timer-value');
+		endDay.classList.add('timer-value');
+		endMin.classList.add('timer-value');
+		activeTimerElm.appendChild(
+			<i-hstack gap={4} class="custom-timer">
+				{endDay}
+				<i-label caption="D" class="timer-unit" />
+				{endHour}
+				<i-label caption="H" class="timer-unit" />
+				{endMin}
+				<i-label caption="M" class="timer-unit" />
+			</i-hstack>
+		);
 
-				// Sticker
-				stickerSections[i] = await Panel.create({ visible: false });
-				stickerLabels[i] = await Label.create();
-				stickerIcons[i] = await Icon.create({ fill: '#fff' });
-				stickerSections[i].classList.add('sticker');
-				stickerSections[i].appendChild(
-					<i-vstack class="sticker-text">
-						{stickerIcons[i]}
-						{stickerLabels[i]}
-					</i-vstack>
-				);
-			}
+		// Sticker
+		const stickerSection = await Panel.create({ visible: false });
+		const stickerLabel = await Label.create();
+		const stickerIcon = await Icon.create({ fill: '#fff' });
+		stickerSection.classList.add('sticker');
+		stickerSection.appendChild(
+			<i-vstack class="sticker-text">
+				{stickerIcon}
+				{stickerLabel}
+			</i-vstack>
+		);
 
-			const onChangeStake = (index: number) => {
-				stakingElms.forEach((elm: VStack) => {
-					elm.visible = false;
-				});
-				stakingElms[index].visible = true;
-			}
-
-			const setAvailableQty = async () => {
-				if (!this.state.isRpcWalletConnected()) return;
-				let i = 0;
-				for (const o of options) {
-					const _totalLocked = await getStakingTotalLocked(rpcWallet, o.address);
-					totalLocked[o.address] = _totalLocked;
-					const optionQty = new BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
-					if (o.mode === 'Stake') {
-						const keyStake = `#btn-stake-${o.address}`;
-						const btnStake = this.querySelector(keyStake) as Button;
-						const isStaking = this.state.getStakingStatus(keyStake).value;
-						if (btnStake) {
-							let isValidInput = false;
-							const inputElm = this.querySelector(`#input-${o.address}`) as Input;
-							if (inputElm) {
-								const manageStake = this.querySelector(`#manage-stake-${o.address}`) as ManageStake;
-								const inputVal = new BigNumber(inputElm.value || 0);
-								isValidInput = inputVal.gt(0) && inputVal.lte(manageStake.getBalance()) && !manageStake?.needToBeApproval();
-							}
-							btnStake.enabled = !isStaking && isValidInput && (isStarted && !(optionQty.lte(0) || isClosed));
-						}
-					} else {
-						const keyUnstake = `#btn-unstake-${o.address}`;
-						const btnUnstake = this.querySelector(keyUnstake) as Button;
-						const isUnstaking = this.state.getStakingStatus(keyUnstake).value;
-						if (btnUnstake) {
-							const manageStake = this.querySelector(`#manage-stake-${o.address}`) as ManageStake;
-							btnUnstake.enabled = !isUnstaking && o.mode !== 'Stake' && Number(o.stakeQty) != 0 && !manageStake?.needToBeApproval();
-						}
+		const setAvailableQty = async () => {
+			if (!this.state.isRpcWalletConnected() || !this.manageStake) return;
+			const o = opt;
+			const _totalLocked = await getStakingTotalLocked(rpcWallet, o.address);
+			totalLocked[o.address] = _totalLocked;
+			const optionQty = new BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
+			if (o.mode === 'Stake') {
+				const btnStake = this.manageStake.btnStake;
+				const isStaking = this.state.getStakingStatus(this.manageStake.actionKey).value;
+				if (btnStake) {
+					let isValidInput = false;
+					const inputElm = this.manageStake.inputAmount;
+					if (inputElm) {
+						const inputVal = new BigNumber(inputElm.value || 0);
+						isValidInput = inputVal.gt(0) && inputVal.lte(this.manageStake.getBalance()) && !this.manageStake.needToBeApproval();
 					}
-					if (isClosed) {
-						if (stickerLabels[i].caption !== 'Closed') {
-							stickerSections[i].classList.add('closed');
-							stickerSections[i].classList.remove('sold-out');
-							stickerLabels[i].caption = 'Closed';
-							stickerIcons[i].name = 'check-square';
-						}
-					} else if (optionQty.lte(0)) {
-						if (stickerLabels[i].caption !== 'Sold Out') {
-							stickerLabels[i].caption = 'Sold Out';
-							stickerIcons[i].name = 'star';
-							stickerSections[i].classList.add('sold-out');
-						}
-					} else {
-						if (stickerLabels[i].caption !== 'Active') {
-							stickerLabels[i].caption = 'Active';
-							stickerIcons[i].name = 'star';
-						}
-					}
-					if (!stickerSections[i].visible) {
-						stickerSections[i].visible = true;
-					}
-					i++;
-				};
-			}
-
-			const setEndRemainingTime = () => {
-				isStarted = moment(activeStartTime).diff(moment()) <= 0;
-				isClosed = moment(activeEndTime).diff(moment()) <= 0;
-				for (let i = 0; i < options.length; i++) {
-					activeTimerRows[i].visible = isStarted && !isClosed;
+					btnStake.enabled = !isStaking && isValidInput && (isStarted && !(optionQty.lte(0) || isClosed));
 				}
-				if (activeEndTime == 0) {
-					for (let i = 0; i < options.length; i++) {
-						endDays[i].caption = endHours[i].caption = endMins[i].caption = '0';
-					}
-					if (this.listActiveTimer[idx]) {
-						clearInterval(this.listActiveTimer[idx]);
-					}
-				} else {
-					const days = moment(activeEndTime).diff(moment(), 'days');
-					const hours = moment(activeEndTime).diff(moment(), 'hours') - days * 24;
-					const mins = moment(activeEndTime).diff(moment(), 'minutes') - days * 24 * 60 - hours * 60;
-					for (let i = 0; i < options.length; i++) {
-						endDays[i].caption = `${days}`;
-						endHours[i].caption = `${hours}`;
-						endMins[i].caption = `${mins}`;
-					}
+			} else {
+				const btnUnstake = this.manageStake.btnUnstake;
+				const isUnstaking = this.state.getStakingStatus(this.manageStake.actionKey).value;
+				if (btnUnstake) {
+					btnUnstake.enabled = !isUnstaking && o.mode !== 'Stake' && Number(o.stakeQty) != 0 && !this.manageStake.needToBeApproval();
 				}
 			}
-
-			const setTimer = () => {
-				setEndRemainingTime();
-				setAvailableQty();
-			}
-
-			setTimer();
-			// this.listActiveTimer.push(setInterval(setTimer, 2000));
-
-			const stakingsElm = await Promise.all(options.map(async (option: any, optionIdx: number) => {
-				const manageStake = new ManageStake();
-				manageStake.id = `manage-stake-${option.address}`;
-				manageStake.width = '100%';
-				manageStake.state = this.state;
-				manageStake.onRefresh = () => this.initializeWidgetConfig(true);
-				this.manageStakeElm.clearInnerHTML();
-				this.manageStakeElm.appendChild(manageStake);
-				manageStake.setData({
-					...campaign,
-					...option,
-				});
-
-				const isClaim = option.mode === 'Claim';
-
-				const rewardsData = option.rewardsData[0] ? [option.rewardsData[0]] : [];
-				const rewardOptions = !isClaim ? rewardsData : [];
-				let aprInfo: any = {};
-
-				const claimStakedRow = await HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
-				claimStakedRow.appendChild(<i-label caption="You Staked" font={{ size: '16px' }} />);
-				claimStakedRow.appendChild(<i-label caption={`${formatNumber(new BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`} font={{ size: '16px' }} />);
-
-				const rowRewards = await VStack.create({ gap: 8, verticalAlignment: 'center' });
-				for (let idx = 0; idx < rewardsData.length; idx++) {
-					const reward = rewardsData[idx];
-					const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
-					const rewardTokenDecimals = rewardToken.decimals || 18;
-					let decimalsOffset = 18 - rewardTokenDecimals;
-					let rewardLockedDecimalsOffset = decimalsOffset;
-					if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
-						rewardLockedDecimalsOffset = decimalsOffset * 2;
-					} else if (lockedTokenDecimals !== 18 && rewardTokenDecimals === 18) {
-						rewardLockedDecimalsOffset = rewardTokenDecimals - lockedTokenDecimals;
-						decimalsOffset = 18 - lockedTokenDecimals;
-					}
-					const rewardSymbol = rewardToken.symbol || '';
-					rowRewards.appendChild(
-						<i-hstack horizontalAlignment="space-between">
-							<i-label caption={`${rewardSymbol} Locked`} font={{ size: '16px', color: Theme.text.primary }} />
-							<i-label caption={`${formatNumber(new BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`} font={{ size: '16px' }} />
-						</i-hstack>
-					);
-					// rowRewards.appendChild(
-					// 	<i-hstack horizontalAlignment="space-between">
-					// 		<i-label caption={`${rewardSymbol} Vesting Start`} font={{ size: '16px', color: colorText }} />
-					// 		<i-label caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
-					// 	</i-hstack>
-					// );
-					// rowRewards.appendChild(
-					// 	<i-hstack horizontalAlignment="space-between">
-					// 		<i-label caption={`${rewardSymbol} Vesting End`} font={{ size: '16px', color: colorText }} />
-					// 		<i-label caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
-					// 	</i-hstack>
-					// );
-					const passClaimStartTime = !(reward.claimStartTime && moment().diff(moment.unix(reward.claimStartTime)) < 0);
-					let rewardClaimable = `0 ${rewardSymbol}`;
-					if (passClaimStartTime && isClaim) {
-						rewardClaimable = `${formatNumber(new BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
-					}
-					let startClaimingText = '';
-					if (!(!reward.claimStartTime || passClaimStartTime) && isClaim) {
-						const claimStart = moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
-						startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
-					}
-					rowRewards.appendChild(
-						<i-hstack horizontalAlignment="space-between">
-							<i-label caption={`${rewardSymbol} Claimable`} font={{ size: '16px' }} />
-							<i-label caption={rewardClaimable} font={{ size: '16px' }} />
-							{startClaimingText ? <i-label caption={startClaimingText} font={{ size: '16px' }} /> : []}
-						</i-hstack>
-					);
-					const btnClaim = await Button.create({
-						// rightIcon: { spin: true, fill: Theme.colors.primary.contrastText, visible: false },
-						rightIcon: { spin: true, fill: '#fff', visible: false },
-						caption: rpcWalletConnected ? `Claim ${rewardSymbol}` : 'Switch Network',
-						// background: { color: `${Theme.colors.primary.main} !important` },
-						// font: { color: Theme.colors.primary.contrastText },
-						enabled: !rpcWalletConnected || (rpcWalletConnected && !(!passClaimStartTime || new BigNumber(reward.claimable).isZero()) && isClaim),
-						margin: { left: 'auto', right: 'auto', bottom: 10 }
-					})
-					btnClaim.id = `btnClaim-${idx}-${option.address}`;
-					btnClaim.classList.add('btn-os', 'btn-stake');
-					btnClaim.onClick = () => rpcWalletConnected ? this.onClaim(btnClaim, { reward, rewardSymbol }) : this.connectWallet();
-					rowRewards.appendChild(btnClaim);
-				};
-
-				const getAprValue = (rewardOption: any) => {
-					if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
-						const apr = new BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, BigNumber.ROUND_DOWN);
-						return `${apr}%`;
-					}
-					return '';
+			if (isClosed) {
+				if (stickerLabel.caption !== 'Closed') {
+					stickerSection.classList.add('closed');
+					stickerSection.classList.remove('sold-out');
+					stickerLabel.caption = 'Closed';
+					stickerIcon.name = 'check-square';
 				}
+			} else if (optionQty.lte(0)) {
+				if (stickerLabel.caption !== 'Sold Out') {
+					stickerLabel.caption = 'Sold Out';
+					stickerIcon.name = 'star';
+					stickerSection.classList.add('sold-out');
+				}
+			} else {
+				if (stickerLabel.caption !== 'Active') {
+					stickerLabel.caption = 'Active';
+					stickerIcon.name = 'star';
+				}
+			}
+			if (!stickerSection.visible) {
+				stickerSection.visible = true;
+			}
+		};
 
-				const durationDays = option.minLockTime / (60 * 60 * 24);
-				const _lockedTokenObject = getLockedTokenObject(option, option.tokenInfo, this.tokenMap);
-				const _lockedTokenIconPaths = getLockedTokenIconPaths(option, _lockedTokenObject, chainId, this.tokenMap);
-				const pathsLength = _lockedTokenIconPaths.length;
-				const rewardToken = rewardsData?.length ? this.getRewardToken(rewardsData[0].rewardTokenAddress) : null;
-				stakingElms[optionIdx].appendChild(
-					<i-vstack gap={15} width={maxWidth} height="100%" padding={{ top: 10, bottom: 10, left: 20, right: 20 }} position="relative">
-						{stickerSections[optionIdx]}
-						<i-hstack gap={10} width="100%" verticalAlignment="center">
-							<i-hstack gap={10} width="50%">
-								<i-hstack width={pathsLength === 1 ? 63.5 : 80} position="relative" verticalAlignment="center">
-									<i-image width={60} height={60} url={tokenAssets.tokenPath(rewardToken, chainId)} fallbackUrl={fallBackUrl} />
-									{
-										_lockedTokenIconPaths.map((v: string, idxImg: number) => {
-											return <i-image position="absolute" width={28} height={28} bottom={0} left={(idxImg * 20) + 35} url={tokenAssets.fullPath(v)} fallbackUrl={fallBackUrl} />
-										})
-									}
-								</i-hstack>
-								<i-vstack gap={2} overflow={{ x: 'hidden' }} verticalAlignment="center">
-									<i-label visible={!!campaign.name} caption={campaign.name} font={{ size: '20px', color: Theme.text.secondary, bold: true }} class="text-overflow" />
-									<i-label visible={!!campaign.desc} caption={campaign.desc} font={{ size: '16px' }} opacity={0.5} class="text-overflow" />
-								</i-vstack>
-							</i-hstack>
+		const setEndRemainingTime = () => {
+			isStarted = moment(activeStartTime).diff(moment()) <= 0;
+			isClosed = moment(activeEndTime).diff(moment()) <= 0;
+			activeTimerRow.visible = isStarted && !isClosed;
+			if (activeEndTime == 0) {
+				endDay.caption = endHour.caption = endMin.caption = '0';
+				if (this.activeTimer) {
+					clearInterval(this.activeTimer);
+				}
+			} else {
+				const days = moment(activeEndTime).diff(moment(), 'days');
+				const hours = moment(activeEndTime).diff(moment(), 'hours') - days * 24;
+				const mins = moment(activeEndTime).diff(moment(), 'minutes') - days * 24 * 60 - hours * 60;
+				endDay.caption = `${days}`;
+				endHour.caption = `${hours}`;
+				endMin.caption = `${mins}`;
+			}
+		}
+
+		const setTimer = () => {
+			setEndRemainingTime();
+			setAvailableQty();
+		}
+		setTimer();
+
+		const option = { ...opt };
+		this.manageStake = new ManageStake(undefined, {
+			width: '100%',
+		});
+		this.manageStake.state = this.state;
+		this.manageStake.onRefresh = () => this.initializeWidgetConfig(true);
+		this.manageStake.setData({
+			...campaign,
+			...option
+		});
+
+		const isClaim = option.mode === 'Claim';
+
+		const rewardsData = option.rewardsData[0] ? [option.rewardsData[0]] : [];
+		const rewardOptions = !isClaim ? rewardsData : [];
+		let aprInfo: any = {};
+
+		const claimStakedRow = await HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
+		claimStakedRow.appendChild(<i-label caption="You Staked" font={{ size: '16px' }} />);
+		claimStakedRow.appendChild(<i-label caption={`${formatNumber(new BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`} font={{ size: '16px' }} />);
+
+		const rowRewards = await VStack.create({ gap: 8, verticalAlignment: 'center' });
+		for (let idx = 0; idx < rewardsData.length; idx++) {
+			const reward = rewardsData[idx];
+			const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
+			const rewardTokenDecimals = rewardToken.decimals || 18;
+			let decimalsOffset = 18 - rewardTokenDecimals;
+			let rewardLockedDecimalsOffset = decimalsOffset;
+			if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
+				rewardLockedDecimalsOffset = decimalsOffset * 2;
+			} else if (lockedTokenDecimals !== 18 && rewardTokenDecimals === 18) {
+				rewardLockedDecimalsOffset = rewardTokenDecimals - lockedTokenDecimals;
+				decimalsOffset = 18 - lockedTokenDecimals;
+			}
+			const rewardSymbol = rewardToken.symbol || '';
+			rowRewards.appendChild(
+				<i-hstack horizontalAlignment="space-between">
+					<i-label caption={`${rewardSymbol} Locked`} font={{ size: '16px', color: Theme.text.primary }} />
+					<i-label caption={`${formatNumber(new BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`} font={{ size: '16px' }} />
+				</i-hstack>
+			);
+			// rowRewards.appendChild(
+			// 	<i-hstack horizontalAlignment="space-between">
+			// 		<i-label caption={`${rewardSymbol} Vesting Start`} font={{ size: '16px', color: colorText }} />
+			// 		<i-label caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
+			// 	</i-hstack>
+			// );
+			// rowRewards.appendChild(
+			// 	<i-hstack horizontalAlignment="space-between">
+			// 		<i-label caption={`${rewardSymbol} Vesting End`} font={{ size: '16px', color: colorText }} />
+			// 		<i-label caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
+			// 	</i-hstack>
+			// );
+			const passClaimStartTime = !(reward.claimStartTime && moment().diff(moment.unix(reward.claimStartTime)) < 0);
+			let rewardClaimable = `0 ${rewardSymbol}`;
+			if (passClaimStartTime && isClaim) {
+				rewardClaimable = `${formatNumber(new BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
+			}
+			let startClaimingText = '';
+			if (!(!reward.claimStartTime || passClaimStartTime) && isClaim) {
+				const claimStart = moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
+				startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
+			}
+			rowRewards.appendChild(
+				<i-hstack horizontalAlignment="space-between">
+					<i-label caption={`${rewardSymbol} Claimable`} font={{ size: '16px' }} />
+					<i-label caption={rewardClaimable} font={{ size: '16px' }} />
+					{startClaimingText ? <i-label caption={startClaimingText} font={{ size: '16px' }} /> : []}
+				</i-hstack>
+			);
+			const btnClaim = await Button.create({
+				// rightIcon: { spin: true, fill: Theme.colors.primary.contrastText, visible: false },
+				rightIcon: { spin: true, fill: '#fff', visible: false },
+				caption: rpcWalletConnected ? `Claim ${rewardSymbol}` : 'Switch Network',
+				// background: { color: `${Theme.colors.primary.main} !important` },
+				// font: { color: Theme.colors.primary.contrastText },
+				enabled: !rpcWalletConnected || (rpcWalletConnected && !(!passClaimStartTime || new BigNumber(reward.claimable).isZero()) && isClaim),
+				margin: { left: 'auto', right: 'auto', bottom: 10 }
+			})
+			btnClaim.classList.add('btn-os', 'btn-stake');
+			btnClaim.onClick = () => rpcWalletConnected ? this.onClaim(btnClaim, { reward, rewardSymbol }) : this.connectWallet();
+			rowRewards.appendChild(btnClaim);
+		};
+
+		const getAprValue = (rewardOption: any) => {
+			if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
+				const apr = new BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, BigNumber.ROUND_DOWN);
+				return `${apr}%`;
+			}
+			return '';
+		}
+
+		const durationDays = option.minLockTime / (60 * 60 * 24);
+		const _lockedTokenObject = getLockedTokenObject(option, option.tokenInfo, this.tokenMap);
+		const _lockedTokenIconPaths = getLockedTokenIconPaths(option, _lockedTokenObject, chainId, this.tokenMap);
+		const pathsLength = _lockedTokenIconPaths.length;
+		const rewardToken = rewardsData?.length ? this.getRewardToken(rewardsData[0].rewardTokenAddress) : null;
+		stakingElm.appendChild(
+			<i-vstack gap={15} width={maxWidth} height="100%" padding={{ top: 10, bottom: 10, left: 20, right: 20 }} position="relative">
+				{stickerSection}
+				<i-hstack gap={10} width="100%" verticalAlignment="center">
+					<i-hstack gap={10} width="50%">
+						<i-hstack width={pathsLength === 1 ? 63.5 : 80} position="relative" verticalAlignment="center">
+							<i-image width={60} height={60} url={tokenAssets.tokenPath(rewardToken, chainId)} fallbackUrl={fallBackUrl} />
 							{
-								await Promise.all(rewardOptions.map(async (rewardOption: any, idx: number) => {
-									const lbApr = await Label.create({ font: { size: '32px', color: Theme.text.secondary } });
-									const lbRate = await Label.create({ font: { size: '16px' }, opacity: 0.5 });
-									lbApr.classList.add('text-overflow');
-									const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
-									const rewardTokenDecimals = rewardToken.decimals || 18;
-									const decimalsOffset = 18 - rewardTokenDecimals;
-									const lockTokenType = option.lockTokenType;
-									
-									// const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
-									const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(this.chainId, option.lockTokenAddress)} : ${rewardOption.multiplier} ${tokenSymbol(this.chainId, rewardOption.rewardTokenAddress)}`;
-									const updateApr = async () => {
-										if (lockTokenType === LockTokenType.ERC20_Token) {
-											const apr: any = await getERC20RewardCurrentAPR(rpcWallet, rewardOption, lockedTokenObject, durationDays);
-											if (!isNaN(parseFloat(apr))) {
-												aprInfo[rewardOption.rewardTokenAddress] = apr;
-											}
-										} else if (lockTokenType === LockTokenType.LP_Token) {
-											if (rewardOption.referencePair) {
-												aprInfo[rewardOption.rewardTokenAddress] = await getLPRewardCurrentAPR(rpcWallet, rewardOption, option.tokenInfo?.lpToken?.object, durationDays);
-											}
-										} else {
-											aprInfo[rewardOption.rewardTokenAddress] = await getVaultRewardCurrentAPR(rpcWallet, rewardOption, option.tokenInfo?.vaultToken?.object, durationDays);
-										}
-										const aprValue = getAprValue(rewardOption);
-										lbApr.caption = `APR ${aprValue}`;
-										lbRate.caption = rateDesc;
-									}
-									updateApr();
-									this.listAprTimer.push(setInterval(updateApr, 10000));
-									const aprValue = getAprValue(rewardOption);
-									lbApr.caption = `APR ${aprValue}`;
-									lbRate.caption = rateDesc;
-									return <i-vstack verticalAlignment="center">
-										{lbApr}
-										{lbRate}
-									</i-vstack>
-								}))
+								_lockedTokenIconPaths.map((v: string, idxImg: number) => {
+									return <i-image position="absolute" width={28} height={28} bottom={0} left={(idxImg * 20) + 35} url={tokenAssets.fullPath(v)} fallbackUrl={fallBackUrl} />
+								})
 							}
 						</i-hstack>
-						<i-hstack width="100%" verticalAlignment="center">
-							<i-vstack gap={2} width="25%" verticalAlignment="center">
-								<i-label caption="Start Date" font={{ size: '14px' }} opacity={0.5} />
-								<i-label caption={formatDate(option.startOfEntryPeriod, 'DD MMM, YYYY')} font={{ size: '16px' }} />
-							</i-vstack>
-							{activeTimerRows[optionIdx]}
-							<i-vstack gap={2} width="25%" verticalAlignment="center">
-								<i-label caption="Stake Duration" font={{ size: '14px' }} opacity={0.5} />
-								<i-hstack gap={4} verticalAlignment="center">
-									{
-										options.map((_option: any, _optionIdx: number) => {
-											const isCurrentIdx = optionIdx === _optionIdx;
-											return <i-button
-												caption={durationDays < 1 ? '< 1 Day' : `${durationDays} Days`}
-												class={`btn-os ${isCurrentIdx ? 'cursor-default' : ''}`}
-												border={{ radius: 12, width: 1, style: 'solid', color: isCurrentIdx ? 'transparent' : '#8994A3' }}
-												font={{ size: '12px', color: isCurrentIdx ? Theme.colors.secondary.contrastText : '#8994A3' }}
-												padding={{ top: 2.5, bottom: 2.5, left: 8, right: 8 }}
-												background={{ color: isCurrentIdx ? `${Theme.colors.secondary.main} !important` : 'transparent' }}
-												onClick={() => onChangeStake(_optionIdx)}
-											/>
-										})
+						<i-vstack gap={2} overflow={{ x: 'hidden' }} verticalAlignment="center">
+							<i-label visible={!!campaign.name} caption={campaign.name} font={{ size: '20px', color: Theme.text.secondary, bold: true }} class="text-overflow" />
+							<i-label visible={!!campaign.desc} caption={campaign.desc} font={{ size: '16px' }} opacity={0.5} class="text-overflow" />
+						</i-vstack>
+					</i-hstack>
+					{
+						await Promise.all(rewardOptions.map(async (rewardOption: any, idx: number) => {
+							const lbApr = await Label.create({ font: { size: '32px', color: Theme.text.secondary } });
+							const lbRate = await Label.create({ font: { size: '16px' }, opacity: 0.5 });
+							lbApr.classList.add('text-overflow');
+							const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
+							const rewardTokenDecimals = rewardToken.decimals || 18;
+							const decimalsOffset = 18 - rewardTokenDecimals;
+							const lockTokenType = option.lockTokenType;
+
+							// const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
+							const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(this.chainId, option.lockTokenAddress)} : ${rewardOption.multiplier} ${tokenSymbol(this.chainId, rewardOption.rewardTokenAddress)}`;
+							const updateApr = async () => {
+								if (lockTokenType === LockTokenType.ERC20_Token) {
+									const apr: any = await getERC20RewardCurrentAPR(rpcWallet, rewardOption, lockedTokenObject, durationDays);
+									if (!isNaN(parseFloat(apr))) {
+										aprInfo[rewardOption.rewardTokenAddress] = apr;
 									}
-								</i-hstack>
-							</i-vstack>
-							<i-vstack gap={4} width="25%" margin={{ left: 'auto' }} verticalAlignment="center" horizontalAlignment="end">
-								<i-hstack gap={4} class="pointer" width="fit-content" verticalAlignment="center" onClick={() => this.getLPToken(campaign, lockedTokenSymbol, chainId)}>
-									<i-icon name="external-link-alt" width={12} height={12} fill={Theme.text.primary} />
-									<i-label caption={`Get ${lockedTokenSymbol}`} font={{ size: '13.6px' }} />
-									{
-										lockedTokenIconPaths.map((v: any) => {
-											return <i-image display="flex" width={15} height={15} url={tokenAssets.fullPath(v)} fallbackUrl={fallBackUrl} />
-										})
+								} else if (lockTokenType === LockTokenType.LP_Token) {
+									if (rewardOption.referencePair) {
+										aprInfo[rewardOption.rewardTokenAddress] = await getLPRewardCurrentAPR(rpcWallet, rewardOption, option.tokenInfo?.lpToken?.object, durationDays);
 									}
-								</i-hstack >
-								{
-									campaign.showContractLink ?
-										<i-hstack gap={4} class="pointer" width="fit-content" verticalAlignment="center" onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
-											<i-icon name="external-link-alt" width={12} height={12} fill={Theme.text.primary} class="inline-block" />
-											<i-label caption="View Contract" font={{ size: '13.6px' }} />
-										</i-hstack> : []
+								} else {
+									aprInfo[rewardOption.rewardTokenAddress] = await getVaultRewardCurrentAPR(rpcWallet, rewardOption, option.tokenInfo?.vaultToken?.object, durationDays);
 								}
-								{/* {
+								const aprValue = getAprValue(rewardOption);
+								lbApr.caption = `APR ${aprValue}`;
+								lbRate.caption = rateDesc;
+							}
+							updateApr();
+							this.listAprTimer.push(setInterval(updateApr, 10000));
+							const aprValue = getAprValue(rewardOption);
+							lbApr.caption = `APR ${aprValue}`;
+							lbRate.caption = rateDesc;
+							return <i-vstack verticalAlignment="center">
+								{lbApr}
+								{lbRate}
+							</i-vstack>
+						}))
+					}
+				</i-hstack>
+				<i-hstack width="100%" verticalAlignment="center">
+					<i-vstack gap={2} width="25%" verticalAlignment="center">
+						<i-label caption="Start Date" font={{ size: '14px' }} opacity={0.5} />
+						<i-label caption={formatDate(option.startOfEntryPeriod, 'DD MMM, YYYY')} font={{ size: '16px' }} />
+					</i-vstack>
+					{activeTimerRow}
+					<i-vstack gap={2} width="25%" verticalAlignment="center">
+						<i-label caption="Stake Duration" font={{ size: '14px' }} opacity={0.5} />
+						<i-hstack gap={4} verticalAlignment="center">
+							<i-button
+								caption={durationDays < 1 ? '< 1 Day' : `${durationDays} Days`}
+								class="btn-os cursor-default"
+								border={{ radius: 12, width: 1, style: 'solid', color: 'transparent' }}
+								font={{ size: '12px', color: Theme.colors.secondary.contrastText }}
+								padding={{ top: 2.5, bottom: 2.5, left: 8, right: 8 }}
+								background={{ color: `${Theme.colors.secondary.main} !important` }}
+							/>
+						</i-hstack>
+					</i-vstack>
+					<i-vstack gap={4} width="25%" margin={{ left: 'auto' }} verticalAlignment="center" horizontalAlignment="end">
+						<i-hstack gap={4} class="pointer" width="fit-content" verticalAlignment="center" onClick={() => this.getLPToken(campaign, lockedTokenSymbol, chainId)}>
+							<i-icon name="external-link-alt" width={12} height={12} fill={Theme.text.primary} />
+							<i-label caption={`Get ${lockedTokenSymbol}`} font={{ size: '13.6px' }} />
+							{
+								lockedTokenIconPaths.map((v: any) => {
+									return <i-image display="flex" width={15} height={15} url={tokenAssets.fullPath(v)} fallbackUrl={fallBackUrl} />
+								})
+							}
+						</i-hstack >
+						{
+							campaign.showContractLink ?
+								<i-hstack gap={4} class="pointer" width="fit-content" verticalAlignment="center" onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
+									<i-icon name="external-link-alt" width={12} height={12} fill={Theme.text.primary} class="inline-block" />
+									<i-label caption="View Contract" font={{ size: '13.6px' }} />
+								</i-hstack> : []
+						}
+						{/* {
 										campaign.showContractLink && isClaim ?
 										<i-hstack gap={4} class="pointer" width="fit-content" verticalAlignment="center" onClick={() => viewOnExplorerByAddress(chainId, rewardsData[0].address)}>
 											<i-icon name="external-link-alt" width={12} height={12} fill={colorText} class="inline-block" />
 											<i-label caption="View Reward Contract" font={{ size: '13.6px', color: colorText }} />
 										</i-hstack> : []
 									} */}
-							</i-vstack>
-						</i-hstack>
-						<i-vstack gap={8}>
-							{claimStakedRow}
-							{/* {
+					</i-vstack>
+				</i-hstack>
+				<i-vstack gap={8}>
+					{claimStakedRow}
+					{/* {
 									await Promise.all(rewardOptions.map(async (rewardOption: any, idx: number) => {
 										const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
 										const rewardTokenDecimals = rewardToken.decimals || 18;
@@ -1100,26 +999,21 @@ export default class ScomStaking extends Module {
 										return rewardElm;
 									}))
 								} */}
-							<i-vstack verticalAlignment="center" horizontalAlignment="center">
-								{manageStake}
-							</i-vstack>
-							{rowRewards}
-						</i-vstack>
+					<i-vstack verticalAlignment="center" horizontalAlignment="center">
+						{this.manageStake}
 					</i-vstack>
-				);
-				return stakingElms[optionIdx];
-			})
-			);
+					{rowRewards}
+				</i-vstack>
+			</i-vstack>
+		);
 
-			nodeItems.push(containerSection);
-			containerSection.appendChild(
-				<i-hstack background={{ color: Theme.background.main }} width="100%" height={maxHeight} border={{ width: 1, style: 'solid', color: '#7979794a' }}>
-					{stakingsElm}
-				</i-hstack>
-			)
-		};
+		containerSection.appendChild(
+			<i-hstack background={{ color: Theme.background.main }} width="100%" height={maxHeight} border={{ width: 1, style: 'solid', color: '#7979794a' }}>
+				{stakingElm}
+			</i-hstack >
+		)
 		this.stakingElm.clearInnerHTML();
-		this.stakingElm.append(this.noCampaignSection, ...nodeItems);
+		this.stakingElm.append(this.noCampaignSection, containerSection);
 	}
 
 	render() {
@@ -1141,7 +1035,6 @@ export default class ScomStaking extends Module {
 						</i-vstack>
 						<i-panel id="stakingElm" class="wrapper" />
 					</i-panel>
-					<i-panel id="manageStakeElm" />
 					<i-scom-wallet-modal id="mdWallet" wallets={[]} />
 					<i-scom-tx-status-modal id="txStatusModal" />
 				</i-panel>
