@@ -31,7 +31,9 @@ declare global {
 @customElements('i-scom-staking-flow-initial-setup')
 export default class ScomStakingFlowInitialSetup extends Module {
 	private state: State;
-	private _data: any;
+	private tokenRequirements: any;
+    private executionProperties: any;
+    private invokerId: string;
     private tokenInput: ScomTokenInput;
     private $eventBus: IEventBus;
 
@@ -44,11 +46,13 @@ export default class ScomStakingFlowInitialSetup extends Module {
 		return this.state.getRpcWallet();
 	}
     private async resetRpcWallet() {
-		const rpcWalletId = await this.state.initRpcWallet(this._data.chainId);
+		const rpcWalletId = await this.state.initRpcWallet(this.executionProperties.chainId);
 		const rpcWallet = this.rpcWallet;
 	}
     async setData(value: any) {
-		this._data = value;
+        this.executionProperties = value.executionProperties;
+        this.tokenRequirements = value.tokenRequirements;
+        this.invokerId = value.invokerId;
 		await this.resetRpcWallet();
 		await this.initializeWidgetConfig();
 	}
@@ -62,27 +66,31 @@ export default class ScomStakingFlowInitialSetup extends Module {
 	}
     private initializeWidgetConfig = async () => {
         await this.initWallet();
-        tokenStore.updateTokenMapData(this._data.chainId);
+        tokenStore.updateTokenMapData(this.executionProperties.chainId);
         const rpcWallet = this.rpcWallet;
         // let campaigns = await getAllCampaignsInfo(rpcWallet, { [this._data.chainId]: this._data });
         // let campaignInfo = campaigns[0];
         // let tokenAddress = campaignInfo.tokenAddress?.toLowerCase()
-        let tokenAddress = this._data.tokenRequirements[0].tokenOut.address?.toLowerCase();
+        let tokenAddress = this.tokenRequirements[0].tokenOut.address?.toLowerCase();
         this.tokenInput.rpcWalletId = rpcWallet.instanceId;
-        const tokenMap = tokenStore.getTokenMapByChainId(this._data.chainId);
+        const tokenMap = tokenStore.getTokenMapByChainId(this.executionProperties.chainId);
         const token = tokenMap[tokenAddress];
         this.tokenInput.tokenDataListProp = [token];
         this.tokenInput.token = token
         await tokenStore.updateTokenBalances(rpcWallet, [token]);
 	}
     private handleClickNext = async () => {
-        let eventName = `${this._data.invokerId}:nextStep`;
-        const tokenBalances = await tokenStore.getTokenBalancesByChainId(this._data.chainId);
+        let eventName = `${this.invokerId}:nextStep`;
+        const tokenBalances = await tokenStore.getTokenBalancesByChainId(this.executionProperties.chainId);
         const balance = tokenBalances[this.tokenInput.token.address.toLowerCase()];
+        this.tokenRequirements[0].tokenOut.amount = this.tokenInput.value;
+        this.executionProperties.stakeInputValue = this.tokenInput.value;
         const isBalanceSufficient = new BigNumber(balance).gte(this.tokenInput.value);
         this.$eventBus.dispatch(eventName, { 
             amount: this.tokenInput.value,
-            isBalanceSufficient
+            tokenAcquisition: !isBalanceSufficient,
+            tokenRequirements: this.tokenRequirements,
+            executionProperties: this.executionProperties
         });
     }
     render() {

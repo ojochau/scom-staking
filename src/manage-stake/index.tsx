@@ -68,10 +68,15 @@ export default class ManageStake extends Module {
     return this._state;
   }
 
-  setData = (data: IExtendOptionInfo) => {
+  setData = async (data: IExtendOptionInfo) => {
     this.address = data.address;
     this.stakingInfo = data;
-    this.onSetupPage();
+    await this.onSetupPage();
+  }
+
+  setInputValue = (value: string) => {
+    this.inputAmount.value = value;
+    this.onInputAmount();
   }
 
   getBalance = () => {

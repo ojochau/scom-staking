@@ -783,7 +783,7 @@ export default class ScomStaking extends Module {
 		});
 		this.manageStake.state = this.state;
 		this.manageStake.onRefresh = () => this.initializeWidgetConfig(true);
-		this.manageStake.setData({
+		await this.manageStake.setData({
 			...campaign,
 			...option
 		});
@@ -1007,6 +1007,9 @@ export default class ScomStaking extends Module {
 			</i-vstack>
 		);
 
+		if (this._data.stakeInputValue) {
+			this.manageStake.setInputValue(this._data.stakeInputValue);
+		}
 		containerSection.appendChild(
 			<i-hstack background={{ color: Theme.background.main }} width="100%" height={maxHeight} border={{ width: 1, style: 'solid', color: '#7979794a' }}>
 				{stakingElm}
@@ -1051,7 +1054,11 @@ export default class ScomStaking extends Module {
 			let properties = options.properties;
 			let tokenRequirements = options.tokenRequirements;
 			let invokerId = options.invokerId;
-			await widget.setData({ ...properties, tokenRequirements, invokerId });
+			await widget.setData({ 
+				executionProperties: properties, 
+				tokenRequirements, 
+				invokerId 
+			});
 		}
 		else {
 			widget = this;

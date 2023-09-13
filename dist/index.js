@@ -1005,10 +1005,14 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
             this.currentMode = CurrentMode.STAKE;
             this.tokenBalances = {};
             this.tokenMap = {};
-            this.setData = (data) => {
+            this.setData = async (data) => {
                 this.address = data.address;
                 this.stakingInfo = data;
-                this.onSetupPage();
+                await this.onSetupPage();
+            };
+            this.setInputValue = (value) => {
+                this.inputAmount.value = value;
+                this.onInputAmount();
             };
             this.getBalance = () => {
                 return eth_wallet_5.BigNumber.min(this.availableQty, this.balance, this.perAddressCap);
@@ -1889,27 +1893,31 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
             this.initializeWidgetConfig = async () => {
                 var _a;
                 await this.initWallet();
-                scom_token_list_4.tokenStore.updateTokenMapData(this._data.chainId);
+                scom_token_list_4.tokenStore.updateTokenMapData(this.executionProperties.chainId);
                 const rpcWallet = this.rpcWallet;
                 // let campaigns = await getAllCampaignsInfo(rpcWallet, { [this._data.chainId]: this._data });
                 // let campaignInfo = campaigns[0];
                 // let tokenAddress = campaignInfo.tokenAddress?.toLowerCase()
-                let tokenAddress = (_a = this._data.tokenRequirements[0].tokenOut.address) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+                let tokenAddress = (_a = this.tokenRequirements[0].tokenOut.address) === null || _a === void 0 ? void 0 : _a.toLowerCase();
                 this.tokenInput.rpcWalletId = rpcWallet.instanceId;
-                const tokenMap = scom_token_list_4.tokenStore.getTokenMapByChainId(this._data.chainId);
+                const tokenMap = scom_token_list_4.tokenStore.getTokenMapByChainId(this.executionProperties.chainId);
                 const token = tokenMap[tokenAddress];
                 this.tokenInput.tokenDataListProp = [token];
                 this.tokenInput.token = token;
                 await scom_token_list_4.tokenStore.updateTokenBalances(rpcWallet, [token]);
             };
             this.handleClickNext = async () => {
-                let eventName = `${this._data.invokerId}:nextStep`;
-                const tokenBalances = await scom_token_list_4.tokenStore.getTokenBalancesByChainId(this._data.chainId);
+                let eventName = `${this.invokerId}:nextStep`;
+                const tokenBalances = await scom_token_list_4.tokenStore.getTokenBalancesByChainId(this.executionProperties.chainId);
                 const balance = tokenBalances[this.tokenInput.token.address.toLowerCase()];
+                this.tokenRequirements[0].tokenOut.amount = this.tokenInput.value;
+                this.executionProperties.stakeInputValue = this.tokenInput.value;
                 const isBalanceSufficient = new eth_wallet_6.BigNumber(balance).gte(this.tokenInput.value);
                 this.$eventBus.dispatch(eventName, {
                     amount: this.tokenInput.value,
-                    isBalanceSufficient
+                    tokenAcquisition: !isBalanceSufficient,
+                    tokenRequirements: this.tokenRequirements,
+                    executionProperties: this.executionProperties
                 });
             };
             this.state = new index_10.State({});
@@ -1919,11 +1927,13 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
             return this.state.getRpcWallet();
         }
         async resetRpcWallet() {
-            const rpcWalletId = await this.state.initRpcWallet(this._data.chainId);
+            const rpcWalletId = await this.state.initRpcWallet(this.executionProperties.chainId);
             const rpcWallet = this.rpcWallet;
         }
         async setData(value) {
-            this._data = value;
+            this.executionProperties = value.executionProperties;
+            this.tokenRequirements = value.tokenRequirements;
+            this.invokerId = value.invokerId;
             await this.resetRpcWallet();
             await this.initializeWidgetConfig();
         }
@@ -2564,7 +2574,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 });
                 this.manageStake.state = this.state;
                 this.manageStake.onRefresh = () => this.initializeWidgetConfig(true);
-                this.manageStake.setData(Object.assign(Object.assign({}, campaign), option));
+                await this.manageStake.setData(Object.assign(Object.assign({}, campaign), option));
                 const isClaim = option.mode === 'Claim';
                 const rewardsData = option.rewardsData[0] ? [option.rewardsData[0]] : [];
                 const rewardOptions = !isClaim ? rewardsData : [];
@@ -2717,6 +2727,9 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         claimStakedRow,
                         this.$render("i-vstack", { verticalAlignment: "center", horizontalAlignment: "center" }, this.manageStake),
                         rowRewards)));
+                if (this._data.stakeInputValue) {
+                    this.manageStake.setInputValue(this._data.stakeInputValue);
+                }
                 containerSection.appendChild(this.$render("i-hstack", { background: { color: Theme.background.main }, width: "100%", height: index_12.maxHeight, border: { width: 1, style: 'solid', color: '#7979794a' } }, stakingElm));
                 this.stakingElm.clearInnerHTML();
                 this.stakingElm.append(this.noCampaignSection, containerSection);
@@ -2777,7 +2790,11 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 let properties = options.properties;
                 let tokenRequirements = options.tokenRequirements;
                 let invokerId = options.invokerId;
-                await widget.setData(Object.assign(Object.assign({}, properties), { tokenRequirements, invokerId }));
+                await widget.setData({
+                    executionProperties: properties,
+                    tokenRequirements,
+                    invokerId
+                });
             }
             else {
                 widget = this;

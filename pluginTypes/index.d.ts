@@ -51,6 +51,7 @@ declare module "@scom/scom-staking/global/utils/interfaces.ts" {
         getTokenURL?: string;
         showContractLink?: boolean;
         staking: ISingleStaking;
+        stakeInputValue?: string;
         commissions?: ICommissionInfo[];
         wallets: IWalletPlugin[];
         networks: INetworkConfig[];
@@ -295,6 +296,7 @@ declare module "@scom/scom-staking/staking-utils/index.ts" {
         getTokenURL?: string;
         showContractLink?: boolean;
         staking: ISingleStaking;
+        stakeInputValue?: string;
         commissions?: import("@scom/scom-staking/global/index.ts").ICommissionInfo[];
         wallets: import("@scom/scom-staking/global/index.ts").IWalletPlugin[];
         networks: import("@scom/scom-staking/global/index.ts").INetworkConfig[];
@@ -377,7 +379,8 @@ declare module "@scom/scom-staking/manage-stake/index.tsx" {
         constructor(parent?: Container, options?: ControlElement);
         set state(value: State);
         get state(): State;
-        setData: (data: IExtendOptionInfo) => void;
+        setData: (data: IExtendOptionInfo) => Promise<void>;
+        setInputValue: (value: string) => void;
         getBalance: () => BigNumber;
         needToBeApproval: () => boolean;
         get actionKey(): string;
@@ -652,7 +655,9 @@ declare module "@scom/scom-staking/flow/initialSetup.tsx" {
     }
     export default class ScomStakingFlowInitialSetup extends Module {
         private state;
-        private _data;
+        private tokenRequirements;
+        private executionProperties;
+        private invokerId;
         private tokenInput;
         private $eventBus;
         constructor(parent?: Container, options?: ControlElement);

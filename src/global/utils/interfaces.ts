@@ -23,6 +23,7 @@ export interface ISingleStakingCampaign {
   showContractLink?: boolean,
   // admin: string, // new campaign
   staking: ISingleStaking,
+  stakeInputValue?: string,
   commissions?: ICommissionInfo[],
   wallets: IWalletPlugin[],
   networks: INetworkConfig[],
