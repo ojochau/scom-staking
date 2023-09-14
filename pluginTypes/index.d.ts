@@ -654,6 +654,10 @@ declare module "@scom/scom-staking/flow/initialSetup.tsx" {
         private invokerId;
         private tokenInput;
         private $eventBus;
+        private walletEvents;
+        private mdWallet;
+        private lbConnectedStatus;
+        private btnConnectWallet;
         constructor(parent?: Container, options?: ControlElement);
         private get rpcWallet();
         private resetRpcWallet;
@@ -661,6 +665,10 @@ declare module "@scom/scom-staking/flow/initialSetup.tsx" {
         private initWallet;
         private initializeWidgetConfig;
         private handleClickStart;
+        connectWallet(): Promise<void>;
+        private displayWalletStatus;
+        private registerEvents;
+        onHide(): void;
         init(): void;
         render(): any;
     }

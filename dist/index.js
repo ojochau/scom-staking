@@ -1873,6 +1873,7 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
     let ScomStakingFlowInitialSetup = class ScomStakingFlowInitialSetup extends components_8.Module {
         constructor(parent, options) {
             super(parent, options);
+            this.walletEvents = [];
             this.initWallet = async () => {
                 try {
                     const rpcWallet = this.rpcWallet;
@@ -1884,6 +1885,8 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
             };
             this.initializeWidgetConfig = async () => {
                 var _a;
+                let connected = (0, index_10.isClientWalletConnected)();
+                this.displayWalletStatus(connected);
                 await this.initWallet();
                 scom_token_list_4.tokenStore.updateTokenMapData(this.executionProperties.chainId);
                 const rpcWallet = this.rpcWallet;
@@ -1931,20 +1934,60 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
             await this.resetRpcWallet();
             await this.initializeWidgetConfig();
         }
+        async connectWallet() {
+            if (!(0, index_10.isClientWalletConnected)()) {
+                if (this.mdWallet) {
+                    await components_8.application.loadPackage('@scom/scom-wallet-modal', '*');
+                    this.mdWallet.networks = this.executionProperties.networks;
+                    this.mdWallet.wallets = this.executionProperties.wallets;
+                    this.mdWallet.showModal();
+                }
+            }
+        }
+        displayWalletStatus(connected) {
+            if (connected) {
+                this.lbConnectedStatus.caption = 'Connected with ' + eth_wallet_6.Wallet.getClientInstance().address;
+                this.btnConnectWallet.visible = false;
+            }
+            else {
+                this.lbConnectedStatus.caption = 'Please connect your wallet first';
+                this.btnConnectWallet.visible = true;
+            }
+        }
+        registerEvents() {
+            let clientWallet = eth_wallet_6.Wallet.getClientInstance();
+            this.walletEvents.push(clientWallet.registerWalletEvent(this, eth_wallet_6.Constants.ClientWalletEvent.AccountsChanged, async (payload) => {
+                const { userTriggeredConnect, account } = payload;
+                let connected = !!account;
+                this.displayWalletStatus(connected);
+            }));
+        }
+        onHide() {
+            let clientWallet = eth_wallet_6.Wallet.getClientInstance();
+            for (let event of this.walletEvents) {
+                clientWallet.unregisterWalletEvent(event);
+            }
+            this.walletEvents = [];
+        }
         init() {
             super.init();
             this.tokenInput.style.setProperty('--input-background', '#232B5A');
             this.tokenInput.style.setProperty('--input-font_color', '#fff');
+            this.registerEvents();
         }
         render() {
             return (this.$render("i-vstack", { gap: '1rem', padding: { top: 10, bottom: 10, left: 20, right: 20 } },
                 this.$render("i-label", { caption: 'Get Ready to Stake', font: { size: '1.5rem' } }),
                 this.$render("i-vstack", { gap: '1rem' },
+                    this.$render("i-label", { id: "lbConnectedStatus" }),
+                    this.$render("i-hstack", null,
+                        this.$render("i-button", { id: "btnConnectWallet", caption: 'Connect Wallet', font: { color: Theme.colors.primary.contrastText }, padding: { top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }, onClick: this.connectWallet })),
                     this.$render("i-label", { caption: 'How many tokens are you planning to stake?' }),
                     this.$render("i-hstack", { verticalAlignment: 'center', width: '50%' },
                         this.$render("i-scom-token-input", { id: "tokenInput", placeholder: '0.0', value: '-', tokenReadOnly: true, isBalanceShown: false, isBtnMaxShown: false, border: { radius: '1rem' }, font: { size: '1.25rem' }, background: { color: Theme.input.background } })),
                     this.$render("i-hstack", { horizontalAlignment: 'end' },
-                        this.$render("i-button", { id: "btnStart", caption: "Start", padding: { top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }, font: { color: Theme.colors.primary.contrastText }, onClick: this.handleClickStart })))));
+                        this.$render("i-button", { id: "btnStart", caption: "Start", padding: { top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }, font: { color: Theme.colors.primary.contrastText }, onClick: this.handleClickStart }))),
+                this.$render("i-scom-wallet-modal", { id: "mdWallet", wallets: [] })));
         }
     };
     ScomStakingFlowInitialSetup = __decorate([

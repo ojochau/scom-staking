@@ -1,70 +1,79 @@
-import { 
-    Module, 
-    ControlElement, 
-    customModule, 
+import {
+    Module,
+    ControlElement,
+    customModule,
     customElements,
     Container,
     Styles,
     IEventBus,
-    application
- } from '@ijstech/components';
+    application,
+    Label,
+    Button
+} from '@ijstech/components';
 import { tokenStore } from '@scom/scom-token-list';
-import { State } from '../store/index';
+import { isClientWalletConnected, State } from '../store/index';
 import ScomTokenInput from '@scom/scom-token-input';
-import { BigNumber } from '@ijstech/eth-wallet';
+import { BigNumber, Constants, IEventBusRegistry, Wallet } from '@ijstech/eth-wallet';
+import ScomWalletModal from '@scom/scom-wallet-modal';
 
 const Theme = Styles.Theme.ThemeVars;
 
 interface ScomStakingFlowInitialSetupElement extends ControlElement {
-	data?: any;
+    data?: any;
 }
 
 declare global {
-	namespace JSX {
-		interface IntrinsicElements {
-			['i-scom-staking-flow-initial-setup']: ScomStakingFlowInitialSetupElement;
-		}
-	}
+    namespace JSX {
+        interface IntrinsicElements {
+            ['i-scom-staking-flow-initial-setup']: ScomStakingFlowInitialSetupElement;
+        }
+    }
 }
 
 @customModule
 @customElements('i-scom-staking-flow-initial-setup')
 export default class ScomStakingFlowInitialSetup extends Module {
-	private state: State;
-	private tokenRequirements: any;
+    private state: State;
+    private tokenRequirements: any;
     private executionProperties: any;
     private invokerId: string;
     private tokenInput: ScomTokenInput;
     private $eventBus: IEventBus;
+    private walletEvents: IEventBusRegistry[] = [];
+    private mdWallet: ScomWalletModal;
+    private lbConnectedStatus: Label;
+    private btnConnectWallet: Button;
 
     constructor(parent?: Container, options?: ControlElement) {
-		super(parent, options);
-		this.state = new State({});
+        super(parent, options);
+        this.state = new State({});
         this.$eventBus = application.EventBus;
-	}
+    }
     private get rpcWallet() {
-		return this.state.getRpcWallet();
-	}
+        return this.state.getRpcWallet();
+    }
     private async resetRpcWallet() {
-		const rpcWalletId = await this.state.initRpcWallet(this.executionProperties.chainId);
-		const rpcWallet = this.rpcWallet;
-	}
+        const rpcWalletId = await this.state.initRpcWallet(this.executionProperties.chainId);
+        const rpcWallet = this.rpcWallet;
+    }
     async setData(value: any) {
         this.executionProperties = value.executionProperties;
         this.tokenRequirements = value.tokenRequirements;
         this.invokerId = value.invokerId;
-		await this.resetRpcWallet();
-		await this.initializeWidgetConfig();
-	}
+        await this.resetRpcWallet();
+        await this.initializeWidgetConfig();
+    }
     private initWallet = async () => {
-		try {
-			const rpcWallet = this.rpcWallet;
-			await rpcWallet.init();
-		} catch (err) {
-			console.log(err);
-		}
-	}
+        try {
+            const rpcWallet = this.rpcWallet;
+            await rpcWallet.init();
+        } catch (err) {
+            console.log(err);
+        }
+    }
     private initializeWidgetConfig = async () => {
+        let connected = isClientWalletConnected();
+        this.displayWalletStatus(connected);
         await this.initWallet();
         tokenStore.updateTokenMapData(this.executionProperties.chainId);
         const rpcWallet = this.rpcWallet;
@@ -78,7 +87,7 @@ export default class ScomStakingFlowInitialSetup extends Module {
         this.tokenInput.tokenDataListProp = [token];
         this.tokenInput.token = token
         await tokenStore.updateTokenBalances(rpcWallet, [token]);
-	}
+    }
     private handleClickStart = async () => {
         this.tokenInput.readOnly = true;
         let eventName = `${this.invokerId}:nextStep`;
@@ -88,23 +97,70 @@ export default class ScomStakingFlowInitialSetup extends Module {
         this.executionProperties.stakeInputValue = this.tokenInput.value;
         const isBalanceSufficient = new BigNumber(balance).gte(this.tokenInput.value);
         this.$eventBus.dispatch(eventName, {
-            isInitialSetup: true, 
+            isInitialSetup: true,
             amount: this.tokenInput.value,
             tokenAcquisition: !isBalanceSufficient,
             tokenRequirements: this.tokenRequirements,
             executionProperties: this.executionProperties
         });
     }
+    async connectWallet() {
+        if (!isClientWalletConnected()) {
+            if (this.mdWallet) {
+                await application.loadPackage('@scom/scom-wallet-modal', '*');
+                this.mdWallet.networks = this.executionProperties.networks;
+                this.mdWallet.wallets = this.executionProperties.wallets;
+                this.mdWallet.showModal();
+            }
+        }
+    }
+    private displayWalletStatus(connected: boolean) {
+        if (connected) {
+            this.lbConnectedStatus.caption = 'Connected with ' + Wallet.getClientInstance().address;
+            this.btnConnectWallet.visible = false;
+        }
+        else {
+            this.lbConnectedStatus.caption = 'Please connect your wallet first';
+            this.btnConnectWallet.visible = true;
+        }
+    }
+    private registerEvents() {
+        let clientWallet = Wallet.getClientInstance();
+        this.walletEvents.push(clientWallet.registerWalletEvent(this, Constants.ClientWalletEvent.AccountsChanged, async (payload: Record<string, any>) => {
+            const { userTriggeredConnect, account } = payload;
+            let connected = !!account;
+            this.displayWalletStatus(connected);
+        }));
+    }
+    onHide() {
+        let clientWallet = Wallet.getClientInstance();
+        for (let event of this.walletEvents) {
+          clientWallet.unregisterWalletEvent(event);
+        }
+        this.walletEvents = [];
+    }    
     init() {
         super.init();
         this.tokenInput.style.setProperty('--input-background', '#232B5A');
         this.tokenInput.style.setProperty('--input-font_color', '#fff');
+        this.registerEvents();
     }
     render() {
         return (
             <i-vstack gap='1rem' padding={{ top: 10, bottom: 10, left: 20, right: 20 }}>
                 <i-label caption='Get Ready to Stake' font={{ size: '1.5rem' }}></i-label>
+
                 <i-vstack gap='1rem'>
+                    <i-label id="lbConnectedStatus"></i-label>
+                    <i-hstack>
+                        <i-button
+                            id="btnConnectWallet"
+                            caption='Connect Wallet'
+                            font={{ color: Theme.colors.primary.contrastText }}
+                            padding={{ top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }}
+                            onClick={this.connectWallet}
+                        ></i-button>
+                    </i-hstack>
                     <i-label caption='How many tokens are you planning to stake?'></i-label>
                     <i-hstack verticalAlignment='center' width='50%'>
                         <i-scom-token-input
@@ -124,11 +180,12 @@ export default class ScomStakingFlowInitialSetup extends Module {
                             id="btnStart"
                             caption="Start"
                             padding={{ top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }}
-                            font={{color: Theme.colors.primary.contrastText }}
+                            font={{ color: Theme.colors.primary.contrastText }}
                             onClick={this.handleClickStart}
                         ></i-button>
                     </i-hstack>
                 </i-vstack>
+                <i-scom-wallet-modal id="mdWallet" wallets={[]} />
             </i-vstack>
         )
     }
