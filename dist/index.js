@@ -78,7 +78,7 @@ define("@scom/scom-staking/global/utils/helper.ts", ["require", "exports", "@ijs
             return;
         }
         if (!new eth_wallet_1.BigNumber(amount).isNaN() && /\d+\.\d+/g.test(amount || '')) {
-            input.value = new eth_wallet_1.BigNumber(amount).dp(decimals || 18, 1).toFixed();
+            input.value = new eth_wallet_1.BigNumber(amount).dp(decimals || 18, 1).toString();
         }
     };
     exports.limitInputNumber = limitInputNumber;
