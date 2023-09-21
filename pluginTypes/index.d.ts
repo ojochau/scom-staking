@@ -13,13 +13,12 @@ declare module "@scom/scom-staking/assets.ts" {
 }
 /// <amd-module name="@scom/scom-staking/global/utils/helper.ts" />
 declare module "@scom/scom-staking/global/utils/helper.ts" {
+    import { BigNumber } from "@ijstech/eth-wallet";
     export const DefaultDateFormat = "DD/MM/YYYY";
     export const formatDate: (date: any, customType?: string, showTimezone?: boolean) => string;
-    export const formatNumber: (value: any, decimals?: number) => string;
-    export const formatNumberWithSeparators: (value: number, precision?: number) => string;
+    export const formatNumber: (value: number | string | BigNumber, decimalFigures?: number) => string;
     export const isInvalidInput: (val: any) => boolean;
     export const limitInputNumber: (input: any, decimals?: number) => void;
-    export const limitDecimals: (value: any, decimals: number) => any;
 }
 /// <amd-module name="@scom/scom-staking/global/utils/common.ts" />
 declare module "@scom/scom-staking/global/utils/common.ts" {
