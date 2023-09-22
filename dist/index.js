@@ -57,11 +57,9 @@ define("@scom/scom-staking/global/utils/helper.ts", ["require", "exports", "@ijs
     };
     exports.formatDate = formatDate;
     const formatNumber = (value, decimalFigures) => {
-        if (typeof value === 'object') {
-            value = value.toString();
-        }
+        const newValue = typeof value === 'object' ? value.toFixed() : value;
         const minValue = '0.0000001';
-        return components_2.FormatUtils.formatNumber(value, { decimalFigures: decimalFigures || 4, minValue });
+        return components_2.FormatUtils.formatNumber(newValue, { decimalFigures: decimalFigures || 4, minValue });
     };
     exports.formatNumber = formatNumber;
     const isInvalidInput = (val) => {
@@ -77,7 +75,8 @@ define("@scom/scom-staking/global/utils/helper.ts", ["require", "exports", "@ijs
             input.value = '0';
             return;
         }
-        if (!new eth_wallet_1.BigNumber(amount).isNaN() && /\d+\.\d+/g.test(amount || '')) {
+        const bigValue = new eth_wallet_1.BigNumber(amount);
+        if (!bigValue.isNaN() && !bigValue.isZero() && /\d+\.\d+/g.test(amount || '')) {
             input.value = new eth_wallet_1.BigNumber(amount).dp(decimals || 18, 1).toFixed();
         }
     };
