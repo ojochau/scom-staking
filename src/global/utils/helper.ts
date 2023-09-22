@@ -13,11 +13,9 @@ export const formatDate = (date: any, customType?: string, showTimezone?: boolea
 }
 
 export const formatNumber = (value: number | string | BigNumber, decimalFigures?: number) => {
-  if (typeof value === 'object') {
-    value = value.toString();
-  }
+  const newValue = typeof value === 'object' ? value.toFixed() : value;
   const minValue = '0.0000001';
-  return FormatUtils.formatNumber(value, {decimalFigures: decimalFigures || 4, minValue});
+  return FormatUtils.formatNumber(newValue, {decimalFigures: decimalFigures || 4, minValue});
 };
 
 export const isInvalidInput = (val: any) => {
@@ -32,8 +30,9 @@ export const limitInputNumber = (input: any, decimals?: number) => {
     input.value = '0';
     return;
   }
-  if (!new BigNumber(amount).isNaN() && /\d+\.\d+/g.test(amount || '')) {
-    input.value = new BigNumber(amount).dp(decimals || 18, 1).toString();
+  const bigValue = new BigNumber(amount);
+  if (!bigValue.isNaN() && !bigValue.isZero() && /\d+\.\d+/g.test(amount || '')) {
+    input.value = new BigNumber(amount).dp(decimals || 18, 1).toFixed();
   }
 }
 
