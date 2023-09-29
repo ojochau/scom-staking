@@ -1031,6 +1031,7 @@ export default class ScomStaking extends Module {
 			let properties = options.properties;
 			let tokenRequirements = options.tokenRequirements;
 			let invokerId = options.invokerId;
+			this.state.setFlowInvokerId(invokerId);
 			await widget.setData({ 
 				executionProperties: properties, 
 				tokenRequirements, 
@@ -1043,6 +1044,8 @@ export default class ScomStaking extends Module {
 			await this.ready();
 			let properties = options.properties;
 			let tag = options.tag;
+			let invokerId = options.invokerId;
+			this.state.setFlowInvokerId(invokerId);
 			await this.setData(properties);
 			if (tag) {
 				await this.setTag(tag);

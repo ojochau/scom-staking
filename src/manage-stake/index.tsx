@@ -1,5 +1,5 @@
-import { moment, Button, Input, Container, HStack, customElements, ControlElement, Module, Label, Styles } from '@ijstech/components';
-import { BigNumber, IERC20ApprovalAction } from '@ijstech/eth-wallet';
+import { moment, Button, Input, Container, HStack, customElements, ControlElement, Module, Label, Styles, application } from '@ijstech/components';
+import { BigNumber, IERC20ApprovalAction, TransactionReceipt } from '@ijstech/eth-wallet';
 import { CurrentMode, IExtendOptionInfo, LockTokenType, TokenMapType, limitInputNumber } from '../global/index';
 import { getLockedTokenObject, getLockedTokenSymbol, getChainNativeToken, isClientWalletConnected, State } from '../store/index';
 import { ITokenObject, tokenStore } from '@scom/scom-token-list';
@@ -12,6 +12,7 @@ import {
   getVaultObject,
   getVaultBalance,
   getStakingTotalLocked,
+  parseDepositEvent,
 } from '../staking-utils/index';
 import { stakingManageStakeStyle } from './index.css';
 
@@ -328,7 +329,7 @@ export default class ManageStake extends Module {
           }
         }
       },
-      onPaid: async () => {
+      onPaid: async (data?: any, receipt?: TransactionReceipt) => {
         if (this.onRefresh) {
           const rpcWallet = this.state.getRpcWallet();
           if (rpcWallet.address) {
@@ -340,6 +341,26 @@ export default class ManageStake extends Module {
         if (this.currentMode === CurrentMode.STAKE) {
           this.btnStake.caption = 'Stake';
           this.btnStake.rightIcon.visible = false;
+          if (this.state.flowInvokerId) {
+            let event = parseDepositEvent(this.state, receipt, this.address);
+            const timestamp = await this.state.getRpcWallet().getBlockTimestamp(receipt.blockNumber.toString());
+            const transactionsInfoArr = [
+              {
+                desc: `Stake ${this.lockedTokenObject.symbol}`,
+                fromToken: this.lockedTokenObject,
+                toToken: null,
+                fromTokenAmount: this.inputAmount.value,
+                toTokenAmount: '-',
+                hash: receipt.transactionHash,
+                timestamp
+              }
+            ];
+            console.log('transactionsInfoArr', transactionsInfoArr);
+            const eventName = `${this.state.flowInvokerId}:addTransactions`;
+            application.EventBus.dispatch(eventName, {
+              list: transactionsInfoArr
+            });
+          }
         } else {
           this.btnUnstake.caption = 'Unstake';
           this.btnUnstake.rightIcon.visible = false;

@@ -81,7 +81,7 @@ export default class ScomStakingFlowInitialSetup extends Module {
         // let campaignInfo = campaigns[0];
         // let tokenAddress = campaignInfo.tokenAddress?.toLowerCase()
         let tokenAddress = this.tokenRequirements[0].tokenOut.address?.toLowerCase();
-        this.tokenInput.rpcWalletId = rpcWallet.instanceId;
+        this.tokenInput.chainId = this.executionProperties.chainId;
         const tokenMap = tokenStore.getTokenMapByChainId(this.executionProperties.chainId);
         const token = tokenMap[tokenAddress];
         this.tokenInput.tokenDataListProp = [token];
@@ -175,12 +175,12 @@ export default class ScomStakingFlowInitialSetup extends Module {
                             background={{ color: Theme.input.background }}
                         ></i-scom-token-input>
                     </i-hstack>
-                    <i-hstack horizontalAlignment='end'>
+                    <i-hstack horizontalAlignment='center'>
                         <i-button
                             id="btnStart"
                             caption="Start"
                             padding={{ top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }}
-                            font={{ color: Theme.colors.primary.contrastText }}
+                            font={{ color: Theme.colors.primary.contrastText, size: '1.5rem' }}
                             onClick={this.handleClickStart}
                         ></i-button>
                     </i-hstack>

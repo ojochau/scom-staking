@@ -163,6 +163,23 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
             this.networkMap = (0, scom_network_list_1.default)();
             this.initData(options);
         }
+        initData(options) {
+            if (options.infuraId) {
+                this.infuraId = options.infuraId;
+            }
+            if (options.networks) {
+                this.setNetworkList(options.networks, options.infuraId);
+            }
+            if (options.proxyAddresses) {
+                this.proxyAddresses = options.proxyAddresses;
+            }
+            if (options.embedderCommissionFee) {
+                this.embedderCommissionFee = options.embedderCommissionFee;
+            }
+        }
+        setFlowInvokerId(id) {
+            this.flowInvokerId = id;
+        }
         initRpcWallet(chainId) {
             var _a, _b, _c;
             if (this.rpcWalletId) {
@@ -182,20 +199,6 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
                 rpcWallet.address = clientWallet.address;
             }
             return instanceId;
-        }
-        initData(options) {
-            if (options.infuraId) {
-                this.infuraId = options.infuraId;
-            }
-            if (options.networks) {
-                this.setNetworkList(options.networks, options.infuraId);
-            }
-            if (options.proxyAddresses) {
-                this.proxyAddresses = options.proxyAddresses;
-            }
-            if (options.embedderCommissionFee) {
-                this.embedderCommissionFee = options.embedderCommissionFee;
-            }
         }
         setNetworkList(networkList, infuraId) {
             const wallet = eth_wallet_3.Wallet.getClientInstance();
@@ -391,7 +394,7 @@ define("@scom/scom-staking/data.json.ts", ["require", "exports"], function (requ
 define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/oswap-time-is-money-contract", "@scom/oswap-openswap-contract", "@scom/oswap-chainlink-contract", "@scom/oswap-cross-chain-bridge-contract", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list"], function (require, exports, eth_wallet_4, oswap_time_is_money_contract_1, oswap_openswap_contract_1, oswap_chainlink_contract_1, oswap_cross_chain_bridge_contract_1, index_4, scom_token_list_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getProxySelectors = exports.lockToken = exports.claimToken = exports.withdrawToken = exports.getVaultRewardCurrentAPR = exports.getLPRewardCurrentAPR = exports.getERC20RewardCurrentAPR = exports.getVaultBalance = exports.getVaultObject = exports.getLPBalance = exports.getLPObject = exports.getStakingTotalLocked = exports.getCampaignInfo = exports.getTokenPrice = void 0;
+    exports.parseDepositEvent = exports.getProxySelectors = exports.lockToken = exports.claimToken = exports.withdrawToken = exports.getVaultRewardCurrentAPR = exports.getLPRewardCurrentAPR = exports.getERC20RewardCurrentAPR = exports.getVaultBalance = exports.getVaultObject = exports.getLPBalance = exports.getLPObject = exports.getStakingTotalLocked = exports.getCampaignInfo = exports.getTokenPrice = void 0;
     const getTokenPrice = async (wallet, token) => {
         let chainId = wallet.chainId;
         let tokenPrice;
@@ -902,6 +905,13 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
         return selectors;
     };
     exports.getProxySelectors = getProxySelectors;
+    const parseDepositEvent = (state, receipt, contractAddress) => {
+        const wallet = state.getRpcWallet();
+        let timeIsMoney = new oswap_time_is_money_contract_1.Contracts.TimeIsMoney(wallet, contractAddress);
+        let event = timeIsMoney.parseDepositEvent(receipt)[0];
+        return event;
+    };
+    exports.parseDepositEvent = parseDepositEvent;
 });
 define("@scom/scom-staking/manage-stake/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_5) {
     "use strict";
@@ -1231,7 +1241,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                         }
                     }
                 },
-                onPaid: async () => {
+                onPaid: async (data, receipt) => {
                     if (this.onRefresh) {
                         const rpcWallet = this.state.getRpcWallet();
                         if (rpcWallet.address) {
@@ -1243,6 +1253,26 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                     if (this.currentMode === index_5.CurrentMode.STAKE) {
                         this.btnStake.caption = 'Stake';
                         this.btnStake.rightIcon.visible = false;
+                        if (this.state.flowInvokerId) {
+                            let event = (0, index_7.parseDepositEvent)(this.state, receipt, this.address);
+                            const timestamp = await this.state.getRpcWallet().getBlockTimestamp(receipt.blockNumber.toString());
+                            const transactionsInfoArr = [
+                                {
+                                    desc: `Stake ${this.lockedTokenObject.symbol}`,
+                                    fromToken: this.lockedTokenObject,
+                                    toToken: null,
+                                    fromTokenAmount: this.inputAmount.value,
+                                    toTokenAmount: '-',
+                                    hash: receipt.transactionHash,
+                                    timestamp
+                                }
+                            ];
+                            console.log('transactionsInfoArr', transactionsInfoArr);
+                            const eventName = `${this.state.flowInvokerId}:addTransactions`;
+                            components_6.application.EventBus.dispatch(eventName, {
+                                list: transactionsInfoArr
+                            });
+                        }
                     }
                     else {
                         this.btnUnstake.caption = 'Unstake';
@@ -1842,7 +1872,7 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
                 // let campaignInfo = campaigns[0];
                 // let tokenAddress = campaignInfo.tokenAddress?.toLowerCase()
                 let tokenAddress = (_a = this.tokenRequirements[0].tokenOut.address) === null || _a === void 0 ? void 0 : _a.toLowerCase();
-                this.tokenInput.rpcWalletId = rpcWallet.instanceId;
+                this.tokenInput.chainId = this.executionProperties.chainId;
                 const tokenMap = scom_token_list_4.tokenStore.getTokenMapByChainId(this.executionProperties.chainId);
                 const token = tokenMap[tokenAddress];
                 this.tokenInput.tokenDataListProp = [token];
@@ -1933,8 +1963,8 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
                     this.$render("i-label", { caption: 'How many tokens are you planning to stake?' }),
                     this.$render("i-hstack", { verticalAlignment: 'center', width: '50%' },
                         this.$render("i-scom-token-input", { id: "tokenInput", placeholder: '0.0', value: '-', tokenReadOnly: true, isBalanceShown: false, isBtnMaxShown: false, border: { radius: '1rem' }, font: { size: '1.25rem' }, background: { color: Theme.input.background } })),
-                    this.$render("i-hstack", { horizontalAlignment: 'end' },
-                        this.$render("i-button", { id: "btnStart", caption: "Start", padding: { top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }, font: { color: Theme.colors.primary.contrastText }, onClick: this.handleClickStart }))),
+                    this.$render("i-hstack", { horizontalAlignment: 'center' },
+                        this.$render("i-button", { id: "btnStart", caption: "Start", padding: { top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }, font: { color: Theme.colors.primary.contrastText, size: '1.5rem' }, onClick: this.handleClickStart }))),
                 this.$render("i-scom-wallet-modal", { id: "mdWallet", wallets: [] })));
         }
     };
@@ -2761,6 +2791,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 let properties = options.properties;
                 let tokenRequirements = options.tokenRequirements;
                 let invokerId = options.invokerId;
+                this.state.setFlowInvokerId(invokerId);
                 await widget.setData({
                     executionProperties: properties,
                     tokenRequirements,
@@ -2773,6 +2804,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 await this.ready();
                 let properties = options.properties;
                 let tag = options.tag;
+                let invokerId = options.invokerId;
+                this.state.setFlowInvokerId(invokerId);
                 await this.setData(properties);
                 if (tag) {
                     await this.setTag(tag);

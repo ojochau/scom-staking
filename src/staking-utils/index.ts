@@ -1,4 +1,4 @@
-import { Wallet, BigNumber, Utils, Erc20, IWallet } from "@ijstech/eth-wallet";
+import { Wallet, BigNumber, Utils, Erc20, IWallet, TransactionReceipt } from "@ijstech/eth-wallet";
 import { Contracts as TimeIsMoneyContracts } from "@scom/oswap-time-is-money-contract";
 import { Contracts } from "@scom/oswap-openswap-contract";
 import { Contracts as UtilsContracts } from "@scom/oswap-chainlink-contract";
@@ -536,6 +536,13 @@ const getProxySelectors = async (state: State, chainId: number, contractAddress:
   return selectors;
 }
 
+const parseDepositEvent = (state: State, receipt: TransactionReceipt, contractAddress: string) => {
+  const wallet = state.getRpcWallet();
+  let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet, contractAddress);
+  let event = timeIsMoney.parseDepositEvent(receipt)[0];
+  return event;
+}
+
 export {
   getCampaignInfo,
   getStakingTotalLocked,
@@ -549,5 +556,6 @@ export {
   withdrawToken,
   claimToken,
   lockToken,
-  getProxySelectors
+  getProxySelectors,
+  parseDepositEvent
 }

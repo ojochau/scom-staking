@@ -1,7 +1,5 @@
 /// <reference path="@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dapp-container/@ijstech/eth-wallet/index.d.ts" />
-/// <reference path="@scom/scom-token-input/@ijstech/eth-wallet/index.d.ts" />
-/// <reference path="@scom/scom-token-input/@scom/scom-token-modal/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@ijstech/eth-contract/index.d.ts" />
 /// <amd-module name="@scom/scom-staking/assets.ts" />
 declare module "@scom/scom-staking/assets.ts" {
@@ -211,9 +209,11 @@ declare module "@scom/scom-staking/store/utils.ts" {
         embedderCommissionFee: string;
         rpcWalletId: string;
         approvalModel: ERC20ApprovalModel;
+        flowInvokerId: string;
         constructor(options: any);
-        initRpcWallet(chainId: number): string;
         private initData;
+        setFlowInvokerId(id: string): void;
+        initRpcWallet(chainId: number): string;
         private setNetworkList;
         getProxyAddress(chainId?: number): string;
         setStakingStatus(key: CurrentMode, value: boolean): void;
@@ -271,7 +271,8 @@ declare module "@scom/scom-staking/data.json.ts" {
 }
 /// <amd-module name="@scom/scom-staking/staking-utils/index.ts" />
 declare module "@scom/scom-staking/staking-utils/index.ts" {
-    import { BigNumber, IWallet } from "@ijstech/eth-wallet";
+    import { BigNumber, IWallet, TransactionReceipt } from "@ijstech/eth-wallet";
+    import { Contracts as TimeIsMoneyContracts } from "@scom/oswap-time-is-money-contract";
     import { ISingleStakingCampaign, ISingleStaking, IExtendOptionInfo } from "@scom/scom-staking/global/index.ts";
     import { State } from "@scom/scom-staking/store/index.ts";
     import { ITokenObject } from '@scom/scom-token-list';
@@ -327,7 +328,8 @@ declare module "@scom/scom-staking/staking-utils/index.ts" {
     const claimToken: (contractAddress: string, callback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     const lockToken: (token: ITokenObject, amount: string, contractAddress: string, callback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     const getProxySelectors: (state: State, chainId: number, contractAddress: string) => Promise<string[]>;
-    export { getCampaignInfo, getStakingTotalLocked, getLPObject, getLPBalance, getVaultObject, getVaultBalance, getERC20RewardCurrentAPR, getLPRewardCurrentAPR, getVaultRewardCurrentAPR, withdrawToken, claimToken, lockToken, getProxySelectors };
+    const parseDepositEvent: (state: State, receipt: TransactionReceipt, contractAddress: string) => TimeIsMoneyContracts.TimeIsMoney.DepositEvent;
+    export { getCampaignInfo, getStakingTotalLocked, getLPObject, getLPBalance, getVaultObject, getVaultBalance, getERC20RewardCurrentAPR, getLPRewardCurrentAPR, getVaultRewardCurrentAPR, withdrawToken, claimToken, lockToken, getProxySelectors, parseDepositEvent };
 }
 /// <amd-module name="@scom/scom-staking/manage-stake/index.css.ts" />
 declare module "@scom/scom-staking/manage-stake/index.css.ts" {
