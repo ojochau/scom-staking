@@ -216,6 +216,7 @@ export default class ManageStake extends Module {
       this.renderStakingInfo(null);
       return;
     }
+    this.btnUnstake.enabled = true;
     this.tokenMap = tokenStore.getTokenMapByChainId(this.state.getChainId());
     if (this.state.isRpcWalletConnected()) {
       await this.initApprovalModelAction();
@@ -349,7 +350,7 @@ export default class ManageStake extends Module {
                 desc: `Stake ${this.lockedTokenObject.symbol}`,
                 fromToken: this.lockedTokenObject,
                 toToken: null,
-                fromTokenAmount: this.inputAmount.value,
+                fromTokenAmount: event.amount.toFixed(),
                 toTokenAmount: '-',
                 hash: receipt.transactionHash,
                 timestamp

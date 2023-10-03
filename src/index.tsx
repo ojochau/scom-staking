@@ -760,10 +760,6 @@ export default class ScomStaking extends Module {
 		});
 		this.manageStake.state = this.state;
 		this.manageStake.onRefresh = () => this.initializeWidgetConfig(true);
-		await this.manageStake.setData({
-			...campaign,
-			...option
-		});
 
 		const isClaim = option.mode === 'Claim';
 
@@ -983,6 +979,11 @@ export default class ScomStaking extends Module {
 				</i-vstack>
 			</i-vstack>
 		);
+
+		await this.manageStake.setData({
+			...campaign,
+			...option
+		});
 
 		if (this._data.stakeInputValue) {
 			this.manageStake.setInputValue(this._data.stakeInputValue);

@@ -1116,6 +1116,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                     this.renderStakingInfo(null);
                     return;
                 }
+                this.btnUnstake.enabled = true;
                 this.tokenMap = scom_token_list_3.tokenStore.getTokenMapByChainId(this.state.getChainId());
                 if (this.state.isRpcWalletConnected()) {
                     await this.initApprovalModelAction();
@@ -1261,7 +1262,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                                     desc: `Stake ${this.lockedTokenObject.symbol}`,
                                     fromToken: this.lockedTokenObject,
                                     toToken: null,
-                                    fromTokenAmount: this.inputAmount.value,
+                                    fromTokenAmount: event.amount.toFixed(),
                                     toTokenAmount: '-',
                                     hash: receipt.transactionHash,
                                     timestamp
@@ -2581,7 +2582,6 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 });
                 this.manageStake.state = this.state;
                 this.manageStake.onRefresh = () => this.initializeWidgetConfig(true);
-                await this.manageStake.setData(Object.assign(Object.assign({}, campaign), option));
                 const isClaim = option.mode === 'Claim';
                 const rewardsData = option.rewardsData[0] ? [option.rewardsData[0]] : [];
                 const rewardOptions = !isClaim ? rewardsData : [];
@@ -2734,6 +2734,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         claimStakedRow,
                         this.$render("i-vstack", { verticalAlignment: "center", horizontalAlignment: "center" }, this.manageStake),
                         rowRewards)));
+                await this.manageStake.setData(Object.assign(Object.assign({}, campaign), option));
                 if (this._data.stakeInputValue) {
                     this.manageStake.setInputValue(this._data.stakeInputValue);
                 }
