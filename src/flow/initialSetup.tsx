@@ -33,22 +33,23 @@ declare global {
 @customModule
 @customElements('i-scom-staking-flow-initial-setup')
 export default class ScomStakingFlowInitialSetup extends Module {
-    private state: State;
+    private _state: State;
     private tokenRequirements: any;
     private executionProperties: any;
-    private invokerId: string;
     private tokenInput: ScomTokenInput;
-    private $eventBus: IEventBus;
     private walletEvents: IEventBusRegistry[] = [];
     private mdWallet: ScomWalletModal;
     private lbConnectedStatus: Label;
     private btnConnectWallet: Button;
 
-    constructor(parent?: Container, options?: ControlElement) {
-        super(parent, options);
-        this.state = new State({});
-        this.$eventBus = application.EventBus;
+    set state(value: State) {
+        this._state = value;
     }
+    
+    get state() {
+        return this._state;
+    }
+
     private get rpcWallet() {
         return this.state.getRpcWallet();
     }
@@ -59,7 +60,6 @@ export default class ScomStakingFlowInitialSetup extends Module {
     async setData(value: any) {
         this.executionProperties = value.executionProperties;
         this.tokenRequirements = value.tokenRequirements;
-        this.invokerId = value.invokerId;
         await this.resetRpcWallet();
         await this.initializeWidgetConfig();
     }
@@ -90,19 +90,20 @@ export default class ScomStakingFlowInitialSetup extends Module {
     }
     private handleClickStart = async () => {
         this.tokenInput.readOnly = true;
-        let eventName = `${this.invokerId}:nextStep`;
         const tokenBalances = await tokenStore.getTokenBalancesByChainId(this.executionProperties.chainId);
         const balance = tokenBalances[this.tokenInput.token.address.toLowerCase()];
         this.tokenRequirements[0].tokenOut.amount = this.tokenInput.value;
         this.executionProperties.stakeInputValue = this.tokenInput.value;
         const isBalanceSufficient = new BigNumber(balance).gte(this.tokenInput.value);
-        this.$eventBus.dispatch(eventName, {
-            isInitialSetup: true,
-            amount: this.tokenInput.value,
-            tokenAcquisition: !isBalanceSufficient,
-            tokenRequirements: this.tokenRequirements,
-            executionProperties: this.executionProperties
-        });
+        if (this.state.handleNextFlowStep) {
+            this.state.handleNextFlowStep({
+                isInitialSetup: true,
+                amount: this.tokenInput.value,
+                tokenAcquisition: !isBalanceSufficient,
+                tokenRequirements: this.tokenRequirements,
+                executionProperties: this.executionProperties
+            });
+        }
     }
     async connectWallet() {
         if (!isClientWalletConnected()) {

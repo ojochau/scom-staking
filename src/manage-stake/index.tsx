@@ -342,7 +342,7 @@ export default class ManageStake extends Module {
         if (this.currentMode === CurrentMode.STAKE) {
           this.btnStake.caption = 'Stake';
           this.btnStake.rightIcon.visible = false;
-          if (this.state.flowInvokerId) {
+          if (this.state.handleAddTransactions) {
             let event = parseDepositEvent(this.state, receipt, this.address);
             const timestamp = await this.state.getRpcWallet().getBlockTimestamp(receipt.blockNumber.toString());
             const transactionsInfoArr = [
@@ -356,9 +356,7 @@ export default class ManageStake extends Module {
                 timestamp
               }
             ];
-            console.log('transactionsInfoArr', transactionsInfoArr);
-            const eventName = `${this.state.flowInvokerId}:addTransactions`;
-            application.EventBus.dispatch(eventName, {
+            this.state.handleAddTransactions({
               list: transactionsInfoArr
             });
           }

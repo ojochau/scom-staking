@@ -209,10 +209,10 @@ declare module "@scom/scom-staking/store/utils.ts" {
         embedderCommissionFee: string;
         rpcWalletId: string;
         approvalModel: ERC20ApprovalModel;
-        flowInvokerId: string;
+        handleNextFlowStep: (data: any) => Promise<void>;
+        handleAddTransactions: (data: any) => Promise<void>;
         constructor(options: any);
         private initData;
-        setFlowInvokerId(id: string): void;
         initRpcWallet(chainId: number): string;
         private setNetworkList;
         getProxyAddress(chainId?: number): string;
@@ -637,7 +637,8 @@ declare module "@scom/scom-staking/formSchema.ts" {
 }
 /// <amd-module name="@scom/scom-staking/flow/initialSetup.tsx" />
 declare module "@scom/scom-staking/flow/initialSetup.tsx" {
-    import { Module, ControlElement, Container } from '@ijstech/components';
+    import { Module, ControlElement } from '@ijstech/components';
+    import { State } from "@scom/scom-staking/store/index.ts";
     interface ScomStakingFlowInitialSetupElement extends ControlElement {
         data?: any;
     }
@@ -649,17 +650,16 @@ declare module "@scom/scom-staking/flow/initialSetup.tsx" {
         }
     }
     export default class ScomStakingFlowInitialSetup extends Module {
-        private state;
+        private _state;
         private tokenRequirements;
         private executionProperties;
-        private invokerId;
         private tokenInput;
-        private $eventBus;
         private walletEvents;
         private mdWallet;
         private lbConnectedStatus;
         private btnConnectWallet;
-        constructor(parent?: Container, options?: ControlElement);
+        set state(value: State);
+        get state(): State;
         private get rpcWallet();
         private resetRpcWallet;
         setData(value: any): Promise<void>;

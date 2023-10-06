@@ -13,7 +13,8 @@ export class State {
   embedderCommissionFee: string = '0';
   rpcWalletId: string = '';
   approvalModel: ERC20ApprovalModel;
-  flowInvokerId: string;
+  handleNextFlowStep: (data: any) => Promise<void>;
+  handleAddTransactions: (data: any) => Promise<void>;
 
   constructor(options: any) {
     this.networkMap = getNetworkList();
@@ -35,10 +36,6 @@ export class State {
     }
   }
 
-  setFlowInvokerId(id: string) {
-    this.flowInvokerId = id;
-  }
-
   initRpcWallet(chainId: number) {
     if (this.rpcWalletId) {
       return this.rpcWalletId;
@@ -58,7 +55,6 @@ export class State {
     }
     return instanceId;
   }
-
 
   private setNetworkList(networkList: INetwork[], infuraId?: string) {
     const wallet = Wallet.getClientInstance();

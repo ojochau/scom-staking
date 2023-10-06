@@ -177,9 +177,6 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
                 this.embedderCommissionFee = options.embedderCommissionFee;
             }
         }
-        setFlowInvokerId(id) {
-            this.flowInvokerId = id;
-        }
         initRpcWallet(chainId) {
             var _a, _b, _c;
             if (this.rpcWalletId) {
@@ -1254,7 +1251,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                     if (this.currentMode === index_5.CurrentMode.STAKE) {
                         this.btnStake.caption = 'Stake';
                         this.btnStake.rightIcon.visible = false;
-                        if (this.state.flowInvokerId) {
+                        if (this.state.handleAddTransactions) {
                             let event = (0, index_7.parseDepositEvent)(this.state, receipt, this.address);
                             const timestamp = await this.state.getRpcWallet().getBlockTimestamp(receipt.blockNumber.toString());
                             const transactionsInfoArr = [
@@ -1268,9 +1265,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                                     timestamp
                                 }
                             ];
-                            console.log('transactionsInfoArr', transactionsInfoArr);
-                            const eventName = `${this.state.flowInvokerId}:addTransactions`;
-                            components_6.application.EventBus.dispatch(eventName, {
+                            this.state.handleAddTransactions({
                                 list: transactionsInfoArr
                             });
                         }
@@ -1850,8 +1845,8 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_8.Styles.Theme.ThemeVars;
     let ScomStakingFlowInitialSetup = class ScomStakingFlowInitialSetup extends components_8.Module {
-        constructor(parent, options) {
-            super(parent, options);
+        constructor() {
+            super(...arguments);
             this.walletEvents = [];
             this.initWallet = async () => {
                 try {
@@ -1882,22 +1877,27 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
             };
             this.handleClickStart = async () => {
                 this.tokenInput.readOnly = true;
-                let eventName = `${this.invokerId}:nextStep`;
                 const tokenBalances = await scom_token_list_4.tokenStore.getTokenBalancesByChainId(this.executionProperties.chainId);
                 const balance = tokenBalances[this.tokenInput.token.address.toLowerCase()];
                 this.tokenRequirements[0].tokenOut.amount = this.tokenInput.value;
                 this.executionProperties.stakeInputValue = this.tokenInput.value;
                 const isBalanceSufficient = new eth_wallet_6.BigNumber(balance).gte(this.tokenInput.value);
-                this.$eventBus.dispatch(eventName, {
-                    isInitialSetup: true,
-                    amount: this.tokenInput.value,
-                    tokenAcquisition: !isBalanceSufficient,
-                    tokenRequirements: this.tokenRequirements,
-                    executionProperties: this.executionProperties
-                });
+                if (this.state.handleNextFlowStep) {
+                    this.state.handleNextFlowStep({
+                        isInitialSetup: true,
+                        amount: this.tokenInput.value,
+                        tokenAcquisition: !isBalanceSufficient,
+                        tokenRequirements: this.tokenRequirements,
+                        executionProperties: this.executionProperties
+                    });
+                }
             };
-            this.state = new index_10.State({});
-            this.$eventBus = components_8.application.EventBus;
+        }
+        set state(value) {
+            this._state = value;
+        }
+        get state() {
+            return this._state;
         }
         get rpcWallet() {
             return this.state.getRpcWallet();
@@ -1909,7 +1909,6 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
         async setData(value) {
             this.executionProperties = value.executionProperties;
             this.tokenRequirements = value.tokenRequirements;
-            this.invokerId = value.invokerId;
             await this.resetRpcWallet();
             await this.initializeWidgetConfig();
         }
@@ -2789,14 +2788,14 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 widget = new initialSetup_1.default();
                 target.appendChild(widget);
                 await widget.ready();
+                widget.state = this.state;
                 let properties = options.properties;
                 let tokenRequirements = options.tokenRequirements;
-                let invokerId = options.invokerId;
-                this.state.setFlowInvokerId(invokerId);
+                this.state.handleNextFlowStep = options.onNextStep;
+                this.state.handleAddTransactions = options.onAddTransactions;
                 await widget.setData({
                     executionProperties: properties,
-                    tokenRequirements,
-                    invokerId
+                    tokenRequirements
                 });
             }
             else {
@@ -2805,8 +2804,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 await this.ready();
                 let properties = options.properties;
                 let tag = options.tag;
-                let invokerId = options.invokerId;
-                this.state.setFlowInvokerId(invokerId);
+                this.state.handleNextFlowStep = options.onNextStep;
+                this.state.handleAddTransactions = options.onAddTransactions;
                 await this.setData(properties);
                 if (tag) {
                     await this.setTag(tag);
