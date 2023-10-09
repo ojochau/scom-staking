@@ -15,7 +15,8 @@
     "@scom/scom-network-picker": "*",
     "@scom/scom-dapp-container": "*",
     "@scom/scom-wallet-modal": "*",
-    "@scom/scom-token-list": "*"
+    "@scom/scom-token-list": "*",
+    "@scom/oswap-time-is-money-contract": "*"
   },
   "packages": [
     "@scom/oswap-openswap-contract",

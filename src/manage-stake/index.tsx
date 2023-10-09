@@ -398,9 +398,11 @@ export default class ManageStake extends Module {
               id="inputAmount"
               inputType="number"
               placeholder="0.0"
-              class="staking-token-input"
               width="100%"
               height="100%"
+              border={{style: 'none'}}
+              padding={{left: 8, right: 8}}
+              font={{size: '1rem'}}
               onChanged={() => this.onInputAmount()}
             />
             <i-hstack gap={4} verticalAlignment="center">
@@ -410,6 +412,7 @@ export default class ManageStake extends Module {
                 enabled={false}
                 // background={{ color: `${Theme.colors.primary.main} !important` }}
                 // font={{ color: Theme.colors.primary.contrastText }}
+                font={{ size: '1rem', color: '#fff', weight: 700 }}
                 class="btn-os"
                 width={45}
                 minHeight={25}
@@ -431,6 +434,7 @@ export default class ManageStake extends Module {
               // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
               // background={{ color: `${Theme.colors.primary.main} !important` }}
               // font={{ color: Theme.colors.primary.contrastText }}
+              font={{ size: '1rem', color: '#fff', weight: 700 }}
               class="btn-os"
               onClick={() => this.onApproveToken()}
             />
@@ -445,6 +449,7 @@ export default class ManageStake extends Module {
               // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
               // background={{ color: `${Theme.colors.primary.main} !important` }}
               // font={{ color: Theme.colors.primary.contrastText }}
+              font={{ size: '1rem', color: '#fff', weight: 700 }}
               class="btn-os"
               onClick={() => this.onStake()}
             />
@@ -458,7 +463,7 @@ export default class ManageStake extends Module {
               rightIcon={{ spin: true, visible: false, fill: '#fff' }}
               // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
               // background={{ color: `${Theme.colors.primary.main} !important` }}
-              // font={{ color: Theme.colors.primary.contrastText }}
+              font={{ size: '1rem', color: '#fff', weight: 700 }}
               class="btn-os"
               onClick={() => this.onUnstake()}
             />
