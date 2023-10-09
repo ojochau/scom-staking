@@ -1863,30 +1863,21 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
                 this.displayWalletStatus(connected);
                 await this.initWallet();
                 scom_token_list_4.tokenStore.updateTokenMapData(this.executionProperties.chainId);
-                const rpcWallet = this.rpcWallet;
-                // let campaigns = await getAllCampaignsInfo(rpcWallet, { [this._data.chainId]: this._data });
-                // let campaignInfo = campaigns[0];
-                // let tokenAddress = campaignInfo.tokenAddress?.toLowerCase()
                 let tokenAddress = (_a = this.tokenRequirements[0].tokenOut.address) === null || _a === void 0 ? void 0 : _a.toLowerCase();
                 this.tokenInput.chainId = this.executionProperties.chainId;
                 const tokenMap = scom_token_list_4.tokenStore.getTokenMapByChainId(this.executionProperties.chainId);
                 const token = tokenMap[tokenAddress];
                 this.tokenInput.tokenDataListProp = [token];
                 this.tokenInput.token = token;
-                await scom_token_list_4.tokenStore.updateTokenBalances(rpcWallet, [token]);
             };
             this.handleClickStart = async () => {
                 this.tokenInput.readOnly = true;
-                const tokenBalances = await scom_token_list_4.tokenStore.getTokenBalancesByChainId(this.executionProperties.chainId);
-                const balance = tokenBalances[this.tokenInput.token.address.toLowerCase()];
                 this.tokenRequirements[0].tokenOut.amount = this.tokenInput.value;
                 this.executionProperties.stakeInputValue = this.tokenInput.value;
-                const isBalanceSufficient = new eth_wallet_6.BigNumber(balance).gte(this.tokenInput.value);
                 if (this.state.handleNextFlowStep) {
                     this.state.handleNextFlowStep({
                         isInitialSetup: true,
                         amount: this.tokenInput.value,
-                        tokenAcquisition: !isBalanceSufficient,
                         tokenRequirements: this.tokenRequirements,
                         executionProperties: this.executionProperties
                     });
@@ -1966,6 +1957,22 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
                     this.$render("i-hstack", { horizontalAlignment: 'center' },
                         this.$render("i-button", { id: "btnStart", caption: "Start", padding: { top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }, font: { color: Theme.colors.primary.contrastText, size: '1.5rem' }, onClick: this.handleClickStart }))),
                 this.$render("i-scom-wallet-modal", { id: "mdWallet", wallets: [] })));
+        }
+        async handleFlowStage(target, stage, options) {
+            let self = this;
+            if (!options.isWidgetConnected) {
+                let properties = options.properties;
+                let tokenRequirements = options.tokenRequirements;
+                this.state.handleNextFlowStep = options.onNextStep;
+                this.state.handleAddTransactions = options.onAddTransactions;
+                await this.setData({
+                    executionProperties: properties,
+                    tokenRequirements
+                });
+            }
+            return {
+                widget: self
+            };
         }
     };
     ScomStakingFlowInitialSetup = __decorate([
@@ -2789,19 +2796,14 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 target.appendChild(widget);
                 await widget.ready();
                 widget.state = this.state;
-                let properties = options.properties;
-                let tokenRequirements = options.tokenRequirements;
-                this.state.handleNextFlowStep = options.onNextStep;
-                this.state.handleAddTransactions = options.onAddTransactions;
-                await widget.setData({
-                    executionProperties: properties,
-                    tokenRequirements
-                });
+                await widget.handleFlowStage(target, stage, options);
             }
             else {
                 widget = this;
-                target.appendChild(widget);
-                await this.ready();
+                if (!options.isWidgetConnected) {
+                    target.appendChild(widget);
+                    await this.ready();
+                }
                 let properties = options.properties;
                 let tag = options.tag;
                 this.state.handleNextFlowStep = options.onNextStep;

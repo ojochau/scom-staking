@@ -8,7 +8,8 @@ import {
     IEventBus,
     application,
     Label,
-    Button
+    Button,
+    Control
 } from '@ijstech/components';
 import { tokenStore } from '@scom/scom-token-list';
 import { isClientWalletConnected, State } from '../store/index';
@@ -76,30 +77,21 @@ export default class ScomStakingFlowInitialSetup extends Module {
         this.displayWalletStatus(connected);
         await this.initWallet();
         tokenStore.updateTokenMapData(this.executionProperties.chainId);
-        const rpcWallet = this.rpcWallet;
-        // let campaigns = await getAllCampaignsInfo(rpcWallet, { [this._data.chainId]: this._data });
-        // let campaignInfo = campaigns[0];
-        // let tokenAddress = campaignInfo.tokenAddress?.toLowerCase()
         let tokenAddress = this.tokenRequirements[0].tokenOut.address?.toLowerCase();
         this.tokenInput.chainId = this.executionProperties.chainId;
         const tokenMap = tokenStore.getTokenMapByChainId(this.executionProperties.chainId);
         const token = tokenMap[tokenAddress];
         this.tokenInput.tokenDataListProp = [token];
         this.tokenInput.token = token
-        await tokenStore.updateTokenBalances(rpcWallet, [token]);
     }
     private handleClickStart = async () => {
         this.tokenInput.readOnly = true;
-        const tokenBalances = await tokenStore.getTokenBalancesByChainId(this.executionProperties.chainId);
-        const balance = tokenBalances[this.tokenInput.token.address.toLowerCase()];
         this.tokenRequirements[0].tokenOut.amount = this.tokenInput.value;
         this.executionProperties.stakeInputValue = this.tokenInput.value;
-        const isBalanceSufficient = new BigNumber(balance).gte(this.tokenInput.value);
         if (this.state.handleNextFlowStep) {
             this.state.handleNextFlowStep({
                 isInitialSetup: true,
                 amount: this.tokenInput.value,
-                tokenAcquisition: !isBalanceSufficient,
                 tokenRequirements: this.tokenRequirements,
                 executionProperties: this.executionProperties
             });
@@ -189,5 +181,21 @@ export default class ScomStakingFlowInitialSetup extends Module {
                 <i-scom-wallet-modal id="mdWallet" wallets={[]} />
             </i-vstack>
         )
+    }
+    async handleFlowStage(target: Control, stage: string, options: any) {
+        let self: ScomStakingFlowInitialSetup = this;
+        if (!options.isWidgetConnected) {
+            let properties = options.properties;
+            let tokenRequirements = options.tokenRequirements;
+            this.state.handleNextFlowStep = options.onNextStep;
+            this.state.handleAddTransactions = options.onAddTransactions;
+            await this.setData({ 
+                executionProperties: properties, 
+                tokenRequirements
+            });
+        }
+        return {
+            widget: self
+        }
     }
 }

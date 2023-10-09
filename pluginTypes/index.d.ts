@@ -637,7 +637,7 @@ declare module "@scom/scom-staking/formSchema.ts" {
 }
 /// <amd-module name="@scom/scom-staking/flow/initialSetup.tsx" />
 declare module "@scom/scom-staking/flow/initialSetup.tsx" {
-    import { Module, ControlElement } from '@ijstech/components';
+    import { Module, ControlElement, Control } from '@ijstech/components';
     import { State } from "@scom/scom-staking/store/index.ts";
     interface ScomStakingFlowInitialSetupElement extends ControlElement {
         data?: any;
@@ -672,6 +672,9 @@ declare module "@scom/scom-staking/flow/initialSetup.tsx" {
         onHide(): void;
         init(): void;
         render(): any;
+        handleFlowStage(target: Control, stage: string, options: any): Promise<{
+            widget: ScomStakingFlowInitialSetup;
+        }>;
     }
 }
 /// <amd-module name="@scom/scom-staking" />
