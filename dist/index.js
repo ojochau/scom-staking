@@ -928,17 +928,7 @@ define("@scom/scom-staking/manage-stake/index.css.ts", ["require", "exports", "@
                         margin: '0',
                     },
                 }
-            },
-            '.staking-token-input > input': {
-                border: 'none',
-                width: '100% !important',
-                height: '100% !important',
-                backgroundColor: 'transparent',
-                color: Theme.input.fontColor,
-                fontSize: '1rem',
-                textAlign: 'left',
-                paddingInline: 8,
-            },
+            }
         }
     });
 });
@@ -1302,29 +1292,28 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
             return (this.$render("i-panel", { class: index_css_1.stakingManageStakeStyle },
                 this.$render("i-hstack", { gap: 10, verticalAlignment: "center", horizontalAlignment: "center" },
                     this.$render("i-hstack", { id: "wrapperInputAmount", gap: 4, width: 280, height: 36, padding: { right: 8 }, background: { color: Theme.input.background }, border: { radius: 8 }, verticalAlignment: "center", horizontalAlignment: "space-between" },
-                        this.$render("i-input", { id: "inputAmount", inputType: "number", placeholder: "0.0", class: "staking-token-input", width: "100%", height: "100%", onChanged: () => this.onInputAmount() }),
+                        this.$render("i-input", { id: "inputAmount", inputType: "number", placeholder: "0.0", width: "100%", height: "100%", border: { style: 'none' }, padding: { left: 8, right: 8 }, font: { size: '1rem' }, onChanged: () => this.onInputAmount() }),
                         this.$render("i-hstack", { gap: 4, verticalAlignment: "center" },
                             this.$render("i-button", { id: "btnMax", caption: "Max", enabled: false, 
                                 // background={{ color: `${Theme.colors.primary.main} !important` }}
                                 // font={{ color: Theme.colors.primary.contrastText }}
-                                class: "btn-os", width: 45, minHeight: 25, onClick: () => this.setMaxBalance() }),
+                                font: { size: '1rem', color: '#fff', weight: 700 }, class: "btn-os", width: 45, minHeight: 25, onClick: () => this.setMaxBalance() }),
                             this.$render("i-label", { id: "lbToken", font: { size: '14px', color: Theme.input.fontColor }, opacity: 0.5 }))),
                     this.$render("i-hstack", { gap: 10, width: "calc(100% - 290px)" },
                         this.$render("i-button", { id: "btnApprove", caption: "Approve", enabled: false, visible: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, 
                             // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
                             // background={{ color: `${Theme.colors.primary.main} !important` }}
                             // font={{ color: Theme.colors.primary.contrastText }}
-                            class: "btn-os", onClick: () => this.onApproveToken() }),
+                            font: { size: '1rem', color: '#fff', weight: 700 }, class: "btn-os", onClick: () => this.onApproveToken() }),
                         this.$render("i-button", { id: "btnStake", caption: "Stake", enabled: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, 
                             // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
                             // background={{ color: `${Theme.colors.primary.main} !important` }}
                             // font={{ color: Theme.colors.primary.contrastText }}
-                            class: "btn-os", onClick: () => this.onStake() }),
+                            font: { size: '1rem', color: '#fff', weight: 700 }, class: "btn-os", onClick: () => this.onStake() }),
                         this.$render("i-button", { id: "btnUnstake", caption: "Unstake", enabled: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, 
                             // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
                             // background={{ color: `${Theme.colors.primary.main} !important` }}
-                            // font={{ color: Theme.colors.primary.contrastText }}
-                            class: "btn-os", onClick: () => this.onUnstake() }))),
+                            font: { size: '1rem', color: '#fff', weight: 700 }, class: "btn-os", onClick: () => this.onUnstake() }))),
                 this.$render("i-scom-tx-status-modal", { id: "txStatusModal" })));
         }
     };
@@ -1333,16 +1322,17 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
     ], ManageStake);
     exports.default = ManageStake;
 });
-define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/components", "@scom/scom-staking/store/index.ts"], function (require, exports, components_7, index_8) {
+define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.stakingComponent = exports.stakingDappContainer = void 0;
+    // import { maxWidth, maxHeight } from './store/index';
     const Theme = components_7.Styles.Theme.ThemeVars;
-    const colorVar = {
-        primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
-        primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
-        primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
-    };
+    // const colorVar = {
+    //   primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
+    //   primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
+    //   primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
+    // }
     exports.stakingDappContainer = components_7.Styles.style({
         $nest: {
             'dapp-container-body': {
@@ -1367,192 +1357,71 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
     });
     exports.stakingComponent = components_7.Styles.style({
         $nest: {
-            'span': {
-                letterSpacing: '0.15px',
-            },
-            '#stakingElm': {
-                background: Theme.background.main,
-            },
-            '.i-loading-overlay': {
-                background: Theme.background.main,
-            },
             '.btn-os': {
-                background: colorVar.primaryButton,
-                height: 'auto !important',
-                color: '#fff',
+                background: 'var(--primary-button-background)',
+                // height: 'auto !important',
+                // color: '#fff',
                 // color: Theme.colors.primary.contrastText,
+                // fontSize: '1rem',
+                // fontWeight: 'bold',
                 transition: 'background .3s ease',
-                fontSize: '1rem',
-                fontWeight: 'bold',
+                boxShadow: 'none',
                 $nest: {
-                    'i-icon.loading-icon': {
-                        marginInline: '0.25rem',
-                        width: '16px !important',
-                        height: '16px !important',
-                    },
-                    'svg': {
-                        // fill: `${Theme.colors.primary.contrastText} !important`
-                        fill: `#fff !important`
-                    }
+                // 'i-icon.loading-icon': {
+                //   marginInline: '0.25rem',
+                //   width: '16px !important',
+                //   height: '16px !important',
+                // },
+                // 'svg': {
+                //   // fill: `${Theme.colors.primary.contrastText} !important`
+                //   fill: `#fff !important`
+                // }
                 },
             },
             '.btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus': {
-                background: colorVar.primaryGradient,
-                backgroundColor: 'transparent',
-                boxShadow: 'none',
+                background: 'var(--primary-button-hover-background)',
                 opacity: .9
             },
             '.btn-os:not(.disabled):not(.is-spinning):focus': {
                 boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)'
             },
             '.btn-os.disabled, .btn-os.is-spinning': {
-                background: colorVar.primaryDisabled,
+                background: 'var(--primary-button-disabled-background)',
                 opacity: 1
             },
-            '.hidden': {
-                display: 'none !important'
-            },
-            '.staking-layout': {
-                width: '100%',
-                marginInline: 'auto',
-                overflow: 'hidden',
-            },
-            '.cursor-default': {
-                cursor: 'default',
-            },
-            '.text-overflow': {
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-            },
             '.wrapper': {
-                width: '100%',
-                height: '100%',
-                maxWidth: index_8.maxWidth,
-                maxHeight: index_8.maxHeight,
                 $nest: {
                     '.sticker': {
-                        position: 'absolute',
-                        top: '-8px',
-                        right: '-33px',
-                        borderInline: '50px solid transparent',
-                        borderBottom: '50px solid #20bf55',
-                        transform: 'rotate(45deg)',
-                        $nest: {
-                            '&.sold-out': {
-                                borderBottomColor: '#ccc',
-                            },
-                            '&.closed': {
-                                borderBottomColor: '#0c1234',
-                                $nest: {
-                                    'i-label > *': {
-                                        color: '#f7d064 !important',
-                                    },
-                                    'i-icon': {
-                                        fill: '#f7d064'
-                                    },
-                                    'svg': {
-                                        fill: '#f7d064'
-                                    }
-                                }
-                            },
-                            '.sticker-text': {
-                                position: 'absolute',
-                                right: '-1.6rem',
-                                top: '0.75rem',
-                                width: '50px',
-                                lineHeight: '1rem',
-                            },
-                            'i-label': {
-                                display: 'flex',
-                                justifyContent: 'center',
-                            },
-                            'i-label > *': {
-                                color: '#3f3f42 !important',
-                                fontSize: '0.75rem',
-                            },
-                            'i-icon': {
-                                width: '14px',
-                                height: '14px',
-                                display: 'block',
-                                margin: 'auto',
-                            },
-                        },
+                        transform: 'rotate(45deg)'
                     },
-                    '.custom-timer': {
-                        display: 'flex',
-                        $nest: {
-                            '.timer-value': {
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                borderRadius: 4,
-                                paddingInline: 4,
-                                minWidth: 20,
-                                height: 20,
-                                fontSize: 14
-                            },
-                            '.timer-unit': {
-                                display: 'flex',
-                                alignItems: 'center',
-                            },
-                        },
-                    },
-                    '.bg-color': {
-                        display: 'flex',
-                        flexDirection: 'column',
-                        color: '#fff',
-                        minHeight: '485px',
-                        height: '100%',
-                        borderRadius: '15px',
-                        paddingBottom: '1rem',
-                        position: 'relative',
-                    },
-                    '.btn-stake': {
-                        width: 370,
-                        maxWidth: '100%',
-                        padding: '0.625rem 0',
-                        marginBottom: '10px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 700,
-                        borderRadius: 12,
-                    },
-                    '.no-campaign': {
-                        padding: '3rem 2rem',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        textAlign: 'center',
-                        justifyContent: 'center',
-                        $nest: {
-                            'i-label > *': {
-                                fontSize: '1.5rem',
-                                marginTop: '1rem',
-                            }
-                        }
-                    }
+                    // '.bg-color': {
+                    //   display: 'flex',
+                    //   flexDirection: 'column',
+                    //   color: '#fff',
+                    //   minHeight: '485px',
+                    //   height: '100%',
+                    //   borderRadius: '15px',
+                    //   paddingBottom: '1rem',
+                    //   position: 'relative',
+                    // }
                 },
             },
-            'i-modal .modal': {
-                background: Theme.background.modal,
-            },
-            '#loadingElm.i-loading--active': {
-                marginTop: '2rem',
-                position: 'initial',
-                $nest: {
-                    '#stakingElm': {
-                        display: 'none !important',
-                    },
-                    '.i-loading-spinner': {
-                        marginTop: '2rem',
-                    },
-                },
-            }
+            // '#loadingElm.i-loading--active': {
+            //   marginTop: '2rem',
+            //   position: 'initial',
+            //   $nest: {
+            //     '#stakingElm': {
+            //       display: 'none !important',
+            //     },
+            //     '.i-loading-spinner': {
+            //       marginTop: '2rem',
+            //     },
+            //   },
+            // }
         }
     });
 });
-define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-network-picker", "@scom/scom-staking/global/index.ts"], function (require, exports, scom_network_picker_1, index_9) {
+define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-network-picker", "@scom/scom-staking/global/index.ts"], function (require, exports, scom_network_picker_1, index_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getProjectOwnerSchema = void 0;
@@ -1640,9 +1509,9 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                         lockTokenType: {
                             type: 'number',
                             oneOf: [
-                                { title: 'ERC20_Token', const: index_9.LockTokenType.ERC20_Token },
-                                { title: 'LP_Token', const: index_9.LockTokenType.LP_Token },
-                                { title: 'VAULT_Token', const: index_9.LockTokenType.VAULT_Token },
+                                { title: 'ERC20_Token', const: index_8.LockTokenType.ERC20_Token },
+                                { title: 'LP_Token', const: index_8.LockTokenType.LP_Token },
+                                { title: 'VAULT_Token', const: index_8.LockTokenType.VAULT_Token },
                             ],
                             required: true
                         },
@@ -1784,9 +1653,9 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                             lockTokenType: {
                                 type: 'number',
                                 oneOf: [
-                                    { title: 'ERC20_Token', const: index_9.LockTokenType.ERC20_Token },
-                                    { title: 'LP_Token', const: index_9.LockTokenType.LP_Token },
-                                    { title: 'VAULT_Token', const: index_9.LockTokenType.VAULT_Token },
+                                    { title: 'ERC20_Token', const: index_8.LockTokenType.ERC20_Token },
+                                    { title: 'LP_Token', const: index_8.LockTokenType.LP_Token },
+                                    { title: 'VAULT_Token', const: index_8.LockTokenType.VAULT_Token },
                                 ],
                                 required: true
                             },
@@ -1840,7 +1709,7 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
     }
     exports.getProjectOwnerSchema = getProjectOwnerSchema;
 });
-define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-token-list", "@scom/scom-staking/store/index.ts", "@ijstech/eth-wallet"], function (require, exports, components_8, scom_token_list_4, index_10, eth_wallet_6) {
+define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-token-list", "@scom/scom-staking/store/index.ts", "@ijstech/eth-wallet"], function (require, exports, components_8, scom_token_list_4, index_9, eth_wallet_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_8.Styles.Theme.ThemeVars;
@@ -1859,7 +1728,7 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
             };
             this.initializeWidgetConfig = async () => {
                 var _a;
-                let connected = (0, index_10.isClientWalletConnected)();
+                let connected = (0, index_9.isClientWalletConnected)();
                 this.displayWalletStatus(connected);
                 await this.initWallet();
                 scom_token_list_4.tokenStore.updateTokenMapData(this.executionProperties.chainId);
@@ -1904,7 +1773,7 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
             await this.initializeWidgetConfig();
         }
         async connectWallet() {
-            if (!(0, index_10.isClientWalletConnected)()) {
+            if (!(0, index_9.isClientWalletConnected)()) {
                 if (this.mdWallet) {
                     await components_8.application.loadPackage('@scom/scom-wallet-modal', '*');
                     this.mdWallet.networks = this.executionProperties.networks;
@@ -1981,10 +1850,11 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
     ], ScomStakingFlowInitialSetup);
     exports.default = ScomStakingFlowInitialSetup;
 });
-define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/data.json.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/manage-stake/index.tsx", "@scom/oswap-time-is-money-contract", "@scom/scom-staking/index.css.ts", "@scom/scom-staking/formSchema.ts", "@scom/scom-staking/flow/initialSetup.tsx"], function (require, exports, components_9, eth_wallet_7, assets_2, index_11, index_12, scom_token_list_5, data_json_1, index_13, index_14, oswap_time_is_money_contract_2, index_css_2, formSchema_1, initialSetup_1) {
+define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/data.json.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/manage-stake/index.tsx", "@scom/oswap-time-is-money-contract", "@scom/scom-staking/index.css.ts", "@scom/scom-staking/formSchema.ts", "@scom/scom-staking/flow/initialSetup.tsx"], function (require, exports, components_9, eth_wallet_7, assets_2, index_10, index_11, scom_token_list_5, data_json_1, index_12, index_13, oswap_time_is_money_contract_2, index_css_2, formSchema_1, initialSetup_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_9.Styles.Theme.ThemeVars;
+    const letterSpacing = '0.15px';
     let ScomStaking = class ScomStaking extends components_9.Module {
         _getActions(category) {
             const actions = [];
@@ -2083,7 +1953,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     getProxySelectors: async (chainId) => {
                         var _a, _b, _c;
                         const address = (_c = (_b = (_a = this.campaign) === null || _a === void 0 ? void 0 : _a.option) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.address;
-                        const selectors = await (0, index_13.getProxySelectors)(this.state, chainId, address);
+                        const selectors = await (0, index_12.getProxySelectors)(this.state, chainId, address);
                         return selectors;
                     },
                     getActions: () => {
@@ -2263,7 +2133,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             };
             this.isWalletValid = async () => {
                 var _a;
-                if (this._data && (0, index_12.isClientWalletConnected)()) {
+                if (this._data && (0, index_11.isClientWalletConnected)()) {
                     try {
                         const wallet = eth_wallet_7.Wallet.getClientInstance();
                         const infoList = this._data[wallet.chainId];
@@ -2288,7 +2158,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     if (!hideLoading && this.loadingElm) {
                         this.loadingElm.visible = true;
                     }
-                    if (!(0, index_12.isClientWalletConnected)() || !this._data || !this.checkValidation()) {
+                    if (!(0, index_11.isClientWalletConnected)() || !this._data || !this.checkValidation()) {
                         await this.renderEmpty();
                         return;
                     }
@@ -2298,7 +2168,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     if (rpcWallet.address) {
                         await scom_token_list_5.tokenStore.updateAllTokenBalances(rpcWallet);
                     }
-                    this.campaign = await (0, index_13.getCampaignInfo)(rpcWallet, { [this._data.chainId]: this._data });
+                    this.campaign = await (0, index_12.getCampaignInfo)(rpcWallet, { [this._data.chainId]: this._data });
                     await this.renderCampaign(hideLoading);
                     if (!hideLoading && this.loadingElm) {
                         this.loadingElm.visible = false;
@@ -2347,11 +2217,11 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     btnClaim.rightIcon.visible = false;
                     btnClaim.enabled = true;
                 };
-                (0, index_11.registerSendTxEvents)({
+                (0, index_10.registerSendTxEvents)({
                     transactionHash: callBack,
                     confirmation: confirmationCallBack
                 });
-                (0, index_13.claimToken)(data.reward.address, callBack);
+                (0, index_12.claimToken)(data.reward.address, callBack);
             };
             this.checkValidation = () => {
                 if (!this._data)
@@ -2385,11 +2255,11 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     window.open(campaign.getTokenURL);
                 }
                 else {
-                    window.open(index_12.getTokenUrl ? index_12.getTokenUrl : `https:openswap.xyz/#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
+                    window.open(index_11.getTokenUrl ? index_11.getTokenUrl : `https:openswap.xyz/#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
                 }
             };
             this.connectWallet = async () => {
-                if (!(0, index_12.isClientWalletConnected)()) {
+                if (!(0, index_11.isClientWalletConnected)()) {
                     if (this.mdWallet) {
                         await components_9.application.loadPackage('@scom/scom-wallet-modal', '*');
                         this.mdWallet.networks = this.networks;
@@ -2407,13 +2277,13 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 if (!this.noCampaignSection) {
                     this.noCampaignSection = await components_9.Panel.create({ height: '100%' });
                 }
-                const isClientConnected = (0, index_12.isClientWalletConnected)();
+                const isClientConnected = (0, index_11.isClientWalletConnected)();
                 // const isRpcConnected = this.state.isRpcWalletConnected();
                 this.noCampaignSection.clearInnerHTML();
-                this.noCampaignSection.appendChild(this.$render("i-panel", { class: "no-campaign", height: "100%", background: { color: Theme.background.main } },
-                    this.$render("i-vstack", { gap: 10, verticalAlignment: "center" },
+                this.noCampaignSection.appendChild(this.$render("i-vstack", { height: "100%", background: { color: Theme.background.main }, padding: { top: '3rem', bottom: '3rem', left: '2rem', right: '2rem' }, justifyContent: 'center', class: "no-campaign text-center" },
+                    this.$render("i-vstack", { verticalAlignment: "center", gap: "1rem" },
                         this.$render("i-image", { url: assets_2.default.fullPath('img/staking/TrollTrooper.svg') }),
-                        this.$render("i-label", { caption: isClientConnected ? 'No Campaigns' : 'Please connect with your wallet!' }))));
+                        this.$render("i-label", { caption: isClientConnected ? 'No Campaigns' : 'Please connect with your wallet!', font: { size: '1.5rem' }, letterSpacing: letterSpacing }))));
                 this.noCampaignSection.visible = true;
             };
             this.renderEmpty = async () => {
@@ -2446,19 +2316,19 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 this.removeTimer();
                 const campaign = this.campaign;
                 const containerSection = await components_9.Panel.create();
-                containerSection.classList.add('container');
+                // containerSection.classList.add('container');
                 let opt = Object.assign({}, campaign.option);
                 let lpTokenData = {};
                 let vaultTokenData = {};
                 if (opt.tokenAddress) {
-                    if (opt.lockTokenType == index_11.LockTokenType.LP_Token) {
+                    if (opt.lockTokenType == index_10.LockTokenType.LP_Token) {
                         lpTokenData = {
-                            'object': await (0, index_13.getLPObject)(rpcWallet, opt.tokenAddress)
+                            'object': await (0, index_12.getLPObject)(rpcWallet, opt.tokenAddress)
                         };
                     }
-                    else if (opt.lockTokenType == index_11.LockTokenType.VAULT_Token) {
+                    else if (opt.lockTokenType == index_10.LockTokenType.VAULT_Token) {
                         vaultTokenData = {
-                            'object': await (0, index_13.getVaultObject)(rpcWallet, opt.tokenAddress)
+                            'object': await (0, index_12.getVaultObject)(rpcWallet, opt.tokenAddress)
                         };
                     }
                 }
@@ -2469,9 +2339,9 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 };
                 opt = Object.assign(Object.assign({}, opt), { tokenInfo });
                 const stakingInfo = opt;
-                const lockedTokenObject = (0, index_12.getLockedTokenObject)(stakingInfo, stakingInfo.tokenInfo, this.tokenMap);
-                const lockedTokenSymbol = (0, index_12.getLockedTokenSymbol)(stakingInfo, lockedTokenObject);
-                const lockedTokenIconPaths = (0, index_12.getLockedTokenIconPaths)(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
+                const lockedTokenObject = (0, index_11.getLockedTokenObject)(stakingInfo, stakingInfo.tokenInfo, this.tokenMap);
+                const lockedTokenSymbol = (0, index_11.getLockedTokenSymbol)(stakingInfo, lockedTokenObject);
+                const lockedTokenIconPaths = (0, index_11.getLockedTokenIconPaths)(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
                 const lockedTokenDecimals = (lockedTokenObject === null || lockedTokenObject === void 0 ? void 0 : lockedTokenObject.decimals) || 18;
                 const defaultDecimalsOffset = 18 - lockedTokenDecimals;
                 const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
@@ -2479,43 +2349,70 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 let isStarted = (0, components_9.moment)(activeStartTime).diff((0, components_9.moment)()) <= 0;
                 let isClosed = (0, components_9.moment)(activeEndTime).diff((0, components_9.moment)()) <= 0;
                 let totalLocked = {};
-                const optionTimer = { background: { color: Theme.colors.secondary.main }, font: { color: Theme.colors.secondary.contrastText } };
+                const optionTimer = {
+                    background: { color: Theme.colors.secondary.main },
+                    font: { color: Theme.colors.secondary.contrastText, size: '0.875rem' },
+                    padding: { left: '4px', right: '4px' },
+                    border: { radius: 4 },
+                    minWidth: 20,
+                    height: 20,
+                    lineHeight: '1.25rem',
+                    letterSpacing
+                };
                 const stakingElm = await components_9.VStack.create();
                 const activeTimerRow = await components_9.VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
                 const activeTimerElm = await components_9.VStack.create();
-                activeTimerRow.appendChild(this.$render("i-label", { caption: "End Date", font: { size: '14px' }, opacity: 0.5 }));
+                activeTimerRow.appendChild(this.$render("i-label", { caption: "End Date", font: { size: '0.875rem' }, opacity: 0.5, letterSpacing: letterSpacing }));
                 activeTimerRow.appendChild(activeTimerElm);
                 const endHour = await components_9.Label.create(optionTimer);
                 const endDay = await components_9.Label.create(optionTimer);
                 const endMin = await components_9.Label.create(optionTimer);
-                endHour.classList.add('timer-value');
-                endDay.classList.add('timer-value');
-                endMin.classList.add('timer-value');
-                activeTimerElm.appendChild(this.$render("i-hstack", { gap: 4, class: "custom-timer" },
+                activeTimerElm.appendChild(this.$render("i-hstack", { gap: 4 },
                     endDay,
-                    this.$render("i-label", { caption: "D", class: "timer-unit" }),
+                    this.$render("i-label", { caption: "D", lineHeight: '1.25rem', font: { size: '0.875rem' }, letterSpacing: letterSpacing }),
                     endHour,
-                    this.$render("i-label", { caption: "H", class: "timer-unit" }),
+                    this.$render("i-label", { caption: "H", lineHeight: '1.25rem', font: { size: '0.875rem' }, letterSpacing: letterSpacing }),
                     endMin,
-                    this.$render("i-label", { caption: "M", class: "timer-unit" })));
+                    this.$render("i-label", { caption: "M", lineHeight: '1.25rem', font: { size: '0.875rem' }, letterSpacing: letterSpacing })));
                 // Sticker
-                const stickerSection = await components_9.Panel.create({ visible: false });
-                const stickerLabel = await components_9.Label.create();
-                const stickerIcon = await components_9.Icon.create({ fill: '#fff' });
+                const stickerSection = await components_9.VStack.create({
+                    visible: false,
+                    position: 'absolute',
+                    top: '-8px',
+                    right: '-33px',
+                    border: {
+                        left: { width: '50px', style: 'solid', color: 'transparent' },
+                        right: { width: '50px', style: 'solid', color: 'transparent' },
+                        bottom: { width: '50px', style: 'solid', color: '#20bf55' }
+                    }
+                });
+                const stickerLabel = await components_9.Label.create({
+                    display: 'flex',
+                    font: { size: '0.75rem', color: '#3f3f42' },
+                    grid: { horizontalAlignment: 'center' },
+                    letterSpacing
+                });
+                const stickerIcon = await components_9.Icon.create({
+                    fill: '#fff',
+                    width: 14,
+                    height: 14,
+                    display: 'block',
+                    margin: { left: 'auto', right: 'auto' }
+                });
                 stickerSection.classList.add('sticker');
-                stickerSection.appendChild(this.$render("i-vstack", { class: "sticker-text" },
+                stickerSection.appendChild(this.$render("i-vstack", { position: 'absolute', top: '0.75rem', right: '-1.6rem', width: 50, lineHeight: '1rem' },
                     stickerIcon,
                     stickerLabel));
                 const setAvailableQty = async () => {
                     if (!this.state.isRpcWalletConnected() || !this.manageStake)
                         return;
                     const o = opt;
-                    const _totalLocked = await (0, index_13.getStakingTotalLocked)(rpcWallet, o.address);
+                    const _totalLocked = await (0, index_12.getStakingTotalLocked)(rpcWallet, o.address);
                     totalLocked[o.address] = _totalLocked;
                     const optionQty = new eth_wallet_7.BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
                     if (o.mode === 'Stake') {
                         const btnStake = this.manageStake.btnStake;
-                        const isStaking = this.state.getStakingStatus(index_11.CurrentMode.STAKE);
+                        const isStaking = this.state.getStakingStatus(index_10.CurrentMode.STAKE);
                         if (btnStake) {
                             let isValidInput = false;
                             const inputElm = this.manageStake.inputAmount;
@@ -2528,15 +2425,16 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     }
                     else {
                         const btnUnstake = this.manageStake.btnUnstake;
-                        const isUnstaking = this.state.getStakingStatus(index_11.CurrentMode.UNLOCK);
+                        const isUnstaking = this.state.getStakingStatus(index_10.CurrentMode.UNLOCK);
                         if (btnUnstake) {
                             btnUnstake.enabled = !isUnstaking && o.mode !== 'Stake' && Number(o.stakeQty) != 0 && !this.manageStake.needToBeApproval();
                         }
                     }
                     if (isClosed) {
                         if (stickerLabel.caption !== 'Closed') {
-                            stickerSection.classList.add('closed');
-                            stickerSection.classList.remove('sold-out');
+                            stickerSection.border.bottom = { width: '50px', style: 'solid', color: '#0c1234' };
+                            stickerIcon.fill = '#f7d064';
+                            stickerLabel.font = { size: '0.75rem', color: '#f7d064' };
                             stickerLabel.caption = 'Closed';
                             stickerIcon.name = 'check-square';
                         }
@@ -2545,7 +2443,9 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         if (stickerLabel.caption !== 'Sold Out') {
                             stickerLabel.caption = 'Sold Out';
                             stickerIcon.name = 'star';
-                            stickerSection.classList.add('sold-out');
+                            stickerSection.border.bottom = { width: '50px', style: 'solid', color: '#ccc' };
+                            stickerIcon.fill = '#fff';
+                            stickerLabel.font = { size: '0.75rem', color: '#3f3f42' };
                         }
                     }
                     else {
@@ -2583,7 +2483,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 };
                 setTimer();
                 const option = Object.assign({}, opt);
-                this.manageStake = new index_14.default(undefined, {
+                this.manageStake = new index_13.default(undefined, {
                     width: '100%',
                 });
                 this.manageStake.state = this.state;
@@ -2593,8 +2493,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 const rewardOptions = !isClaim ? rewardsData : [];
                 let aprInfo = {};
                 const claimStakedRow = await components_9.HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
-                claimStakedRow.appendChild(this.$render("i-label", { caption: "You Staked", font: { size: '16px' } }));
-                claimStakedRow.appendChild(this.$render("i-label", { caption: `${(0, index_11.formatNumber)(new eth_wallet_7.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`, font: { size: '16px' } }));
+                claimStakedRow.appendChild(this.$render("i-label", { caption: "You Staked", font: { size: '1rem' }, letterSpacing: letterSpacing }));
+                claimStakedRow.appendChild(this.$render("i-label", { caption: `${(0, index_10.formatNumber)(new eth_wallet_7.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`, font: { size: '1rem' }, letterSpacing: letterSpacing }));
                 const rowRewards = await components_9.VStack.create({ gap: 8, verticalAlignment: 'center' });
                 for (let idx = 0; idx < rewardsData.length; idx++) {
                     const reward = rewardsData[idx];
@@ -2611,8 +2511,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     }
                     const rewardSymbol = rewardToken.symbol || '';
                     rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
-                        this.$render("i-label", { caption: `${rewardSymbol} Locked`, font: { size: '16px', color: Theme.text.primary } }),
-                        this.$render("i-label", { caption: `${(0, index_11.formatNumber)(new eth_wallet_7.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '16px' } })));
+                        this.$render("i-label", { caption: `${rewardSymbol} Locked`, font: { size: '1rem', color: Theme.text.primary }, letterSpacing: letterSpacing }),
+                        this.$render("i-label", { caption: `${(0, index_10.formatNumber)(new eth_wallet_7.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '1rem' }, letterSpacing: letterSpacing })));
                     // rowRewards.appendChild(
                     // 	<i-hstack horizontalAlignment="space-between">
                     // 		<i-label caption={`${rewardSymbol} Vesting Start`} font={{ size: '16px', color: colorText }} />
@@ -2628,7 +2528,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     const passClaimStartTime = !(reward.claimStartTime && (0, components_9.moment)().diff(components_9.moment.unix(reward.claimStartTime)) < 0);
                     let rewardClaimable = `0 ${rewardSymbol}`;
                     if (passClaimStartTime && isClaim) {
-                        rewardClaimable = `${(0, index_11.formatNumber)(new eth_wallet_7.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
+                        rewardClaimable = `${(0, index_10.formatNumber)(new eth_wallet_7.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
                     }
                     let startClaimingText = '';
                     if (!(!reward.claimStartTime || passClaimStartTime) && isClaim) {
@@ -2636,19 +2536,28 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
                     }
                     rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
-                        this.$render("i-label", { caption: `${rewardSymbol} Claimable`, font: { size: '16px' } }),
-                        this.$render("i-label", { caption: rewardClaimable, font: { size: '16px' } }),
-                        startClaimingText ? this.$render("i-label", { caption: startClaimingText, font: { size: '16px' } }) : []));
+                        this.$render("i-label", { caption: `${rewardSymbol} Claimable`, font: { size: '1rem' }, letterSpacing: letterSpacing }),
+                        this.$render("i-label", { caption: rewardClaimable, font: { size: '1rem' } }),
+                        startClaimingText ? this.$render("i-label", { caption: startClaimingText, font: { size: '1rem' }, letterSpacing: letterSpacing }) : []));
                     const btnClaim = await components_9.Button.create({
-                        // rightIcon: { spin: true, fill: Theme.colors.primary.contrastText, visible: false },
-                        rightIcon: { spin: true, fill: '#fff', visible: false },
+                        rightIcon: {
+                            spin: true,
+                            fill: '#fff',
+                            visible: false,
+                            margin: { left: '0.25rem', right: '0.25rem' },
+                            width: 16, height: 16
+                        },
                         caption: rpcWalletConnected ? `Claim ${rewardSymbol}` : 'Switch Network',
-                        // background: { color: `${Theme.colors.primary.main} !important` },
-                        // font: { color: Theme.colors.primary.contrastText },
+                        font: { color: '#fff', size: '1rem', bold: true },
                         enabled: !rpcWalletConnected || (rpcWalletConnected && !(!passClaimStartTime || new eth_wallet_7.BigNumber(reward.claimable).isZero()) && isClaim),
-                        margin: { left: 'auto', right: 'auto', bottom: 10 }
+                        margin: { left: 'auto', right: 'auto', bottom: 10 },
+                        padding: { top: '0.625rem', bottom: '0.625rem' },
+                        border: { radius: 12 },
+                        maxWidth: '100%',
+                        width: 370,
+                        height: 'auto'
                     });
-                    btnClaim.classList.add('btn-os', 'btn-stake');
+                    btnClaim.classList.add('btn-os');
                     btnClaim.onClick = () => rpcWalletConnected ? this.onClaim(btnClaim, { reward, rewardSymbol }) : this.connectWallet();
                     rowRewards.appendChild(btnClaim);
                 }
@@ -2661,47 +2570,47 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     return '';
                 };
                 const durationDays = option.minLockTime / (60 * 60 * 24);
-                const _lockedTokenObject = (0, index_12.getLockedTokenObject)(option, option.tokenInfo, this.tokenMap);
-                const _lockedTokenIconPaths = (0, index_12.getLockedTokenIconPaths)(option, _lockedTokenObject, chainId, this.tokenMap);
+                const _lockedTokenObject = (0, index_11.getLockedTokenObject)(option, option.tokenInfo, this.tokenMap);
+                const _lockedTokenIconPaths = (0, index_11.getLockedTokenIconPaths)(option, _lockedTokenObject, chainId, this.tokenMap);
                 const pathsLength = _lockedTokenIconPaths.length;
                 const rewardToken = (rewardsData === null || rewardsData === void 0 ? void 0 : rewardsData.length) ? this.getRewardToken(rewardsData[0].rewardTokenAddress) : null;
-                stakingElm.appendChild(this.$render("i-vstack", { gap: 15, width: index_12.maxWidth, height: "100%", padding: { top: 10, bottom: 10, left: 20, right: 20 }, position: "relative" },
+                stakingElm.appendChild(this.$render("i-vstack", { gap: 15, width: index_11.maxWidth, height: "100%", padding: { top: 10, bottom: 10, left: 20, right: 20 }, position: "relative" },
                     stickerSection,
                     this.$render("i-hstack", { gap: 10, width: "100%", verticalAlignment: "center" },
                         this.$render("i-hstack", { gap: 10, width: "50%" },
                             this.$render("i-hstack", { width: pathsLength === 1 ? 63.5 : 80, position: "relative", verticalAlignment: "center" },
-                                this.$render("i-image", { width: 60, height: 60, url: scom_token_list_5.assets.tokenPath(rewardToken, chainId), fallbackUrl: index_12.fallBackUrl }),
+                                this.$render("i-image", { width: 60, height: 60, url: scom_token_list_5.assets.tokenPath(rewardToken, chainId), fallbackUrl: index_11.fallBackUrl }),
                                 _lockedTokenIconPaths.map((v, idxImg) => {
-                                    return this.$render("i-image", { position: "absolute", width: 28, height: 28, bottom: 0, left: (idxImg * 20) + 35, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_12.fallBackUrl });
+                                    return this.$render("i-image", { position: "absolute", width: 28, height: 28, bottom: 0, left: (idxImg * 20) + 35, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_11.fallBackUrl });
                                 })),
                             this.$render("i-vstack", { gap: 2, overflow: { x: 'hidden' }, verticalAlignment: "center" },
-                                this.$render("i-label", { visible: !!campaign.name, caption: campaign.name, font: { size: '20px', color: Theme.text.secondary, bold: true }, class: "text-overflow" }),
-                                this.$render("i-label", { visible: !!campaign.desc, caption: campaign.desc, font: { size: '16px' }, opacity: 0.5, class: "text-overflow" }))),
+                                this.$render("i-label", { visible: !!campaign.name, caption: campaign.name, font: { size: '1.25rem', color: Theme.text.secondary, bold: true }, textOverflow: "ellipsis", letterSpacing: letterSpacing, class: "text-overflow" }),
+                                this.$render("i-label", { visible: !!campaign.desc, caption: campaign.desc, font: { size: '1rem' }, opacity: 0.5, textOverflow: "ellipsis", letterSpacing: letterSpacing, class: "text-overflow" }))),
                         await Promise.all(rewardOptions.map(async (rewardOption, idx) => {
-                            const lbApr = await components_9.Label.create({ font: { size: '32px', color: Theme.text.secondary } });
-                            const lbRate = await components_9.Label.create({ font: { size: '16px' }, opacity: 0.5 });
+                            const lbApr = await components_9.Label.create({ font: { size: '2rem', color: Theme.text.secondary }, letterSpacing });
+                            const lbRate = await components_9.Label.create({ font: { size: '1rem' }, opacity: 0.5, letterSpacing });
                             lbApr.classList.add('text-overflow');
                             const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
                             const rewardTokenDecimals = rewardToken.decimals || 18;
                             const decimalsOffset = 18 - rewardTokenDecimals;
                             const lockTokenType = option.lockTokenType;
                             // const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
-                            const rateDesc = `1 ${lockTokenType === index_11.LockTokenType.LP_Token ? 'LP' : (0, index_12.tokenSymbol)(this.chainId, option.lockTokenAddress)} : ${rewardOption.multiplier} ${(0, index_12.tokenSymbol)(this.chainId, rewardOption.rewardTokenAddress)}`;
+                            const rateDesc = `1 ${lockTokenType === index_10.LockTokenType.LP_Token ? 'LP' : (0, index_11.tokenSymbol)(this.chainId, option.lockTokenAddress)} : ${rewardOption.multiplier} ${(0, index_11.tokenSymbol)(this.chainId, rewardOption.rewardTokenAddress)}`;
                             const updateApr = async () => {
                                 var _a, _b, _c, _d;
-                                if (lockTokenType === index_11.LockTokenType.ERC20_Token) {
-                                    const apr = await (0, index_13.getERC20RewardCurrentAPR)(rpcWallet, rewardOption, lockedTokenObject, durationDays);
+                                if (lockTokenType === index_10.LockTokenType.ERC20_Token) {
+                                    const apr = await (0, index_12.getERC20RewardCurrentAPR)(rpcWallet, rewardOption, lockedTokenObject, durationDays);
                                     if (!isNaN(parseFloat(apr))) {
                                         aprInfo[rewardOption.rewardTokenAddress] = apr;
                                     }
                                 }
-                                else if (lockTokenType === index_11.LockTokenType.LP_Token) {
+                                else if (lockTokenType === index_10.LockTokenType.LP_Token) {
                                     if (rewardOption.referencePair) {
-                                        aprInfo[rewardOption.rewardTokenAddress] = await (0, index_13.getLPRewardCurrentAPR)(rpcWallet, rewardOption, (_b = (_a = option.tokenInfo) === null || _a === void 0 ? void 0 : _a.lpToken) === null || _b === void 0 ? void 0 : _b.object, durationDays);
+                                        aprInfo[rewardOption.rewardTokenAddress] = await (0, index_12.getLPRewardCurrentAPR)(rpcWallet, rewardOption, (_b = (_a = option.tokenInfo) === null || _a === void 0 ? void 0 : _a.lpToken) === null || _b === void 0 ? void 0 : _b.object, durationDays);
                                     }
                                 }
                                 else {
-                                    aprInfo[rewardOption.rewardTokenAddress] = await (0, index_13.getVaultRewardCurrentAPR)(rpcWallet, rewardOption, (_d = (_c = option.tokenInfo) === null || _c === void 0 ? void 0 : _c.vaultToken) === null || _d === void 0 ? void 0 : _d.object, durationDays);
+                                    aprInfo[rewardOption.rewardTokenAddress] = await (0, index_12.getVaultRewardCurrentAPR)(rpcWallet, rewardOption, (_d = (_c = option.tokenInfo) === null || _c === void 0 ? void 0 : _c.vaultToken) === null || _d === void 0 ? void 0 : _d.object, durationDays);
                                 }
                                 const aprValue = getAprValue(rewardOption);
                                 lbApr.caption = `APR ${aprValue}`;
@@ -2718,24 +2627,24 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         }))),
                     this.$render("i-hstack", { width: "100%", verticalAlignment: "center" },
                         this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
-                            this.$render("i-label", { caption: "Start Date", font: { size: '14px' }, opacity: 0.5 }),
-                            this.$render("i-label", { caption: (0, index_11.formatDate)(option.startOfEntryPeriod, 'DD MMM, YYYY'), font: { size: '16px' } })),
+                            this.$render("i-label", { caption: "Start Date", font: { size: '0.875rem' }, opacity: 0.5, letterSpacing: letterSpacing }),
+                            this.$render("i-label", { caption: (0, index_10.formatDate)(option.startOfEntryPeriod, 'DD MMM, YYYY'), font: { size: '1rem' }, letterSpacing: letterSpacing })),
                         activeTimerRow,
                         this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
-                            this.$render("i-label", { caption: "Stake Duration", font: { size: '14px' }, opacity: 0.5 }),
+                            this.$render("i-label", { caption: "Stake Duration", font: { size: '0.875rem' }, opacity: 0.5, letterSpacing: letterSpacing }),
                             this.$render("i-hstack", { gap: 4, verticalAlignment: "center" },
-                                this.$render("i-button", { caption: durationDays < 1 ? '< 1 Day' : `${durationDays} Days`, class: "btn-os cursor-default", border: { radius: 12, width: 1, style: 'solid', color: 'transparent' }, font: { size: '12px', color: Theme.colors.secondary.contrastText }, padding: { top: 2.5, bottom: 2.5, left: 8, right: 8 }, background: { color: `${Theme.colors.secondary.main} !important` } }))),
+                                this.$render("i-button", { height: "auto", caption: durationDays < 1 ? '< 1 Day' : `${durationDays} Days`, font: { size: '12px', color: Theme.colors.secondary.contrastText, weight: 700 }, background: { color: `${Theme.colors.secondary.main} !important` }, border: { radius: 12, width: 1, style: 'solid', color: 'transparent' }, padding: { top: 2.5, bottom: 2.5, left: 8, right: 8 }, cursor: "default", class: "btn-os cursor-default" }))),
                         this.$render("i-vstack", { gap: 4, width: "25%", margin: { left: 'auto' }, verticalAlignment: "center", horizontalAlignment: "end" },
                             this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => this.getLPToken(campaign, lockedTokenSymbol, chainId) },
                                 this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: Theme.text.primary }),
-                                this.$render("i-label", { caption: `Get ${lockedTokenSymbol}`, font: { size: '13.6px' } }),
+                                this.$render("i-label", { caption: `Get ${lockedTokenSymbol}`, font: { size: '0.85rem' }, letterSpacing: letterSpacing }),
                                 lockedTokenIconPaths.map((v) => {
-                                    return this.$render("i-image", { display: "flex", width: 15, height: 15, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_12.fallBackUrl });
+                                    return this.$render("i-image", { display: "flex", width: 15, height: 15, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_11.fallBackUrl });
                                 })),
                             campaign.showContractLink ?
-                                this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => (0, index_12.viewOnExplorerByAddress)(chainId, option.address) },
+                                this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => (0, index_11.viewOnExplorerByAddress)(chainId, option.address) },
                                     this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: Theme.text.primary, class: "inline-block" }),
-                                    this.$render("i-label", { caption: "View Contract", font: { size: '13.6px' } })) : [])),
+                                    this.$render("i-label", { caption: "View Contract", font: { size: '0.85rem' }, letterSpacing: letterSpacing })) : [])),
                     this.$render("i-vstack", { gap: 8 },
                         claimStakedRow,
                         this.$render("i-vstack", { verticalAlignment: "center", horizontalAlignment: "center" }, this.manageStake),
@@ -2744,11 +2653,11 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 if (this._data.stakeInputValue) {
                     this.manageStake.setInputValue(this._data.stakeInputValue);
                 }
-                containerSection.appendChild(this.$render("i-hstack", { background: { color: Theme.background.main }, width: "100%", height: index_12.maxHeight, border: { width: 1, style: 'solid', color: '#7979794a' } }, stakingElm));
+                containerSection.appendChild(this.$render("i-hstack", { background: { color: Theme.background.main }, width: "100%", height: index_11.maxHeight, border: { width: 1, style: 'solid', color: '#7979794a' } }, stakingElm));
                 this.stakingElm.clearInnerHTML();
                 this.stakingElm.append(this.noCampaignSection, containerSection);
             };
-            this.state = new index_12.State(data_json_1.default);
+            this.state = new index_11.State(data_json_1.default);
         }
         removeRpcWalletEvents() {
             const rpcWallet = this.rpcWallet;
@@ -2780,12 +2689,12 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
         render() {
             return (this.$render("i-scom-dapp-container", { id: "dappContainer", class: index_css_2.stakingDappContainer },
                 this.$render("i-panel", { class: index_css_2.stakingComponent, minHeight: 200 },
-                    this.$render("i-panel", { id: "stakingLayout", class: "staking-layout", width: index_12.maxWidth, height: index_12.maxHeight, margin: { left: 'auto', right: 'auto' } },
-                        this.$render("i-vstack", { id: "loadingElm", class: "i-loading-overlay" },
+                    this.$render("i-panel", { id: "stakingLayout", width: index_11.maxWidth, height: index_11.maxHeight, margin: { left: 'auto', right: 'auto' }, overflow: 'hidden' },
+                        this.$render("i-vstack", { id: "loadingElm", background: { color: Theme.background.main }, class: "i-loading-overlay" },
                             this.$render("i-vstack", { class: "i-loading-spinner", horizontalAlignment: "center", verticalAlignment: "center" },
                                 this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_2.default.fullPath('img/loading.svg'), width: 36, height: 36 } }),
-                                this.$render("i-label", { caption: "Loading...", font: { color: '#FD4A4C', size: '1.5em' }, class: "i-loading-spinner_text" }))),
-                        this.$render("i-panel", { id: "stakingElm", class: "wrapper" })),
+                                this.$render("i-label", { caption: "Loading...", font: { color: '#FD4A4C', size: '1.5em' }, letterSpacing: letterSpacing, class: "i-loading-spinner_text" }))),
+                        this.$render("i-panel", { id: "stakingElm", background: { color: Theme.background.main }, width: "100%", height: "100%", maxWidth: index_11.maxWidth, maxHeight: index_11.maxHeight, class: "wrapper" })),
                     this.$render("i-scom-wallet-modal", { id: "mdWallet", wallets: [] }),
                     this.$render("i-scom-tx-status-modal", { id: "txStatusModal" }))));
         }
