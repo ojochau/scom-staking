@@ -311,9 +311,6 @@ export default class ScomStaking extends Module {
 		if (this.dappContainer)
 			this.dappContainer.setTag(this.tag);
 		this.updateTheme();
-		// if (this.stakingElm) {
-		// 	this.renderCampaign();
-		// }
 	}
 
 	private updateStyle(name: string, value: any) {
@@ -386,27 +383,7 @@ export default class ScomStaking extends Module {
 	}
 
 	private onChainChanged = async () => {
-		if (await this.isWalletValid()) {
-			this.initializeWidgetConfig();
-		}
-	}
-
-	private isWalletValid = async () => {
-		if (this._data && isClientWalletConnected()) {
-			try {
-				const wallet = Wallet.getClientInstance();
-				const infoList = this._data[wallet.chainId];
-				const stakingAddress = infoList && infoList[0].staking?.address;
-				if (stakingAddress) {
-					const timeIsMoney = new Contracts.TimeIsMoney(wallet, stakingAddress);
-					await timeIsMoney.getCredit(wallet.address);
-				}
-				return true;
-			} catch {
-				return false;
-			}
-		}
-		return false;
+		this.initializeWidgetConfig();
 	}
 
 	private refreshUI = () => {
@@ -424,11 +401,8 @@ export default class ScomStaking extends Module {
 			}
 			await this.initWallet();
 			tokenStore.updateTokenMapData(this.chainId);
-			const rpcWallet = this.rpcWallet;
-			if (rpcWallet.address) {
-				await tokenStore.updateAllTokenBalances(rpcWallet);
-			}
-			this.campaign = await getCampaignInfo(rpcWallet, { [this._data.chainId]: this._data });
+			await tokenStore.updateTokenBalancesByChainId(this.chainId);
+			this.campaign = await getCampaignInfo(this.rpcWallet, { [this._data.chainId]: this._data });
 			await this.renderCampaign(hideLoading);
 			if (!hideLoading && this.loadingElm) {
 				this.loadingElm.visible = false;

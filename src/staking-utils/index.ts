@@ -1,4 +1,4 @@
-import { Wallet, BigNumber, Utils, Erc20, IWallet, TransactionReceipt } from "@ijstech/eth-wallet";
+import { Wallet, BigNumber, Utils, Erc20, IWallet, TransactionReceipt, Contract, IMulticallContractCall } from "@ijstech/eth-wallet";
 import { Contracts as TimeIsMoneyContracts } from "@scom/oswap-time-is-money-contract";
 import { Contracts } from "@scom/oswap-openswap-contract";
 import { Contracts as UtilsContracts } from "@scom/oswap-chainlink-contract";
@@ -86,50 +86,82 @@ const getDefaultStakingByAddress = async (wallet: IWallet, option: ISingleStakin
 
     let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet, stakingAddress);
     let mode = '';
-    // let minimumLockTime = await timeIsMoney.minimumLockTime();
-    // let maximumTotalLock = await timeIsMoney.maximumTotalLock();
-    // let totalLockedWei = await timeIsMoney.totalLocked();
-    // let totalCreditWei = await timeIsMoney.getCredit(currentAddress);
-    // let lockAmountWei = await timeIsMoney.lockAmount(currentAddress);
-    // let withdrawn = await timeIsMoney.withdrawn(currentAddress);
-
-    const minimumLockTimeFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'minimumLockTime', []);
-    const maximumTotalLockFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'maximumTotalLock', []);
-    const totalLockedFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'totalLocked', []);
-    const totalCreditFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'getCredit', [currentAddress]);
-    const lockAmountFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'lockAmount', [currentAddress]);
-    const withdrawnFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'withdrawn', [currentAddress]);
-    const tokenFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'token', []);
-    const endOfEntryPeriodFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'endOfEntryPeriod', []);
-    const perAddressCapFuncCallData = wallet.encodeFunctionCall(timeIsMoney, 'perAddressCap', []);
-    const funcCallDataArr = [
-      minimumLockTimeFuncCallData,
-      maximumTotalLockFuncCallData,
-      totalLockedFuncCallData,
-      totalCreditFuncCallData,
-      lockAmountFuncCallData,
-      withdrawnFuncCallData,
-      tokenFuncCallData,
-      endOfEntryPeriodFuncCallData,
-      perAddressCapFuncCallData
-    ];
-    const result = await wallet.multiCall(funcCallDataArr.map((callData) => {
-      return {
-        to: stakingAddress,
-        data: callData
+    let multicallResult = await wallet.doMulticall([
+      {
+        contract: timeIsMoney,
+        methodName: 'minimumLockTime',
+        params: [],
+        to: stakingAddress
+      },
+      {
+        contract: timeIsMoney,
+        methodName: 'maximumTotalLock',
+        params: [],
+        to: stakingAddress
+      },
+      {
+        contract: timeIsMoney,
+        methodName: 'totalLocked',
+        params: [],
+        to: stakingAddress
+      },
+      {
+        contract: timeIsMoney,
+        methodName: 'getCredit',
+        params: [currentAddress],
+        to: stakingAddress
+      },
+      {
+        contract: timeIsMoney,
+        methodName: 'lockAmount',
+        params: [currentAddress],
+        to: stakingAddress
+      },
+      {
+        contract: timeIsMoney,
+        methodName: 'withdrawn',
+        params: [currentAddress],
+        to: stakingAddress
+      },
+      {
+        contract: timeIsMoney,
+        methodName: 'token',
+        params: [],
+        to: stakingAddress
+      },
+      {
+        contract: timeIsMoney,
+        methodName: 'endOfEntryPeriod',
+        params: [],
+        to: stakingAddress
+      },
+      {
+        contract: timeIsMoney,
+        methodName: 'perAddressCap',
+        params: [],
+        to: stakingAddress
+      },
+      {
+        contract: timeIsMoney,
+        methodName: 'startOfEntryPeriod',
+        params: [],
+        to: stakingAddress
       }
-    }));
-    const multiCallResults = result.results;
-    const minimumLockTime = new BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'minimumLockTime', multiCallResults[0])[0]);
-    const maximumTotalLock = new BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'maximumTotalLock', multiCallResults[1])[0]);
-    const totalLockedWei = new BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'totalLocked', multiCallResults[2])[0]);
-    const totalCreditWei = new BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'getCredit', multiCallResults[3])[0]);
-    const lockAmountWei = new BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'lockAmount', multiCallResults[4])[0]);
-    const withdrawn = wallet.decodeAbiEncodedParameters(timeIsMoney, 'withdrawn', multiCallResults[5])[0];
-    const tokenAddress = wallet.decodeAbiEncodedParameters(timeIsMoney, 'token', multiCallResults[6])[0];
-    const endOfEntryPeriod = new BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'endOfEntryPeriod', multiCallResults[7])[0]).toFixed();
-    const perAddressCapWei = new BigNumber(wallet.decodeAbiEncodedParameters(timeIsMoney, 'perAddressCap', multiCallResults[8])[0]);
+    ])
 
+    const minimumLockTime = multicallResult[0];
+    const maximumTotalLock = multicallResult[1];
+    const totalLockedWei = multicallResult[2];
+    const totalCreditWei = multicallResult[3];
+    const lockAmountWei = multicallResult[4];
+    const withdrawn = multicallResult[5];
+    const tokenAddress = multicallResult[6];
+    const endOfEntryPeriod = multicallResult[7].toFixed();
+    const perAddressCapWei = multicallResult[8];
+    let startOfEntryPeriod = '0';
+    if (multicallResult[9]) {
+      startOfEntryPeriod = multicallResult[9].toFixed();
+    }
     let totalCredit = Utils.fromDecimals(totalCreditWei).toFixed();
     let lockAmount = Utils.fromDecimals(lockAmountWei).toFixed();
     let stakeQty = withdrawn ? '0' : lockAmount;
@@ -144,13 +176,6 @@ const getDefaultStakingByAddress = async (wallet: IWallet, option: ISingleStakin
       mode = 'Unlock';
     }
 
-    let startOfEntryPeriod = '0';
-    try {
-      startOfEntryPeriod = (await timeIsMoney.startOfEntryPeriod()).toFixed();
-    } catch (err) { }
-    // let tokenAddress = await timeIsMoney.token();
-    // let endOfEntryPeriod = (await timeIsMoney.endOfEntryPeriod()).toFixed();
-    // let perAddressCapWei = await timeIsMoney.perAddressCap();
     let stakingDecimals = 18 - getTokenDecimals(tokenAddress.toLocaleLowerCase(), wallet.chainId);
     let perAddressCap = Utils.fromDecimals(perAddressCapWei).shiftedBy(stakingDecimals).toFixed();
     let maxTotalLock = Utils.fromDecimals(maximumTotalLock).shiftedBy(stakingDecimals).toFixed();
@@ -171,86 +196,103 @@ const getDefaultStakingByAddress = async (wallet: IWallet, option: ISingleStakin
 
     if (hasRewardAddress) {
       let rewardsData: IRewardInfo[] = [];
-      let promises = rewards.map(async (reward, index) => {
-        return new Promise<void>(async (resolve, reject) => {
-          let rewardsContract, admin, multiplier, initialReward, rewardTokenAddress, vestingPeriod, vestingStartDate, claimDeadline;
-          try {
-            let claimable = '0';
-            if (reward.isCommonStartDate) {
-              rewardsContract = new TimeIsMoneyContracts.RewardsCommonStartDate(wallet, reward.address);
-            } else {
-              rewardsContract = new TimeIsMoneyContracts.Rewards(wallet, reward.address);
+      for (let index = 0; index < rewards.length; index++) {
+        let reward = rewards[index];
+        let rewardsContract, admin, multiplier, initialReward, rewardTokenAddress, vestingPeriod, vestingStartDate, claimDeadline;
+        try {
+          let claimable = '0';
+          if (reward.isCommonStartDate) {
+            rewardsContract = new TimeIsMoneyContracts.RewardsCommonStartDate(wallet, reward.address);
+          } else {
+            rewardsContract = new TimeIsMoneyContracts.Rewards(wallet, reward.address);
+          }
+          
+          let mulicallContracts: IMulticallContractCall[] = [
+            {
+              contract: rewardsContract,
+              methodName: 'admin',
+              params: [],
+              to: reward.address
+            },
+            {
+              contract: rewardsContract,
+              methodName: 'token',
+              params: [],
+              to: reward.address
+            },
+            {
+              contract: rewardsContract,
+              methodName: 'multiplier',
+              params: [],
+              to: reward.address
+            },
+            {
+              contract: rewardsContract,
+              methodName: 'initialReward',
+              params: [],
+              to: reward.address
+            },
+            {
+              contract: rewardsContract,
+              methodName: 'vestingPeriod',
+              params: [],
+              to: reward.address
+            },
+            {
+              contract: rewardsContract,
+              methodName: 'claimDeadline',
+              params: [],
+              to: reward.address
             }
-            if (mode === 'Claim') {
-              let unclaimedWei = await rewardsContract.unclaimed();
-              claimable = Utils.fromDecimals(unclaimedWei).toFixed();
-            }
-            const adminFuncCallData = wallet.encodeFunctionCall(rewardsContract, 'admin', []);
-            const tokenFuncCallData = wallet.encodeFunctionCall(rewardsContract, 'token', []);
-            const multiplierFuncCallData = wallet.encodeFunctionCall(rewardsContract, 'multiplier', []);
-            const initialRewardFuncCallData = wallet.encodeFunctionCall(rewardsContract, 'initialReward', []);
-            const vestingPeriodFuncCallData = wallet.encodeFunctionCall(rewardsContract, 'vestingPeriod', []);
-            const claimDeadlineFuncCallData = wallet.encodeFunctionCall(rewardsContract, 'claimDeadline', []);
-            let callDataArr = [
-              adminFuncCallData,
-              tokenFuncCallData,
-              multiplierFuncCallData,
-              initialRewardFuncCallData,
-              vestingPeriodFuncCallData,
-              claimDeadlineFuncCallData
-            ];
-            if (reward.isCommonStartDate) {
-              const vestingStartDateFuncCallData = wallet.encodeFunctionCall(rewardsContract, 'vestingStartDate', []);
-              callDataArr.push(vestingStartDateFuncCallData);
-            }
-            const result = await wallet.multiCall(callDataArr.map((callData) => {
-              return {
-                to: reward.address,
-                data: callData
-              }
-            }));
-            const multiCallResults = result.results;
-            admin = wallet.decodeAbiEncodedParameters(rewardsContract, 'admin', multiCallResults[0])[0];
-            rewardTokenAddress = wallet.decodeAbiEncodedParameters(rewardsContract, 'token', multiCallResults[1])[0];
-            let multiplierWei = new BigNumber(wallet.decodeAbiEncodedParameters(rewardsContract, 'multiplier', multiCallResults[2])[0]);
-            initialReward = new BigNumber(wallet.decodeAbiEncodedParameters(rewardsContract, 'initialReward', multiCallResults[3])[0]).toFixed();
-            vestingPeriod = new BigNumber(wallet.decodeAbiEncodedParameters(rewardsContract, 'vestingPeriod', multiCallResults[4])[0]).toNumber();
-            claimDeadline = new BigNumber(wallet.decodeAbiEncodedParameters(rewardsContract, 'claimDeadline', multiCallResults[5])[0]).toNumber();
-            if (reward.isCommonStartDate) {
-              vestingStartDate = new BigNumber(wallet.decodeAbiEncodedParameters(rewardsContract, 'vestingStartDate', multiCallResults[6])[0]).toNumber();
-            }
-            // admin = await rewardsContract.admin();
-            // rewardTokenAddress = await rewardsContract.token();
-            // let multiplierWei = await rewardsContract.multiplier();
-            // initialReward = Utils.fromDecimals(await rewardsContract.initialReward(), rewardTokenDecimals).toFixed();
-            // vestingPeriod = (await rewardsContract.vestingPeriod()).toNumber();
-            // claimDeadline = (await rewardsContract.claimDeadline()).toNumber();
-
-            // if (reward.isCommonStartDate) {
-            //   vestingStartDate = (await rewardsContract.vestingStartDate()).toNumber();
-            // }
-
-            let rewardToken = new Erc20(wallet, rewardTokenAddress);
-            let rewardTokenDecimals = await rewardToken.decimals;
-            multiplier = Utils.fromDecimals(multiplierWei, rewardTokenDecimals).toFixed();
-            let rewardAmount = new BigNumber(multiplier).multipliedBy(maxTotalLock).toFixed();
-            rewardsData.push({
-              ...reward,
-              claimable,
-              rewardTokenAddress,
-              multiplier,
-              initialReward,
-              vestingPeriod,
-              admin,
-              vestingStartDate,
-              rewardAmount,
-              index
+          ];
+          if (mode === 'Claim') {
+            mulicallContracts.push({
+              contract: rewardsContract,
+              methodName: 'unclaimed',
+              params: [],
+              to: reward.address
             });
-          } catch { }
-          resolve();
-        })
-      });
-      await Promise.all(promises);
+          }
+          if (reward.isCommonStartDate) {
+            mulicallContracts.push({
+              contract: rewardsContract,
+              methodName: 'vestingStartDate',
+              params: [],
+              to: reward.address
+            });
+          }
+          let multicallResult = await wallet.doMulticall(mulicallContracts);
+          admin = multicallResult[0];
+          rewardTokenAddress = multicallResult[1];
+          let multiplierWei = multicallResult[2];
+          initialReward = multicallResult[3].toFixed();
+          vestingPeriod = multicallResult[4].toNumber();
+          claimDeadline = multicallResult[5].toNumber();
+          if (mode === 'Claim') {
+            claimable = Utils.fromDecimals(multicallResult[6]).toFixed();
+          }
+          if (reward.isCommonStartDate) {
+            vestingStartDate = multicallResult[7].toNumber();
+          }
+
+          let rewardToken = new Contracts.ERC20(wallet, rewardTokenAddress);
+          let rewardTokenDecimals = await (await rewardToken.decimals()).toNumber();
+          multiplier = Utils.fromDecimals(multiplierWei, rewardTokenDecimals).toFixed();
+          let rewardAmount = new BigNumber(multiplier).multipliedBy(maxTotalLock).toFixed();
+          rewardsData.push({
+            ...reward,
+            claimable,
+            rewardTokenAddress,
+            multiplier,
+            initialReward,
+            vestingPeriod,
+            admin,
+            vestingStartDate,
+            rewardAmount,
+            index
+          });
+        } catch { }
+      }
       return {
         ...option,
         ...obj,

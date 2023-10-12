@@ -296,11 +296,8 @@ export default class ManageStake extends Module {
         }
       },
       onApproved: async (token: ITokenObject) => {
-        const rpcWallet = this.state.getRpcWallet();
         try {
-          if (rpcWallet.address) {
-            await tokenStore.updateTokenBalances(rpcWallet, [getChainNativeToken(this.state.getChainId())]);
-          }
+          await tokenStore.updateNativeTokenBalanceByChainId(this.state.getChainId());
         } catch { }
         await this.updateEnableInput();
         this.btnApprove.rightIcon.visible = false;
@@ -332,10 +329,8 @@ export default class ManageStake extends Module {
       },
       onPaid: async (data?: any, receipt?: TransactionReceipt) => {
         if (this.onRefresh) {
-          const rpcWallet = this.state.getRpcWallet();
-          if (rpcWallet.address) {
-            await tokenStore.updateAllTokenBalances(rpcWallet);
-          }
+          const chainId = this.state.getChainId();
+          await tokenStore.updateTokenBalancesByChainId(chainId);
           await this.onRefresh();
           this.state.setStakingStatus(this.currentMode, false);
         }

@@ -781,7 +781,6 @@ declare module "@scom/scom-staking" {
         removeRpcWalletEvents(): void;
         onHide(): void;
         private onChainChanged;
-        private isWalletValid;
         private refreshUI;
         private initializeWidgetConfig;
         private initWallet;
