@@ -18,17 +18,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 define("@scom/scom-staking/assets.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -178,17 +167,16 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
             }
         }
         initRpcWallet(chainId) {
-            var _a, _b, _c;
             if (this.rpcWalletId) {
                 return this.rpcWalletId;
             }
             const clientWallet = eth_wallet_3.Wallet.getClientInstance();
-            const networkList = Object.values(((_a = components_3.application.store) === null || _a === void 0 ? void 0 : _a.networkMap) || []);
+            const networkList = Object.values(components_3.application.store?.networkMap || []);
             const instanceId = clientWallet.initRpcWallet({
                 networks: networkList,
                 defaultChainId: chainId,
-                infuraId: (_b = components_3.application.store) === null || _b === void 0 ? void 0 : _b.infuraId,
-                multicalls: (_c = components_3.application.store) === null || _c === void 0 ? void 0 : _c.multicalls
+                infuraId: components_3.application.store?.infuraId,
+                multicalls: components_3.application.store?.multicalls
             });
             this.rpcWalletId = instanceId;
             if (clientWallet.address) {
@@ -214,7 +202,10 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
                         network.rpcUrls[i] = network.rpcUrls[i].replace(/{InfuraId}/g, infuraId);
                     }
                 }
-                this.networkMap[network.chainId] = Object.assign(Object.assign({}, networkInfo), network);
+                this.networkMap[network.chainId] = {
+                    ...networkInfo,
+                    ...network
+                };
                 wallet.setNetworkInfo(this.networkMap[network.chainId]);
             }
         }
@@ -237,14 +228,17 @@ define("@scom/scom-staking/store/utils.ts", ["require", "exports", "@ijstech/eth
         }
         isRpcWalletConnected() {
             const wallet = this.getRpcWallet();
-            return wallet === null || wallet === void 0 ? void 0 : wallet.isConnected;
+            return wallet?.isConnected;
         }
         getChainId() {
             const rpcWallet = this.getRpcWallet();
-            return rpcWallet === null || rpcWallet === void 0 ? void 0 : rpcWallet.chainId;
+            return rpcWallet?.chainId;
         }
         async setApprovalModelAction(options) {
-            const approvalOptions = Object.assign(Object.assign({}, options), { spenderAddress: '' });
+            const approvalOptions = {
+                ...options,
+                spenderAddress: ''
+            };
             let wallet = this.getRpcWallet();
             this.approvalModel = new eth_wallet_3.ERC20ApprovalModel(wallet, approvalOptions);
             let approvalModelAction = this.approvalModel.getAction();
@@ -323,7 +317,6 @@ define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-s
     };
     exports.getLockedTokenSymbol = getLockedTokenSymbol;
     const getLockedTokenIconPaths = (info, tokenObject, chainId, tokenMap) => {
-        var _a;
         if (info && tokenObject) {
             if (!tokenMap) {
                 tokenMap = scom_token_list_1.tokenStore.getTokenMapByChainId(chainId);
@@ -332,7 +325,7 @@ define("@scom/scom-staking/store/index.ts", ["require", "exports", "@scom/scom-s
                 return [scom_token_list_1.assets.getTokenIconPath(tokenObject, chainId)];
             }
             if (info.lockTokenType == index_3.LockTokenType.LP_Token) {
-                const nativeToken = (_a = scom_token_list_1.DefaultTokens[chainId]) === null || _a === void 0 ? void 0 : _a.find((token) => token.isNative);
+                const nativeToken = scom_token_list_1.DefaultTokens[chainId]?.find((token) => token.isNative);
                 const token0 = tokenMap[tokenObject.token0] || nativeToken;
                 const token1 = tokenMap[tokenObject.token1] || nativeToken;
                 return [scom_token_list_1.assets.getTokenIconPath(token0, chainId), scom_token_list_1.assets.getTokenIconPath(token1, chainId)];
@@ -651,7 +644,9 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
                         let rewardTokenDecimals = await (await rewardToken.decimals()).toNumber();
                         multiplier = eth_wallet_4.Utils.fromDecimals(multiplierWei, rewardTokenDecimals).toFixed();
                         let rewardAmount = new eth_wallet_4.BigNumber(multiplier).multipliedBy(maxTotalLock).toFixed();
-                        rewardsData.push(Object.assign(Object.assign({}, reward), { claimable,
+                        rewardsData.push({
+                            ...reward,
+                            claimable,
                             rewardTokenAddress,
                             multiplier,
                             initialReward,
@@ -659,11 +654,17 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
                             admin,
                             vestingStartDate,
                             rewardAmount,
-                            index }));
+                            index
+                        });
                     }
-                    catch (_a) { }
+                    catch { }
                 }
-                return Object.assign(Object.assign(Object.assign({}, option), obj), { rewardsData: rewardsData, rewards: rewardsData.sort((a, b) => a.index - b.index) });
+                return {
+                    ...option,
+                    ...obj,
+                    rewardsData: rewardsData,
+                    rewards: rewardsData.sort((a, b) => a.index - b.index)
+                };
             }
             else {
                 return obj;
@@ -675,20 +676,26 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
         }
     };
     const getCampaignInfo = async (wallet, stakingInfo) => {
-        var _a;
         let chainId = wallet.chainId;
         let stakingCampaignInfo = stakingInfo[chainId];
         if (!stakingCampaignInfo)
             return null;
-        let staking = Object.assign({}, stakingCampaignInfo.staking);
+        let staking = { ...stakingCampaignInfo.staking };
         let optionExtendedInfo;
         try {
             optionExtendedInfo = await getDefaultStakingByAddress(wallet, staking);
         }
         catch (error) { }
-        let stakingExtendInfo = Object.assign(Object.assign({}, staking), optionExtendedInfo);
+        let stakingExtendInfo = { ...staking, ...optionExtendedInfo };
         // const admin = stakingExtendInfo.rewards && stakingExtendInfo.rewards[0] ? stakingExtendInfo.rewards[0].admin : '';
-        return Object.assign(Object.assign({}, stakingCampaignInfo), { campaignStart: stakingExtendInfo.startOfEntryPeriod / 1000, campaignEnd: stakingExtendInfo.endOfEntryPeriod / 1000, tokenAddress: (_a = stakingExtendInfo.tokenAddress) === null || _a === void 0 ? void 0 : _a.toLowerCase(), option: stakingExtendInfo });
+        return {
+            // admin,
+            ...stakingCampaignInfo,
+            campaignStart: stakingExtendInfo.startOfEntryPeriod / 1000,
+            campaignEnd: stakingExtendInfo.endOfEntryPeriod / 1000,
+            tokenAddress: stakingExtendInfo.tokenAddress?.toLowerCase(),
+            option: stakingExtendInfo
+        };
     };
     exports.getCampaignInfo = getCampaignInfo;
     const getStakingTotalLocked = async (wallet, stakingAddress) => {
@@ -747,7 +754,7 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
                 assetToken
             };
         }
-        catch (_a) {
+        catch {
             return {};
         }
     };
@@ -873,7 +880,7 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
             let VaultTokenPrice = new eth_wallet_4.BigNumber(assetTokenPrice).times(lpToAssetRatio).toFixed();
             APR = new eth_wallet_4.BigNumber(rewardOption.multiplier).times(new eth_wallet_4.BigNumber(rewardPrice).times(365)).div(new eth_wallet_4.BigNumber(VaultTokenPrice).times(lockedDays)).toFixed();
         }
-        catch (_a) { }
+        catch { }
         return APR;
     };
     exports.getVaultRewardCurrentAPR = getVaultRewardCurrentAPR;
@@ -1017,7 +1024,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                 else {
                     params.content = content;
                 }
-                this.txStatusModal.message = Object.assign({}, params);
+                this.txStatusModal.message = { ...params };
                 this.txStatusModal.showModal();
             };
             this.onApproveToken = async () => {
@@ -1033,24 +1040,21 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                 this.approvalModelAction.doPayAction();
             };
             this.onInputAmount = () => {
-                var _a;
                 if (this.inputAmount.enabled === false)
                     return;
                 this.currentMode = index_5.CurrentMode.STAKE;
-                (0, index_5.limitInputNumber)(this.inputAmount, ((_a = this.lockedTokenObject) === null || _a === void 0 ? void 0 : _a.decimals) || 18);
+                (0, index_5.limitInputNumber)(this.inputAmount, this.lockedTokenObject?.decimals || 18);
                 if (this.state.isRpcWalletConnected())
                     this.approvalModelAction.checkAllowance(this.lockedTokenObject, this.inputAmount.value);
             };
             this.setMaxBalance = () => {
-                var _a;
                 this.currentMode = index_5.CurrentMode.STAKE;
                 this.inputAmount.value = eth_wallet_5.BigNumber.min(this.availableQty, this.balance, this.perAddressCap).toFixed();
-                (0, index_5.limitInputNumber)(this.inputAmount, ((_a = this.lockedTokenObject) === null || _a === void 0 ? void 0 : _a.decimals) || 18);
+                (0, index_5.limitInputNumber)(this.inputAmount, this.lockedTokenObject?.decimals || 18);
                 if (this.state.isRpcWalletConnected())
                     this.approvalModelAction.checkAllowance(this.lockedTokenObject, this.inputAmount.value);
             };
             this.renderStakingInfo = async (info) => {
-                var _a;
                 if (!info || !Object.keys(info).length) {
                     this.btnApprove.visible = false;
                     if (!this.state.isRpcWalletConnected()) {
@@ -1086,7 +1090,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                     vaultToken: vaultTokenData
                 };
                 this.lockedTokenObject = (0, index_6.getLockedTokenObject)(info, tokenInfo, this.tokenMap);
-                const defaultDecimalsOffset = 18 - (((_a = this.lockedTokenObject) === null || _a === void 0 ? void 0 : _a.decimals) || 18);
+                const defaultDecimalsOffset = 18 - (this.lockedTokenObject?.decimals || 18);
                 const symbol = (0, index_6.getLockedTokenSymbol)(info, this.lockedTokenObject);
                 this.tokenSymbol = symbol;
                 this.perAddressCap = new eth_wallet_5.BigNumber(info.perAddressCap).shiftedBy(defaultDecimalsOffset).toFixed();
@@ -1154,13 +1158,12 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                 await this.renderStakingInfo(this.stakingInfo);
             };
             this.updateEnableInput = async () => {
-                var _a, _b;
-                if (((_a = this.stakingInfo) === null || _a === void 0 ? void 0 : _a.mode) !== 'Stake')
+                if (this.stakingInfo?.mode !== 'Stake')
                     return;
                 const totalLocked = await (0, index_7.getStakingTotalLocked)(this.state.getRpcWallet(), this.address);
                 const activeStartTime = this.stakingInfo.startOfEntryPeriod;
                 const activeEndTime = this.stakingInfo.endOfEntryPeriod;
-                const lockedTokenDecimals = ((_b = this.lockedTokenObject) === null || _b === void 0 ? void 0 : _b.decimals) || 18;
+                const lockedTokenDecimals = this.lockedTokenObject?.decimals || 18;
                 const defaultDecimalsOffset = 18 - lockedTokenDecimals;
                 const optionQty = new eth_wallet_5.BigNumber(this.stakingInfo.maxTotalLock).minus(totalLocked).shiftedBy(defaultDecimalsOffset);
                 const isStarted = (0, components_6.moment)(activeStartTime).diff((0, components_6.moment)()) <= 0;
@@ -1204,9 +1207,8 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                     this.btnUnstake.enabled = this.stakingInfo.mode !== 'Stake' && new eth_wallet_5.BigNumber(this.stakeQty).gt(0);
                 },
                 onToBePaid: async (token) => {
-                    var _a;
                     this.btnApprove.visible = false;
-                    const isClosed = (0, components_6.moment)(((_a = this.stakingInfo) === null || _a === void 0 ? void 0 : _a.endOfEntryPeriod) || 0).diff((0, components_6.moment)()) <= 0;
+                    const isClosed = (0, components_6.moment)(this.stakingInfo?.endOfEntryPeriod || 0).diff((0, components_6.moment)()) <= 0;
                     if (this.currentMode === index_5.CurrentMode.STAKE) {
                         const amount = new eth_wallet_5.BigNumber(this.inputAmount.value);
                         if (amount.gt(this.balance)) {
@@ -1238,7 +1240,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                     try {
                         await scom_token_list_3.tokenStore.updateNativeTokenBalanceByChainId(this.state.getChainId());
                     }
-                    catch (_a) { }
+                    catch { }
                     await this.updateEnableInput();
                     this.btnApprove.rightIcon.visible = false;
                     this.btnApprove.visible = false;
@@ -1646,8 +1648,7 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                     return networkPicker;
                 },
                 getData: (control) => {
-                    var _a;
-                    return (_a = control.selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId;
+                    return control.selectedNetwork?.chainId;
                 },
                 setData: (control, value) => {
                     control.setNetworkByChainId(value);
@@ -1764,12 +1765,11 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
                 }
             };
             this.initializeWidgetConfig = async () => {
-                var _a;
                 let connected = (0, index_9.isClientWalletConnected)();
                 this.displayWalletStatus(connected);
                 await this.initWallet();
                 scom_token_list_4.tokenStore.updateTokenMapData(this.executionProperties.chainId);
-                let tokenAddress = (_a = this.tokenRequirements[0].tokenOut.address) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+                let tokenAddress = this.tokenRequirements[0].tokenOut.address?.toLowerCase();
                 this.tokenInput.chainId = this.executionProperties.chainId;
                 const tokenMap = scom_token_list_4.tokenStore.getTokenMapByChainId(this.executionProperties.chainId);
                 const token = tokenMap[tokenAddress];
@@ -1911,7 +1911,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         return {
                             execute: async () => {
                                 oldData = JSON.parse(JSON.stringify(this._data));
-                                const { chainId, name, desc, logo, getTokenURL, showContractLink, staking } = userInputData, themeSettings = __rest(userInputData, ["chainId", "name", "desc", "logo", "getTokenURL", "showContractLink", "staking"]);
+                                const { chainId, name, desc, logo, getTokenURL, showContractLink, staking, ...themeSettings } = userInputData;
                                 const generalSettings = {
                                     chainId,
                                     name,
@@ -1937,7 +1937,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                                     this._data.staking = generalSettings.staking;
                                 await this.resetRpcWallet();
                                 this.refreshUI();
-                                if (builder === null || builder === void 0 ? void 0 : builder.setData)
+                                if (builder?.setData)
                                     builder.setData(this._data);
                                 oldTag = JSON.parse(JSON.stringify(this.tag));
                                 if (builder)
@@ -1950,7 +1950,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             undo: async () => {
                                 this._data = JSON.parse(JSON.stringify(oldData));
                                 this.refreshUI();
-                                if (builder === null || builder === void 0 ? void 0 : builder.setData)
+                                if (builder?.setData)
                                     builder.setData(this._data);
                                 this.tag = JSON.parse(JSON.stringify(oldTag));
                                 if (builder)
@@ -1988,8 +1988,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     name: 'Project Owner Configurator',
                     target: 'Project Owners',
                     getProxySelectors: async (chainId) => {
-                        var _a, _b, _c;
-                        const address = (_c = (_b = (_a = this.campaign) === null || _a === void 0 ? void 0 : _a.option) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.address;
+                        const address = this.campaign?.option?.[0]?.address;
                         const selectors = await (0, index_12.getProxySelectors)(this.state, chainId, address);
                         return selectors;
                     },
@@ -2012,7 +2011,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     getData: this.getData.bind(this),
                     setData: async (data) => {
                         const defaultData = data_json_1.default.defaultBuilderData;
-                        await this.setData(Object.assign(Object.assign({}, defaultData), data));
+                        await this.setData({ ...defaultData, ...data });
                     },
                     getTag: this.getTag.bind(this),
                     setTag: this.setTag.bind(this)
@@ -2031,20 +2030,26 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         if (params.data) {
                             const decodedString = window.atob(params.data);
                             const commissions = JSON.parse(decodedString);
-                            let resultingData = Object.assign(Object.assign({}, self._data), { commissions });
+                            let resultingData = {
+                                ...self._data,
+                                commissions
+                            };
                             await this.setData(resultingData);
                         }
                     },
                     bindOnChanged: (element, callback) => {
                         element.onChanged = async (data) => {
-                            let resultingData = Object.assign(Object.assign({}, self._data), data);
+                            let resultingData = {
+                                ...self._data,
+                                ...data
+                            };
                             await this.setData(resultingData);
                             await callback(data);
                         };
                     },
                     getData: () => {
                         const fee = this.state.embedderCommissionFee;
-                        return Object.assign(Object.assign({}, this.getData()), { fee });
+                        return { ...this.getData(), fee };
                     },
                     setData: this.setData.bind(this),
                     getTag: this.getTag.bind(this),
@@ -2056,7 +2061,6 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             return this._data;
         }
         async resetRpcWallet() {
-            var _a;
             this.removeRpcWalletEvents();
             const rpcWalletId = await this.state.initRpcWallet(this.chainId);
             const rpcWallet = this.rpcWallet;
@@ -2074,7 +2078,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 showHeader: this.showHeader,
                 rpcWalletId: rpcWallet.instanceId
             };
-            if ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.setData)
+            if (this.dappContainer?.setData)
                 this.dappContainer.setData(data);
             // TODO - update proxy address
         }
@@ -2087,8 +2091,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             return this.tag;
         }
         updateTag(type, value) {
-            var _a;
-            this.tag[type] = (_a = this.tag[type]) !== null && _a !== void 0 ? _a : {};
+            this.tag[type] = this.tag[type] ?? {};
             for (let prop in value) {
                 if (value.hasOwnProperty(prop))
                     this.tag[type][prop] = value[prop];
@@ -2114,35 +2117,31 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 this.style.removeProperty(name);
         }
         updateTheme() {
-            var _a, _b, _c, _d, _e, _f, _g, _h;
-            const themeVar = ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.theme) || 'light';
-            this.updateStyle('--text-primary', (_b = this.tag[themeVar]) === null || _b === void 0 ? void 0 : _b.fontColor);
-            this.updateStyle('--background-main', (_c = this.tag[themeVar]) === null || _c === void 0 ? void 0 : _c.backgroundColor);
-            this.updateStyle('--text-secondary', (_d = this.tag[themeVar]) === null || _d === void 0 ? void 0 : _d.textSecondary);
+            const themeVar = this.dappContainer?.theme || 'light';
+            this.updateStyle('--text-primary', this.tag[themeVar]?.fontColor);
+            this.updateStyle('--background-main', this.tag[themeVar]?.backgroundColor);
+            this.updateStyle('--text-secondary', this.tag[themeVar]?.textSecondary);
             // this.updateStyle('--colors-primary-main', this.tag[themeVar]?.buttonBackgroundColor);
             // this.updateStyle('--colors-primary-contrast_text', this.tag[themeVar]?.buttonFontColor);
-            this.updateStyle('--colors-secondary-main', (_e = this.tag[themeVar]) === null || _e === void 0 ? void 0 : _e.secondaryColor);
-            this.updateStyle('--colors-secondary-contrast_text', (_f = this.tag[themeVar]) === null || _f === void 0 ? void 0 : _f.secondaryFontColor);
-            this.updateStyle('--input-font_color', (_g = this.tag[themeVar]) === null || _g === void 0 ? void 0 : _g.inputFontColor);
-            this.updateStyle('--input-background', (_h = this.tag[themeVar]) === null || _h === void 0 ? void 0 : _h.inputBackgroundColor);
+            this.updateStyle('--colors-secondary-main', this.tag[themeVar]?.secondaryColor);
+            this.updateStyle('--colors-secondary-contrast_text', this.tag[themeVar]?.secondaryFontColor);
+            this.updateStyle('--input-font_color', this.tag[themeVar]?.inputFontColor);
+            this.updateStyle('--input-background', this.tag[themeVar]?.inputBackgroundColor);
         }
         get wallets() {
-            var _a;
-            return (_a = this._data.wallets) !== null && _a !== void 0 ? _a : [];
+            return this._data.wallets ?? [];
         }
         set wallets(value) {
             this._data.wallets = value;
         }
         get networks() {
-            var _a;
-            return (_a = this._data.networks) !== null && _a !== void 0 ? _a : [];
+            return this._data.networks ?? [];
         }
         set networks(value) {
             this._data.networks = value;
         }
         get showHeader() {
-            var _a;
-            return (_a = this._data.showHeader) !== null && _a !== void 0 ? _a : true;
+            return this._data.showHeader ?? true;
         }
         set showHeader(value) {
             this._data.showHeader = value;
@@ -2205,7 +2204,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 else {
                     params.content = content;
                 }
-                this.txStatusModal.message = Object.assign({}, params);
+                this.txStatusModal.message = { ...params };
                 this.txStatusModal.showModal();
             };
             this.onClaim = async (btnClaim, data) => {
@@ -2258,7 +2257,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 clearInterval(this.activeTimer);
             };
             this.getRewardToken = (tokenAddress) => {
-                return this.tokenMap[tokenAddress] || this.tokenMap[tokenAddress === null || tokenAddress === void 0 ? void 0 : tokenAddress.toLocaleLowerCase()] || {};
+                return this.tokenMap[tokenAddress] || this.tokenMap[tokenAddress?.toLocaleLowerCase()] || {};
             };
             this.getLPToken = (campaign, token, chainId) => {
                 if (campaign.getTokenURL) {
@@ -2327,7 +2326,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 const campaign = this.campaign;
                 const containerSection = await components_9.Panel.create();
                 // containerSection.classList.add('container');
-                let opt = Object.assign({}, campaign.option);
+                let opt = { ...campaign.option };
                 let lpTokenData = {};
                 let vaultTokenData = {};
                 if (opt.tokenAddress) {
@@ -2347,12 +2346,15 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     lpToken: lpTokenData,
                     vaultToken: vaultTokenData
                 };
-                opt = Object.assign(Object.assign({}, opt), { tokenInfo });
+                opt = {
+                    ...opt,
+                    tokenInfo
+                };
                 const stakingInfo = opt;
                 const lockedTokenObject = (0, index_11.getLockedTokenObject)(stakingInfo, stakingInfo.tokenInfo, this.tokenMap);
                 const lockedTokenSymbol = (0, index_11.getLockedTokenSymbol)(stakingInfo, lockedTokenObject);
                 const lockedTokenIconPaths = (0, index_11.getLockedTokenIconPaths)(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
-                const lockedTokenDecimals = (lockedTokenObject === null || lockedTokenObject === void 0 ? void 0 : lockedTokenObject.decimals) || 18;
+                const lockedTokenDecimals = lockedTokenObject?.decimals || 18;
                 const defaultDecimalsOffset = 18 - lockedTokenDecimals;
                 const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
                 const activeEndTime = stakingInfo ? stakingInfo.endOfEntryPeriod : 0;
@@ -2492,7 +2494,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     setAvailableQty();
                 };
                 setTimer();
-                const option = Object.assign({}, opt);
+                const option = { ...opt };
                 this.manageStake = new index_13.default(undefined, {
                     width: '100%',
                 });
@@ -2583,7 +2585,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 const _lockedTokenObject = (0, index_11.getLockedTokenObject)(option, option.tokenInfo, this.tokenMap);
                 const _lockedTokenIconPaths = (0, index_11.getLockedTokenIconPaths)(option, _lockedTokenObject, chainId, this.tokenMap);
                 const pathsLength = _lockedTokenIconPaths.length;
-                const rewardToken = (rewardsData === null || rewardsData === void 0 ? void 0 : rewardsData.length) ? this.getRewardToken(rewardsData[0].rewardTokenAddress) : null;
+                const rewardToken = rewardsData?.length ? this.getRewardToken(rewardsData[0].rewardTokenAddress) : null;
                 stakingElm.appendChild(this.$render("i-vstack", { gap: 15, width: index_11.maxWidth, height: "100%", padding: { top: 10, bottom: 10, left: 20, right: 20 }, position: "relative" },
                     stickerSection,
                     this.$render("i-hstack", { gap: 10, width: "100%", verticalAlignment: "center" },
@@ -2607,7 +2609,6 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             // const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
                             const rateDesc = `1 ${lockTokenType === index_10.LockTokenType.LP_Token ? 'LP' : (0, index_11.tokenSymbol)(this.chainId, option.lockTokenAddress)} : ${rewardOption.multiplier} ${(0, index_11.tokenSymbol)(this.chainId, rewardOption.rewardTokenAddress)}`;
                             const updateApr = async () => {
-                                var _a, _b, _c, _d;
                                 if (lockTokenType === index_10.LockTokenType.ERC20_Token) {
                                     const apr = await (0, index_12.getERC20RewardCurrentAPR)(rpcWallet, rewardOption, lockedTokenObject, durationDays);
                                     if (!isNaN(parseFloat(apr))) {
@@ -2616,11 +2617,11 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                                 }
                                 else if (lockTokenType === index_10.LockTokenType.LP_Token) {
                                     if (rewardOption.referencePair) {
-                                        aprInfo[rewardOption.rewardTokenAddress] = await (0, index_12.getLPRewardCurrentAPR)(rpcWallet, rewardOption, (_b = (_a = option.tokenInfo) === null || _a === void 0 ? void 0 : _a.lpToken) === null || _b === void 0 ? void 0 : _b.object, durationDays);
+                                        aprInfo[rewardOption.rewardTokenAddress] = await (0, index_12.getLPRewardCurrentAPR)(rpcWallet, rewardOption, option.tokenInfo?.lpToken?.object, durationDays);
                                     }
                                 }
                                 else {
-                                    aprInfo[rewardOption.rewardTokenAddress] = await (0, index_12.getVaultRewardCurrentAPR)(rpcWallet, rewardOption, (_d = (_c = option.tokenInfo) === null || _c === void 0 ? void 0 : _c.vaultToken) === null || _d === void 0 ? void 0 : _d.object, durationDays);
+                                    aprInfo[rewardOption.rewardTokenAddress] = await (0, index_12.getVaultRewardCurrentAPR)(rpcWallet, rewardOption, option.tokenInfo?.vaultToken?.object, durationDays);
                                 }
                                 const aprValue = getAprValue(rewardOption);
                                 lbApr.caption = `APR ${aprValue}`;
@@ -2659,7 +2660,10 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         claimStakedRow,
                         this.$render("i-vstack", { verticalAlignment: "center", horizontalAlignment: "center" }, this.manageStake),
                         rowRewards)));
-                await this.manageStake.setData(Object.assign(Object.assign({}, campaign), option));
+                await this.manageStake.setData({
+                    ...campaign,
+                    ...option
+                });
                 if (this._data.stakeInputValue) {
                     this.manageStake.setInputValue(this._data.stakeInputValue);
                 }
