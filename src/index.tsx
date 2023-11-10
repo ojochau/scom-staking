@@ -1083,6 +1083,8 @@ export default class ScomStaking extends Module {
 			let tag = options.tag;
 			this.state.handleNextFlowStep = options.onNextStep;
 			this.state.handleAddTransactions = options.onAddTransactions;
+            this.state.handleJumpToStep = options.onJumpToStep;
+            this.state.handleUpdateStepStatus = options.onUpdateStepStatus;
 			await this.setData(properties);
 			if (tag) {
 				await this.setTag(tag);
