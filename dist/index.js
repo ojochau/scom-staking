@@ -1280,6 +1280,12 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                     if (this.currentMode === index_5.CurrentMode.STAKE) {
                         this.btnStake.caption = 'Stake';
                         this.btnStake.rightIcon.visible = false;
+                        if (this.state.handleUpdateStepStatus) {
+                            this.state.handleUpdateStepStatus({
+                                status: "Completed",
+                                color: Theme.colors.success.main
+                            });
+                        }
                         if (this.state.handleAddTransactions) {
                             let event = (0, index_7.parseDepositEvent)(this.state, receipt, this.address);
                             const timestamp = await this.state.getRpcWallet().getBlockTimestamp(receipt.blockNumber.toString());
@@ -1780,6 +1786,12 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
                 this.tokenInput.readOnly = true;
                 this.tokenRequirements[0].tokenOut.amount = this.tokenInput.value;
                 this.executionProperties.stakeInputValue = this.tokenInput.value;
+                if (this.state.handleUpdateStepStatus) {
+                    this.state.handleUpdateStepStatus({
+                        status: "Completed",
+                        color: Theme.colors.success.main
+                    });
+                }
                 if (this.state.handleNextFlowStep) {
                     this.state.handleNextFlowStep({
                         isInitialSetup: true,
@@ -1871,6 +1883,8 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
                 let tokenRequirements = options.tokenRequirements;
                 this.state.handleNextFlowStep = options.onNextStep;
                 this.state.handleAddTransactions = options.onAddTransactions;
+                this.state.handleJumpToStep = options.onJumpToStep;
+                this.state.handleUpdateStepStatus = options.onUpdateStepStatus;
                 await this.setData({
                     executionProperties: properties,
                     tokenRequirements
@@ -2731,6 +2745,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 let tag = options.tag;
                 this.state.handleNextFlowStep = options.onNextStep;
                 this.state.handleAddTransactions = options.onAddTransactions;
+                this.state.handleJumpToStep = options.onJumpToStep;
+                this.state.handleUpdateStepStatus = options.onUpdateStepStatus;
                 await this.setData(properties);
                 if (tag) {
                     await this.setTag(tag);

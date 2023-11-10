@@ -88,6 +88,12 @@ export default class ScomStakingFlowInitialSetup extends Module {
         this.tokenInput.readOnly = true;
         this.tokenRequirements[0].tokenOut.amount = this.tokenInput.value;
         this.executionProperties.stakeInputValue = this.tokenInput.value;
+        if (this.state.handleUpdateStepStatus) {
+            this.state.handleUpdateStepStatus({
+                status: "Completed",
+                color: Theme.colors.success.main
+            })
+        }
         if (this.state.handleNextFlowStep) {
             this.state.handleNextFlowStep({
                 isInitialSetup: true,
@@ -189,6 +195,8 @@ export default class ScomStakingFlowInitialSetup extends Module {
             let tokenRequirements = options.tokenRequirements;
             this.state.handleNextFlowStep = options.onNextStep;
             this.state.handleAddTransactions = options.onAddTransactions;
+            this.state.handleJumpToStep = options.onJumpToStep;
+            this.state.handleUpdateStepStatus = options.onUpdateStepStatus;
             await this.setData({ 
                 executionProperties: properties, 
                 tokenRequirements

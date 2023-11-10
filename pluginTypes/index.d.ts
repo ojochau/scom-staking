@@ -211,6 +211,8 @@ declare module "@scom/scom-staking/store/utils.ts" {
         approvalModel: ERC20ApprovalModel;
         handleNextFlowStep: (data: any) => Promise<void>;
         handleAddTransactions: (data: any) => Promise<void>;
+        handleJumpToStep: (data: any) => Promise<void>;
+        handleUpdateStepStatus: (data: any) => Promise<void>;
         constructor(options: any);
         private initData;
         initRpcWallet(chainId: number): string;
