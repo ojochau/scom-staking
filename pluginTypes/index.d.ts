@@ -567,7 +567,7 @@ declare module "@scom/scom-staking/formSchema.ts" {
             "#/properties/chainId": {
                 render: () => ScomNetworkPicker;
                 getData: (control: ScomNetworkPicker) => number;
-                setData: (control: ScomNetworkPicker, value: number) => void;
+                setData: (control: ScomNetworkPicker, value: number) => Promise<void>;
             };
         };
     };
@@ -732,19 +732,6 @@ declare module "@scom/scom-staking" {
         } | {
             name: string;
             target: string;
-            getActions: (category?: string) => any[];
-            getData: any;
-            setData: (data: any) => Promise<void>;
-            getTag: any;
-            setTag: any;
-            getProxySelectors?: undefined;
-            elementName?: undefined;
-            getLinkParams?: undefined;
-            setLinkParams?: undefined;
-            bindOnChanged?: undefined;
-        } | {
-            name: string;
-            target: string;
             elementName: string;
             getLinkParams: () => {
                 data: string;
@@ -762,6 +749,19 @@ declare module "@scom/scom-staking" {
             setTag: any;
             getProxySelectors?: undefined;
             getActions?: undefined;
+        } | {
+            name: string;
+            target: string;
+            getActions: (category?: string) => any[];
+            getData: any;
+            setData: any;
+            getTag: any;
+            setTag: any;
+            getProxySelectors?: undefined;
+            elementName?: undefined;
+            getLinkParams?: undefined;
+            setLinkParams?: undefined;
+            bindOnChanged?: undefined;
         })[];
         private getData;
         private resetRpcWallet;
