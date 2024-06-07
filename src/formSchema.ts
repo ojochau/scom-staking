@@ -189,7 +189,8 @@ export default {
             getData: (control: ScomNetworkPicker) => {
                 return control.selectedNetwork?.chainId;
             },
-            setData: (control: ScomNetworkPicker, value: number) => {
+            setData: async (control: ScomNetworkPicker, value: number) => {
+                await control.ready();
                 control.setNetworkByChainId(value);
             }
         }

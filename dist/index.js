@@ -1656,7 +1656,8 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                 getData: (control) => {
                     return control.selectedNetwork?.chainId;
                 },
-                setData: (control, value) => {
+                setData: async (control, value) => {
+                    await control.ready();
                     control.setNetworkByChainId(value);
                 }
             }
@@ -1909,7 +1910,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
     let ScomStaking = class ScomStaking extends components_9.Module {
         _getActions(category) {
             const actions = [];
-            if (category && category !== 'offers') {
+            if (category !== 'offers') {
                 actions.push({
                     name: 'Edit',
                     icon: 'edit',
@@ -2065,6 +2066,19 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         const fee = this.state.embedderCommissionFee;
                         return { ...this.getData(), fee };
                     },
+                    setData: this.setData.bind(this),
+                    getTag: this.getTag.bind(this),
+                    setTag: this.setTag.bind(this)
+                },
+                {
+                    name: 'Editor',
+                    target: 'Editor',
+                    getActions: (category) => {
+                        const actions = this._getActions(category);
+                        const editAction = actions.find(action => action.name === 'Edit');
+                        return editAction ? [editAction] : [];
+                    },
+                    getData: this.getData.bind(this),
                     setData: this.setData.bind(this),
                     getTag: this.getTag.bind(this),
                     setTag: this.setTag.bind(this)

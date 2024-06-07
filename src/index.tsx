@@ -89,7 +89,7 @@ export default class ScomStaking extends Module {
 
 	private _getActions(category?: string) {
 		const actions = [];
-		if (category && category !== 'offers') {
+		if (category !== 'offers') {
 			actions.push(
 				{
 					name: 'Edit',
@@ -249,6 +249,19 @@ export default class ScomStaking extends Module {
 				setData: this.setData.bind(this),
 				getTag: this.getTag.bind(this),
 				setTag: this.setTag.bind(this)
+			},
+			{
+			  name: 'Editor',
+			  target: 'Editor',
+			  getActions: (category?: string) => {
+				const actions = this._getActions(category);
+				const editAction = actions.find(action => action.name === 'Edit');
+				return editAction ? [editAction] : [];
+			  },
+			  getData: this.getData.bind(this),
+			  setData: this.setData.bind(this),
+			  getTag: this.getTag.bind(this),
+			  setTag: this.setTag.bind(this)
 			}
 		]
 	}
