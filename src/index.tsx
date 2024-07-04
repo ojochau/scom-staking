@@ -508,8 +508,8 @@ export default class ScomStaking extends Module {
 	}
 
 	async init() {
-		this.isReadyCallbackQueued = true;
-		super.init();
+		// this.isReadyCallbackQueued = true;
+		await super.init();
 		const lazyLoad = this.getAttribute('lazyLoad', true, false);
 		if (!lazyLoad) {
 			const data = this.getAttribute('data', true);
@@ -519,8 +519,8 @@ export default class ScomStaking extends Module {
 				this.renderEmpty();
 			}
 		}
-		this.isReadyCallbackQueued = false;
-		this.executeReadyCallback();
+		// this.isReadyCallbackQueued = false;
+		// this.executeReadyCallback();
 	}
 
 	private connectWallet = async () => {

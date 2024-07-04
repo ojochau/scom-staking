@@ -2713,8 +2713,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             this.removeRpcWalletEvents();
         }
         async init() {
-            this.isReadyCallbackQueued = true;
-            super.init();
+            // this.isReadyCallbackQueued = true;
+            await super.init();
             const lazyLoad = this.getAttribute('lazyLoad', true, false);
             if (!lazyLoad) {
                 const data = this.getAttribute('data', true);
@@ -2725,8 +2725,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     this.renderEmpty();
                 }
             }
-            this.isReadyCallbackQueued = false;
-            this.executeReadyCallback();
+            // this.isReadyCallbackQueued = false;
+            // this.executeReadyCallback();
         }
         render() {
             return (this.$render("i-scom-dapp-container", { id: "dappContainer", class: index_css_2.stakingDappContainer },
