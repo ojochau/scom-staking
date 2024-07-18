@@ -498,6 +498,18 @@ declare module "@scom/scom-staking/formSchema.ts" {
                             title: string;
                             format: string;
                         };
+                        primaryButtonBackground: {
+                            type: string;
+                            format: string;
+                        };
+                        primaryButtonHoverBackground: {
+                            type: string;
+                            format: string;
+                        };
+                        primaryButtonDisabledBackground: {
+                            type: string;
+                            format: string;
+                        };
                     };
                 };
                 light: {
@@ -534,6 +546,18 @@ declare module "@scom/scom-staking/formSchema.ts" {
                             title: string;
                             format: string;
                         };
+                        primaryButtonBackground: {
+                            type: string;
+                            format: string;
+                        };
+                        primaryButtonHoverBackground: {
+                            type: string;
+                            format: string;
+                        };
+                        primaryButtonDisabledBackground: {
+                            type: string;
+                            format: string;
+                        };
                     };
                 };
             };
@@ -558,7 +582,13 @@ declare module "@scom/scom-staking/formSchema.ts" {
                     elements: {
                         type: string;
                         label: string;
-                        scope: string;
+                        elements: {
+                            type: string;
+                            elements: {
+                                type: string;
+                                scope: string;
+                            }[];
+                        }[];
                     }[];
                 }[];
             })[];
