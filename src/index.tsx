@@ -285,7 +285,7 @@ export default class ScomStaking extends Module {
 		const data = {
 			defaultChainId: this.chainId,
 			wallets: this.wallets,
-			networks: this.networks,
+			networks: this.networks.length ? this.networks : [{ chainId: this.chainId }],
 			showHeader: this.showHeader,
 			rpcWalletId: rpcWallet.instanceId
 		}
@@ -337,12 +337,14 @@ export default class ScomStaking extends Module {
 		this.updateStyle('--text-primary', this.tag[themeVar]?.fontColor);
 		this.updateStyle('--background-main', this.tag[themeVar]?.backgroundColor);
 		this.updateStyle('--text-secondary', this.tag[themeVar]?.textSecondary);
-		// this.updateStyle('--colors-primary-main', this.tag[themeVar]?.buttonBackgroundColor);
-		// this.updateStyle('--colors-primary-contrast_text', this.tag[themeVar]?.buttonFontColor);
 		this.updateStyle('--colors-secondary-main', this.tag[themeVar]?.secondaryColor);
 		this.updateStyle('--colors-secondary-contrast_text', this.tag[themeVar]?.secondaryFontColor);
 		this.updateStyle('--input-font_color', this.tag[themeVar]?.inputFontColor);
 		this.updateStyle('--input-background', this.tag[themeVar]?.inputBackgroundColor);
+
+		this.updateStyle('--primary-button-background', this.tag[themeVar]?.primaryButtonBackground || 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box');
+		this.updateStyle('--primary-button-hover-background', this.tag[themeVar]?.primaryButtonHoverBackground || 'linear-gradient(255deg,#f15e61,#b52082)');
+		this.updateStyle('--primary-button-disabled-background', this.tag[themeVar]?.primaryButtonDisabledBackground || 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box');
 	}
 
 	get wallets() {
@@ -554,8 +556,8 @@ export default class ScomStaking extends Module {
 				justifyContent='center'
 				class="no-campaign text-center"
 			>
-				<i-vstack verticalAlignment="center" gap="1rem">
-					<i-image url={Assets.fullPath('img/staking/TrollTrooper.svg')} />
+				<i-vstack verticalAlignment="center" gap="1rem" width="100%" height="100%">
+					<i-image width="100%" height="100%" url={Assets.fullPath('img/staking/TrollTrooper.svg')} />
 					<i-label caption={isClientConnected ? 'No Campaigns' : 'Please connect with your wallet!'} font={{size: '1.5rem'}} letterSpacing={letterSpacing} />
 					{
 						// !isClientConnected || !isRpcConnected ? <i-button
@@ -793,7 +795,7 @@ export default class ScomStaking extends Module {
 
 		const isClaim = option.mode === 'Claim';
 
-		const rewardsData = option.rewardsData[0] ? [option.rewardsData[0]] : [];
+		const rewardsData =  option.rewardsData && option.rewardsData[0] ? [option.rewardsData[0]] : [];
 		const rewardOptions = !isClaim ? rewardsData : [];
 		let aprInfo: any = {};
 
@@ -860,7 +862,7 @@ export default class ScomStaking extends Module {
 					width: 16, height: 16
 				},
 				caption: rpcWalletConnected ? `Claim ${rewardSymbol}` : 'Switch Network',
-				font: { color: '#fff', size: '1rem', bold: true },
+				font: { size: '1rem', bold: true },
 				enabled: !rpcWalletConnected || (rpcWalletConnected && !(!passClaimStartTime || new BigNumber(reward.claimable).isZero()) && isClaim),
 				margin: { left: 'auto', right: 'auto', bottom: 10 },
 				padding: {top: '0.625rem', bottom: '0.625rem'},
@@ -1045,7 +1047,9 @@ export default class ScomStaking extends Module {
 				<i-panel class={stakingComponent} minHeight={200}>
 					<i-panel
 						id="stakingLayout"
-						width={maxWidth} height={maxHeight}
+						width={maxWidth}
+						height={maxHeight}
+						maxWidth="100%"
 						margin={{ left: 'auto', right: 'auto' }}
 						overflow={'hidden'}
 					>

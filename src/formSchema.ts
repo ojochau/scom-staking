@@ -27,14 +27,6 @@ const theme = {
             type: 'string',
             format: 'color'
         },
-        // buttonBackgroundColor: {
-        // 	type: 'string',
-        // 	format: 'color'
-        // },
-        // buttonFontColor: {
-        // 	type: 'string',
-        // 	format: 'color'
-        // },
         secondaryColor: {
             type: 'string',
             title: 'Timer Background Color',
@@ -43,6 +35,18 @@ const theme = {
         secondaryFontColor: {
             type: 'string',
             title: 'Timer Font Color',
+            format: 'color'
+        },
+        primaryButtonBackground: {
+            type: 'string',
+            format: 'color'
+        },
+        primaryButtonHoverBackground: {
+            type: 'string',
+            format: 'color'
+        },
+        primaryButtonDisabledBackground: {
+            type: 'string',
             format: 'color'
         }
     }
@@ -162,14 +166,120 @@ export default {
                         type: 'VerticalLayout',
                         elements: [
                             {
-                                type: 'Control',
+                                type: 'Group',
                                 label: 'Dark',
-                                scope: '#/properties/dark'
+                                elements: [
+                                    {
+                                        type: 'HorizontalLayout',
+                                        elements: [
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/dark/properties/inputBackgroundColor'
+                                            },
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/dark/properties/inputFontColor'
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        type: 'HorizontalLayout',
+                                        elements: [
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/dark/properties/secondaryColor'
+                                            },
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/dark/properties/secondaryFontColor'
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        type: 'HorizontalLayout',
+                                        elements: [
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/dark/properties/primaryButtonBackground'
+                                            },
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/dark/properties/primaryButtonHoverBackground'
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        type: 'HorizontalLayout',
+                                        elements: [
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/dark/properties/primaryButtonDisabledBackground'
+                                            },
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/dark/properties/textSecondary'
+                                            }
+                                        ]
+                                    }
+                                ]
                             },
                             {
-                                type: 'Control',
+                                type: 'Group',
                                 label: 'Light',
-                                scope: '#/properties/light'
+                                elements: [
+                                    {
+                                        type: 'HorizontalLayout',
+                                        elements: [
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/light/properties/inputBackgroundColor'
+                                            },
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/light/properties/inputFontColor'
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        type: 'HorizontalLayout',
+                                        elements: [
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/light/properties/secondaryColor'
+                                            },
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/light/properties/secondaryFontColor'
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        type: 'HorizontalLayout',
+                                        elements: [
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/light/properties/primaryButtonBackground'
+                                            },
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/light/properties/primaryButtonHoverBackground'
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        type: 'HorizontalLayout',
+                                        elements: [
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/light/properties/primaryButtonDisabledBackground'
+                                            },
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/light/properties/textSecondary'
+                                            }
+                                        ]
+                                    }
+                                ]
                             }
                         ]
                     }

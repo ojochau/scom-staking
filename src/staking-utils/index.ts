@@ -320,7 +320,9 @@ const getCampaignInfo = async (wallet: IWallet, stakingInfo: { [key: number]: IS
   try {
     optionExtendedInfo = await getDefaultStakingByAddress(wallet, staking);
   }
-  catch (error) { }
+  catch (error) {
+    return null;
+  }
   let stakingExtendInfo: IExtendOptionInfo = { ...staking, ...optionExtendedInfo };
 
   // const admin = stakingExtendInfo.rewards && stakingExtendInfo.rewards[0] ? stakingExtendInfo.rewards[0].admin : '';

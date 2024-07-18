@@ -685,7 +685,9 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
         try {
             optionExtendedInfo = await getDefaultStakingByAddress(wallet, staking);
         }
-        catch (error) { }
+        catch (error) {
+            return null;
+        }
         let stakingExtendInfo = { ...staking, ...optionExtendedInfo };
         // const admin = stakingExtendInfo.rewards && stakingExtendInfo.rewards[0] ? stakingExtendInfo.rewards[0].admin : '';
         return {
@@ -1495,14 +1497,6 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                 type: 'string',
                 format: 'color'
             },
-            // buttonBackgroundColor: {
-            // 	type: 'string',
-            // 	format: 'color'
-            // },
-            // buttonFontColor: {
-            // 	type: 'string',
-            // 	format: 'color'
-            // },
             secondaryColor: {
                 type: 'string',
                 title: 'Timer Background Color',
@@ -1511,6 +1505,18 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
             secondaryFontColor: {
                 type: 'string',
                 title: 'Timer Font Color',
+                format: 'color'
+            },
+            primaryButtonBackground: {
+                type: 'string',
+                format: 'color'
+            },
+            primaryButtonHoverBackground: {
+                type: 'string',
+                format: 'color'
+            },
+            primaryButtonDisabledBackground: {
+                type: 'string',
                 format: 'color'
             }
         }
@@ -1629,14 +1635,120 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                             type: 'VerticalLayout',
                             elements: [
                                 {
-                                    type: 'Control',
+                                    type: 'Group',
                                     label: 'Dark',
-                                    scope: '#/properties/dark'
+                                    elements: [
+                                        {
+                                            type: 'HorizontalLayout',
+                                            elements: [
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/dark/properties/inputBackgroundColor'
+                                                },
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/dark/properties/inputFontColor'
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            type: 'HorizontalLayout',
+                                            elements: [
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/dark/properties/secondaryColor'
+                                                },
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/dark/properties/secondaryFontColor'
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            type: 'HorizontalLayout',
+                                            elements: [
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/dark/properties/primaryButtonBackground'
+                                                },
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/dark/properties/primaryButtonHoverBackground'
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            type: 'HorizontalLayout',
+                                            elements: [
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/dark/properties/primaryButtonDisabledBackground'
+                                                },
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/dark/properties/textSecondary'
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 },
                                 {
-                                    type: 'Control',
+                                    type: 'Group',
                                     label: 'Light',
-                                    scope: '#/properties/light'
+                                    elements: [
+                                        {
+                                            type: 'HorizontalLayout',
+                                            elements: [
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/light/properties/inputBackgroundColor'
+                                                },
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/light/properties/inputFontColor'
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            type: 'HorizontalLayout',
+                                            elements: [
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/light/properties/secondaryColor'
+                                                },
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/light/properties/secondaryFontColor'
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            type: 'HorizontalLayout',
+                                            elements: [
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/light/properties/primaryButtonBackground'
+                                                },
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/light/properties/primaryButtonHoverBackground'
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            type: 'HorizontalLayout',
+                                            elements: [
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/light/properties/primaryButtonDisabledBackground'
+                                                },
+                                                {
+                                                    type: 'Control',
+                                                    scope: '#/properties/light/properties/textSecondary'
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 }
                             ]
                         }
@@ -2102,7 +2214,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             const data = {
                 defaultChainId: this.chainId,
                 wallets: this.wallets,
-                networks: this.networks,
+                networks: this.networks.length ? this.networks : [{ chainId: this.chainId }],
                 showHeader: this.showHeader,
                 rpcWalletId: rpcWallet.instanceId
             };
@@ -2149,12 +2261,13 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             this.updateStyle('--text-primary', this.tag[themeVar]?.fontColor);
             this.updateStyle('--background-main', this.tag[themeVar]?.backgroundColor);
             this.updateStyle('--text-secondary', this.tag[themeVar]?.textSecondary);
-            // this.updateStyle('--colors-primary-main', this.tag[themeVar]?.buttonBackgroundColor);
-            // this.updateStyle('--colors-primary-contrast_text', this.tag[themeVar]?.buttonFontColor);
             this.updateStyle('--colors-secondary-main', this.tag[themeVar]?.secondaryColor);
             this.updateStyle('--colors-secondary-contrast_text', this.tag[themeVar]?.secondaryFontColor);
             this.updateStyle('--input-font_color', this.tag[themeVar]?.inputFontColor);
             this.updateStyle('--input-background', this.tag[themeVar]?.inputBackgroundColor);
+            this.updateStyle('--primary-button-background', this.tag[themeVar]?.primaryButtonBackground || 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box');
+            this.updateStyle('--primary-button-hover-background', this.tag[themeVar]?.primaryButtonHoverBackground || 'linear-gradient(255deg,#f15e61,#b52082)');
+            this.updateStyle('--primary-button-disabled-background', this.tag[themeVar]?.primaryButtonDisabledBackground || 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box');
         }
         get wallets() {
             return this._data.wallets ?? [];
@@ -2318,8 +2431,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 // const isRpcConnected = this.state.isRpcWalletConnected();
                 this.noCampaignSection.clearInnerHTML();
                 this.noCampaignSection.appendChild(this.$render("i-vstack", { height: "100%", background: { color: Theme.background.main }, padding: { top: '3rem', bottom: '3rem', left: '2rem', right: '2rem' }, justifyContent: 'center', class: "no-campaign text-center" },
-                    this.$render("i-vstack", { verticalAlignment: "center", gap: "1rem" },
-                        this.$render("i-image", { url: assets_2.default.fullPath('img/staking/TrollTrooper.svg') }),
+                    this.$render("i-vstack", { verticalAlignment: "center", gap: "1rem", width: "100%", height: "100%" },
+                        this.$render("i-image", { width: "100%", height: "100%", url: assets_2.default.fullPath('img/staking/TrollTrooper.svg') }),
                         this.$render("i-label", { caption: isClientConnected ? 'No Campaigns' : 'Please connect with your wallet!', font: { size: '1.5rem' }, letterSpacing: letterSpacing }))));
                 this.noCampaignSection.visible = true;
             };
@@ -2529,7 +2642,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 this.manageStake.state = this.state;
                 this.manageStake.onRefresh = () => this.initializeWidgetConfig(true);
                 const isClaim = option.mode === 'Claim';
-                const rewardsData = option.rewardsData[0] ? [option.rewardsData[0]] : [];
+                const rewardsData = option.rewardsData && option.rewardsData[0] ? [option.rewardsData[0]] : [];
                 const rewardOptions = !isClaim ? rewardsData : [];
                 let aprInfo = {};
                 const claimStakedRow = await components_9.HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
@@ -2588,7 +2701,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             width: 16, height: 16
                         },
                         caption: rpcWalletConnected ? `Claim ${rewardSymbol}` : 'Switch Network',
-                        font: { color: '#fff', size: '1rem', bold: true },
+                        font: { size: '1rem', bold: true },
                         enabled: !rpcWalletConnected || (rpcWalletConnected && !(!passClaimStartTime || new eth_wallet_7.BigNumber(reward.claimable).isZero()) && isClaim),
                         margin: { left: 'auto', right: 'auto', bottom: 10 },
                         padding: { top: '0.625rem', bottom: '0.625rem' },
@@ -2731,7 +2844,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
         render() {
             return (this.$render("i-scom-dapp-container", { id: "dappContainer", class: index_css_2.stakingDappContainer },
                 this.$render("i-panel", { class: index_css_2.stakingComponent, minHeight: 200 },
-                    this.$render("i-panel", { id: "stakingLayout", width: index_11.maxWidth, height: index_11.maxHeight, margin: { left: 'auto', right: 'auto' }, overflow: 'hidden' },
+                    this.$render("i-panel", { id: "stakingLayout", width: index_11.maxWidth, height: index_11.maxHeight, maxWidth: "100%", margin: { left: 'auto', right: 'auto' }, overflow: 'hidden' },
                         this.$render("i-vstack", { id: "loadingElm", background: { color: Theme.background.main }, class: "i-loading-overlay" },
                             this.$render("i-vstack", { class: "i-loading-spinner", horizontalAlignment: "center", verticalAlignment: "center" },
                                 this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_2.default.fullPath('img/loading.svg'), width: 36, height: 36 } }),
