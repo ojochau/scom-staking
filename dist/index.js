@@ -1539,10 +1539,10 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                     type: 'string',
                     label: 'Campaign Description'
                 },
-                logo: {
-                    type: 'string',
-                    title: 'Campaign Logo'
-                },
+                // logo: {
+                //     type: 'string',
+                //     title: 'Campaign Logo'
+                // },
                 getTokenURL: {
                     type: 'string',
                     title: 'Token Trade URL'
@@ -1607,10 +1607,10 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                                     type: 'Control',
                                     scope: '#/properties/desc'
                                 },
-                                {
-                                    type: 'Control',
-                                    scope: '#/properties/logo'
-                                },
+                                // {
+                                //     type: 'Control',
+                                //     scope: '#/properties/logo'
+                                // },
                                 {
                                     type: 'Control',
                                     scope: '#/properties/getTokenURL'
@@ -1789,10 +1789,10 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                         type: 'string',
                         label: 'Campaign Description'
                     },
-                    logo: {
-                        type: 'string',
-                        title: 'Campaign Logo'
-                    },
+                    // logo: {
+                    //     type: 'string',
+                    //     title: 'Campaign Logo'
+                    // },
                     getTokenURL: {
                         type: 'string',
                         title: 'Token Trade URL'
@@ -1844,10 +1844,10 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                         type: 'Control',
                         scope: '#/properties/desc'
                     },
-                    {
-                        type: 'Control',
-                        scope: '#/properties/logo'
-                    },
+                    // {
+                    //     type: 'Control',
+                    //     scope: '#/properties/logo'
+                    // },
                     {
                         type: 'Control',
                         scope: '#/properties/getTokenURL'

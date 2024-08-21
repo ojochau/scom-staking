@@ -70,10 +70,10 @@ export default {
                 type: 'string',
                 label: 'Campaign Description'
             },
-            logo: {
-                type: 'string',
-                title: 'Campaign Logo'
-            },
+            // logo: {
+            //     type: 'string',
+            //     title: 'Campaign Logo'
+            // },
             getTokenURL: {
                 type: 'string',
                 title: 'Token Trade URL'
@@ -138,10 +138,10 @@ export default {
                                 type: 'Control',
                                 scope: '#/properties/desc'
                             },
-                            {
-                                type: 'Control',
-                                scope: '#/properties/logo'
-                            },
+                            // {
+                            //     type: 'Control',
+                            //     scope: '#/properties/logo'
+                            // },
                             {
                                 type: 'Control',
                                 scope: '#/properties/getTokenURL'
@@ -321,10 +321,10 @@ export function getProjectOwnerSchema() {
                     type: 'string',
                     label: 'Campaign Description'
                 },
-                logo: {
-                    type: 'string',
-                    title: 'Campaign Logo'
-                },
+                // logo: {
+                //     type: 'string',
+                //     title: 'Campaign Logo'
+                // },
                 getTokenURL: {
                     type: 'string',
                     title: 'Token Trade URL'
@@ -376,10 +376,10 @@ export function getProjectOwnerSchema() {
                     type: 'Control',
                     scope: '#/properties/desc'
                 },
-                {
-                    type: 'Control',
-                    scope: '#/properties/logo'
-                },
+                // {
+                //     type: 'Control',
+                //     scope: '#/properties/logo'
+                // },
                 {
                     type: 'Control',
                     scope: '#/properties/getTokenURL'
