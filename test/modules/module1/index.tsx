@@ -3,11 +3,12 @@ import { getMulticallInfoList } from '@scom/scom-multicall';
 import { INetwork } from '@ijstech/eth-wallet';
 import getNetworkList from '@scom/scom-network-list';
 import ScomStaking from '@scom/scom-staking';
+import ScomWidgetTest from '@scom/scom-widget-test';
 
 @customModule
 export default class Module1 extends Module {
     private stakingElm: ScomStaking;
-    private mainStack: VStack;
+    private widgetModule: ScomWidgetTest;
 
     constructor(parent?: Container, options?: any) {
         super(parent, options);
@@ -45,40 +46,70 @@ export default class Module1 extends Module {
         return networkMap;
     }
 
+    private async onShowConfig() {
+        const editor = this.stakingElm.getConfigurators().find(v => v.target === 'Editor');
+        const widgetData = await editor.getData();
+        if (!this.widgetModule) {
+            this.widgetModule = await ScomWidgetTest.create({
+                widgetName: 'scom-staking',
+                onConfirm: (data: any, tag: any) => {
+                    editor.setData(data);
+                    editor.setTag(tag);
+                    this.widgetModule.closeModal();
+                }
+            });
+        }
+        this.widgetModule.openModal({
+            width: '90%',
+            maxWidth: '90rem',
+            padding: { top: 0, bottom: 0, left: 0, right: 0 },
+            closeOnBackdropClick: true,
+            closeIcon: null
+        });
+        this.widgetModule.show(widgetData);
+    }
+
     async init() {
         super.init();
     }
 
     render() {
         return <i-panel>
-            <i-hstack id="mainStack" margin={{ top: '1rem', left: '1rem' }} gap="2rem">
-                <i-scom-staking data={{
-                    "chainId": 43113,
-                    "name": "Scom-Staking",
-                    "desc": "Earn USDT.e",
-                    "showContractLink": true,
-                    "staking":
-                    {
-                        "address": "0x0314297AdfE7012b9c6Cc0FDaB0c0a7C6E89285A",
-                        "lockTokenType": 0,
-                        "rewards":
+            <i-vstack
+                margin={{ top: '1rem', left: '1rem', right: '1rem' }}
+                gap="1rem"
+            >
+                <i-button caption="Config" onClick={this.onShowConfig} width={160} padding={{ top: 5, bottom: 5 }} margin={{ left: 'auto', right: 20 }} font={{ color: '#fff' }} />
+                <i-scom-staking
+                    id="stakingElm"
+                    data={{
+                        "chainId": 43113,
+                        "name": "Scom-Staking",
+                        "desc": "Earn USDT.e",
+                        "showContractLink": true,
+                        "staking":
                         {
-                            "address": "0x35DE68B1eD3Edc32Bf41A53A3e7c37c17E50ce03",
-                            "isCommonStartDate": false,
-                        }
-                    },
-                    "networks": [
-                        {
-                            "chainId": 43113
-                        }
-                    ],
-                    "wallets": [
-                        {
-                            "name": "metamask"
-                        }
-                    ]
-                }} />
-            </i-hstack>
+                            "address": "0x0314297AdfE7012b9c6Cc0FDaB0c0a7C6E89285A",
+                            "lockTokenType": 0,
+                            "rewards":
+                            {
+                                "address": "0x35DE68B1eD3Edc32Bf41A53A3e7c37c17E50ce03",
+                                "isCommonStartDate": false
+                            }
+                        },
+                        "networks": [
+                            {
+                                "chainId": 43113
+                            }
+                        ],
+                        "wallets": [
+                            {
+                                "name": "metamask"
+                            }
+                        ]
+                    }}
+                />
+            </i-vstack>
         </i-panel>
     }
 }

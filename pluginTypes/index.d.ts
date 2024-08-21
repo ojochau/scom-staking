@@ -423,10 +423,6 @@ declare module "@scom/scom-staking/formSchema.ts" {
                     type: string;
                     label: string;
                 };
-                logo: {
-                    type: string;
-                    title: string;
-                };
                 getTokenURL: {
                     type: string;
                     title: string;
@@ -614,10 +610,6 @@ declare module "@scom/scom-staking/formSchema.ts" {
                 desc: {
                     type: string;
                     label: string;
-                };
-                logo: {
-                    type: string;
-                    title: string;
                 };
                 getTokenURL: {
                     type: string;
