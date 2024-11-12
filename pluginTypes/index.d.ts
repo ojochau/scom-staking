@@ -708,6 +708,7 @@ declare module "@scom/scom-staking" {
     import { IWalletPlugin } from '@scom/scom-wallet-modal';
     import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
     import { INetworkConfig } from '@scom/scom-network-picker';
+    import { BlockNoteSpecs, callbackFnType, executeFnType, BlockNoteEditor } from '@scom/scom-blocknote-sdk';
     interface ScomStakingElement extends ControlElement {
         data?: ISingleStakingCampaign;
         lazyLoad?: boolean;
@@ -719,7 +720,7 @@ declare module "@scom/scom-staking" {
             }
         }
     }
-    export default class ScomStaking extends Module {
+    export default class ScomStaking extends Module implements BlockNoteSpecs {
         private state;
         private _data;
         tag: any;
@@ -736,6 +737,23 @@ declare module "@scom/scom-staking" {
         private dappContainer;
         private mdWallet;
         private rpcWalletEvents;
+        addBlock(blocknote: any, executeFn: executeFnType, callbackFn?: callbackFnType): {
+            block: any;
+            slashItem: {
+                name: string;
+                execute: (editor: BlockNoteEditor) => void;
+                aliases: string[];
+                group: string;
+                icon: {
+                    name: string;
+                };
+                hint: string;
+            };
+            moduleData: {
+                name: string;
+                localPath: string;
+            };
+        };
         private _getActions;
         private getProjectOwnerActions;
         getConfigurators(): ({

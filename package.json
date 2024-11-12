@@ -28,7 +28,8 @@
         "@scom/oswap-time-is-money-contract": "^0.1.0",
         "@scom/oswap-chainlink-contract": "^0.1.0",
         "@scom/oswap-cross-chain-bridge-contract": "^0.1.0",
-        "@scom/scom-token-input": "^0.1.1"
+        "@scom/scom-token-input": "^0.1.1",
+        "@scom/scom-blocknote-sdk": "^0.1.2"
     },
     "devDependencies": {
         "@ijstech/cli": "^0.1.28",

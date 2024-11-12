@@ -48,6 +48,7 @@ import ScomTxStatusModal from '@scom/scom-tx-status-modal';
 import { INetworkConfig } from '@scom/scom-network-picker';
 import formSchema, { getProjectOwnerSchema } from './formSchema';
 import ScomStakingFlowInitialSetup from './flow/initialSetup';
+import { BlockNoteSpecs, callbackFnType, executeFnType, BlockNoteEditor, Block, parseUrl, getWidgetEmbedUrl } from '@scom/scom-blocknote-sdk';
 
 const Theme = Styles.Theme.ThemeVars;
 const letterSpacing = '0.15px';
@@ -67,7 +68,7 @@ declare global {
 
 @customModule
 @customElements('i-scom-staking')
-export default class ScomStaking extends Module {
+export default class ScomStaking extends Module implements BlockNoteSpecs {
 	private state: State;
 	private _data: ISingleStakingCampaign;
 	tag: any = {};
@@ -86,6 +87,151 @@ export default class ScomStaking extends Module {
 	private mdWallet: ScomWalletModal;
 
 	private rpcWalletEvents: IEventBusRegistry[] = [];
+
+	addBlock(blocknote: any, executeFn: executeFnType, callbackFn?: callbackFnType) {
+		const moduleData = {
+			name: '@scom/scom-staking',
+			localPath: 'scom-staking'
+		}
+
+		const blockType = 'staking';
+
+		const stakingRegex = /https:\/\/widget.noto.fan\/(#!\/)?scom\/scom-staking\/\S+/g;
+		function getData(href: string) {
+			const widgetData = parseUrl(href);
+			if (widgetData) {
+				const { module, properties } = widgetData;
+				if (module.localPath === moduleData.localPath) return { ...properties };
+			}
+			return false;
+		}
+
+		const StakingBlock = blocknote.createBlockSpec(
+			{
+				type: blockType,
+				propSchema: {
+					...blocknote.defaultProps,
+					chainId: { default: 0 },
+					name: { default: '' },
+					desc: { default: '' },
+					logo: { default: '' },
+					getTokenURL: { default: '' },
+					showContractLink: { default: false },
+					staking: { default: null },
+					stakeInputValue: { default: '' },
+					commissions: { default: [] },
+					wallets: { default: [] },
+					networks: { default: [] },
+				},
+				content: "none"
+			},
+			{
+				render: (block: Block) => {
+					const wrapper = new Panel();
+					const props = JSON.parse(JSON.stringify(block.props));
+					const customElm = new ScomStaking(wrapper, { ...props });
+					if (typeof callbackFn === 'function') {
+						callbackFn(customElm, block);
+					}
+					wrapper.appendChild(customElm);
+					return {
+						dom: wrapper
+					};
+				},
+				parseFn: () => {
+					return [
+						{
+							tag: `div[data-content-type=${blockType}]`,
+							node: blockType
+						},
+						{
+							tag: "a",
+							getAttrs: (element: string | HTMLElement) => {
+								if (typeof element === "string") {
+									return false;
+								}
+								const href = element.getAttribute('href');
+								if (href) return getData(href);
+								return false;
+							},
+							priority: 408,
+							node: blockType
+						},
+						{
+							tag: "p",
+							getAttrs: (element: string | HTMLElement) => {
+								if (typeof element === "string") {
+									return false;
+								}
+								const child = element.firstChild as HTMLElement;
+								if (child?.nodeName === 'A' && child.getAttribute('href')) {
+									const href = child.getAttribute('href');
+									return getData(href);
+								}
+								return false;
+							},
+							priority: 409,
+							node: blockType
+						}
+					]
+				},
+				toExternalHTML: (block: any, editor: any) => {
+					const link = document.createElement("a");
+					const url = getWidgetEmbedUrl(
+						{
+							type: blockType,
+							props: { ...(block.props || {}) }
+						},
+						moduleData
+					);
+					link.setAttribute("href", url);
+					link.textContent = blockType;
+					const wrapper = document.createElement("p");
+					wrapper.appendChild(link);
+					return { dom: wrapper };
+				},
+				pasteRules: [
+					{
+						find: stakingRegex,
+						handler(props: any) {
+							const { state, chain, range } = props;
+							const textContent = state.doc.resolve(range.from).nodeAfter?.textContent;
+							const widgetData = parseUrl(textContent);
+							if (!widgetData) return null;
+							const { properties } = widgetData;
+							chain().BNUpdateBlock(state.selection.from, {
+								type: blockType,
+								props: {
+									...properties
+								},
+							}).setTextSelection(range.from + 1);
+						}
+					}
+				]
+			}
+		);
+		const StakingSlashItem = {
+			name: "Staking",
+			execute: (editor: BlockNoteEditor) => {
+				const block: any = {
+					type: blockType,
+					props: configData.defaultBuilderData
+				};
+				if (typeof executeFn === 'function') {
+					executeFn(editor, block);
+				}
+			},
+			aliases: [blockType, "widget"],
+			group: "Widget",
+      icon: { name: 'hand-holding-usd' },
+      hint: "Insert a staking widget"
+		};
+		return {
+			block: StakingBlock,
+			slashItem: StakingSlashItem,
+			moduleData
+		}
+	}
 
 	private _getActions(category?: string) {
 		const actions = [];
@@ -251,17 +397,17 @@ export default class ScomStaking extends Module {
 				setTag: this.setTag.bind(this)
 			},
 			{
-			  name: 'Editor',
-			  target: 'Editor',
-			  getActions: (category?: string) => {
-				const actions = this._getActions(category);
-				const editAction = actions.find(action => action.name === 'Edit');
-				return editAction ? [editAction] : [];
-			  },
-			  getData: this.getData.bind(this),
-			  setData: this.setData.bind(this),
-			  getTag: this.getTag.bind(this),
-			  setTag: this.setTag.bind(this)
+				name: 'Editor',
+				target: 'Editor',
+				getActions: (category?: string) => {
+					const actions = this._getActions(category);
+					const editAction = actions.find(action => action.name === 'Edit');
+					return editAction ? [editAction] : [];
+				},
+				getData: this.getData.bind(this),
+				setData: this.setData.bind(this),
+				getTag: this.getTag.bind(this),
+				setTag: this.setTag.bind(this)
 			}
 		]
 	}
@@ -552,13 +698,13 @@ export default class ScomStaking extends Module {
 			<i-vstack
 				height="100%"
 				background={{ color: Theme.background.main }}
-				padding={{top: '3rem', bottom: '3rem', left: '2rem', right: '2rem'}}
+				padding={{ top: '3rem', bottom: '3rem', left: '2rem', right: '2rem' }}
 				justifyContent='center'
 				class="no-campaign text-center"
 			>
 				<i-vstack verticalAlignment="center" gap="1rem" width="100%" height="100%">
 					<i-image width="100%" height="100%" url={Assets.fullPath('img/staking/TrollTrooper.svg')} />
-					<i-label caption={isClientConnected ? 'No Campaigns' : 'Please connect with your wallet!'} font={{size: '1.5rem'}} letterSpacing={letterSpacing} />
+					<i-label caption={isClientConnected ? 'No Campaigns' : 'Please connect with your wallet!'} font={{ size: '1.5rem' }} letterSpacing={letterSpacing} />
 					{
 						// !isClientConnected || !isRpcConnected ? <i-button
 						// caption={!isClientConnected ? 'Connect Wallet' : 'Switch Network'}
@@ -662,11 +808,11 @@ export default class ScomStaking extends Module {
 		activeTimerElm.appendChild(
 			<i-hstack gap={4}>
 				{endDay}
-				<i-label caption="D" lineHeight={'1.25rem'} font={{size: '0.875rem'}} letterSpacing={letterSpacing}/>
+				<i-label caption="D" lineHeight={'1.25rem'} font={{ size: '0.875rem' }} letterSpacing={letterSpacing} />
 				{endHour}
-				<i-label caption="H" lineHeight={'1.25rem'} font={{size: '0.875rem'}} letterSpacing={letterSpacing}/>
+				<i-label caption="H" lineHeight={'1.25rem'} font={{ size: '0.875rem' }} letterSpacing={letterSpacing} />
 				{endMin}
-				<i-label caption="M" lineHeight={'1.25rem'} font={{size: '0.875rem'}} letterSpacing={letterSpacing}/>
+				<i-label caption="M" lineHeight={'1.25rem'} font={{ size: '0.875rem' }} letterSpacing={letterSpacing} />
 			</i-hstack>
 		);
 
@@ -677,15 +823,15 @@ export default class ScomStaking extends Module {
 			top: '-8px',
 			right: '-33px',
 			border: {
-				left: { width: '50px', style: 'solid', color: 'transparent'},
-				right: { width: '50px', style: 'solid', color: 'transparent'},
-				bottom: { width: '50px', style: 'solid', color: '#20bf55'}
+				left: { width: '50px', style: 'solid', color: 'transparent' },
+				right: { width: '50px', style: 'solid', color: 'transparent' },
+				bottom: { width: '50px', style: 'solid', color: '#20bf55' }
 			}
 		});
 		const stickerLabel = await Label.create({
 			display: 'flex',
-			font: {size: '0.75rem', color: '#3f3f42'},
-			grid: {horizontalAlignment: 'center'},
+			font: { size: '0.75rem', color: '#3f3f42' },
+			grid: { horizontalAlignment: 'center' },
 			letterSpacing
 		});
 		const stickerIcon = await Icon.create({
@@ -693,7 +839,7 @@ export default class ScomStaking extends Module {
 			width: 14,
 			height: 14,
 			display: 'block',
-			margin: {left: 'auto', right: 'auto'}
+			margin: { left: 'auto', right: 'auto' }
 		});
 		stickerSection.classList.add('sticker');
 		stickerSection.appendChild(
@@ -736,9 +882,9 @@ export default class ScomStaking extends Module {
 			}
 			if (isClosed) {
 				if (stickerLabel.caption !== 'Closed') {
-					stickerSection.border.bottom = {width: '50px', style: 'solid', color: '#0c1234'}
+					stickerSection.border.bottom = { width: '50px', style: 'solid', color: '#0c1234' }
 					stickerIcon.fill = '#f7d064';
-					stickerLabel.font = {size: '0.75rem', color: '#f7d064'};
+					stickerLabel.font = { size: '0.75rem', color: '#f7d064' };
 					stickerLabel.caption = 'Closed';
 					stickerIcon.name = 'check-square';
 				}
@@ -746,9 +892,9 @@ export default class ScomStaking extends Module {
 				if (stickerLabel.caption !== 'Sold Out') {
 					stickerLabel.caption = 'Sold Out';
 					stickerIcon.name = 'star';
-					stickerSection.border.bottom = {width: '50px', style: 'solid', color: '#ccc'}
+					stickerSection.border.bottom = { width: '50px', style: 'solid', color: '#ccc' }
 					stickerIcon.fill = '#fff';
-					stickerLabel.font = {size: '0.75rem', color: '#3f3f42'};
+					stickerLabel.font = { size: '0.75rem', color: '#3f3f42' };
 				}
 			} else {
 				if (stickerLabel.caption !== 'Active') {
@@ -795,7 +941,7 @@ export default class ScomStaking extends Module {
 
 		const isClaim = option.mode === 'Claim';
 
-		const rewardsData =  option.rewardsData && option.rewardsData[0] ? [option.rewardsData[0]] : [];
+		const rewardsData = option.rewardsData && option.rewardsData[0] ? [option.rewardsData[0]] : [];
 		const rewardOptions = !isClaim ? rewardsData : [];
 		let aprInfo: any = {};
 
@@ -858,15 +1004,15 @@ export default class ScomStaking extends Module {
 					spin: true,
 					fill: '#fff',
 					visible: false,
-					margin: {left: '0.25rem', right: '0.25rem'},
+					margin: { left: '0.25rem', right: '0.25rem' },
 					width: 16, height: 16
 				},
 				caption: rpcWalletConnected ? `Claim ${rewardSymbol}` : 'Switch Network',
 				font: { size: '1rem', bold: true },
 				enabled: !rpcWalletConnected || (rpcWalletConnected && !(!passClaimStartTime || new BigNumber(reward.claimable).isZero()) && isClaim),
 				margin: { left: 'auto', right: 'auto', bottom: 10 },
-				padding: {top: '0.625rem', bottom: '0.625rem'},
-				border: {radius: 12},
+				padding: { top: '0.625rem', bottom: '0.625rem' },
+				border: { radius: 12 },
 				maxWidth: '100%',
 				width: 370,
 				height: 'auto'
@@ -1053,7 +1199,7 @@ export default class ScomStaking extends Module {
 						margin={{ left: 'auto', right: 'auto' }}
 						overflow={'hidden'}
 					>
-						<i-vstack id="loadingElm" background={{color:  Theme.background.main}} class="i-loading-overlay">
+						<i-vstack id="loadingElm" background={{ color: Theme.background.main }} class="i-loading-overlay">
 							<i-vstack class="i-loading-spinner" horizontalAlignment="center" verticalAlignment="center">
 								<i-icon
 									class="i-loading-spinner_icon"
@@ -1068,7 +1214,7 @@ export default class ScomStaking extends Module {
 						</i-vstack>
 						<i-panel
 							id="stakingElm"
-							background={{color:  Theme.background.main}}
+							background={{ color: Theme.background.main }}
 							width="100%" height="100%"
 							maxWidth={maxWidth} maxHeight={maxHeight}
 							class="wrapper"
@@ -1100,8 +1246,8 @@ export default class ScomStaking extends Module {
 			let tag = options.tag;
 			this.state.handleNextFlowStep = options.onNextStep;
 			this.state.handleAddTransactions = options.onAddTransactions;
-            this.state.handleJumpToStep = options.onJumpToStep;
-            this.state.handleUpdateStepStatus = options.onUpdateStepStatus;
+			this.state.handleJumpToStep = options.onJumpToStep;
+			this.state.handleUpdateStepStatus = options.onUpdateStepStatus;
 			await this.setData(properties);
 			if (tag) {
 				await this.setTag(tag);

@@ -2014,12 +2014,151 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
     ], ScomStakingFlowInitialSetup);
     exports.default = ScomStakingFlowInitialSetup;
 });
-define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/data.json.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/manage-stake/index.tsx", "@scom/scom-staking/index.css.ts", "@scom/scom-staking/formSchema.ts", "@scom/scom-staking/flow/initialSetup.tsx"], function (require, exports, components_9, eth_wallet_7, assets_2, index_10, index_11, scom_token_list_5, data_json_1, index_12, index_13, index_css_2, formSchema_1, initialSetup_1) {
+define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/data.json.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/manage-stake/index.tsx", "@scom/scom-staking/index.css.ts", "@scom/scom-staking/formSchema.ts", "@scom/scom-staking/flow/initialSetup.tsx", "@scom/scom-blocknote-sdk"], function (require, exports, components_9, eth_wallet_7, assets_2, index_10, index_11, scom_token_list_5, data_json_1, index_12, index_13, index_css_2, formSchema_1, initialSetup_1, scom_blocknote_sdk_1) {
     "use strict";
+    var ScomStaking_1;
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_9.Styles.Theme.ThemeVars;
     const letterSpacing = '0.15px';
-    let ScomStaking = class ScomStaking extends components_9.Module {
+    let ScomStaking = ScomStaking_1 = class ScomStaking extends components_9.Module {
+        addBlock(blocknote, executeFn, callbackFn) {
+            const moduleData = {
+                name: '@scom/scom-staking',
+                localPath: 'scom-staking'
+            };
+            const blockType = 'staking';
+            const stakingRegex = /https:\/\/widget.noto.fan\/(#!\/)?scom\/scom-staking\/\S+/g;
+            function getData(href) {
+                const widgetData = (0, scom_blocknote_sdk_1.parseUrl)(href);
+                if (widgetData) {
+                    const { module, properties } = widgetData;
+                    if (module.localPath === moduleData.localPath)
+                        return { ...properties };
+                }
+                return false;
+            }
+            const StakingBlock = blocknote.createBlockSpec({
+                type: blockType,
+                propSchema: {
+                    ...blocknote.defaultProps,
+                    chainId: { default: 0 },
+                    name: { default: '' },
+                    desc: { default: '' },
+                    logo: { default: '' },
+                    getTokenURL: { default: '' },
+                    showContractLink: { default: false },
+                    staking: { default: null },
+                    stakeInputValue: { default: '' },
+                    commissions: { default: [] },
+                    wallets: { default: [] },
+                    networks: { default: [] },
+                },
+                content: "none"
+            }, {
+                render: (block) => {
+                    const wrapper = new components_9.Panel();
+                    const props = JSON.parse(JSON.stringify(block.props));
+                    const customElm = new ScomStaking_1(wrapper, { ...props });
+                    if (typeof callbackFn === 'function') {
+                        callbackFn(customElm, block);
+                    }
+                    wrapper.appendChild(customElm);
+                    return {
+                        dom: wrapper
+                    };
+                },
+                parseFn: () => {
+                    return [
+                        {
+                            tag: `div[data-content-type=${blockType}]`,
+                            node: blockType
+                        },
+                        {
+                            tag: "a",
+                            getAttrs: (element) => {
+                                if (typeof element === "string") {
+                                    return false;
+                                }
+                                const href = element.getAttribute('href');
+                                if (href)
+                                    return getData(href);
+                                return false;
+                            },
+                            priority: 408,
+                            node: blockType
+                        },
+                        {
+                            tag: "p",
+                            getAttrs: (element) => {
+                                if (typeof element === "string") {
+                                    return false;
+                                }
+                                const child = element.firstChild;
+                                if (child?.nodeName === 'A' && child.getAttribute('href')) {
+                                    const href = child.getAttribute('href');
+                                    return getData(href);
+                                }
+                                return false;
+                            },
+                            priority: 409,
+                            node: blockType
+                        }
+                    ];
+                },
+                toExternalHTML: (block, editor) => {
+                    const link = document.createElement("a");
+                    const url = (0, scom_blocknote_sdk_1.getWidgetEmbedUrl)({
+                        type: blockType,
+                        props: { ...(block.props || {}) }
+                    }, moduleData);
+                    link.setAttribute("href", url);
+                    link.textContent = blockType;
+                    const wrapper = document.createElement("p");
+                    wrapper.appendChild(link);
+                    return { dom: wrapper };
+                },
+                pasteRules: [
+                    {
+                        find: stakingRegex,
+                        handler(props) {
+                            const { state, chain, range } = props;
+                            const textContent = state.doc.resolve(range.from).nodeAfter?.textContent;
+                            const widgetData = (0, scom_blocknote_sdk_1.parseUrl)(textContent);
+                            if (!widgetData)
+                                return null;
+                            const { properties } = widgetData;
+                            chain().BNUpdateBlock(state.selection.from, {
+                                type: blockType,
+                                props: {
+                                    ...properties
+                                },
+                            }).setTextSelection(range.from + 1);
+                        }
+                    }
+                ]
+            });
+            const StakingSlashItem = {
+                name: "Staking",
+                execute: (editor) => {
+                    const block = {
+                        type: blockType,
+                        props: data_json_1.default.defaultBuilderData
+                    };
+                    if (typeof executeFn === 'function') {
+                        executeFn(editor, block);
+                    }
+                },
+                aliases: [blockType, "widget"],
+                group: "Widget",
+                icon: { name: 'hand-holding-usd' },
+                hint: "Insert a staking widget"
+            };
+            return {
+                block: StakingBlock,
+                slashItem: StakingSlashItem,
+                moduleData
+            };
+        }
         _getActions(category) {
             const actions = [];
             if (category !== 'offers') {
@@ -2884,7 +3023,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             };
         }
     };
-    ScomStaking = __decorate([
+    ScomStaking = ScomStaking_1 = __decorate([
         components_9.customModule,
         (0, components_9.customElements)('i-scom-staking')
     ], ScomStaking);
