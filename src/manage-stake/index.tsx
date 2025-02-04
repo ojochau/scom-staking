@@ -1,7 +1,7 @@
-import { moment, Button, Input, Container, HStack, customElements, ControlElement, Module, Label, Styles, application } from '@ijstech/components';
+import { moment, Button, Input, Container, HStack, customElements, ControlElement, Module, Label, Styles } from '@ijstech/components';
 import { BigNumber, IERC20ApprovalAction, TransactionReceipt } from '@ijstech/eth-wallet';
 import { CurrentMode, IExtendOptionInfo, LockTokenType, TokenMapType, limitInputNumber } from '../global/index';
-import { getLockedTokenObject, getLockedTokenSymbol, getChainNativeToken, isClientWalletConnected, State } from '../store/index';
+import { getLockedTokenObject, getLockedTokenSymbol, isClientWalletConnected, State } from '../store/index';
 import { ITokenObject, tokenStore } from '@scom/scom-token-list';
 import ScomTxStatusModal from '@scom/scom-tx-status-modal';
 import {
@@ -15,6 +15,7 @@ import {
   parseDepositEvent,
 } from '../staking-utils/index';
 import { stakingManageStakeStyle } from './index.css';
+import { mergeI18nData, commonJson, stakeJson } from '../languages/index';
 
 const Theme = Styles.Theme.ThemeVars;
 
@@ -96,7 +97,7 @@ export default class ManageStake extends Module {
   }
 
   private onApproveToken = async () => {
-    this.showMessage('warning', `Approve ${this.tokenSymbol}`);
+    this.showMessage('warning', this.i18n.get('$approve_token', { token: this.tokenSymbol }));
     this.approvalModelAction.doApproveAction(this.lockedTokenObject, this.inputAmount.value);
   }
 
@@ -248,7 +249,7 @@ export default class ManageStake extends Module {
     this.approvalModelAction = await this.state.setApprovalModelAction({
       sender: this,
       payAction: async () => {
-        this.showMessage('warning', `${this.currentMode === CurrentMode.STAKE ? 'Stake' : 'Unlock'} ${this.tokenSymbol}`);
+        this.showMessage('warning', this.i18n.get(this.currentMode === CurrentMode.STAKE ? '$stake_token' : '$unlock_token', { token: this.tokenSymbol }));
         if (this.currentMode === CurrentMode.STAKE) {
           lockToken(this.lockedTokenObject, this.inputAmount.value, this.address, this.callback);
         } else {
@@ -257,7 +258,7 @@ export default class ManageStake extends Module {
       },
       onToBeApproved: async (token: ITokenObject) => {
         if (new BigNumber(this.inputAmount.value).lte(BigNumber.min(this.availableQty, this.balance, this.perAddressCap))) {
-          this.btnApprove.caption = `Approve ${token.symbol}`;
+          this.btnApprove.caption = this.i18n.get('$approve_token', { token: token.symbol });
           this.btnApprove.visible = true;
           this.btnApprove.enabled = true;
         } else {
@@ -272,11 +273,11 @@ export default class ManageStake extends Module {
         if (this.currentMode === CurrentMode.STAKE) {
           const amount = new BigNumber(this.inputAmount.value);
           if (amount.gt(this.balance)) {
-            this.btnStake.caption = 'Insufficient Balance';
+            this.btnStake.caption = this.i18n.get('$insufficient_balance');
             this.btnStake.enabled = false;
             return;
           }
-          this.btnStake.caption = 'Stake';
+          this.btnStake.caption = this.i18n.get('$stake');
           if (amount.isNaN() || amount.lte(0) || amount.gt(BigNumber.min(this.availableQty, this.balance, this.perAddressCap))) {
             this.btnStake.enabled = false;
           } else {
@@ -288,7 +289,7 @@ export default class ManageStake extends Module {
       onApproving: async (token: ITokenObject, receipt?: string) => {
         if (receipt) {
           this.showMessage('success', receipt);
-          this.btnApprove.caption = `Approving`;
+          this.btnApprove.caption = this.i18n.get('$approving');
           this.btnApprove.enabled = false;
           this.btnApprove.rightIcon.visible = true;
           this.btnMax.enabled = false;
@@ -315,12 +316,12 @@ export default class ManageStake extends Module {
           this.inputAmount.enabled = false;
           this.btnMax.enabled = false;
           if (this.currentMode === CurrentMode.STAKE) {
-            this.btnStake.caption = 'Staking';
+            this.btnStake.caption = this.i18n.get('$staking');
             this.btnStake.rightIcon.visible = true;
             this.state.setStakingStatus(this.currentMode, true);
             this.btnUnstake.enabled = false;
           } else {
-            this.btnUnstake.caption = 'Unstaking';
+            this.btnUnstake.caption = this.i18n.get('$unstaking');
             this.btnUnstake.rightIcon.visible = true;
             this.state.setStakingStatus(this.currentMode, true);
             this.btnStake.enabled = false;
@@ -335,11 +336,11 @@ export default class ManageStake extends Module {
           this.state.setStakingStatus(this.currentMode, false);
         }
         if (this.currentMode === CurrentMode.STAKE) {
-          this.btnStake.caption = 'Stake';
+          this.btnStake.caption = this.i18n.get('$stake');
           this.btnStake.rightIcon.visible = false;
           if (this.state.handleUpdateStepStatus) {
             this.state.handleUpdateStepStatus({
-              status: "Completed",
+              status: this.i18n.get('$completed'),
               color: Theme.colors.success.main
             });
           }
@@ -348,7 +349,7 @@ export default class ManageStake extends Module {
             const timestamp = await this.state.getRpcWallet().getBlockTimestamp(receipt.blockNumber.toString());
             const transactionsInfoArr = [
               {
-                desc: `Stake ${this.lockedTokenObject.symbol}`,
+                desc: this.i18n.get('$stake_token', { token: this.lockedTokenObject.symbol }),
                 fromToken: this.lockedTokenObject,
                 toToken: null,
                 fromTokenAmount: event.amount.toFixed(),
@@ -362,7 +363,7 @@ export default class ManageStake extends Module {
             });
           }
         } else {
-          this.btnUnstake.caption = 'Unstake';
+          this.btnUnstake.caption = this.i18n.get('$unstake');
           this.btnUnstake.rightIcon.visible = false;
         }
         await this.updateEnableInput();
@@ -373,10 +374,10 @@ export default class ManageStake extends Module {
       onPayingError: async (err: Error) => {
         await this.updateEnableInput();
         if (this.currentMode === CurrentMode.STAKE) {
-          this.btnStake.caption = 'Stake';
+          this.btnStake.caption = this.i18n.get('$stake');
           this.btnStake.rightIcon.visible = false;
         } else {
-          this.btnUnstake.caption = 'Unstake';
+          this.btnUnstake.caption = this.i18n.get('$unstake');
           this.btnUnstake.rightIcon.visible = false;
         }
         this.showMessage('error', err);
@@ -387,6 +388,7 @@ export default class ManageStake extends Module {
   }
 
   init() {
+    this.i18n.init({ ...mergeI18nData([commonJson, stakeJson]) });
     super.init();
   }
 
@@ -401,15 +403,15 @@ export default class ManageStake extends Module {
               placeholder="0.0"
               width="100%"
               height="100%"
-              border={{style: 'none'}}
-              padding={{left: 8, right: 8}}
-              font={{size: '1rem'}}
+              border={{ style: 'none' }}
+              padding={{ left: 8, right: 8 }}
+              font={{ size: '1rem' }}
               onChanged={() => this.onInputAmount()}
             />
             <i-hstack gap={4} verticalAlignment="center">
               <i-button
                 id="btnMax"
-                caption="Max"
+                caption="$max"
                 enabled={false}
                 // background={{ color: `${Theme.colors.primary.main} !important` }}
                 // font={{ color: Theme.colors.primary.contrastText }}
@@ -425,7 +427,7 @@ export default class ManageStake extends Module {
           <i-hstack gap={10} width="calc(100% - 290px)">
             <i-button
               id="btnApprove"
-              caption="Approve"
+              caption="$approve"
               enabled={false}
               visible={false}
               width="100%"
@@ -441,7 +443,7 @@ export default class ManageStake extends Module {
             />
             <i-button
               id="btnStake"
-              caption="Stake"
+              caption="$stake"
               enabled={false}
               width="100%"
               minHeight={36}
@@ -456,7 +458,7 @@ export default class ManageStake extends Module {
             />
             <i-button
               id="btnUnstake"
-              caption="Unstake"
+              caption="$unstake"
               enabled={false}
               width="100%"
               minHeight={36}

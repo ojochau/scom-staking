@@ -39,7 +39,6 @@ import {
 	getProxySelectors,
 } from './staking-utils/index';
 import ManageStake from './manage-stake/index';
-import { Contracts } from '@scom/oswap-time-is-money-contract';
 import { stakingComponent, stakingDappContainer } from './index.css';
 import ScomDappContainer from '@scom/scom-dapp-container';
 import ScomWalletModal, { IWalletPlugin } from '@scom/scom-wallet-modal';
@@ -49,6 +48,7 @@ import { INetworkConfig } from '@scom/scom-network-picker';
 import formSchema, { getProjectOwnerSchema } from './formSchema';
 import ScomStakingFlowInitialSetup from './flow/initialSetup';
 import { BlockNoteSpecs, callbackFnType, executeFnType, BlockNoteEditor, Block, parseUrl, getWidgetEmbedUrl } from '@scom/scom-blocknote-sdk';
+import { commonJson, mainJson, mergeI18nData } from './languages/index';
 
 const Theme = Styles.Theme.ThemeVars;
 const letterSpacing = '0.15px';
@@ -223,8 +223,8 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 			},
 			aliases: [blockType, "widget"],
 			group: "Widget",
-      icon: { name: 'hand-holding-usd' },
-      hint: "Insert a staking widget"
+			icon: { name: 'hand-holding-usd' },
+			hint: "Insert a staking widget"
 		};
 		return {
 			block: StakingBlock,
@@ -594,7 +594,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 	}
 
 	private onClaim = async (btnClaim: Button, data: any) => {
-		this.showMessage('warning', `Claim ${data.rewardSymbol}`);
+		this.showMessage('warning', this.i18n.get('$claim', { token: data.rewardSymbol }));
 		const callBack = async (err: any, reply: any) => {
 			if (err) {
 				this.showMessage('error', err);
@@ -656,7 +656,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 	}
 
 	async init() {
-		// this.isReadyCallbackQueued = true;
+		this.i18n.init({ ...mergeI18nData([commonJson, mainJson]) });
 		await super.init();
 		const lazyLoad = this.getAttribute('lazyLoad', true, false);
 		if (!lazyLoad) {
@@ -667,8 +667,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 				this.renderEmpty();
 			}
 		}
-		// this.isReadyCallbackQueued = false;
-		// this.executeReadyCallback();
+		this.executeReadyCallback();
 	}
 
 	private connectWallet = async () => {
@@ -704,10 +703,10 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 			>
 				<i-vstack verticalAlignment="center" gap="1rem" width="100%" height="100%">
 					<i-image width="100%" height="100%" url={Assets.fullPath('img/staking/TrollTrooper.svg')} />
-					<i-label caption={isClientConnected ? 'No Campaigns' : 'Please connect with your wallet!'} font={{ size: '1.5rem' }} letterSpacing={letterSpacing} />
+					<i-label caption={this.i18n.get(isClientConnected ? '$no_campaigns' : '$please_connect_with_your_wallet')} font={{ size: '1.5rem' }} letterSpacing={letterSpacing} />
 					{
 						// !isClientConnected || !isRpcConnected ? <i-button
-						// caption={!isClientConnected ? 'Connect Wallet' : 'Switch Network'}
+						// caption={this.i18n.get(!isClientConnected ? '$connect_wallet' : '$switch_network')}
 						// class="btn-os btn-stake"
 						// maxWidth={220}
 						// // background={{ color: `${Theme.colors.primary.main} !important` }}
@@ -800,7 +799,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 		const stakingElm = await VStack.create();
 		const activeTimerRow = await VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
 		const activeTimerElm = await VStack.create();
-		activeTimerRow.appendChild(<i-label caption="End Date" font={{ size: '0.875rem' }} opacity={0.5} letterSpacing={letterSpacing} />);
+		activeTimerRow.appendChild(<i-label caption="$end_date" font={{ size: '0.875rem' }} opacity={0.5} letterSpacing={letterSpacing} />);
 		activeTimerRow.appendChild(activeTimerElm);
 		const endHour = await Label.create(optionTimer);
 		const endDay = await Label.create(optionTimer);
@@ -881,24 +880,24 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 				}
 			}
 			if (isClosed) {
-				if (stickerLabel.caption !== 'Closed') {
+				if (stickerLabel.caption !== this.i18n.get('$close')) {
 					stickerSection.border.bottom = { width: '50px', style: 'solid', color: '#0c1234' }
 					stickerIcon.fill = '#f7d064';
 					stickerLabel.font = { size: '0.75rem', color: '#f7d064' };
-					stickerLabel.caption = 'Closed';
+					stickerLabel.caption = this.i18n.get('$close');
 					stickerIcon.name = 'check-square';
 				}
 			} else if (optionQty.lte(0)) {
-				if (stickerLabel.caption !== 'Sold Out') {
-					stickerLabel.caption = 'Sold Out';
+				if (stickerLabel.caption !== this.i18n.get('$sold_out')) {
+					stickerLabel.caption = this.i18n.get('$sold_out');
 					stickerIcon.name = 'star';
 					stickerSection.border.bottom = { width: '50px', style: 'solid', color: '#ccc' }
 					stickerIcon.fill = '#fff';
 					stickerLabel.font = { size: '0.75rem', color: '#3f3f42' };
 				}
 			} else {
-				if (stickerLabel.caption !== 'Active') {
-					stickerLabel.caption = 'Active';
+				if (stickerLabel.caption !== this.i18n.get('$active')) {
+					stickerLabel.caption = this.i18n.get('$active');
 					stickerIcon.name = 'star';
 				}
 			}
@@ -946,7 +945,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 		let aprInfo: any = {};
 
 		const claimStakedRow = await HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
-		claimStakedRow.appendChild(<i-label caption="You Staked" font={{ size: '1rem' }} letterSpacing={letterSpacing} />);
+		claimStakedRow.appendChild(<i-label caption="$you_staked" font={{ size: '1rem' }} letterSpacing={letterSpacing} />);
 		claimStakedRow.appendChild(<i-label caption={`${formatNumber(new BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`} font={{ size: '1rem' }} letterSpacing={letterSpacing} />);
 
 		const rowRewards = await VStack.create({ gap: 8, verticalAlignment: 'center' });
@@ -965,19 +964,19 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 			const rewardSymbol = rewardToken.symbol || '';
 			rowRewards.appendChild(
 				<i-hstack horizontalAlignment="space-between">
-					<i-label caption={`${rewardSymbol} Locked`} font={{ size: '1rem', color: Theme.text.primary }} letterSpacing={letterSpacing} />
+					<i-label caption={this.i18n.get('$token_locked', { token: rewardSymbol })} font={{ size: '1rem', color: Theme.text.primary }} letterSpacing={letterSpacing} />
 					<i-label caption={`${formatNumber(new BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`} font={{ size: '1rem' }} letterSpacing={letterSpacing} />
 				</i-hstack>
 			);
 			// rowRewards.appendChild(
 			// 	<i-hstack horizontalAlignment="space-between">
-			// 		<i-label caption={`${rewardSymbol} Vesting Start`} font={{ size: '16px', color: colorText }} />
+			// 		<i-label caption={this.i18n.get('$token_vesting_start', {token: rewardSymbol})} font={{ size: '16px', color: colorText }} />
 			// 		<i-label caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
 			// 	</i-hstack>
 			// );
 			// rowRewards.appendChild(
 			// 	<i-hstack horizontalAlignment="space-between">
-			// 		<i-label caption={`${rewardSymbol} Vesting End`} font={{ size: '16px', color: colorText }} />
+			// 		<i-label caption={this.i18n.get('$token_vesting_end', {token: rewardSymbol})} font={{ size: '16px', color: colorText }} />
 			// 		<i-label caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
 			// 	</i-hstack>
 			// );
@@ -989,11 +988,11 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 			let startClaimingText = '';
 			if (!(!reward.claimStartTime || passClaimStartTime) && isClaim) {
 				const claimStart = moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
-				startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
+				startClaimingText = this.i18n.get('$claim_token_after_start', { token: rewardSymbol, start: claimStart });
 			}
 			rowRewards.appendChild(
 				<i-hstack horizontalAlignment="space-between">
-					<i-label caption={`${rewardSymbol} Claimable`} font={{ size: '1rem' }} letterSpacing={letterSpacing} />
+					<i-label caption={this.i18n.get('$token_claimable', { token: rewardSymbol })} font={{ size: '1rem' }} letterSpacing={letterSpacing} />
 					<i-label caption={rewardClaimable} font={{ size: '1rem' }} />
 					{startClaimingText ? <i-label caption={startClaimingText} font={{ size: '1rem' }} letterSpacing={letterSpacing} /> : []}
 				</i-hstack>
@@ -1007,7 +1006,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 					margin: { left: '0.25rem', right: '0.25rem' },
 					width: 16, height: 16
 				},
-				caption: rpcWalletConnected ? `Claim ${rewardSymbol}` : 'Switch Network',
+				caption: rpcWalletConnected ? this.i18n.get('$claim_token', { token: rewardSymbol }) : this.i18n.get('$switch_network'),
 				font: { size: '1rem', bold: true },
 				enabled: !rpcWalletConnected || (rpcWalletConnected && !(!passClaimStartTime || new BigNumber(reward.claimable).isZero()) && isClaim),
 				margin: { left: 'auto', right: 'auto', bottom: 10 },
@@ -1096,16 +1095,16 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 				</i-hstack>
 				<i-hstack width="100%" verticalAlignment="center">
 					<i-vstack gap={2} width="25%" verticalAlignment="center">
-						<i-label caption="Start Date" font={{ size: '0.875rem' }} opacity={0.5} letterSpacing={letterSpacing} />
+						<i-label caption="$start_date" font={{ size: '0.875rem' }} opacity={0.5} letterSpacing={letterSpacing} />
 						<i-label caption={formatDate(option.startOfEntryPeriod, 'DD MMM, YYYY')} font={{ size: '1rem' }} letterSpacing={letterSpacing} />
 					</i-vstack>
 					{activeTimerRow}
 					<i-vstack gap={2} width="25%" verticalAlignment="center">
-						<i-label caption="Stake Duration" font={{ size: '0.875rem' }} opacity={0.5} letterSpacing={letterSpacing} />
+						<i-label caption="$stake_duration" font={{ size: '0.875rem' }} opacity={0.5} letterSpacing={letterSpacing} />
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-button
 								height="auto"
-								caption={durationDays < 1 ? '< 1 Day' : `${durationDays} Days`}
+								caption={durationDays < 1 ? this.i18n.get('$less_than_one_day') : this.i18n.get('$duration_days', { duration: durationDays.toString() })}
 								font={{ size: '12px', color: Theme.colors.secondary.contrastText, weight: 700 }}
 								background={{ color: `${Theme.colors.secondary.main} !important` }}
 								border={{ radius: 12, width: 1, style: 'solid', color: 'transparent' }}
@@ -1118,7 +1117,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 					<i-vstack gap={4} width="25%" margin={{ left: 'auto' }} verticalAlignment="center" horizontalAlignment="end">
 						<i-hstack gap={4} class="pointer" width="fit-content" verticalAlignment="center" onClick={() => this.getLPToken(campaign, lockedTokenSymbol, chainId)}>
 							<i-icon name="external-link-alt" width={12} height={12} fill={Theme.text.primary} />
-							<i-label caption={`Get ${lockedTokenSymbol}`} font={{ size: '0.85rem' }} letterSpacing={letterSpacing} />
+							<i-label caption={this.i18n.get('$get_token', { token: lockedTokenSymbol })} font={{ size: '0.85rem' }} letterSpacing={letterSpacing} />
 							{
 								lockedTokenIconPaths.map((v: any) => {
 									return <i-image display="flex" width={15} height={15} url={tokenAssets.fullPath(v)} fallbackUrl={fallBackUrl} />
@@ -1129,14 +1128,14 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 							campaign.showContractLink ?
 								<i-hstack gap={4} class="pointer" width="fit-content" verticalAlignment="center" onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
 									<i-icon name="external-link-alt" width={12} height={12} fill={Theme.text.primary} class="inline-block" />
-									<i-label caption="View Contract" font={{ size: '0.85rem' }} letterSpacing={letterSpacing} />
+									<i-label caption="$view_contract" font={{ size: '0.85rem' }} letterSpacing={letterSpacing} />
 								</i-hstack> : []
 						}
 						{/* {
 										campaign.showContractLink && isClaim ?
 										<i-hstack gap={4} class="pointer" width="fit-content" verticalAlignment="center" onClick={() => viewOnExplorerByAddress(chainId, rewardsData[0].address)}>
 											<i-icon name="external-link-alt" width={12} height={12} fill={colorText} class="inline-block" />
-											<i-label caption="View Reward Contract" font={{ size: '13.6px', color: colorText }} />
+											<i-label caption="$view_reward_contract" font={{ size: '13.6px', color: colorText }} />
 										</i-hstack> : []
 									} */}
 					</i-vstack>
@@ -1157,7 +1156,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 										const earnedQty = formatNumber(new BigNumber(option.totalCredit).times(new BigNumber(rewardOption.multiplier)).shiftedBy(offset));
 										const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || '';
 										const rewardElm = await HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
-										rewardElm.appendChild(<i-label caption="You Earned" font={{ size: '16px', color: colorText }} />);
+										rewardElm.appendChild(<i-label caption="$you_earned" font={{ size: '16px', color: colorText }} />);
 										rewardElm.appendChild(<i-label caption={`${earnedQty} ${earnedSymbol}`} font={{ size: '16px', color: colorText }} />);
 										return rewardElm;
 									}))

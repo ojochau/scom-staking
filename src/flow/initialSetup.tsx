@@ -3,9 +3,7 @@ import {
     ControlElement,
     customModule,
     customElements,
-    Container,
     Styles,
-    IEventBus,
     application,
     Label,
     Button,
@@ -14,8 +12,9 @@ import {
 import { tokenStore } from '@scom/scom-token-list';
 import { isClientWalletConnected, State } from '../store/index';
 import ScomTokenInput from '@scom/scom-token-input';
-import { BigNumber, Constants, IEventBusRegistry, Wallet } from '@ijstech/eth-wallet';
+import { Constants, IEventBusRegistry, Wallet } from '@ijstech/eth-wallet';
 import ScomWalletModal from '@scom/scom-wallet-modal';
+import { commonJson, setupJson, mergeI18nData } from '../languages/index';
 
 const Theme = Styles.Theme.ThemeVars;
 
@@ -46,7 +45,7 @@ export default class ScomStakingFlowInitialSetup extends Module {
     set state(value: State) {
         this._state = value;
     }
-    
+
     get state() {
         return this._state;
     }
@@ -90,7 +89,7 @@ export default class ScomStakingFlowInitialSetup extends Module {
         this.executionProperties.stakeInputValue = this.tokenInput.value;
         if (this.state.handleUpdateStepStatus) {
             this.state.handleUpdateStepStatus({
-                status: "Completed",
+                status: this.i18n.get('$completed'),
                 color: Theme.colors.success.main
             })
         }
@@ -115,11 +114,11 @@ export default class ScomStakingFlowInitialSetup extends Module {
     }
     private displayWalletStatus(connected: boolean) {
         if (connected) {
-            this.lbConnectedStatus.caption = 'Connected with ' + Wallet.getClientInstance().address;
+            this.lbConnectedStatus.caption = this.i18n.get('$connected_with_address', { address: Wallet.getClientInstance().address });
             this.btnConnectWallet.visible = false;
         }
         else {
-            this.lbConnectedStatus.caption = 'Please connect your wallet first';
+            this.lbConnectedStatus.caption = this.i18n.get('$please_connect_with_your_wallet');
             this.btnConnectWallet.visible = true;
         }
     }
@@ -134,11 +133,12 @@ export default class ScomStakingFlowInitialSetup extends Module {
     onHide() {
         let clientWallet = Wallet.getClientInstance();
         for (let event of this.walletEvents) {
-          clientWallet.unregisterWalletEvent(event);
+            clientWallet.unregisterWalletEvent(event);
         }
         this.walletEvents = [];
-    }    
+    }
     init() {
+        this.i18n.init({ ...mergeI18nData([commonJson, setupJson]) });
         super.init();
         this.tokenInput.style.setProperty('--input-background', '#232B5A');
         this.tokenInput.style.setProperty('--input-font_color', '#fff');
@@ -147,20 +147,20 @@ export default class ScomStakingFlowInitialSetup extends Module {
     render() {
         return (
             <i-vstack gap='1rem' padding={{ top: 10, bottom: 10, left: 20, right: 20 }}>
-                <i-label caption='Get Ready to Stake' font={{ size: '1.5rem' }}></i-label>
+                <i-label caption="$get_ready_to_stake" font={{ size: '1.5rem' }}></i-label>
 
                 <i-vstack gap='1rem'>
                     <i-label id="lbConnectedStatus"></i-label>
                     <i-hstack>
                         <i-button
                             id="btnConnectWallet"
-                            caption='Connect Wallet'
+                            caption="$connect_wallet"
                             font={{ color: Theme.colors.primary.contrastText }}
                             padding={{ top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }}
                             onClick={this.connectWallet}
                         ></i-button>
                     </i-hstack>
-                    <i-label caption='How many tokens are you planning to stake?'></i-label>
+                    <i-label caption="$how_many_tokens_are_you_planning_to_stake"></i-label>
                     <i-hstack verticalAlignment='center' width='50%'>
                         <i-scom-token-input
                             id="tokenInput"
@@ -177,7 +177,7 @@ export default class ScomStakingFlowInitialSetup extends Module {
                     <i-hstack horizontalAlignment='center'>
                         <i-button
                             id="btnStart"
-                            caption="Start"
+                            caption="$start"
                             padding={{ top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }}
                             font={{ color: Theme.colors.primary.contrastText, size: '1.5rem' }}
                             onClick={this.handleClickStart}
@@ -197,8 +197,8 @@ export default class ScomStakingFlowInitialSetup extends Module {
             this.state.handleAddTransactions = options.onAddTransactions;
             this.state.handleJumpToStep = options.onJumpToStep;
             this.state.handleUpdateStepStatus = options.onUpdateStepStatus;
-            await this.setData({ 
-                executionProperties: properties, 
+            await this.setData({
+                executionProperties: properties,
                 tokenRequirements
             });
         }
