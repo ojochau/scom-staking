@@ -337,6 +337,180 @@ declare module "@scom/scom-staking/staking-utils/index.ts" {
 declare module "@scom/scom-staking/manage-stake/index.css.ts" {
     export const stakingManageStakeStyle: string;
 }
+/// <amd-module name="@scom/scom-staking/languages/common.json.ts" />
+declare module "@scom/scom-staking/languages/common.json.ts" {
+    const _default_2: {
+        en: {
+            connect_wallet: string;
+            please_connect_with_your_wallet: string;
+            completed: string;
+        };
+        "zh-hant": {
+            connect_wallet: string;
+            please_connect_with_your_wallet: string;
+            completed: string;
+        };
+        vi: {
+            connect_wallet: string;
+            please_connect_with_your_wallet: string;
+            completed: string;
+        };
+    };
+    export default _default_2;
+}
+/// <amd-module name="@scom/scom-staking/languages/setup.json.ts" />
+declare module "@scom/scom-staking/languages/setup.json.ts" {
+    const _default_3: {
+        en: {
+            connected_with_address: string;
+            get_ready_to_stake: string;
+            how_many_tokens_are_you_planning_to_stake: string;
+            start: string;
+        };
+        "zh-hant": {
+            connected_with_address: string;
+            get_ready_to_stake: string;
+            how_many_tokens_are_you_planning_to_stake: string;
+            start: string;
+        };
+        vi: {
+            connected_with_address: string;
+            get_ready_to_stake: string;
+            how_many_tokens_are_you_planning_to_stake: string;
+            start: string;
+        };
+    };
+    export default _default_3;
+}
+/// <amd-module name="@scom/scom-staking/languages/stake.json.ts" />
+declare module "@scom/scom-staking/languages/stake.json.ts" {
+    const _default_4: {
+        en: {
+            approve_token: string;
+            stake_token: string;
+            unlock_token: string;
+            stake: string;
+            unstake: string;
+            approve: string;
+            approving: string;
+            staking: string;
+            unstaking: string;
+            insufficient_balance: string;
+            max: string;
+        };
+        "zh-hant": {
+            approve_token: string;
+            stake_token: string;
+            unlock_token: string;
+            stake: string;
+            unstake: string;
+            approve: string;
+            approving: string;
+            staking: string;
+            unstaking: string;
+            insufficient_balance: string;
+            max: string;
+        };
+        vi: {
+            approve_token: string;
+            stake_token: string;
+            unlock_token: string;
+            stake: string;
+            unstake: string;
+            approve: string;
+            approving: string;
+            staking: string;
+            unstaking: string;
+            insufficient_balance: string;
+            max: string;
+        };
+    };
+    export default _default_4;
+}
+/// <amd-module name="@scom/scom-staking/languages/main.json.ts" />
+declare module "@scom/scom-staking/languages/main.json.ts" {
+    const _default_5: {
+        en: {
+            claim_token: string;
+            no_campaigns: string;
+            switch_network: string;
+            start_date: string;
+            end_date: string;
+            closed: string;
+            sold_out: string;
+            active: string;
+            you_staked: string;
+            token_locked: string;
+            token_vesting_start: string;
+            token_vesting_end: string;
+            claim_token_after_start: string;
+            token_claimable: string;
+            stake_duration: string;
+            less_than_one_day: string;
+            duration_days: string;
+            get_token: string;
+            view_contract: string;
+            view_reward_contract: string;
+            you_earned: string;
+        };
+        "zh-hant": {
+            claim_token: string;
+            no_campaigns: string;
+            switch_network: string;
+            start_date: string;
+            end_date: string;
+            closed: string;
+            sold_out: string;
+            active: string;
+            you_staked: string;
+            token_locked: string;
+            token_vesting_start: string;
+            token_vesting_end: string;
+            claim_token_after_start: string;
+            token_claimable: string;
+            stake_duration: string;
+            less_than_one_day: string;
+            duration_days: string;
+            get_token: string;
+            view_contract: string;
+            view_reward_contract: string;
+            you_earned: string;
+        };
+        vi: {
+            claim_token: string;
+            no_campaigns: string;
+            switch_network: string;
+            start_date: string;
+            end_date: string;
+            closed: string;
+            sold_out: string;
+            active: string;
+            you_staked: string;
+            token_locked: string;
+            token_vesting_start: string;
+            token_vesting_end: string;
+            claim_token_after_start: string;
+            token_claimable: string;
+            stake_duration: string;
+            less_than_one_day: string;
+            duration_days: string;
+            get_token: string;
+            view_contract: string;
+            view_reward_contract: string;
+            you_earned: string;
+        };
+    };
+    export default _default_5;
+}
+/// <amd-module name="@scom/scom-staking/languages/index.ts" />
+declare module "@scom/scom-staking/languages/index.ts" {
+    import commonJson from "@scom/scom-staking/languages/common.json.ts";
+    import setupJson from "@scom/scom-staking/languages/setup.json.ts";
+    import stakeJson from "@scom/scom-staking/languages/stake.json.ts";
+    import mainJson from "@scom/scom-staking/languages/main.json.ts";
+    function mergeI18nData(i18nData: Record<string, any>[]): Record<string, any>;
+    export { commonJson, setupJson, stakeJson, mainJson, mergeI18nData };
+}
 /// <amd-module name="@scom/scom-staking/manage-stake/index.tsx" />
 declare module "@scom/scom-staking/manage-stake/index.tsx" {
     import { Button, Input, Container, ControlElement, Module } from '@ijstech/components';
@@ -405,7 +579,7 @@ declare module "@scom/scom-staking/index.css.ts" {
 declare module "@scom/scom-staking/formSchema.ts" {
     import ScomNetworkPicker from '@scom/scom-network-picker';
     import { LockTokenType } from "@scom/scom-staking/global/index.ts";
-    const _default_2: {
+    const _default_6: {
         dataSchema: {
             type: string;
             properties: {
@@ -597,7 +771,7 @@ declare module "@scom/scom-staking/formSchema.ts" {
             };
         };
     };
-    export default _default_2;
+    export default _default_6;
     export function getProjectOwnerSchema(): {
         dataSchema: {
             type: string;

@@ -983,7 +983,196 @@ define("@scom/scom-staking/manage-stake/index.css.ts", ["require", "exports", "@
         }
     });
 });
-define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/manage-stake/index.css.ts"], function (require, exports, components_6, eth_wallet_5, index_5, index_6, scom_token_list_3, index_7, index_css_1) {
+define("@scom/scom-staking/languages/common.json.ts", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    ///<amd-module name='@scom/scom-staking/languages/common.json.ts'/> 
+    exports.default = {
+        "en": {
+            "connect_wallet": "Connect Wallet",
+            "please_connect_with_your_wallet": "Please connect with your wallet!",
+            "completed": "Completed",
+        },
+        "zh-hant": {
+            "connect_wallet": "連接錢包",
+            "please_connect_with_your_wallet": "請連接您的錢包！",
+            "completed": "完成",
+        },
+        "vi": {
+            "connect_wallet": "Kết nối ví",
+            "please_connect_with_your_wallet": "Vui lòng kết nối với ví của bạn!",
+            "completed": "Hoàn thành",
+        }
+    };
+});
+define("@scom/scom-staking/languages/setup.json.ts", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    ///<amd-module name='@scom/scom-staking/languages/setup.json.ts'/> 
+    exports.default = {
+        "en": {
+            "connected_with_address": "Connected with {{address}}",
+            "get_ready_to_stake": "Get Ready to Stake",
+            "how_many_tokens_are_you_planning_to_stake": "How many tokens are you planning to stake?",
+            "start": "Start",
+        },
+        "zh-hant": {
+            "connected_with_address": "已連接至 {{address}}",
+            "get_ready_to_stake": "準備好質押",
+            "how_many_tokens_are_you_planning_to_stake": "您計劃質押多少個 Token？",
+            "start": "開始",
+        },
+        "vi": {
+            "connected_with_address": "Đã kết nối với {{address}}",
+            "get_ready_to_stake": "Chuẩn bị để đặt cược",
+            "how_many_tokens_are_you_planning_to_stake": "Bạn dự định đặt cược bao nhiêu token?",
+            "start": "Bắt đầu",
+        }
+    };
+});
+define("@scom/scom-staking/languages/stake.json.ts", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    ///<amd-module name='@scom/scom-staking/languages/stake.json.ts'/> 
+    exports.default = {
+        "en": {
+            "approve_token": "Approve {{token}}",
+            "stake_token": "Stake {{token}}",
+            "unlock_token": "Unlock {{token}}",
+            "stake": "Stake",
+            "unstake": "Unstake",
+            "approve": "Approve",
+            "approving": "Approving",
+            "staking": "Staking",
+            "unstaking": "Unstaking",
+            "insufficient_balance": "Insufficient Balance",
+            "max": "Max",
+        },
+        "zh-hant": {
+            "approve_token": "批准 {{token}}",
+            "stake_token": "質押 {{token}}",
+            "unlock_token": "解鎖 {{token}}",
+            "stake": "質押",
+            "unstake": "解除質押",
+            "approve": "批准",
+            "approving": "正在批准",
+            "staking": "正在質押",
+            "unstaking": "正在解除質押",
+            "insufficient_balance": "餘額不足",
+            "max": "最大",
+        },
+        "vi": {
+            "approve_token": "Phê duyệt {{token}}",
+            "stake_token": "Đặt cược {{token}}",
+            "unlock_token": "Mở khóa {{token}}",
+            "stake": "Đặt cược",
+            "unstake": "Hủy đặt cược",
+            "approve": "Phê duyệt",
+            "approving": "Đang phê duyệt",
+            "staking": "Đang đặt cược",
+            "unstaking": "Đang hủy đặt cược",
+            "insufficient_balance": "Số dư không đủ",
+            "max": "Tối đa",
+        }
+    };
+});
+define("@scom/scom-staking/languages/main.json.ts", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    ///<amd-module name='@scom/scom-staking/languages/main.json.ts'/> 
+    exports.default = {
+        "en": {
+            "claim_token": "Claim {{token}}",
+            "no_campaigns": "No Campaigns",
+            "switch_network": "Switch Network",
+            "start_date": "Start Date",
+            "end_date": "End Date",
+            "closed": "Closed",
+            "sold_out": "Sold Out",
+            "active": "Active",
+            "you_staked": "You Staked",
+            "token_locked": "{{token}} Locked",
+            "token_vesting_start": "{{token}} Vesting Start",
+            "token_vesting_end": "{{token}} Vesting End",
+            "claim_token_after_start": "Claim {{token}} after {{start}}",
+            "token_claimable": "{{token}} Claimable",
+            "stake_duration": "Stake Duration",
+            "less_than_one_day": "< 1 Day",
+            "duration_days": "{{duration}} Days",
+            "get_token": "Get {{token}}",
+            "view_contract": "View Contract",
+            "view_reward_contract": "View Reward Contract",
+            "you_earned": "You Earned",
+        },
+        "zh-hant": {
+            "claim_token": "領取 {{token}}",
+            "no_campaigns": "沒有活動",
+            "switch_network": "切換網路",
+            "start_date": "開始日期",
+            "end_date": "結束日期",
+            "closed": "已結束",
+            "sold_out": "已售完",
+            "active": "進行中",
+            "you_staked": "您已質押",
+            "token_locked": "{{token}} 鎖倉",
+            "token_vesting_start": "{{token}} 解鎖開始",
+            "token_vesting_end": "{{token}} 解鎖結束",
+            "claim_token_after_start": "於 {{start}} 之後領取 {{token}}",
+            "token_claimable": "{{token}} 可領取",
+            "stake_duration": "質押期限",
+            "less_than_one_day": "< 1 天",
+            "duration_days": "{{duration}} 天",
+            "get_token": "獲取 {{token}}",
+            "view_contract": "查看合約",
+            "view_reward_contract": "查看獎勳合約",
+            "you_earned": "您已獲得",
+        },
+        "vi": {
+            "claim_token": "Nhận {{token}}",
+            "no_campaigns": "Không có chiến dịch",
+            "switch_network": "Chuyển mạng",
+            "start_date": "Ngày bắt đầu",
+            "end_date": "Ngày kết thúc",
+            "closed": "Đã đóng",
+            "sold_out": "Hết hàng",
+            "active": "Đang hoạt động",
+            "you_staked": "Bạn đã đặt cược",
+            "token_locked": "{{token}} đã khóa",
+            "token_vesting_start": "Bắt đầu giải ngân {{token}}",
+            "token_vesting_end": "Kết thúc giải ngân {{token}}",
+            "claim_token_after_start": "Nhận {{token}} sau {{start}}",
+            "token_claimable": "{{token}} có thể nhận được",
+            "stake_duration": "Thời gian đặt cược",
+            "less_than_one_day": "< 1 Ngày",
+            "duration_days": "{{duration}} Ngày",
+            "get_token": "Lấy {{token}}",
+            "view_contract": "Xem hợp đồng",
+            "view_reward_contract": "Xem hợp đồng thưởng",
+            "you_earned": "Bạn đã kiếm được",
+        }
+    };
+});
+define("@scom/scom-staking/languages/index.ts", ["require", "exports", "@scom/scom-staking/languages/common.json.ts", "@scom/scom-staking/languages/setup.json.ts", "@scom/scom-staking/languages/stake.json.ts", "@scom/scom-staking/languages/main.json.ts"], function (require, exports, common_json_1, setup_json_1, stake_json_1, main_json_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.mergeI18nData = exports.mainJson = exports.stakeJson = exports.setupJson = exports.commonJson = void 0;
+    exports.commonJson = common_json_1.default;
+    exports.setupJson = setup_json_1.default;
+    exports.stakeJson = stake_json_1.default;
+    exports.mainJson = main_json_1.default;
+    function mergeI18nData(i18nData) {
+        const mergedI18nData = {};
+        for (let i = 0; i < i18nData.length; i++) {
+            const i18nItem = i18nData[i];
+            for (const key in i18nItem) {
+                mergedI18nData[key] = { ...(mergedI18nData[key] || {}), ...(i18nItem[key] || {}) };
+            }
+        }
+        return mergedI18nData;
+    }
+    exports.mergeI18nData = mergeI18nData;
+});
+define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/manage-stake/index.css.ts", "@scom/scom-staking/languages/index.ts"], function (require, exports, components_6, eth_wallet_5, index_5, index_6, scom_token_list_3, index_7, index_css_1, index_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_6.Styles.Theme.ThemeVars;
@@ -1030,7 +1219,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                 this.txStatusModal.showModal();
             };
             this.onApproveToken = async () => {
-                this.showMessage('warning', `Approve ${this.tokenSymbol}`);
+                this.showMessage('warning', this.i18n.get('$approve_token', { token: this.tokenSymbol }));
                 this.approvalModelAction.doApproveAction(this.lockedTokenObject, this.inputAmount.value);
             };
             this.onStake = async () => {
@@ -1188,7 +1377,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
             this.approvalModelAction = await this.state.setApprovalModelAction({
                 sender: this,
                 payAction: async () => {
-                    this.showMessage('warning', `${this.currentMode === index_5.CurrentMode.STAKE ? 'Stake' : 'Unlock'} ${this.tokenSymbol}`);
+                    this.showMessage('warning', this.i18n.get(this.currentMode === index_5.CurrentMode.STAKE ? '$stake_token' : '$unlock_token', { token: this.tokenSymbol }));
                     if (this.currentMode === index_5.CurrentMode.STAKE) {
                         (0, index_7.lockToken)(this.lockedTokenObject, this.inputAmount.value, this.address, this.callback);
                     }
@@ -1198,7 +1387,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                 },
                 onToBeApproved: async (token) => {
                     if (new eth_wallet_5.BigNumber(this.inputAmount.value).lte(eth_wallet_5.BigNumber.min(this.availableQty, this.balance, this.perAddressCap))) {
-                        this.btnApprove.caption = `Approve ${token.symbol}`;
+                        this.btnApprove.caption = this.i18n.get('$approve_token', { token: token.symbol });
                         this.btnApprove.visible = true;
                         this.btnApprove.enabled = true;
                     }
@@ -1214,11 +1403,11 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                     if (this.currentMode === index_5.CurrentMode.STAKE) {
                         const amount = new eth_wallet_5.BigNumber(this.inputAmount.value);
                         if (amount.gt(this.balance)) {
-                            this.btnStake.caption = 'Insufficient Balance';
+                            this.btnStake.caption = this.i18n.get('$insufficient_balance');
                             this.btnStake.enabled = false;
                             return;
                         }
-                        this.btnStake.caption = 'Stake';
+                        this.btnStake.caption = this.i18n.get('$stake');
                         if (amount.isNaN() || amount.lte(0) || amount.gt(eth_wallet_5.BigNumber.min(this.availableQty, this.balance, this.perAddressCap))) {
                             this.btnStake.enabled = false;
                         }
@@ -1231,7 +1420,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                 onApproving: async (token, receipt) => {
                     if (receipt) {
                         this.showMessage('success', receipt);
-                        this.btnApprove.caption = `Approving`;
+                        this.btnApprove.caption = this.i18n.get('$approving');
                         this.btnApprove.enabled = false;
                         this.btnApprove.rightIcon.visible = true;
                         this.btnMax.enabled = false;
@@ -1259,13 +1448,13 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                         this.inputAmount.enabled = false;
                         this.btnMax.enabled = false;
                         if (this.currentMode === index_5.CurrentMode.STAKE) {
-                            this.btnStake.caption = 'Staking';
+                            this.btnStake.caption = this.i18n.get('$staking');
                             this.btnStake.rightIcon.visible = true;
                             this.state.setStakingStatus(this.currentMode, true);
                             this.btnUnstake.enabled = false;
                         }
                         else {
-                            this.btnUnstake.caption = 'Unstaking';
+                            this.btnUnstake.caption = this.i18n.get('$unstaking');
                             this.btnUnstake.rightIcon.visible = true;
                             this.state.setStakingStatus(this.currentMode, true);
                             this.btnStake.enabled = false;
@@ -1280,11 +1469,11 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                         this.state.setStakingStatus(this.currentMode, false);
                     }
                     if (this.currentMode === index_5.CurrentMode.STAKE) {
-                        this.btnStake.caption = 'Stake';
+                        this.btnStake.caption = this.i18n.get('$stake');
                         this.btnStake.rightIcon.visible = false;
                         if (this.state.handleUpdateStepStatus) {
                             this.state.handleUpdateStepStatus({
-                                status: "Completed",
+                                status: this.i18n.get('$completed'),
                                 color: Theme.colors.success.main
                             });
                         }
@@ -1293,7 +1482,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                             const timestamp = await this.state.getRpcWallet().getBlockTimestamp(receipt.blockNumber.toString());
                             const transactionsInfoArr = [
                                 {
-                                    desc: `Stake ${this.lockedTokenObject.symbol}`,
+                                    desc: this.i18n.get('$stake_token', { token: this.lockedTokenObject.symbol }),
                                     fromToken: this.lockedTokenObject,
                                     toToken: null,
                                     fromTokenAmount: event.amount.toFixed(),
@@ -1308,7 +1497,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                         }
                     }
                     else {
-                        this.btnUnstake.caption = 'Unstake';
+                        this.btnUnstake.caption = this.i18n.get('$unstake');
                         this.btnUnstake.rightIcon.visible = false;
                     }
                     await this.updateEnableInput();
@@ -1319,11 +1508,11 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                 onPayingError: async (err) => {
                     await this.updateEnableInput();
                     if (this.currentMode === index_5.CurrentMode.STAKE) {
-                        this.btnStake.caption = 'Stake';
+                        this.btnStake.caption = this.i18n.get('$stake');
                         this.btnStake.rightIcon.visible = false;
                     }
                     else {
-                        this.btnUnstake.caption = 'Unstake';
+                        this.btnUnstake.caption = this.i18n.get('$unstake');
                         this.btnUnstake.rightIcon.visible = false;
                     }
                     this.showMessage('error', err);
@@ -1333,6 +1522,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
             this.state.approvalModel.spenderAddress = this.address;
         }
         init() {
+            this.i18n.init({ ...(0, index_8.mergeI18nData)([index_8.commonJson, index_8.stakeJson]) });
             super.init();
         }
         render() {
@@ -1341,23 +1531,23 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                     this.$render("i-hstack", { id: "wrapperInputAmount", gap: 4, width: 280, height: 36, padding: { right: 8 }, background: { color: Theme.input.background }, border: { radius: 8 }, verticalAlignment: "center", horizontalAlignment: "space-between" },
                         this.$render("i-input", { id: "inputAmount", inputType: "number", placeholder: "0.0", width: "100%", height: "100%", border: { style: 'none' }, padding: { left: 8, right: 8 }, font: { size: '1rem' }, onChanged: () => this.onInputAmount() }),
                         this.$render("i-hstack", { gap: 4, verticalAlignment: "center" },
-                            this.$render("i-button", { id: "btnMax", caption: "Max", enabled: false, 
+                            this.$render("i-button", { id: "btnMax", caption: "$max", enabled: false, 
                                 // background={{ color: `${Theme.colors.primary.main} !important` }}
                                 // font={{ color: Theme.colors.primary.contrastText }}
                                 font: { size: '1rem', color: '#fff', weight: 700 }, class: "btn-os", width: 45, minHeight: 25, onClick: () => this.setMaxBalance() }),
                             this.$render("i-label", { id: "lbToken", font: { size: '14px', color: Theme.input.fontColor }, opacity: 0.5 }))),
                     this.$render("i-hstack", { gap: 10, width: "calc(100% - 290px)" },
-                        this.$render("i-button", { id: "btnApprove", caption: "Approve", enabled: false, visible: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, 
+                        this.$render("i-button", { id: "btnApprove", caption: "$approve", enabled: false, visible: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, 
                             // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
                             // background={{ color: `${Theme.colors.primary.main} !important` }}
                             // font={{ color: Theme.colors.primary.contrastText }}
                             font: { size: '1rem', color: '#fff', weight: 700 }, class: "btn-os", onClick: () => this.onApproveToken() }),
-                        this.$render("i-button", { id: "btnStake", caption: "Stake", enabled: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, 
+                        this.$render("i-button", { id: "btnStake", caption: "$stake", enabled: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, 
                             // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
                             // background={{ color: `${Theme.colors.primary.main} !important` }}
                             // font={{ color: Theme.colors.primary.contrastText }}
                             font: { size: '1rem', color: '#fff', weight: 700 }, class: "btn-os", onClick: () => this.onStake() }),
-                        this.$render("i-button", { id: "btnUnstake", caption: "Unstake", enabled: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, 
+                        this.$render("i-button", { id: "btnUnstake", caption: "$unstake", enabled: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, 
                             // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
                             // background={{ color: `${Theme.colors.primary.main} !important` }}
                             font: { size: '1rem', color: '#fff', weight: 700 }, class: "btn-os", onClick: () => this.onUnstake() }))),
@@ -1468,7 +1658,7 @@ define("@scom/scom-staking/index.css.ts", ["require", "exports", "@ijstech/compo
         }
     });
 });
-define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-network-picker", "@scom/scom-staking/global/index.ts"], function (require, exports, scom_network_picker_1, index_8) {
+define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-network-picker", "@scom/scom-staking/global/index.ts"], function (require, exports, scom_network_picker_1, index_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getProjectOwnerSchema = void 0;
@@ -1560,9 +1750,9 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                         lockTokenType: {
                             type: 'number',
                             oneOf: [
-                                { title: 'ERC20_Token', const: index_8.LockTokenType.ERC20_Token },
-                                { title: 'LP_Token', const: index_8.LockTokenType.LP_Token },
-                                { title: 'VAULT_Token', const: index_8.LockTokenType.VAULT_Token },
+                                { title: 'ERC20_Token', const: index_9.LockTokenType.ERC20_Token },
+                                { title: 'LP_Token', const: index_9.LockTokenType.LP_Token },
+                                { title: 'VAULT_Token', const: index_9.LockTokenType.VAULT_Token },
                             ],
                             required: true
                         },
@@ -1810,9 +2000,9 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
                             lockTokenType: {
                                 type: 'number',
                                 oneOf: [
-                                    { title: 'ERC20_Token', const: index_8.LockTokenType.ERC20_Token },
-                                    { title: 'LP_Token', const: index_8.LockTokenType.LP_Token },
-                                    { title: 'VAULT_Token', const: index_8.LockTokenType.VAULT_Token },
+                                    { title: 'ERC20_Token', const: index_9.LockTokenType.ERC20_Token },
+                                    { title: 'LP_Token', const: index_9.LockTokenType.LP_Token },
+                                    { title: 'VAULT_Token', const: index_9.LockTokenType.VAULT_Token },
                                 ],
                                 required: true
                             },
@@ -1866,7 +2056,7 @@ define("@scom/scom-staking/formSchema.ts", ["require", "exports", "@scom/scom-ne
     }
     exports.getProjectOwnerSchema = getProjectOwnerSchema;
 });
-define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-token-list", "@scom/scom-staking/store/index.ts", "@ijstech/eth-wallet"], function (require, exports, components_8, scom_token_list_4, index_9, eth_wallet_6) {
+define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-token-list", "@scom/scom-staking/store/index.ts", "@ijstech/eth-wallet", "@scom/scom-staking/languages/index.ts"], function (require, exports, components_8, scom_token_list_4, index_10, eth_wallet_6, index_11) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_8.Styles.Theme.ThemeVars;
@@ -1884,7 +2074,7 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
                 }
             };
             this.initializeWidgetConfig = async () => {
-                let connected = (0, index_9.isClientWalletConnected)();
+                let connected = (0, index_10.isClientWalletConnected)();
                 this.displayWalletStatus(connected);
                 await this.initWallet();
                 scom_token_list_4.tokenStore.updateTokenMapData(this.executionProperties.chainId);
@@ -1901,7 +2091,7 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
                 this.executionProperties.stakeInputValue = this.tokenInput.value;
                 if (this.state.handleUpdateStepStatus) {
                     this.state.handleUpdateStepStatus({
-                        status: "Completed",
+                        status: this.i18n.get('$completed'),
                         color: Theme.colors.success.main
                     });
                 }
@@ -1935,7 +2125,7 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
             await this.initializeWidgetConfig();
         }
         async connectWallet() {
-            if (!(0, index_9.isClientWalletConnected)()) {
+            if (!(0, index_10.isClientWalletConnected)()) {
                 if (this.mdWallet) {
                     await components_8.application.loadPackage('@scom/scom-wallet-modal', '*');
                     this.mdWallet.networks = this.executionProperties.networks;
@@ -1946,11 +2136,11 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
         }
         displayWalletStatus(connected) {
             if (connected) {
-                this.lbConnectedStatus.caption = 'Connected with ' + eth_wallet_6.Wallet.getClientInstance().address;
+                this.lbConnectedStatus.caption = this.i18n.get('$connected_with_address', { address: eth_wallet_6.Wallet.getClientInstance().address });
                 this.btnConnectWallet.visible = false;
             }
             else {
-                this.lbConnectedStatus.caption = 'Please connect your wallet first';
+                this.lbConnectedStatus.caption = this.i18n.get('$please_connect_with_your_wallet');
                 this.btnConnectWallet.visible = true;
             }
         }
@@ -1970,6 +2160,7 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
             this.walletEvents = [];
         }
         init() {
+            this.i18n.init({ ...(0, index_11.mergeI18nData)([index_11.commonJson, index_11.setupJson]) });
             super.init();
             this.tokenInput.style.setProperty('--input-background', '#232B5A');
             this.tokenInput.style.setProperty('--input-font_color', '#fff');
@@ -1977,16 +2168,16 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
         }
         render() {
             return (this.$render("i-vstack", { gap: '1rem', padding: { top: 10, bottom: 10, left: 20, right: 20 } },
-                this.$render("i-label", { caption: 'Get Ready to Stake', font: { size: '1.5rem' } }),
+                this.$render("i-label", { caption: "$get_ready_to_stake", font: { size: '1.5rem' } }),
                 this.$render("i-vstack", { gap: '1rem' },
                     this.$render("i-label", { id: "lbConnectedStatus" }),
                     this.$render("i-hstack", null,
-                        this.$render("i-button", { id: "btnConnectWallet", caption: 'Connect Wallet', font: { color: Theme.colors.primary.contrastText }, padding: { top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }, onClick: this.connectWallet })),
-                    this.$render("i-label", { caption: 'How many tokens are you planning to stake?' }),
+                        this.$render("i-button", { id: "btnConnectWallet", caption: "$connect_wallet", font: { color: Theme.colors.primary.contrastText }, padding: { top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }, onClick: this.connectWallet })),
+                    this.$render("i-label", { caption: "$how_many_tokens_are_you_planning_to_stake" }),
                     this.$render("i-hstack", { verticalAlignment: 'center', width: '50%' },
                         this.$render("i-scom-token-input", { id: "tokenInput", placeholder: '0.0', value: '-', tokenReadOnly: true, isBalanceShown: false, isBtnMaxShown: false, border: { radius: '1rem' }, font: { size: '1.25rem' }, background: { color: Theme.input.background } })),
                     this.$render("i-hstack", { horizontalAlignment: 'center' },
-                        this.$render("i-button", { id: "btnStart", caption: "Start", padding: { top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }, font: { color: Theme.colors.primary.contrastText, size: '1.5rem' }, onClick: this.handleClickStart }))),
+                        this.$render("i-button", { id: "btnStart", caption: "$start", padding: { top: '0.25rem', bottom: '0.25rem', left: '0.75rem', right: '0.75rem' }, font: { color: Theme.colors.primary.contrastText, size: '1.5rem' }, onClick: this.handleClickStart }))),
                 this.$render("i-scom-wallet-modal", { id: "mdWallet", wallets: [] })));
         }
         async handleFlowStage(target, stage, options) {
@@ -2014,7 +2205,7 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
     ], ScomStakingFlowInitialSetup);
     exports.default = ScomStakingFlowInitialSetup;
 });
-define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/data.json.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/manage-stake/index.tsx", "@scom/scom-staking/index.css.ts", "@scom/scom-staking/formSchema.ts", "@scom/scom-staking/flow/initialSetup.tsx", "@scom/scom-blocknote-sdk"], function (require, exports, components_9, eth_wallet_7, assets_2, index_10, index_11, scom_token_list_5, data_json_1, index_12, index_13, index_css_2, formSchema_1, initialSetup_1, scom_blocknote_sdk_1) {
+define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/data.json.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/manage-stake/index.tsx", "@scom/scom-staking/index.css.ts", "@scom/scom-staking/formSchema.ts", "@scom/scom-staking/flow/initialSetup.tsx", "@scom/scom-blocknote-sdk", "@scom/scom-staking/languages/index.ts"], function (require, exports, components_9, eth_wallet_7, assets_2, index_12, index_13, scom_token_list_5, data_json_1, index_14, index_15, index_css_2, formSchema_1, initialSetup_1, scom_blocknote_sdk_1, index_16) {
     "use strict";
     var ScomStaking_1;
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -2255,7 +2446,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     target: 'Project Owners',
                     getProxySelectors: async (chainId) => {
                         const address = this.campaign?.option?.[0]?.address;
-                        const selectors = await (0, index_12.getProxySelectors)(this.state, chainId, address);
+                        const selectors = await (0, index_14.getProxySelectors)(this.state, chainId, address);
                         return selectors;
                     },
                     getActions: () => {
@@ -2450,14 +2641,14 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     if (!hideLoading && this.loadingElm) {
                         this.loadingElm.visible = true;
                     }
-                    if (!(0, index_11.isClientWalletConnected)() || !this._data || !this.checkValidation()) {
+                    if (!(0, index_13.isClientWalletConnected)() || !this._data || !this.checkValidation()) {
                         await this.renderEmpty();
                         return;
                     }
                     await this.initWallet();
                     scom_token_list_5.tokenStore.updateTokenMapData(this.chainId);
                     await scom_token_list_5.tokenStore.updateTokenBalancesByChainId(this.chainId);
-                    this.campaign = await (0, index_12.getCampaignInfo)(this.rpcWallet, { [this._data.chainId]: this._data });
+                    this.campaign = await (0, index_14.getCampaignInfo)(this.rpcWallet, { [this._data.chainId]: this._data });
                     await this.renderCampaign(hideLoading);
                     if (!hideLoading && this.loadingElm) {
                         this.loadingElm.visible = false;
@@ -2488,7 +2679,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 this.txStatusModal.showModal();
             };
             this.onClaim = async (btnClaim, data) => {
-                this.showMessage('warning', `Claim ${data.rewardSymbol}`);
+                this.showMessage('warning', this.i18n.get('$claim', { token: data.rewardSymbol }));
                 const callBack = async (err, reply) => {
                     if (err) {
                         this.showMessage('error', err);
@@ -2506,11 +2697,11 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     btnClaim.rightIcon.visible = false;
                     btnClaim.enabled = true;
                 };
-                (0, index_10.registerSendTxEvents)({
+                (0, index_12.registerSendTxEvents)({
                     transactionHash: callBack,
                     confirmation: confirmationCallBack
                 });
-                (0, index_12.claimToken)(data.reward.address, callBack);
+                (0, index_14.claimToken)(data.reward.address, callBack);
             };
             this.checkValidation = () => {
                 if (!this._data)
@@ -2544,11 +2735,11 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     window.open(campaign.getTokenURL);
                 }
                 else {
-                    window.open(index_11.getTokenUrl ? index_11.getTokenUrl : `https:openswap.xyz/#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
+                    window.open(index_13.getTokenUrl ? index_13.getTokenUrl : `https:openswap.xyz/#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
                 }
             };
             this.connectWallet = async () => {
-                if (!(0, index_11.isClientWalletConnected)()) {
+                if (!(0, index_13.isClientWalletConnected)()) {
                     if (this.mdWallet) {
                         await components_9.application.loadPackage('@scom/scom-wallet-modal', '*');
                         this.mdWallet.networks = this.networks;
@@ -2566,13 +2757,13 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 if (!this.noCampaignSection) {
                     this.noCampaignSection = await components_9.Panel.create({ height: '100%' });
                 }
-                const isClientConnected = (0, index_11.isClientWalletConnected)();
+                const isClientConnected = (0, index_13.isClientWalletConnected)();
                 // const isRpcConnected = this.state.isRpcWalletConnected();
                 this.noCampaignSection.clearInnerHTML();
                 this.noCampaignSection.appendChild(this.$render("i-vstack", { height: "100%", background: { color: Theme.background.main }, padding: { top: '3rem', bottom: '3rem', left: '2rem', right: '2rem' }, justifyContent: 'center', class: "no-campaign text-center" },
                     this.$render("i-vstack", { verticalAlignment: "center", gap: "1rem", width: "100%", height: "100%" },
                         this.$render("i-image", { width: "100%", height: "100%", url: assets_2.default.fullPath('img/staking/TrollTrooper.svg') }),
-                        this.$render("i-label", { caption: isClientConnected ? 'No Campaigns' : 'Please connect with your wallet!', font: { size: '1.5rem' }, letterSpacing: letterSpacing }))));
+                        this.$render("i-label", { caption: this.i18n.get(isClientConnected ? '$no_campaigns' : '$please_connect_with_your_wallet'), font: { size: '1.5rem' }, letterSpacing: letterSpacing }))));
                 this.noCampaignSection.visible = true;
             };
             this.renderEmpty = async () => {
@@ -2610,14 +2801,14 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 let lpTokenData = {};
                 let vaultTokenData = {};
                 if (opt.tokenAddress) {
-                    if (opt.lockTokenType == index_10.LockTokenType.LP_Token) {
+                    if (opt.lockTokenType == index_12.LockTokenType.LP_Token) {
                         lpTokenData = {
-                            'object': await (0, index_12.getLPObject)(rpcWallet, opt.tokenAddress)
+                            'object': await (0, index_14.getLPObject)(rpcWallet, opt.tokenAddress)
                         };
                     }
-                    else if (opt.lockTokenType == index_10.LockTokenType.VAULT_Token) {
+                    else if (opt.lockTokenType == index_12.LockTokenType.VAULT_Token) {
                         vaultTokenData = {
-                            'object': await (0, index_12.getVaultObject)(rpcWallet, opt.tokenAddress)
+                            'object': await (0, index_14.getVaultObject)(rpcWallet, opt.tokenAddress)
                         };
                     }
                 }
@@ -2631,9 +2822,9 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     tokenInfo
                 };
                 const stakingInfo = opt;
-                const lockedTokenObject = (0, index_11.getLockedTokenObject)(stakingInfo, stakingInfo.tokenInfo, this.tokenMap);
-                const lockedTokenSymbol = (0, index_11.getLockedTokenSymbol)(stakingInfo, lockedTokenObject);
-                const lockedTokenIconPaths = (0, index_11.getLockedTokenIconPaths)(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
+                const lockedTokenObject = (0, index_13.getLockedTokenObject)(stakingInfo, stakingInfo.tokenInfo, this.tokenMap);
+                const lockedTokenSymbol = (0, index_13.getLockedTokenSymbol)(stakingInfo, lockedTokenObject);
+                const lockedTokenIconPaths = (0, index_13.getLockedTokenIconPaths)(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
                 const lockedTokenDecimals = lockedTokenObject?.decimals || 18;
                 const defaultDecimalsOffset = 18 - lockedTokenDecimals;
                 const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
@@ -2654,7 +2845,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 const stakingElm = await components_9.VStack.create();
                 const activeTimerRow = await components_9.VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
                 const activeTimerElm = await components_9.VStack.create();
-                activeTimerRow.appendChild(this.$render("i-label", { caption: "End Date", font: { size: '0.875rem' }, opacity: 0.5, letterSpacing: letterSpacing }));
+                activeTimerRow.appendChild(this.$render("i-label", { caption: "$end_date", font: { size: '0.875rem' }, opacity: 0.5, letterSpacing: letterSpacing }));
                 activeTimerRow.appendChild(activeTimerElm);
                 const endHour = await components_9.Label.create(optionTimer);
                 const endDay = await components_9.Label.create(optionTimer);
@@ -2699,12 +2890,12 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     if (!this.state.isRpcWalletConnected() || !this.manageStake)
                         return;
                     const o = opt;
-                    const _totalLocked = await (0, index_12.getStakingTotalLocked)(rpcWallet, o.address);
+                    const _totalLocked = await (0, index_14.getStakingTotalLocked)(rpcWallet, o.address);
                     totalLocked[o.address] = _totalLocked;
                     const optionQty = new eth_wallet_7.BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
                     if (o.mode === 'Stake') {
                         const btnStake = this.manageStake.btnStake;
-                        const isStaking = this.state.getStakingStatus(index_10.CurrentMode.STAKE);
+                        const isStaking = this.state.getStakingStatus(index_12.CurrentMode.STAKE);
                         if (btnStake) {
                             let isValidInput = false;
                             const inputElm = this.manageStake.inputAmount;
@@ -2717,23 +2908,23 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     }
                     else {
                         const btnUnstake = this.manageStake.btnUnstake;
-                        const isUnstaking = this.state.getStakingStatus(index_10.CurrentMode.UNLOCK);
+                        const isUnstaking = this.state.getStakingStatus(index_12.CurrentMode.UNLOCK);
                         if (btnUnstake) {
                             btnUnstake.enabled = !isUnstaking && o.mode !== 'Stake' && Number(o.stakeQty) != 0 && !this.manageStake.needToBeApproval();
                         }
                     }
                     if (isClosed) {
-                        if (stickerLabel.caption !== 'Closed') {
+                        if (stickerLabel.caption !== this.i18n.get('$close')) {
                             stickerSection.border.bottom = { width: '50px', style: 'solid', color: '#0c1234' };
                             stickerIcon.fill = '#f7d064';
                             stickerLabel.font = { size: '0.75rem', color: '#f7d064' };
-                            stickerLabel.caption = 'Closed';
+                            stickerLabel.caption = this.i18n.get('$close');
                             stickerIcon.name = 'check-square';
                         }
                     }
                     else if (optionQty.lte(0)) {
-                        if (stickerLabel.caption !== 'Sold Out') {
-                            stickerLabel.caption = 'Sold Out';
+                        if (stickerLabel.caption !== this.i18n.get('$sold_out')) {
+                            stickerLabel.caption = this.i18n.get('$sold_out');
                             stickerIcon.name = 'star';
                             stickerSection.border.bottom = { width: '50px', style: 'solid', color: '#ccc' };
                             stickerIcon.fill = '#fff';
@@ -2741,8 +2932,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         }
                     }
                     else {
-                        if (stickerLabel.caption !== 'Active') {
-                            stickerLabel.caption = 'Active';
+                        if (stickerLabel.caption !== this.i18n.get('$active')) {
+                            stickerLabel.caption = this.i18n.get('$active');
                             stickerIcon.name = 'star';
                         }
                     }
@@ -2775,7 +2966,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 };
                 setTimer();
                 const option = { ...opt };
-                this.manageStake = new index_13.default(undefined, {
+                this.manageStake = new index_15.default(undefined, {
                     width: '100%',
                 });
                 this.manageStake.state = this.state;
@@ -2785,8 +2976,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 const rewardOptions = !isClaim ? rewardsData : [];
                 let aprInfo = {};
                 const claimStakedRow = await components_9.HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
-                claimStakedRow.appendChild(this.$render("i-label", { caption: "You Staked", font: { size: '1rem' }, letterSpacing: letterSpacing }));
-                claimStakedRow.appendChild(this.$render("i-label", { caption: `${(0, index_10.formatNumber)(new eth_wallet_7.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`, font: { size: '1rem' }, letterSpacing: letterSpacing }));
+                claimStakedRow.appendChild(this.$render("i-label", { caption: "$you_staked", font: { size: '1rem' }, letterSpacing: letterSpacing }));
+                claimStakedRow.appendChild(this.$render("i-label", { caption: `${(0, index_12.formatNumber)(new eth_wallet_7.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`, font: { size: '1rem' }, letterSpacing: letterSpacing }));
                 const rowRewards = await components_9.VStack.create({ gap: 8, verticalAlignment: 'center' });
                 for (let idx = 0; idx < rewardsData.length; idx++) {
                     const reward = rewardsData[idx];
@@ -2803,32 +2994,32 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     }
                     const rewardSymbol = rewardToken.symbol || '';
                     rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
-                        this.$render("i-label", { caption: `${rewardSymbol} Locked`, font: { size: '1rem', color: Theme.text.primary }, letterSpacing: letterSpacing }),
-                        this.$render("i-label", { caption: `${(0, index_10.formatNumber)(new eth_wallet_7.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '1rem' }, letterSpacing: letterSpacing })));
+                        this.$render("i-label", { caption: this.i18n.get('$token_locked', { token: rewardSymbol }), font: { size: '1rem', color: Theme.text.primary }, letterSpacing: letterSpacing }),
+                        this.$render("i-label", { caption: `${(0, index_12.formatNumber)(new eth_wallet_7.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '1rem' }, letterSpacing: letterSpacing })));
                     // rowRewards.appendChild(
                     // 	<i-hstack horizontalAlignment="space-between">
-                    // 		<i-label caption={`${rewardSymbol} Vesting Start`} font={{ size: '16px', color: colorText }} />
+                    // 		<i-label caption={this.i18n.get('$token_vesting_start', {token: rewardSymbol})} font={{ size: '16px', color: colorText }} />
                     // 		<i-label caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
                     // 	</i-hstack>
                     // );
                     // rowRewards.appendChild(
                     // 	<i-hstack horizontalAlignment="space-between">
-                    // 		<i-label caption={`${rewardSymbol} Vesting End`} font={{ size: '16px', color: colorText }} />
+                    // 		<i-label caption={this.i18n.get('$token_vesting_end', {token: rewardSymbol})} font={{ size: '16px', color: colorText }} />
                     // 		<i-label caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
                     // 	</i-hstack>
                     // );
                     const passClaimStartTime = !(reward.claimStartTime && (0, components_9.moment)().diff(components_9.moment.unix(reward.claimStartTime)) < 0);
                     let rewardClaimable = `0 ${rewardSymbol}`;
                     if (passClaimStartTime && isClaim) {
-                        rewardClaimable = `${(0, index_10.formatNumber)(new eth_wallet_7.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
+                        rewardClaimable = `${(0, index_12.formatNumber)(new eth_wallet_7.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
                     }
                     let startClaimingText = '';
                     if (!(!reward.claimStartTime || passClaimStartTime) && isClaim) {
                         const claimStart = components_9.moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
-                        startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
+                        startClaimingText = this.i18n.get('$claim_token_after_start', { token: rewardSymbol, start: claimStart });
                     }
                     rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
-                        this.$render("i-label", { caption: `${rewardSymbol} Claimable`, font: { size: '1rem' }, letterSpacing: letterSpacing }),
+                        this.$render("i-label", { caption: this.i18n.get('$token_claimable', { token: rewardSymbol }), font: { size: '1rem' }, letterSpacing: letterSpacing }),
                         this.$render("i-label", { caption: rewardClaimable, font: { size: '1rem' } }),
                         startClaimingText ? this.$render("i-label", { caption: startClaimingText, font: { size: '1rem' }, letterSpacing: letterSpacing }) : []));
                     const btnClaim = await components_9.Button.create({
@@ -2839,7 +3030,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             margin: { left: '0.25rem', right: '0.25rem' },
                             width: 16, height: 16
                         },
-                        caption: rpcWalletConnected ? `Claim ${rewardSymbol}` : 'Switch Network',
+                        caption: rpcWalletConnected ? this.i18n.get('$claim_token', { token: rewardSymbol }) : this.i18n.get('$switch_network'),
                         font: { size: '1rem', bold: true },
                         enabled: !rpcWalletConnected || (rpcWalletConnected && !(!passClaimStartTime || new eth_wallet_7.BigNumber(reward.claimable).isZero()) && isClaim),
                         margin: { left: 'auto', right: 'auto', bottom: 10 },
@@ -2862,18 +3053,18 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     return '';
                 };
                 const durationDays = option.minLockTime / (60 * 60 * 24);
-                const _lockedTokenObject = (0, index_11.getLockedTokenObject)(option, option.tokenInfo, this.tokenMap);
-                const _lockedTokenIconPaths = (0, index_11.getLockedTokenIconPaths)(option, _lockedTokenObject, chainId, this.tokenMap);
+                const _lockedTokenObject = (0, index_13.getLockedTokenObject)(option, option.tokenInfo, this.tokenMap);
+                const _lockedTokenIconPaths = (0, index_13.getLockedTokenIconPaths)(option, _lockedTokenObject, chainId, this.tokenMap);
                 const pathsLength = _lockedTokenIconPaths.length;
                 const rewardToken = rewardsData?.length ? this.getRewardToken(rewardsData[0].rewardTokenAddress) : null;
-                stakingElm.appendChild(this.$render("i-vstack", { gap: 15, width: index_11.maxWidth, height: "100%", padding: { top: 10, bottom: 10, left: 20, right: 20 }, position: "relative" },
+                stakingElm.appendChild(this.$render("i-vstack", { gap: 15, width: index_13.maxWidth, height: "100%", padding: { top: 10, bottom: 10, left: 20, right: 20 }, position: "relative" },
                     stickerSection,
                     this.$render("i-hstack", { gap: 10, width: "100%", verticalAlignment: "center" },
                         this.$render("i-hstack", { gap: 10, width: "50%" },
                             this.$render("i-hstack", { width: pathsLength === 1 ? 63.5 : 80, position: "relative", verticalAlignment: "center" },
-                                this.$render("i-image", { width: 60, height: 60, url: scom_token_list_5.assets.tokenPath(rewardToken, chainId), fallbackUrl: index_11.fallBackUrl }),
+                                this.$render("i-image", { width: 60, height: 60, url: scom_token_list_5.assets.tokenPath(rewardToken, chainId), fallbackUrl: index_13.fallBackUrl }),
                                 _lockedTokenIconPaths.map((v, idxImg) => {
-                                    return this.$render("i-image", { position: "absolute", width: 28, height: 28, bottom: 0, left: (idxImg * 20) + 35, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_11.fallBackUrl });
+                                    return this.$render("i-image", { position: "absolute", width: 28, height: 28, bottom: 0, left: (idxImg * 20) + 35, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_13.fallBackUrl });
                                 })),
                             this.$render("i-vstack", { gap: 2, overflow: { x: 'hidden' }, verticalAlignment: "center" },
                                 this.$render("i-label", { visible: !!campaign.name, caption: campaign.name, font: { size: '1.25rem', color: Theme.text.secondary, bold: true }, textOverflow: "ellipsis", letterSpacing: letterSpacing, class: "text-overflow" }),
@@ -2887,21 +3078,21 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             const decimalsOffset = 18 - rewardTokenDecimals;
                             const lockTokenType = option.lockTokenType;
                             // const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
-                            const rateDesc = `1 ${lockTokenType === index_10.LockTokenType.LP_Token ? 'LP' : (0, index_11.tokenSymbol)(this.chainId, option.lockTokenAddress)} : ${rewardOption.multiplier} ${(0, index_11.tokenSymbol)(this.chainId, rewardOption.rewardTokenAddress)}`;
+                            const rateDesc = `1 ${lockTokenType === index_12.LockTokenType.LP_Token ? 'LP' : (0, index_13.tokenSymbol)(this.chainId, option.lockTokenAddress)} : ${rewardOption.multiplier} ${(0, index_13.tokenSymbol)(this.chainId, rewardOption.rewardTokenAddress)}`;
                             const updateApr = async () => {
-                                if (lockTokenType === index_10.LockTokenType.ERC20_Token) {
-                                    const apr = await (0, index_12.getERC20RewardCurrentAPR)(rpcWallet, rewardOption, lockedTokenObject, durationDays);
+                                if (lockTokenType === index_12.LockTokenType.ERC20_Token) {
+                                    const apr = await (0, index_14.getERC20RewardCurrentAPR)(rpcWallet, rewardOption, lockedTokenObject, durationDays);
                                     if (!isNaN(parseFloat(apr))) {
                                         aprInfo[rewardOption.rewardTokenAddress] = apr;
                                     }
                                 }
-                                else if (lockTokenType === index_10.LockTokenType.LP_Token) {
+                                else if (lockTokenType === index_12.LockTokenType.LP_Token) {
                                     if (rewardOption.referencePair) {
-                                        aprInfo[rewardOption.rewardTokenAddress] = await (0, index_12.getLPRewardCurrentAPR)(rpcWallet, rewardOption, option.tokenInfo?.lpToken?.object, durationDays);
+                                        aprInfo[rewardOption.rewardTokenAddress] = await (0, index_14.getLPRewardCurrentAPR)(rpcWallet, rewardOption, option.tokenInfo?.lpToken?.object, durationDays);
                                     }
                                 }
                                 else {
-                                    aprInfo[rewardOption.rewardTokenAddress] = await (0, index_12.getVaultRewardCurrentAPR)(rpcWallet, rewardOption, option.tokenInfo?.vaultToken?.object, durationDays);
+                                    aprInfo[rewardOption.rewardTokenAddress] = await (0, index_14.getVaultRewardCurrentAPR)(rpcWallet, rewardOption, option.tokenInfo?.vaultToken?.object, durationDays);
                                 }
                                 const aprValue = getAprValue(rewardOption);
                                 lbApr.caption = `APR ${aprValue}`;
@@ -2918,24 +3109,24 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                         }))),
                     this.$render("i-hstack", { width: "100%", verticalAlignment: "center" },
                         this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
-                            this.$render("i-label", { caption: "Start Date", font: { size: '0.875rem' }, opacity: 0.5, letterSpacing: letterSpacing }),
-                            this.$render("i-label", { caption: (0, index_10.formatDate)(option.startOfEntryPeriod, 'DD MMM, YYYY'), font: { size: '1rem' }, letterSpacing: letterSpacing })),
+                            this.$render("i-label", { caption: "$start_date", font: { size: '0.875rem' }, opacity: 0.5, letterSpacing: letterSpacing }),
+                            this.$render("i-label", { caption: (0, index_12.formatDate)(option.startOfEntryPeriod, 'DD MMM, YYYY'), font: { size: '1rem' }, letterSpacing: letterSpacing })),
                         activeTimerRow,
                         this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
-                            this.$render("i-label", { caption: "Stake Duration", font: { size: '0.875rem' }, opacity: 0.5, letterSpacing: letterSpacing }),
+                            this.$render("i-label", { caption: "$stake_duration", font: { size: '0.875rem' }, opacity: 0.5, letterSpacing: letterSpacing }),
                             this.$render("i-hstack", { gap: 4, verticalAlignment: "center" },
-                                this.$render("i-button", { height: "auto", caption: durationDays < 1 ? '< 1 Day' : `${durationDays} Days`, font: { size: '12px', color: Theme.colors.secondary.contrastText, weight: 700 }, background: { color: `${Theme.colors.secondary.main} !important` }, border: { radius: 12, width: 1, style: 'solid', color: 'transparent' }, padding: { top: 2.5, bottom: 2.5, left: 8, right: 8 }, cursor: "default", class: "btn-os cursor-default" }))),
+                                this.$render("i-button", { height: "auto", caption: durationDays < 1 ? this.i18n.get('$less_than_one_day') : this.i18n.get('$duration_days', { duration: durationDays.toString() }), font: { size: '12px', color: Theme.colors.secondary.contrastText, weight: 700 }, background: { color: `${Theme.colors.secondary.main} !important` }, border: { radius: 12, width: 1, style: 'solid', color: 'transparent' }, padding: { top: 2.5, bottom: 2.5, left: 8, right: 8 }, cursor: "default", class: "btn-os cursor-default" }))),
                         this.$render("i-vstack", { gap: 4, width: "25%", margin: { left: 'auto' }, verticalAlignment: "center", horizontalAlignment: "end" },
                             this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => this.getLPToken(campaign, lockedTokenSymbol, chainId) },
                                 this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: Theme.text.primary }),
-                                this.$render("i-label", { caption: `Get ${lockedTokenSymbol}`, font: { size: '0.85rem' }, letterSpacing: letterSpacing }),
+                                this.$render("i-label", { caption: this.i18n.get('$get_token', { token: lockedTokenSymbol }), font: { size: '0.85rem' }, letterSpacing: letterSpacing }),
                                 lockedTokenIconPaths.map((v) => {
-                                    return this.$render("i-image", { display: "flex", width: 15, height: 15, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_11.fallBackUrl });
+                                    return this.$render("i-image", { display: "flex", width: 15, height: 15, url: scom_token_list_5.assets.fullPath(v), fallbackUrl: index_13.fallBackUrl });
                                 })),
                             campaign.showContractLink ?
-                                this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => (0, index_11.viewOnExplorerByAddress)(chainId, option.address) },
+                                this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => (0, index_13.viewOnExplorerByAddress)(chainId, option.address) },
                                     this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: Theme.text.primary, class: "inline-block" }),
-                                    this.$render("i-label", { caption: "View Contract", font: { size: '0.85rem' }, letterSpacing: letterSpacing })) : [])),
+                                    this.$render("i-label", { caption: "$view_contract", font: { size: '0.85rem' }, letterSpacing: letterSpacing })) : [])),
                     this.$render("i-vstack", { gap: 8 },
                         claimStakedRow,
                         this.$render("i-vstack", { verticalAlignment: "center", horizontalAlignment: "center" }, this.manageStake),
@@ -2947,11 +3138,11 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 if (this._data.stakeInputValue) {
                     this.manageStake.setInputValue(this._data.stakeInputValue);
                 }
-                containerSection.appendChild(this.$render("i-hstack", { background: { color: Theme.background.main }, width: "100%", height: index_11.maxHeight, border: { width: 1, style: 'solid', color: '#7979794a' } }, stakingElm));
+                containerSection.appendChild(this.$render("i-hstack", { background: { color: Theme.background.main }, width: "100%", height: index_13.maxHeight, border: { width: 1, style: 'solid', color: '#7979794a' } }, stakingElm));
                 this.stakingElm.clearInnerHTML();
                 this.stakingElm.append(this.noCampaignSection, containerSection);
             };
-            this.state = new index_11.State(data_json_1.default);
+            this.state = new index_13.State(data_json_1.default);
         }
         removeRpcWalletEvents() {
             const rpcWallet = this.rpcWallet;
@@ -2965,7 +3156,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             this.removeRpcWalletEvents();
         }
         async init() {
-            // this.isReadyCallbackQueued = true;
+            this.i18n.init({ ...(0, index_16.mergeI18nData)([index_16.commonJson, index_16.mainJson]) });
             await super.init();
             const lazyLoad = this.getAttribute('lazyLoad', true, false);
             if (!lazyLoad) {
@@ -2977,18 +3168,17 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     this.renderEmpty();
                 }
             }
-            // this.isReadyCallbackQueued = false;
-            // this.executeReadyCallback();
+            this.executeReadyCallback();
         }
         render() {
             return (this.$render("i-scom-dapp-container", { id: "dappContainer", class: index_css_2.stakingDappContainer },
                 this.$render("i-panel", { class: index_css_2.stakingComponent, minHeight: 200 },
-                    this.$render("i-panel", { id: "stakingLayout", width: index_11.maxWidth, height: index_11.maxHeight, maxWidth: "100%", margin: { left: 'auto', right: 'auto' }, overflow: 'hidden' },
+                    this.$render("i-panel", { id: "stakingLayout", width: index_13.maxWidth, height: index_13.maxHeight, maxWidth: "100%", margin: { left: 'auto', right: 'auto' }, overflow: 'hidden' },
                         this.$render("i-vstack", { id: "loadingElm", background: { color: Theme.background.main }, class: "i-loading-overlay" },
                             this.$render("i-vstack", { class: "i-loading-spinner", horizontalAlignment: "center", verticalAlignment: "center" },
                                 this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_2.default.fullPath('img/loading.svg'), width: 36, height: 36 } }),
                                 this.$render("i-label", { caption: "Loading...", font: { color: '#FD4A4C', size: '1.5em' }, letterSpacing: letterSpacing, class: "i-loading-spinner_text" }))),
-                        this.$render("i-panel", { id: "stakingElm", background: { color: Theme.background.main }, width: "100%", height: "100%", maxWidth: index_11.maxWidth, maxHeight: index_11.maxHeight, class: "wrapper" })),
+                        this.$render("i-panel", { id: "stakingElm", background: { color: Theme.background.main }, width: "100%", height: "100%", maxWidth: index_13.maxWidth, maxHeight: index_13.maxHeight, class: "wrapper" })),
                     this.$render("i-scom-wallet-modal", { id: "mdWallet", wallets: [] }),
                     this.$render("i-scom-tx-status-modal", { id: "txStatusModal" }))));
         }
