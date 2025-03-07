@@ -248,8 +248,8 @@ const getDefaultStakingByAddress = async (wallet: IWallet, option: ISingleStakin
           if (mode === 'Claim') {
             mulicallContracts.push({
               contract: rewardsContract,
-              methodName: 'unclaimed',
-              params: [],
+              methodName: 'unclaimedForAccount',
+              params: [currentAddress],
               to: reward.address
             });
           }

@@ -614,8 +614,8 @@ define("@scom/scom-staking/staking-utils/index.ts", ["require", "exports", "@ijs
                         if (mode === 'Claim') {
                             mulicallContracts.push({
                                 contract: rewardsContract,
-                                methodName: 'unclaimed',
-                                params: [],
+                                methodName: 'unclaimedForAccount',
+                                params: [currentAddress],
                                 to: reward.address
                             });
                         }
