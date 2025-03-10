@@ -1,4 +1,4 @@
-import { moment, Module, Panel, Icon, Button, Label, VStack, HStack, Container, ControlElement, application, customModule, customElements, Styles, Control } from '@ijstech/components';
+import { moment, Module, Panel, Icon, Button, Label, VStack, HStack, Container, ControlElement, application, customModule, customElements, Styles, Control, IBorder } from '@ijstech/components';
 import { BigNumber, Constants, IEventBusRegistry, Wallet } from '@ijstech/eth-wallet';
 import Assets from './assets';
 import {
@@ -40,7 +40,7 @@ import {
 } from './staking-utils/index';
 import ManageStake from './manage-stake/index';
 import { stakingComponent, stakingDappContainer } from './index.css';
-import ScomDappContainer from '@scom/scom-dapp-container';
+import ScomDappContainer, { WidgetType } from '@scom/scom-dapp-container';
 import ScomWalletModal, { IWalletPlugin } from '@scom/scom-wallet-modal';
 import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
 import ScomTxStatusModal from '@scom/scom-tx-status-modal';
@@ -56,6 +56,7 @@ const letterSpacing = '0.15px';
 interface ScomStakingElement extends ControlElement {
 	data?: ISingleStakingCampaign;
 	lazyLoad?: boolean;
+	widgetType?: WidgetType;
 }
 
 declare global {
@@ -85,6 +86,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 	private tokenMap: TokenMapType = {};
 	private dappContainer: ScomDappContainer;
 	private mdWallet: ScomWalletModal;
+	private _widgetType: WidgetType = WidgetType.Standalone;
 
 	private rpcWalletEvents: IEventBusRegistry[] = [];
 
@@ -433,7 +435,8 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 			wallets: this.wallets,
 			networks: this.networks.length ? this.networks : [{ chainId: this.chainId }],
 			showHeader: this.showHeader,
-			rpcWalletId: rpcWallet.instanceId
+			rpcWalletId: rpcWallet.instanceId,
+			widgetType: this.widgetType
 		}
 		if (this.dappContainer?.setData) this.dappContainer.setData(data);
 		// TODO - update proxy address
@@ -515,6 +518,14 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 
 	set showHeader(value: boolean) {
 		this._data.showHeader = value;
+	}
+
+	get widgetType() {
+		return this._widgetType;
+	}
+
+	set widgetType(value: WidgetType) {
+		this._widgetType = value;
 	}
 
 	private get chainId() {
@@ -659,6 +670,8 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 		this.i18n.init({ ...mergeI18nData([commonJson, mainJson]) });
 		await super.init();
 		const lazyLoad = this.getAttribute('lazyLoad', true, false);
+		const widgetType = this.getAttribute('widgetType', true);
+		if (widgetType) this.widgetType = widgetType;
 		if (!lazyLoad) {
 			const data = this.getAttribute('data', true);
 			if (data) {
@@ -1177,8 +1190,9 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 		if (this._data.stakeInputValue) {
 			this.manageStake.setInputValue(this._data.stakeInputValue);
 		}
+		const border: IBorder = this.widgetType === WidgetType.Standalone ? { width: 1, style: 'solid', color: '#7979794a' } : undefined;
 		containerSection.appendChild(
-			<i-hstack background={{ color: Theme.background.main }} width="100%" height={maxHeight} border={{ width: 1, style: 'solid', color: '#7979794a' }}>
+			<i-hstack background={{ color: Theme.background.main }} width="100%" height={maxHeight} border={border}>
 				{stakingElm}
 			</i-hstack >
 		)
