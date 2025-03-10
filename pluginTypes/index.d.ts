@@ -879,6 +879,7 @@ declare module "@scom/scom-staking/flow/initialSetup.tsx" {
 declare module "@scom/scom-staking" {
     import { Module, Container, ControlElement, Control } from '@ijstech/components';
     import { ISingleStakingCampaign } from "@scom/scom-staking/global/index.ts";
+    import { WidgetType } from '@scom/scom-dapp-container';
     import { IWalletPlugin } from '@scom/scom-wallet-modal';
     import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
     import { INetworkConfig } from '@scom/scom-network-picker';
@@ -886,6 +887,7 @@ declare module "@scom/scom-staking" {
     interface ScomStakingElement extends ControlElement {
         data?: ISingleStakingCampaign;
         lazyLoad?: boolean;
+        widgetType?: WidgetType;
     }
     global {
         namespace JSX {
@@ -910,6 +912,7 @@ declare module "@scom/scom-staking" {
         private tokenMap;
         private dappContainer;
         private mdWallet;
+        private _widgetType;
         private rpcWalletEvents;
         addBlock(blocknote: any, executeFn: executeFnType, callbackFn?: callbackFnType): {
             block: any;
@@ -991,6 +994,8 @@ declare module "@scom/scom-staking" {
         set networks(value: INetworkConfig[]);
         get showHeader(): boolean;
         set showHeader(value: boolean);
+        get widgetType(): WidgetType;
+        set widgetType(value: WidgetType);
         private get chainId();
         private get rpcWallet();
         constructor(parent?: Container, options?: ControlElement);

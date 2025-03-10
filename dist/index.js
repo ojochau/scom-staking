@@ -2205,7 +2205,7 @@ define("@scom/scom-staking/flow/initialSetup.tsx", ["require", "exports", "@ijst
     ], ScomStakingFlowInitialSetup);
     exports.default = ScomStakingFlowInitialSetup;
 });
-define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/data.json.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/manage-stake/index.tsx", "@scom/scom-staking/index.css.ts", "@scom/scom-staking/formSchema.ts", "@scom/scom-staking/flow/initialSetup.tsx", "@scom/scom-blocknote-sdk", "@scom/scom-staking/languages/index.ts"], function (require, exports, components_9, eth_wallet_7, assets_2, index_12, index_13, scom_token_list_5, data_json_1, index_14, index_15, index_css_2, formSchema_1, initialSetup_1, scom_blocknote_sdk_1, index_16) {
+define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-staking/assets.ts", "@scom/scom-staking/global/index.ts", "@scom/scom-staking/store/index.ts", "@scom/scom-token-list", "@scom/scom-staking/data.json.ts", "@scom/scom-staking/staking-utils/index.ts", "@scom/scom-staking/manage-stake/index.tsx", "@scom/scom-staking/index.css.ts", "@scom/scom-dapp-container", "@scom/scom-staking/formSchema.ts", "@scom/scom-staking/flow/initialSetup.tsx", "@scom/scom-blocknote-sdk", "@scom/scom-staking/languages/index.ts"], function (require, exports, components_9, eth_wallet_7, assets_2, index_12, index_13, scom_token_list_5, data_json_1, index_14, index_15, index_css_2, scom_dapp_container_1, formSchema_1, initialSetup_1, scom_blocknote_sdk_1, index_16) {
     "use strict";
     var ScomStaking_1;
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -2546,7 +2546,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 wallets: this.wallets,
                 networks: this.networks.length ? this.networks : [{ chainId: this.chainId }],
                 showHeader: this.showHeader,
-                rpcWalletId: rpcWallet.instanceId
+                rpcWalletId: rpcWallet.instanceId,
+                widgetType: this.widgetType
             };
             if (this.dappContainer?.setData)
                 this.dappContainer.setData(data);
@@ -2617,6 +2618,12 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
         set showHeader(value) {
             this._data.showHeader = value;
         }
+        get widgetType() {
+            return this._widgetType;
+        }
+        set widgetType(value) {
+            this._widgetType = value;
+        }
         get chainId() {
             return this._data.chainId;
         }
@@ -2629,6 +2636,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             this.defaultEdit = true;
             this.listAprTimer = [];
             this.tokenMap = {};
+            this._widgetType = scom_dapp_container_1.WidgetType.Standalone;
             this.rpcWalletEvents = [];
             this.onChainChanged = async () => {
                 this.initializeWidgetConfig();
@@ -3138,7 +3146,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 if (this._data.stakeInputValue) {
                     this.manageStake.setInputValue(this._data.stakeInputValue);
                 }
-                containerSection.appendChild(this.$render("i-hstack", { background: { color: Theme.background.main }, width: "100%", height: index_13.maxHeight, border: { width: 1, style: 'solid', color: '#7979794a' } }, stakingElm));
+                const border = this.widgetType === scom_dapp_container_1.WidgetType.Standalone ? { width: 1, style: 'solid', color: '#7979794a' } : undefined;
+                containerSection.appendChild(this.$render("i-hstack", { background: { color: Theme.background.main }, width: "100%", height: index_13.maxHeight, border: border }, stakingElm));
                 this.stakingElm.clearInnerHTML();
                 this.stakingElm.append(this.noCampaignSection, containerSection);
             };
@@ -3159,6 +3168,9 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             this.i18n.init({ ...(0, index_16.mergeI18nData)([index_16.commonJson, index_16.mainJson]) });
             await super.init();
             const lazyLoad = this.getAttribute('lazyLoad', true, false);
+            const widgetType = this.getAttribute('widgetType', true);
+            if (widgetType)
+                this.widgetType = widgetType;
             if (!lazyLoad) {
                 const data = this.getAttribute('data', true);
                 if (data) {
