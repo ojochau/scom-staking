@@ -2624,6 +2624,12 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
         set widgetType(value) {
             this._widgetType = value;
         }
+        get hideDate() {
+            return this._hideDate;
+        }
+        set hideDate(value) {
+            this._hideDate = value;
+        }
         get chainId() {
             return this._data.chainId;
         }
@@ -2637,6 +2643,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             this.listAprTimer = [];
             this.tokenMap = {};
             this._widgetType = scom_dapp_container_1.WidgetType.Standalone;
+            this._hideDate = false;
             this.rpcWalletEvents = [];
             this.onChainChanged = async () => {
                 this.initializeWidgetConfig();
@@ -2850,8 +2857,8 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                     lineHeight: '1.25rem',
                     letterSpacing
                 };
-                const stakingElm = await components_9.VStack.create();
-                const activeTimerRow = await components_9.VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
+                const stakingElm = await components_9.VStack.create({ width: '100%' });
+                const activeTimerRow = await components_9.VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center', visible: !this.hideDate });
                 const activeTimerElm = await components_9.VStack.create();
                 activeTimerRow.appendChild(this.$render("i-label", { caption: "$end_date", font: { size: '0.875rem' }, opacity: 0.5, letterSpacing: letterSpacing }));
                 activeTimerRow.appendChild(activeTimerElm);
@@ -2952,7 +2959,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 const setEndRemainingTime = () => {
                     isStarted = (0, components_9.moment)(activeStartTime).diff((0, components_9.moment)()) <= 0;
                     isClosed = (0, components_9.moment)(activeEndTime).diff((0, components_9.moment)()) <= 0;
-                    activeTimerRow.visible = isStarted && !isClosed;
+                    activeTimerRow.visible = !this.hideDate && isStarted && !isClosed;
                     if (activeEndTime == 0) {
                         endDay.caption = endHour.caption = endMin.caption = '0';
                         if (this.activeTimer) {
@@ -3065,7 +3072,19 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 const _lockedTokenIconPaths = (0, index_13.getLockedTokenIconPaths)(option, _lockedTokenObject, chainId, this.tokenMap);
                 const pathsLength = _lockedTokenIconPaths.length;
                 const rewardToken = rewardsData?.length ? this.getRewardToken(rewardsData[0].rewardTokenAddress) : null;
-                stakingElm.appendChild(this.$render("i-vstack", { gap: 15, width: index_13.maxWidth, height: "100%", padding: { top: 10, bottom: 10, left: 20, right: 20 }, position: "relative" },
+                const pnlContractProps = this.hideDate ? {
+                    direction: 'horizontal',
+                    width: '100%',
+                    justifyContent: 'end',
+                    gap: '1rem'
+                } : {
+                    direction: 'vertical',
+                    width: '25%',
+                    justifyContent: 'center',
+                    alignItems: 'end',
+                    gap: 4
+                };
+                stakingElm.appendChild(this.$render("i-vstack", { gap: 15, width: "100%", maxWidth: index_13.maxWidth, height: "100%", padding: { top: 10, bottom: 10, left: 20, right: 20 }, position: "relative" },
                     stickerSection,
                     this.$render("i-hstack", { gap: 10, width: "100%", verticalAlignment: "center" },
                         this.$render("i-hstack", { gap: 10, width: "50%" },
@@ -3116,15 +3135,15 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                                 lbRate);
                         }))),
                     this.$render("i-hstack", { width: "100%", verticalAlignment: "center" },
-                        this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
+                        this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center", visible: !this.hideDate },
                             this.$render("i-label", { caption: "$start_date", font: { size: '0.875rem' }, opacity: 0.5, letterSpacing: letterSpacing }),
                             this.$render("i-label", { caption: (0, index_12.formatDate)(option.startOfEntryPeriod, 'DD MMM, YYYY'), font: { size: '1rem' }, letterSpacing: letterSpacing })),
                         activeTimerRow,
-                        this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center" },
+                        this.$render("i-vstack", { gap: 2, width: "25%", verticalAlignment: "center", visible: !this.hideDate },
                             this.$render("i-label", { caption: "$stake_duration", font: { size: '0.875rem' }, opacity: 0.5, letterSpacing: letterSpacing }),
                             this.$render("i-hstack", { gap: 4, verticalAlignment: "center" },
                                 this.$render("i-button", { height: "auto", caption: durationDays < 1 ? this.i18n.get('$less_than_one_day') : this.i18n.get('$duration_days', { duration: durationDays.toString() }), font: { size: '12px', color: Theme.colors.secondary.contrastText, weight: 700 }, background: { color: `${Theme.colors.secondary.main} !important` }, border: { radius: 12, width: 1, style: 'solid', color: 'transparent' }, padding: { top: 2.5, bottom: 2.5, left: 8, right: 8 }, cursor: "default", class: "btn-os cursor-default" }))),
-                        this.$render("i-vstack", { gap: 4, width: "25%", margin: { left: 'auto' }, verticalAlignment: "center", horizontalAlignment: "end" },
+                        this.$render("i-stack", { margin: { left: 'auto' }, ...pnlContractProps },
                             this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => this.getLPToken(campaign, lockedTokenSymbol, chainId) },
                                 this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: Theme.text.primary }),
                                 this.$render("i-label", { caption: this.i18n.get('$get_token', { token: lockedTokenSymbol }), font: { size: '0.85rem' }, letterSpacing: letterSpacing }),
@@ -3171,6 +3190,9 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
             const widgetType = this.getAttribute('widgetType', true);
             if (widgetType)
                 this.widgetType = widgetType;
+            const hideDate = this.getAttribute('hideDate', true);
+            if (hideDate != null)
+                this.hideDate = hideDate;
             if (!lazyLoad) {
                 const data = this.getAttribute('data', true);
                 if (data) {

@@ -888,6 +888,7 @@ declare module "@scom/scom-staking" {
         data?: ISingleStakingCampaign;
         lazyLoad?: boolean;
         widgetType?: WidgetType;
+        hideDate?: boolean;
     }
     global {
         namespace JSX {
@@ -913,6 +914,7 @@ declare module "@scom/scom-staking" {
         private dappContainer;
         private mdWallet;
         private _widgetType;
+        private _hideDate;
         private rpcWalletEvents;
         addBlock(blocknote: any, executeFn: executeFnType, callbackFn?: callbackFnType): {
             block: any;
@@ -996,6 +998,8 @@ declare module "@scom/scom-staking" {
         set showHeader(value: boolean);
         get widgetType(): WidgetType;
         set widgetType(value: WidgetType);
+        get hideDate(): boolean;
+        set hideDate(value: boolean);
         private get chainId();
         private get rpcWallet();
         constructor(parent?: Container, options?: ControlElement);
