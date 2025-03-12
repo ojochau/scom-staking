@@ -57,6 +57,7 @@ interface ScomStakingElement extends ControlElement {
 	data?: ISingleStakingCampaign;
 	lazyLoad?: boolean;
 	widgetType?: WidgetType;
+	hideDate?: boolean;
 }
 
 declare global {
@@ -87,6 +88,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 	private dappContainer: ScomDappContainer;
 	private mdWallet: ScomWalletModal;
 	private _widgetType: WidgetType = WidgetType.Standalone;
+	private _hideDate = false;
 
 	private rpcWalletEvents: IEventBusRegistry[] = [];
 
@@ -519,6 +521,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 	set showHeader(value: boolean) {
 		this._data.showHeader = value;
 	}
+	
 
 	get widgetType() {
 		return this._widgetType;
@@ -526,6 +529,14 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 
 	set widgetType(value: WidgetType) {
 		this._widgetType = value;
+	}
+
+	get hideDate() {
+		return this._hideDate;
+	}
+
+	set hideDate(value: boolean) {
+		this._hideDate = value;
 	}
 
 	private get chainId() {
@@ -672,6 +683,8 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 		const lazyLoad = this.getAttribute('lazyLoad', true, false);
 		const widgetType = this.getAttribute('widgetType', true);
 		if (widgetType) this.widgetType = widgetType;
+		const hideDate = this.getAttribute('hideDate', true);
+		if (hideDate != null) this.hideDate = hideDate;
 		if (!lazyLoad) {
 			const data = this.getAttribute('data', true);
 			if (data) {
@@ -809,8 +822,8 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 			lineHeight: '1.25rem',
 			letterSpacing
 		};
-		const stakingElm = await VStack.create();
-		const activeTimerRow = await VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center' });
+		const stakingElm = await VStack.create({ width: '100%' });
+		const activeTimerRow = await VStack.create({ gap: 2, width: '25%', verticalAlignment: 'center', visible: !this.hideDate });
 		const activeTimerElm = await VStack.create();
 		activeTimerRow.appendChild(<i-label caption="$end_date" font={{ size: '0.875rem' }} opacity={0.5} letterSpacing={letterSpacing} />);
 		activeTimerRow.appendChild(activeTimerElm);
@@ -922,7 +935,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 		const setEndRemainingTime = () => {
 			isStarted = moment(activeStartTime).diff(moment()) <= 0;
 			isClosed = moment(activeEndTime).diff(moment()) <= 0;
-			activeTimerRow.visible = isStarted && !isClosed;
+			activeTimerRow.visible = !this.hideDate && isStarted && !isClosed;
 			if (activeEndTime == 0) {
 				endDay.caption = endHour.caption = endMin.caption = '0';
 				if (this.activeTimer) {
@@ -1047,8 +1060,20 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 		const _lockedTokenIconPaths = getLockedTokenIconPaths(option, _lockedTokenObject, chainId, this.tokenMap);
 		const pathsLength = _lockedTokenIconPaths.length;
 		const rewardToken = rewardsData?.length ? this.getRewardToken(rewardsData[0].rewardTokenAddress) : null;
+		const pnlContractProps: any = this.hideDate ? {
+			direction: 'horizontal',
+			width: '100%',
+			justifyContent: 'end',
+			gap: '1rem'
+		} : {
+			direction: 'vertical',
+			width: '25%',
+			justifyContent: 'center',
+			alignItems: 'end',
+			gap: 4
+		};
 		stakingElm.appendChild(
-			<i-vstack gap={15} width={maxWidth} height="100%" padding={{ top: 10, bottom: 10, left: 20, right: 20 }} position="relative">
+			<i-vstack gap={15} width="100%" maxWidth={maxWidth} height="100%" padding={{ top: 10, bottom: 10, left: 20, right: 20 }} position="relative">
 				{stickerSection}
 				<i-hstack gap={10} width="100%" verticalAlignment="center">
 					<i-hstack gap={10} width="50%">
@@ -1107,12 +1132,12 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 					}
 				</i-hstack>
 				<i-hstack width="100%" verticalAlignment="center">
-					<i-vstack gap={2} width="25%" verticalAlignment="center">
+					<i-vstack gap={2} width="25%" verticalAlignment="center" visible={!this.hideDate}>
 						<i-label caption="$start_date" font={{ size: '0.875rem' }} opacity={0.5} letterSpacing={letterSpacing} />
 						<i-label caption={formatDate(option.startOfEntryPeriod, 'DD MMM, YYYY')} font={{ size: '1rem' }} letterSpacing={letterSpacing} />
 					</i-vstack>
 					{activeTimerRow}
-					<i-vstack gap={2} width="25%" verticalAlignment="center">
+					<i-vstack gap={2} width="25%" verticalAlignment="center" visible={!this.hideDate}>
 						<i-label caption="$stake_duration" font={{ size: '0.875rem' }} opacity={0.5} letterSpacing={letterSpacing} />
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-button
@@ -1127,7 +1152,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 							/>
 						</i-hstack>
 					</i-vstack>
-					<i-vstack gap={4} width="25%" margin={{ left: 'auto' }} verticalAlignment="center" horizontalAlignment="end">
+					<i-stack margin={{ left: 'auto' }} {...pnlContractProps}>
 						<i-hstack gap={4} class="pointer" width="fit-content" verticalAlignment="center" onClick={() => this.getLPToken(campaign, lockedTokenSymbol, chainId)}>
 							<i-icon name="external-link-alt" width={12} height={12} fill={Theme.text.primary} />
 							<i-label caption={this.i18n.get('$get_token', { token: lockedTokenSymbol })} font={{ size: '0.85rem' }} letterSpacing={letterSpacing} />
@@ -1151,7 +1176,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 											<i-label caption="$view_reward_contract" font={{ size: '13.6px', color: colorText }} />
 										</i-hstack> : []
 									} */}
-					</i-vstack>
+					</i-stack>
 				</i-hstack>
 				<i-vstack gap={8}>
 					{claimStakedRow}
