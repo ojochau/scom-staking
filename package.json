@@ -1,7 +1,7 @@
 {
     "name": "@scom/scom-staking",
     "author": "",
-    "version": "0.1.23",
+    "version": "0.1.24",
     "main": "dist/index.js",
     "plugin": "dist",
     "pluginTypes": "pluginTypes/index.d.ts",
