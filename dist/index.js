@@ -1528,7 +1528,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
         render() {
             return (this.$render("i-panel", { class: index_css_1.stakingManageStakeStyle },
                 this.$render("i-hstack", { gap: 10, verticalAlignment: "center", horizontalAlignment: "center" },
-                    this.$render("i-hstack", { id: "wrapperInputAmount", gap: 4, width: 280, height: 36, padding: { right: 8 }, background: { color: Theme.input.background }, border: { radius: 8 }, verticalAlignment: "center", horizontalAlignment: "space-between" },
+                    this.$render("i-hstack", { id: "wrapperInputAmount", gap: 4, width: 280, height: 36, padding: { right: 8 }, background: { color: Theme.input.background }, border: { radius: 8 }, verticalAlignment: "center", horizontalAlignment: "space-between", stack: { shrink: '0' } },
                         this.$render("i-input", { id: "inputAmount", inputType: "number", placeholder: "0.0", width: "100%", height: "100%", border: { style: 'none' }, padding: { left: 8, right: 8 }, font: { size: '1rem' }, onChanged: () => this.onInputAmount() }),
                         this.$render("i-hstack", { gap: 4, verticalAlignment: "center" },
                             this.$render("i-button", { id: "btnMax", caption: "$max", enabled: false, 
@@ -1536,7 +1536,7 @@ define("@scom/scom-staking/manage-stake/index.tsx", ["require", "exports", "@ijs
                                 // font={{ color: Theme.colors.primary.contrastText }}
                                 font: { size: '1rem', color: '#fff', weight: 700 }, class: "btn-os", width: 45, minHeight: 25, onClick: () => this.setMaxBalance() }),
                             this.$render("i-label", { id: "lbToken", font: { size: '14px', color: Theme.input.fontColor }, opacity: 0.5 }))),
-                    this.$render("i-hstack", { gap: 10, width: "calc(100% - 290px)" },
+                    this.$render("i-hstack", { gap: 10, width: "100%", maxWidth: 370 },
                         this.$render("i-button", { id: "btnApprove", caption: "$approve", enabled: false, visible: false, width: "100%", minHeight: 36, border: { radius: 12 }, rightIcon: { spin: true, visible: false, fill: '#fff' }, 
                             // rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
                             // background={{ color: `${Theme.colors.primary.main} !important` }}

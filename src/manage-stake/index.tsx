@@ -396,7 +396,7 @@ export default class ManageStake extends Module {
     return (
       <i-panel class={stakingManageStakeStyle}>
         <i-hstack gap={10} verticalAlignment="center" horizontalAlignment="center">
-          <i-hstack id="wrapperInputAmount" gap={4} width={280} height={36} padding={{ right: 8 }} background={{ color: Theme.input.background }} border={{ radius: 8 }} verticalAlignment="center" horizontalAlignment="space-between">
+          <i-hstack id="wrapperInputAmount" gap={4} width={280} height={36} padding={{ right: 8 }} background={{ color: Theme.input.background }} border={{ radius: 8 }} verticalAlignment="center" horizontalAlignment="space-between" stack={{ shrink: '0' }}>
             <i-input
               id="inputAmount"
               inputType="number"
@@ -424,7 +424,7 @@ export default class ManageStake extends Module {
               <i-label id="lbToken" font={{ size: '14px', color: Theme.input.fontColor }} opacity={0.5} />
             </i-hstack>
           </i-hstack>
-          <i-hstack gap={10} width="calc(100% - 290px)">
+          <i-hstack gap={10} width="100%" maxWidth={370}>
             <i-button
               id="btnApprove"
               caption="$approve"
