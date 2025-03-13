@@ -25,6 +25,8 @@ export interface ISingleStakingCampaign {
   getTokenURL?: string,
   // campaignStart: number, // new campaign
   // campaignEnd: number, // new campaign
+  showSwapTokenLink?: boolean,
+  showRewardsInStakeMode?: boolean,
   showContractLink?: boolean,
   // admin: string, // new campaign
   staking: ISingleStaking,

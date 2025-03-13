@@ -50,6 +50,8 @@ declare module "@scom/scom-staking/global/utils/interfaces.ts" {
         desc?: string;
         logo?: string;
         getTokenURL?: string;
+        showSwapTokenLink?: boolean;
+        showRewardsInStakeMode?: boolean;
         showContractLink?: boolean;
         staking: ISingleStaking;
         stakeInputValue?: string;
@@ -291,6 +293,8 @@ declare module "@scom/scom-staking/staking-utils/index.ts" {
         desc?: string;
         logo?: string;
         getTokenURL?: string;
+        showSwapTokenLink?: boolean;
+        showRewardsInStakeMode?: boolean;
         showContractLink?: boolean;
         staking: ISingleStaking;
         stakeInputValue?: string;
@@ -996,6 +1000,10 @@ declare module "@scom/scom-staking" {
         set networks(value: INetworkConfig[]);
         get showHeader(): boolean;
         set showHeader(value: boolean);
+        get showSwapTokenLink(): boolean;
+        set showSwapTokenLink(value: boolean);
+        get showRewardsInStakeMode(): boolean;
+        set showRewardsInStakeMode(value: boolean);
         get widgetType(): WidgetType;
         set widgetType(value: WidgetType);
         get hideDate(): boolean;

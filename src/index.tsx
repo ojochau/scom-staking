@@ -522,6 +522,21 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 		this._data.showHeader = value;
 	}
 	
+	get showSwapTokenLink() {
+		return this._data.showSwapTokenLink ?? true;
+	}
+
+	set showSwapTokenLink(value: boolean) {
+		this._data.showSwapTokenLink = value;
+	}
+
+	get showRewardsInStakeMode() {
+		return this._data.showRewardsInStakeMode ?? true;
+	}
+
+	set showRewardsInStakeMode(value: boolean) {
+		this._data.showRewardsInStakeMode = value;
+	}
 
 	get widgetType() {
 		return this._widgetType;
@@ -965,6 +980,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 		this.manageStake.onRefresh = () => this.initializeWidgetConfig(true);
 
 		const isClaim = option.mode === 'Claim';
+		const isStake = option.mode === 'Stake';
 
 		const rewardsData = option.rewardsData && option.rewardsData[0] ? [option.rewardsData[0]] : [];
 		const rewardOptions = !isClaim ? rewardsData : [];
@@ -974,78 +990,80 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 		claimStakedRow.appendChild(<i-label caption="$you_staked" font={{ size: '1rem' }} letterSpacing={letterSpacing} />);
 		claimStakedRow.appendChild(<i-label caption={`${formatNumber(new BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`} font={{ size: '1rem' }} letterSpacing={letterSpacing} />);
 
-		const rowRewards = await VStack.create({ gap: 8, verticalAlignment: 'center' });
-		for (let idx = 0; idx < rewardsData.length; idx++) {
-			const reward = rewardsData[idx];
-			const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
-			const rewardTokenDecimals = rewardToken.decimals || 18;
-			let decimalsOffset = 18 - rewardTokenDecimals;
-			let rewardLockedDecimalsOffset = decimalsOffset;
-			if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
-				rewardLockedDecimalsOffset = decimalsOffset * 2;
-			} else if (lockedTokenDecimals !== 18 && rewardTokenDecimals === 18) {
-				rewardLockedDecimalsOffset = rewardTokenDecimals - lockedTokenDecimals;
-				decimalsOffset = 18 - lockedTokenDecimals;
-			}
-			const rewardSymbol = rewardToken.symbol || '';
-			rowRewards.appendChild(
-				<i-hstack horizontalAlignment="space-between">
-					<i-label caption={this.i18n.get('$token_locked', { token: rewardSymbol })} font={{ size: '1rem', color: Theme.text.primary }} letterSpacing={letterSpacing} />
-					<i-label caption={`${formatNumber(new BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`} font={{ size: '1rem' }} letterSpacing={letterSpacing} />
-				</i-hstack>
-			);
-			// rowRewards.appendChild(
-			// 	<i-hstack horizontalAlignment="space-between">
-			// 		<i-label caption={this.i18n.get('$token_vesting_start', {token: rewardSymbol})} font={{ size: '16px', color: colorText }} />
-			// 		<i-label caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
-			// 	</i-hstack>
-			// );
-			// rowRewards.appendChild(
-			// 	<i-hstack horizontalAlignment="space-between">
-			// 		<i-label caption={this.i18n.get('$token_vesting_end', {token: rewardSymbol})} font={{ size: '16px', color: colorText }} />
-			// 		<i-label caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
-			// 	</i-hstack>
-			// );
-			const passClaimStartTime = !(reward.claimStartTime && moment().diff(moment.unix(reward.claimStartTime)) < 0);
-			let rewardClaimable = `0 ${rewardSymbol}`;
-			if (passClaimStartTime && isClaim) {
-				rewardClaimable = `${formatNumber(new BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
-			}
-			let startClaimingText = '';
-			if (!(!reward.claimStartTime || passClaimStartTime) && isClaim) {
-				const claimStart = moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
-				startClaimingText = this.i18n.get('$claim_token_after_start', { token: rewardSymbol, start: claimStart });
-			}
-			rowRewards.appendChild(
-				<i-hstack horizontalAlignment="space-between">
-					<i-label caption={this.i18n.get('$token_claimable', { token: rewardSymbol })} font={{ size: '1rem' }} letterSpacing={letterSpacing} />
-					<i-label caption={rewardClaimable} font={{ size: '1rem' }} />
-					{startClaimingText ? <i-label caption={startClaimingText} font={{ size: '1rem' }} letterSpacing={letterSpacing} /> : []}
-				</i-hstack>
-			);
+		const rowRewards: any = !isStake || this.showRewardsInStakeMode ? await VStack.create({ gap: 8, verticalAlignment: 'center' }) : [];
+		if (!isStake || this.showRewardsInStakeMode) {
+			for (let idx = 0; idx < rewardsData.length; idx++) {
+				const reward = rewardsData[idx];
+				const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
+				const rewardTokenDecimals = rewardToken.decimals || 18;
+				let decimalsOffset = 18 - rewardTokenDecimals;
+				let rewardLockedDecimalsOffset = decimalsOffset;
+				if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
+					rewardLockedDecimalsOffset = decimalsOffset * 2;
+				} else if (lockedTokenDecimals !== 18 && rewardTokenDecimals === 18) {
+					rewardLockedDecimalsOffset = rewardTokenDecimals - lockedTokenDecimals;
+					decimalsOffset = 18 - lockedTokenDecimals;
+				}
+				const rewardSymbol = rewardToken.symbol || '';
+				rowRewards.appendChild(
+					<i-hstack horizontalAlignment="space-between">
+						<i-label caption={this.i18n.get('$token_locked', { token: rewardSymbol })} font={{ size: '1rem', color: Theme.text.primary }} letterSpacing={letterSpacing} />
+						<i-label caption={`${formatNumber(new BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`} font={{ size: '1rem' }} letterSpacing={letterSpacing} />
+					</i-hstack>
+				);
+				// rowRewards.appendChild(
+				// 	<i-hstack horizontalAlignment="space-between">
+				// 		<i-label caption={this.i18n.get('$token_vesting_start', {token: rewardSymbol})} font={{ size: '16px', color: colorText }} />
+				// 		<i-label caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
+				// 	</i-hstack>
+				// );
+				// rowRewards.appendChild(
+				// 	<i-hstack horizontalAlignment="space-between">
+				// 		<i-label caption={this.i18n.get('$token_vesting_end', {token: rewardSymbol})} font={{ size: '16px', color: colorText }} />
+				// 		<i-label caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
+				// 	</i-hstack>
+				// );
+				const passClaimStartTime = !(reward.claimStartTime && moment().diff(moment.unix(reward.claimStartTime)) < 0);
+				let rewardClaimable = `0 ${rewardSymbol}`;
+				if (passClaimStartTime && isClaim) {
+					rewardClaimable = `${formatNumber(new BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
+				}
+				let startClaimingText = '';
+				if (!(!reward.claimStartTime || passClaimStartTime) && isClaim) {
+					const claimStart = moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
+					startClaimingText = this.i18n.get('$claim_token_after_start', { token: rewardSymbol, start: claimStart });
+				}
+				rowRewards.appendChild(
+					<i-hstack horizontalAlignment="space-between">
+						<i-label caption={this.i18n.get('$token_claimable', { token: rewardSymbol })} font={{ size: '1rem' }} letterSpacing={letterSpacing} />
+						<i-label caption={rewardClaimable} font={{ size: '1rem' }} />
+						{startClaimingText ? <i-label caption={startClaimingText} font={{ size: '1rem' }} letterSpacing={letterSpacing} /> : []}
+					</i-hstack>
+				);
 
-			const btnClaim = await Button.create({
-				rightIcon: {
-					spin: true,
-					fill: '#fff',
-					visible: false,
-					margin: { left: '0.25rem', right: '0.25rem' },
-					width: 16, height: 16
-				},
-				caption: rpcWalletConnected ? this.i18n.get('$claim_token', { token: rewardSymbol }) : this.i18n.get('$switch_network'),
-				font: { size: '1rem', bold: true },
-				enabled: !rpcWalletConnected || (rpcWalletConnected && !(!passClaimStartTime || new BigNumber(reward.claimable).isZero()) && isClaim),
-				margin: { left: 'auto', right: 'auto', bottom: 10 },
-				padding: { top: '0.625rem', bottom: '0.625rem' },
-				border: { radius: 12 },
-				maxWidth: '100%',
-				width: 370,
-				height: 'auto'
-			})
-			btnClaim.classList.add('btn-os');
-			btnClaim.onClick = () => rpcWalletConnected ? this.onClaim(btnClaim, { reward, rewardSymbol }) : this.connectWallet();
-			rowRewards.appendChild(btnClaim);
-		};
+				const btnClaim = await Button.create({
+					rightIcon: {
+						spin: true,
+						fill: '#fff',
+						visible: false,
+						margin: { left: '0.25rem', right: '0.25rem' },
+						width: 16, height: 16
+					},
+					caption: rpcWalletConnected ? this.i18n.get('$claim_token', { token: rewardSymbol }) : this.i18n.get('$switch_network'),
+					font: { size: '1rem', bold: true },
+					enabled: !rpcWalletConnected || (rpcWalletConnected && !(!passClaimStartTime || new BigNumber(reward.claimable).isZero()) && isClaim),
+					margin: { left: 'auto', right: 'auto', bottom: 10 },
+					padding: { top: '0.625rem', bottom: '0.625rem' },
+					border: { radius: 12 },
+					maxWidth: '100%',
+					width: 370,
+					height: 'auto'
+				})
+				btnClaim.classList.add('btn-os');
+				btnClaim.onClick = () => rpcWalletConnected ? this.onClaim(btnClaim, { reward, rewardSymbol }) : this.connectWallet();
+				rowRewards.appendChild(btnClaim);
+			};
+		}
 
 		const getAprValue = (rewardOption: any) => {
 			if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
@@ -1124,7 +1142,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 							const aprValue = getAprValue(rewardOption);
 							lbApr.caption = `APR ${aprValue}`;
 							lbRate.caption = rateDesc;
-							return <i-vstack verticalAlignment="center">
+							return <i-vstack verticalAlignment="center" visible={!!aprValue}>
 								{lbApr}
 								{lbRate}
 							</i-vstack>
@@ -1153,7 +1171,7 @@ export default class ScomStaking extends Module implements BlockNoteSpecs {
 						</i-hstack>
 					</i-vstack>
 					<i-stack margin={{ left: 'auto' }} {...pnlContractProps}>
-						<i-hstack gap={4} class="pointer" width="fit-content" verticalAlignment="center" onClick={() => this.getLPToken(campaign, lockedTokenSymbol, chainId)}>
+						<i-hstack gap={4} class="pointer" width="fit-content" verticalAlignment="center" onClick={() => this.getLPToken(campaign, lockedTokenSymbol, chainId)} visible={this.showSwapTokenLink}>
 							<i-icon name="external-link-alt" width={12} height={12} fill={Theme.text.primary} />
 							<i-label caption={this.i18n.get('$get_token', { token: lockedTokenSymbol })} font={{ size: '0.85rem' }} letterSpacing={letterSpacing} />
 							{

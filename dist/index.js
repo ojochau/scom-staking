@@ -2618,6 +2618,18 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
         set showHeader(value) {
             this._data.showHeader = value;
         }
+        get showSwapTokenLink() {
+            return this._data.showSwapTokenLink ?? true;
+        }
+        set showSwapTokenLink(value) {
+            this._data.showSwapTokenLink = value;
+        }
+        get showRewardsInStakeMode() {
+            return this._data.showRewardsInStakeMode ?? true;
+        }
+        set showRewardsInStakeMode(value) {
+            this._data.showRewardsInStakeMode = value;
+        }
         get widgetType() {
             return this._widgetType;
         }
@@ -2987,79 +2999,82 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                 this.manageStake.state = this.state;
                 this.manageStake.onRefresh = () => this.initializeWidgetConfig(true);
                 const isClaim = option.mode === 'Claim';
+                const isStake = option.mode === 'Stake';
                 const rewardsData = option.rewardsData && option.rewardsData[0] ? [option.rewardsData[0]] : [];
                 const rewardOptions = !isClaim ? rewardsData : [];
                 let aprInfo = {};
                 const claimStakedRow = await components_9.HStack.create({ verticalAlignment: 'center', horizontalAlignment: 'space-between' });
                 claimStakedRow.appendChild(this.$render("i-label", { caption: "$you_staked", font: { size: '1rem' }, letterSpacing: letterSpacing }));
                 claimStakedRow.appendChild(this.$render("i-label", { caption: `${(0, index_12.formatNumber)(new eth_wallet_7.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`, font: { size: '1rem' }, letterSpacing: letterSpacing }));
-                const rowRewards = await components_9.VStack.create({ gap: 8, verticalAlignment: 'center' });
-                for (let idx = 0; idx < rewardsData.length; idx++) {
-                    const reward = rewardsData[idx];
-                    const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
-                    const rewardTokenDecimals = rewardToken.decimals || 18;
-                    let decimalsOffset = 18 - rewardTokenDecimals;
-                    let rewardLockedDecimalsOffset = decimalsOffset;
-                    if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
-                        rewardLockedDecimalsOffset = decimalsOffset * 2;
+                const rowRewards = !isStake || this.showRewardsInStakeMode ? await components_9.VStack.create({ gap: 8, verticalAlignment: 'center' }) : [];
+                if (!isStake || this.showRewardsInStakeMode) {
+                    for (let idx = 0; idx < rewardsData.length; idx++) {
+                        const reward = rewardsData[idx];
+                        const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
+                        const rewardTokenDecimals = rewardToken.decimals || 18;
+                        let decimalsOffset = 18 - rewardTokenDecimals;
+                        let rewardLockedDecimalsOffset = decimalsOffset;
+                        if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
+                            rewardLockedDecimalsOffset = decimalsOffset * 2;
+                        }
+                        else if (lockedTokenDecimals !== 18 && rewardTokenDecimals === 18) {
+                            rewardLockedDecimalsOffset = rewardTokenDecimals - lockedTokenDecimals;
+                            decimalsOffset = 18 - lockedTokenDecimals;
+                        }
+                        const rewardSymbol = rewardToken.symbol || '';
+                        rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
+                            this.$render("i-label", { caption: this.i18n.get('$token_locked', { token: rewardSymbol }), font: { size: '1rem', color: Theme.text.primary }, letterSpacing: letterSpacing }),
+                            this.$render("i-label", { caption: `${(0, index_12.formatNumber)(new eth_wallet_7.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '1rem' }, letterSpacing: letterSpacing })));
+                        // rowRewards.appendChild(
+                        // 	<i-hstack horizontalAlignment="space-between">
+                        // 		<i-label caption={this.i18n.get('$token_vesting_start', {token: rewardSymbol})} font={{ size: '16px', color: colorText }} />
+                        // 		<i-label caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
+                        // 	</i-hstack>
+                        // );
+                        // rowRewards.appendChild(
+                        // 	<i-hstack horizontalAlignment="space-between">
+                        // 		<i-label caption={this.i18n.get('$token_vesting_end', {token: rewardSymbol})} font={{ size: '16px', color: colorText }} />
+                        // 		<i-label caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
+                        // 	</i-hstack>
+                        // );
+                        const passClaimStartTime = !(reward.claimStartTime && (0, components_9.moment)().diff(components_9.moment.unix(reward.claimStartTime)) < 0);
+                        let rewardClaimable = `0 ${rewardSymbol}`;
+                        if (passClaimStartTime && isClaim) {
+                            rewardClaimable = `${(0, index_12.formatNumber)(new eth_wallet_7.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
+                        }
+                        let startClaimingText = '';
+                        if (!(!reward.claimStartTime || passClaimStartTime) && isClaim) {
+                            const claimStart = components_9.moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
+                            startClaimingText = this.i18n.get('$claim_token_after_start', { token: rewardSymbol, start: claimStart });
+                        }
+                        rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
+                            this.$render("i-label", { caption: this.i18n.get('$token_claimable', { token: rewardSymbol }), font: { size: '1rem' }, letterSpacing: letterSpacing }),
+                            this.$render("i-label", { caption: rewardClaimable, font: { size: '1rem' } }),
+                            startClaimingText ? this.$render("i-label", { caption: startClaimingText, font: { size: '1rem' }, letterSpacing: letterSpacing }) : []));
+                        const btnClaim = await components_9.Button.create({
+                            rightIcon: {
+                                spin: true,
+                                fill: '#fff',
+                                visible: false,
+                                margin: { left: '0.25rem', right: '0.25rem' },
+                                width: 16, height: 16
+                            },
+                            caption: rpcWalletConnected ? this.i18n.get('$claim_token', { token: rewardSymbol }) : this.i18n.get('$switch_network'),
+                            font: { size: '1rem', bold: true },
+                            enabled: !rpcWalletConnected || (rpcWalletConnected && !(!passClaimStartTime || new eth_wallet_7.BigNumber(reward.claimable).isZero()) && isClaim),
+                            margin: { left: 'auto', right: 'auto', bottom: 10 },
+                            padding: { top: '0.625rem', bottom: '0.625rem' },
+                            border: { radius: 12 },
+                            maxWidth: '100%',
+                            width: 370,
+                            height: 'auto'
+                        });
+                        btnClaim.classList.add('btn-os');
+                        btnClaim.onClick = () => rpcWalletConnected ? this.onClaim(btnClaim, { reward, rewardSymbol }) : this.connectWallet();
+                        rowRewards.appendChild(btnClaim);
                     }
-                    else if (lockedTokenDecimals !== 18 && rewardTokenDecimals === 18) {
-                        rewardLockedDecimalsOffset = rewardTokenDecimals - lockedTokenDecimals;
-                        decimalsOffset = 18 - lockedTokenDecimals;
-                    }
-                    const rewardSymbol = rewardToken.symbol || '';
-                    rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
-                        this.$render("i-label", { caption: this.i18n.get('$token_locked', { token: rewardSymbol }), font: { size: '1rem', color: Theme.text.primary }, letterSpacing: letterSpacing }),
-                        this.$render("i-label", { caption: `${(0, index_12.formatNumber)(new eth_wallet_7.BigNumber(reward.vestedReward || 0).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`, font: { size: '1rem' }, letterSpacing: letterSpacing })));
-                    // rowRewards.appendChild(
-                    // 	<i-hstack horizontalAlignment="space-between">
-                    // 		<i-label caption={this.i18n.get('$token_vesting_start', {token: rewardSymbol})} font={{ size: '16px', color: colorText }} />
-                    // 		<i-label caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
-                    // 	</i-hstack>
-                    // );
-                    // rowRewards.appendChild(
-                    // 	<i-hstack horizontalAlignment="space-between">
-                    // 		<i-label caption={this.i18n.get('$token_vesting_end', {token: rewardSymbol})} font={{ size: '16px', color: colorText }} />
-                    // 		<i-label caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} font={{ size: '16px', color: colorText }} />
-                    // 	</i-hstack>
-                    // );
-                    const passClaimStartTime = !(reward.claimStartTime && (0, components_9.moment)().diff(components_9.moment.unix(reward.claimStartTime)) < 0);
-                    let rewardClaimable = `0 ${rewardSymbol}`;
-                    if (passClaimStartTime && isClaim) {
-                        rewardClaimable = `${(0, index_12.formatNumber)(new eth_wallet_7.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
-                    }
-                    let startClaimingText = '';
-                    if (!(!reward.claimStartTime || passClaimStartTime) && isClaim) {
-                        const claimStart = components_9.moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
-                        startClaimingText = this.i18n.get('$claim_token_after_start', { token: rewardSymbol, start: claimStart });
-                    }
-                    rowRewards.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between" },
-                        this.$render("i-label", { caption: this.i18n.get('$token_claimable', { token: rewardSymbol }), font: { size: '1rem' }, letterSpacing: letterSpacing }),
-                        this.$render("i-label", { caption: rewardClaimable, font: { size: '1rem' } }),
-                        startClaimingText ? this.$render("i-label", { caption: startClaimingText, font: { size: '1rem' }, letterSpacing: letterSpacing }) : []));
-                    const btnClaim = await components_9.Button.create({
-                        rightIcon: {
-                            spin: true,
-                            fill: '#fff',
-                            visible: false,
-                            margin: { left: '0.25rem', right: '0.25rem' },
-                            width: 16, height: 16
-                        },
-                        caption: rpcWalletConnected ? this.i18n.get('$claim_token', { token: rewardSymbol }) : this.i18n.get('$switch_network'),
-                        font: { size: '1rem', bold: true },
-                        enabled: !rpcWalletConnected || (rpcWalletConnected && !(!passClaimStartTime || new eth_wallet_7.BigNumber(reward.claimable).isZero()) && isClaim),
-                        margin: { left: 'auto', right: 'auto', bottom: 10 },
-                        padding: { top: '0.625rem', bottom: '0.625rem' },
-                        border: { radius: 12 },
-                        maxWidth: '100%',
-                        width: 370,
-                        height: 'auto'
-                    });
-                    btnClaim.classList.add('btn-os');
-                    btnClaim.onClick = () => rpcWalletConnected ? this.onClaim(btnClaim, { reward, rewardSymbol }) : this.connectWallet();
-                    rowRewards.appendChild(btnClaim);
+                    ;
                 }
-                ;
                 const getAprValue = (rewardOption) => {
                     if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
                         const apr = new eth_wallet_7.BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, eth_wallet_7.BigNumber.ROUND_DOWN);
@@ -3130,7 +3145,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             const aprValue = getAprValue(rewardOption);
                             lbApr.caption = `APR ${aprValue}`;
                             lbRate.caption = rateDesc;
-                            return this.$render("i-vstack", { verticalAlignment: "center" },
+                            return this.$render("i-vstack", { verticalAlignment: "center", visible: !!aprValue },
                                 lbApr,
                                 lbRate);
                         }))),
@@ -3144,7 +3159,7 @@ define("@scom/scom-staking", ["require", "exports", "@ijstech/components", "@ijs
                             this.$render("i-hstack", { gap: 4, verticalAlignment: "center" },
                                 this.$render("i-button", { height: "auto", caption: durationDays < 1 ? this.i18n.get('$less_than_one_day') : this.i18n.get('$duration_days', { duration: durationDays.toString() }), font: { size: '12px', color: Theme.colors.secondary.contrastText, weight: 700 }, background: { color: `${Theme.colors.secondary.main} !important` }, border: { radius: 12, width: 1, style: 'solid', color: 'transparent' }, padding: { top: 2.5, bottom: 2.5, left: 8, right: 8 }, cursor: "default", class: "btn-os cursor-default" }))),
                         this.$render("i-stack", { margin: { left: 'auto' }, ...pnlContractProps },
-                            this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => this.getLPToken(campaign, lockedTokenSymbol, chainId) },
+                            this.$render("i-hstack", { gap: 4, class: "pointer", width: "fit-content", verticalAlignment: "center", onClick: () => this.getLPToken(campaign, lockedTokenSymbol, chainId), visible: this.showSwapTokenLink },
                                 this.$render("i-icon", { name: "external-link-alt", width: 12, height: 12, fill: Theme.text.primary }),
                                 this.$render("i-label", { caption: this.i18n.get('$get_token', { token: lockedTokenSymbol }), font: { size: '0.85rem' }, letterSpacing: letterSpacing }),
                                 lockedTokenIconPaths.map((v) => {
